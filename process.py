@@ -166,9 +166,8 @@ def playWithOMX(url, sub, width="", height="", new_log=False):
             str(volume) + " < /tmp/cmd"
         )
     if "/tmp/" in url:
-        os.system(
-            "rm -rf " + url
-        )
+        if os.path.exists(url):
+            os.remove(url)
 
     if getState() != "2":  # In case we are again in the launchvideo function
         setState("0")
