@@ -91,10 +91,17 @@ Extracting url in maximal quality.''')
             vidId = ''.join(random.choice(
                 string.ascii_uppercase + string.digits) for _ in range(6)
             )
-            os.system(
-                "youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio' -o /tmp/" +
-                vidId + ".mp4 --merge-output-format mp4 " + url
+            ydl = youtube_dl.YoutubeDL(
+                {
+                    'logger': logger,
+                    'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best',
+                    'ignoreerrors': True,
+                    'merge_output_format': 'mp4',
+                    'outtmpl': '/tmp/' + vidId + '.mp4'
+                }
             )
+            with ydl:  # Downloading youtub-dl video
+                result = ydl.download([url])
             return "/tmp/" + vidId + ".mp4"
     elif "vimeo" in url:
         if slow_mode:
