@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ `id -u` -ne 0 ]
+if [ "$(id -u)" != "0" ]
 then
   echo "Please run this script with root privileges!"
   echo "Try again with sudo."
@@ -9,7 +9,8 @@ fi
 
 echo "This script will install RaspberryCast"
 
-read -p "Which user do you want to install RaspberryCast as? (Leave blank to set to default): " USER
+# shellcheck disable=SC2039
+read -r -p "Which user do you want to install RaspberryCast as? (Leave blank to set to default): " USER
 
 if ! [ -n "$USER" ]; then
     echo "Setting user to default value 'pi'."
@@ -25,7 +26,8 @@ echo "Your system will be rebooted on completion"
 echo "Do you wish to continue? (y/n)"
 
 while true; do
-  read -p "" yn
+  # shellcheck disable=SC2039
+  read -r -p "" yn
   case $yn in
       [Yy]* ) break;;
       [Nn]* ) exit 0;;
@@ -39,6 +41,7 @@ echo "Installing necessary dependencies... (This could take a while)"
 echo ""
 echo "============================================================"
 
+apt-get update
 apt-get install -y lsof python-pip git wget omxplayer libnss-mdns fbi
 echo "============================================================"
 

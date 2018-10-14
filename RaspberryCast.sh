@@ -1,39 +1,56 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-        echo "Error: This script takes exactly one argument."
-        echo "The argument should be either 'start' or 'stop'."
-        exit
-fi
-
-if [ $1 = "start" ]; then
-	if [ `id -u` -eq 0 ]
-	then
-		echo "Please start this script without root privileges!"
-		echo "Try again without sudo."
-		exit 0
-	fi
+function start() {
+  if [ "$(lsof -t -i :2020)" ]; then
+    echo "RaspberryCast server is already running."
+    return
+  fi
 	echo "Checking for updates."
 	git pull
 	echo "Starting RaspberryCast server."
 	./server.py &
 	echo "Done."
-	exit
-elif [ $1 = "stop" ] ; then
-	if [ `id -u` -ne 0 ]
-	then
-		echo "Please start this script with root privileges!"
-		echo "Try again with sudo."
-		exit 0
-	fi
+}
+
+function stop() {
 	echo "Killing RaspberryCast..."
-	killall omxplayer.bin >/dev/null 2>&1
-	killall python >/dev/null 2>&1
-	kill $(lsof -t -i :2020) >/dev/null 2>&1
-	rm *.srt >/dev/null 2>&1
+	sudo killall omxplayer.bin >/dev/null 2>&1
+	sudo killall python >/dev/null 2>&1
+	kill "$(lsof -t -i :2020)" >/dev/null 2>&1
+	rm ./*.srt >/dev/null 2>&1
 	echo "Done."
-	exit
-else
-	echo "Error, illegal argument. Possible values are: 'stop', 'start'."
-	exit
+}
+
+restart() {
+  stop && start
+}
+
+function status() {
+  echo -n "RaspberryCast is ... "
+  [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
+}
+
+if [ "$(id -u)" = "0" ]
+then
+  echo "Please start this script without root privileges!"
+  echo "Try again without sudo."
+  exit 0
 fi
+
+case "$1" in
+start)
+  start
+  ;;
+stop)
+  stop
+  ;;
+restart)
+  restart
+  ;;
+status)
+  status
+  ;;
+*)
+  echo "Usage: $0 {start|stop|restart|status}"
+  ;;
+esac
