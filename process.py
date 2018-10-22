@@ -216,3 +216,8 @@ def setVolume(vol):
         volume += 300
     if vol == "less":
         volume -= 300
+
+
+def initVolume(vol):
+    global volume
+    volume = vol
