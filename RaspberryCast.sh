@@ -1,24 +1,26 @@
 #!/bin/bash
 
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+
 function start() {
   if [ "$(lsof -t -i :2020)" ]; then
     echo "RaspberryCast server is already running."
     return
   fi
-	echo "Checking for updates."
-	git pull
-	echo "Starting RaspberryCast server."
-	./server.py &
-	echo "Done."
+  echo "Checking for updates."
+  (cd "$ROOT" && git pull)
+  echo "Starting RaspberryCast server."
+  "$ROOT/server.py" &
+  echo "Done."
 }
 
 function stop() {
-	echo "Killing RaspberryCast..."
-	sudo killall omxplayer.bin >/dev/null 2>&1
-	sudo killall python >/dev/null 2>&1
-	kill "$(lsof -t -i :2020)" >/dev/null 2>&1
-	rm ./*.srt >/dev/null 2>&1
-	echo "Done."
+  echo "Killing RaspberryCast..."
+  sudo killall omxplayer.bin >/dev/null 2>&1
+  sudo killall python >/dev/null 2>&1
+  kill "$(lsof -t -i :2020)" >/dev/null 2>&1
+  rm "$ROOT/*.srt" >/dev/null 2>&1
+  echo "Done."
 }
 
 restart() {
@@ -30,8 +32,7 @@ function status() {
   [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
 }
 
-if [ "$(id -u)" = "0" ]
-then
+if [ "$(id -u)" = "0" ]; then
   echo "Please start this script without root privileges!"
   echo "Try again without sudo."
   exit 0
