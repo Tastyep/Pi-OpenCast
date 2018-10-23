@@ -9,23 +9,23 @@ class OmxPlayer(object):
         os.system("echo -n q > /tmp/cmd &")
 
     def start(self):
-        os.system("echo . > /tmp/cmd &")
+        os.system("echo -n . > /tmp/cmd &")
 
     def pause(self):
-        os.system("echo p > /tmp/cmd &")
+        os.system("echo -n p > /tmp/cmd &")
 
     def show_subtitles(self, show):
         if show:
-            os.system("echo w > /tmp/cmd &")
+            os.system("echo -n w > /tmp/cmd &")
         else:
-            os.system("echo x > /tmp/cmd &")
+            os.system("echo -n x > /tmp/cmd &")
 
     def change_volume(self, increase):
         if increase:
-            os.system("echo + > /tmp/cmd &")
+            os.system("echo -n + > /tmp/cmd &")
             self.set_volume(self.volume + 300)
         else:
-            os.system("echo - > /tmp/cmd &")
+            os.system("echo -n - > /tmp/cmd &")
             self.set_volume(self.volume - 300)
 
     def set_volume(self, volume):
