@@ -22,8 +22,28 @@ def stream_video(url):
     video = downloader.fetch_metadata(url)
     if video is None:
         return
-    downloader.download(video)
-    player.play(video)
+
+    downloader.download(video,
+                        lambda video: player.play(video))
+
+
+def stop_video():
+    player.stop()
+
+
+def pause_video(pause):
+    if pause:
+        player.pause()
+    else:
+        player.start()
+
+
+def change_volume(increase):
+    player.change_volume(increase)
+
+
+def seek_time(forward, long):
+    player.seek(forward, long)
 
 
 def parse_playlist(url):
@@ -40,4 +60,4 @@ def parse_playlist(url):
     return urls
 
 
-stream_video("https://www.youtube.com/playlist?list=OLAK5uy_nW7BR4s8FW7r1EJCAeyB9wZxYmp4EjZX0")
+#stream_video("https://www.youtube.com/playlist?list=OLAK5uy_nW7BR4s8FW7r1EJCAeyB9wZxYmp4EjZX0")

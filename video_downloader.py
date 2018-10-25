@@ -19,7 +19,7 @@ class VideoDownloader(object):
             self.cv.notifyAll()
         self.thread.join()
 
-    def download(self, video):
+    def download(self, video, dl_callback):
         video['path'] = '/tmp/' + video['title'] + '.mp4'
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
@@ -30,6 +30,7 @@ class VideoDownloader(object):
         })
         with ydl:  # Download the video
             ydl.download([video['url']])
+        dl_callback(video)
 
     def queue_downloads(self, urls):
         Thread(target=self.__queue_downloads,
@@ -66,8 +67,7 @@ class VideoDownloader(object):
                 if self.stopped:
                     return
                 video = self.queue.popleft()
-                self.download(video)
-                dl_callback(video)
+            self.download(video, dl_callback)
 
 
 def make_video_downloader(dl_callback):

@@ -97,6 +97,14 @@ class OmxPlayer(object):
                 # + " --subtitles subtitle.srt < /tmp/cmd"
             )
 
+    def __make_fifo(self):
+        try:
+            os.mkfifo("/tmp/cmd")
+        except OSError as e:
+            # 17 means the file already exists.
+            if e.errno != 17:
+                raise
+
 
 def make_player(default_volume):
     omx_player = OmxPlayer(default_volume)
