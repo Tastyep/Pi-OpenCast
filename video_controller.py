@@ -1,19 +1,26 @@
 import youtube_dl
 import omxplayer
+import video_downloader
 
-omx_player = omxplayer.make_player()
+
+player = omxplayer.make_player()
+downloader = video_downloader.make_video_downloader(lambda video:
+                                                    player.queue_video(video))
 
 
 def stream_video(url, sub=False):
-    omx_player.stop()
+    player.stop()
 
     if '/playlist' in url:
         urls = parse_playlist(url)
         url = urls[0]
-        add_urls_to_queue(urls[1:])
+        downloader.queue_downloads(urls[1:])
 
-    video_path = download_video(url)
-    omx_player.play(video_path)
+    video = downloader.fetch_metadata(url)
+    if video is None:
+        return
+    downloader.download(video)
+    player.play(video)
 
 
 def parse_playlist(url):
@@ -27,28 +34,7 @@ def parse_playlist(url):
 
     base_url = url.split('/playlist', 1)[0]
     urls = [base_url + '/watch?v=' + entry['id'] for entry in data['entries']]
-
     return urls
 
 
-def download_video(url):
-    video_path = '/tmp/1.mp4'
-    ydl = youtube_dl.YoutubeDL({
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
-                  'bestvideo+bestaudio/best',
-        'ignoreerrors': True,
-        'merge_output_format': 'mp4',
-        'outtmpl': video_path
-    })
-    with ydl:  # Download the video
-        ydl.download([url])
-
-    return video_path
-
-
-def add_urls_to_queue(urls):
-    for url in urls:
-        print("url= ", url)
-
-
-stream_video("https://www.youtube.com/playlist?list=PLlpsJiGuS_nOn6Qvl35ik4X1AN7b7WlhM")
+stream_video("https://www.youtube.com/playlist?list=OLAK5uy_nW7BR4s8FW7r1EJCAeyB9wZxYmp4EjZX0")
