@@ -3,18 +3,21 @@ import omxplayer
 import video_downloader
 
 
-player = omxplayer.make_player()
+player = omxplayer.make_player(0)
 downloader = video_downloader.make_video_downloader(lambda video:
                                                     player.queue_video(video))
 
 
-def stream_video(url, sub=False):
+def stream_video(url):
     player.stop()
 
     if '/playlist' in url:
         urls = parse_playlist(url)
         url = urls[0]
         downloader.queue_downloads(urls[1:])
+        # Change the player's state so that it automatically plays videos added
+        # to its queue
+        player.play()
 
     video = downloader.fetch_metadata(url)
     if video is None:

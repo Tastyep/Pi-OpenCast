@@ -1,5 +1,5 @@
 import os
-import threading
+from threading import Thread, Condition
 
 from collections import deque
 from enum import Enum
@@ -7,18 +7,34 @@ from enum import Enum
 
 # Video player status enumeration
 class PlayerState(Enum):
-    stopped = 1
-    playing = 2
+    stopped = 0
+    playing = 1
 
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
 class OmxPlayer(object):
-    queue = deque()
-    volume = 0
-    state = PlayerState.stopped
+    def __init__(self, default_volume):
+        self.stopped = False
+        self.queue = deque()
+
+        self.volume = default_volume
+
+        self.cv = Condition()
+        self.thread = Thread(target=self.__play)
+        self.thread.start()
+
+    def __del__(self):
+        with self.cv:
+            self.stopped = True
+            self.stop()
+            self.cv.notifyAll()
+        self.thread.join()
 
     def queue_video(self, video):
-        self.queue.append(video)
+        with self.cv:
+            self.queue.append(video)
+            if self.state == PlayerState.playing:
+                self.cv.notify()
 
     # Omx player calls
 
@@ -46,9 +62,6 @@ class OmxPlayer(object):
             os.system("echo -n - > /tmp/cmd &")
             self.set_volume(self.volume - 300)
 
-    def set_volume(self, volume):
-        self.volume = volume
-
     def seek(self, forward, long):
         if forward:
             if long:    # Up arrow
@@ -61,25 +74,31 @@ class OmxPlayer(object):
             else:       # Left arrow
                 os.system("echo -n $'\x1b\x5b\x44' > /tmp/cmd &")
 
-    def play(self, video):
-        threading.Thread(target=self.__play, args=(video,)).start()
+    def play(self, video=None):
+        with self.cv:
+            if video is not None:
+                self.queue.appendleft(video)
+            self.state = PlayerState.playing
+            self.cv.notify()
 
-    def __play(self, video):
-        self.state = PlayerState.playing
-        os.system(
-            "omxplayer -o both '" + video['path'] + "'"
-            + " --vol " + str(self.volume)
-            # + " --subtitles subtitle.srt < /tmp/cmd"
-        )
-        if self.state == PlayerState.playing:
-            if len(self.queue) > 0:
+    def __play(self):
+        while not self.stopped:
+            with self.cv:
+                while not self.stopped and (len(self.queue) == 0 or
+                                            self.state == PlayerState.stopped):
+                    self.cv.wait()
+                if self.stopped:
+                    return
+
                 video = self.queue.popleft()
-                self.play(video)
-            else:
-                self.stop()
+            os.system(
+                "omxplayer -o both '" + video['path'] + "'"
+                + " --vol " + str(self.volume)
+                # + " --subtitles subtitle.srt < /tmp/cmd"
+            )
 
 
-def make_player():
-    omx_player = OmxPlayer()
+def make_player(default_volume):
+    omx_player = OmxPlayer(default_volume)
 
     return omx_player

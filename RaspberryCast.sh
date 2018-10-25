@@ -23,7 +23,7 @@ function stop() {
   echo "Done."
 }
 
-restart() {
+function restart() {
   stop && start
 }
 
