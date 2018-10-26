@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
+import sys
+import logging
+
 import video_controller as controller
 
 from bottle import Bottle, SimpleTemplate, request, response, \
                    template, run, static_file
 
-app = Bottle()
 
+logger = logging.getLogger("App")
+app = Bottle()
 SimpleTemplate.defaults["get_url"] = app.get_url
 
 
@@ -42,6 +46,8 @@ def queue():
 @app.route('/video')
 def video():
     control = request.query['control']
+    logger.debug("Control command received: " + control)
+
     if control == "pause":
         controller.pause_video(True)
     elif control in ["stop", "next"]:
@@ -69,4 +75,25 @@ def webstate():
     return 0
 
 
-run(app, reloader=False, host='0.0.0.0', debug=True, quiet=True, port=2020)
+def main():
+    logging.basicConfig(
+        filename='RaspberryCast.log',
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt='%m-%d %H:%M:%S',
+        level=logging.DEBUG
+    )
+
+    # Creating handler to print messages on stdout
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+    run(app, reloader=False, host='0.0.0.0', debug=True, quiet=True, port=2020)
+
+
+if __name__ == '__main__':
+    main()

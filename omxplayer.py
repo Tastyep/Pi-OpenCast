@@ -1,8 +1,11 @@
 import os
-from threading import Thread, Condition
+import logging
 
+from threading import Thread, Condition
 from collections import deque
 from enum import Enum
+
+logger = logging.getLogger("App")
 
 
 # Video player status enumeration
@@ -17,7 +20,8 @@ class OmxPlayer(object):
         self.stopped = False
         self.queue = deque()
 
-        self.volume = default_volume
+        self.volume_ = default_volume
+        self.__make_fifo()
 
         self.cv = Condition()
         self.thread = Thread(target=self.__play)
@@ -32,9 +36,13 @@ class OmxPlayer(object):
 
     def queue_video(self, video):
         with self.cv:
+            logger.debug("Queue video: %r" % (video))
             self.queue.append(video)
             if self.state == PlayerState.playing:
                 self.cv.notify()
+
+    def volume(self):
+        return self.volume_
 
     # Omx player calls
 
@@ -57,10 +65,10 @@ class OmxPlayer(object):
     def change_volume(self, increase):
         if increase:
             os.system("echo -n + > /tmp/cmd &")
-            self.set_volume(self.volume + 300)
+            self.__set_volume(self.volume() + 300)
         else:
             os.system("echo -n - > /tmp/cmd &")
-            self.set_volume(self.volume - 300)
+            self.__set_volume(self.volume() - 300)
 
     def seek(self, forward, long):
         if forward:
@@ -79,6 +87,7 @@ class OmxPlayer(object):
             if video is not None:
                 self.queue.appendleft(video)
             self.state = PlayerState.playing
+            self.start()
             self.cv.notify()
 
     def __play(self):
@@ -91,11 +100,15 @@ class OmxPlayer(object):
                     return
 
                 video = self.queue.popleft()
+            logger.info("Playing: %r" % (video))
             os.system(
                 "omxplayer -o both '" + video['path'] + "'"
-                + " --vol " + str(self.volume)
+                + " --vol " + str(self.volume())
                 # + " --subtitles subtitle.srt < /tmp/cmd"
             )
+
+    def __set_volume(self, volume):
+        self.volume_ = volume
 
     def __make_fifo(self):
         try:
