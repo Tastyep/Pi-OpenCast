@@ -30,6 +30,17 @@ def stream_video(url):
                         lambda video: player.play(video))
 
 
+def queue_video(url):
+    logger.debug('queue video, URL="' + url + '"')
+
+    if '/playlist' in url:
+        urls = parse_playlist(url)
+        logger.debug("Playlist url unwound to %r" % (urls))
+        downloader.queue_downloads(urls)
+    else:
+        downloader.queue_downloads([url])
+
+
 def stop_video():
     logger.debug('Stop current video')
     player.stop()

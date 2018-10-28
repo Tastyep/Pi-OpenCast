@@ -39,8 +39,8 @@ def stream():
 
 @app.route('/queue')
 def queue():
-    # url =
-    request.query['url']
+    url = request.query['url']
+    controller.queue_video(url)
 
 
 @app.route('/video')
