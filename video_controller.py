@@ -10,7 +10,7 @@ downloader = video_downloader.make_video_downloader(lambda video:
 
 
 def stream_video(url):
-    logger.debug('stream_video, URL="' + url + '"')
+    logger.debug('stream video, URL="' + url + '"')
     player.stop()
 
     if '/playlist' in url:
@@ -40,11 +40,8 @@ def next_video():
     player.next()
 
 
-def pause_video(pause):
-    if pause:
-        player.pause()
-    else:
-        player.start()
+def play_pause_video(pause):
+    player.play_pause()
 
 
 def change_volume(increase):

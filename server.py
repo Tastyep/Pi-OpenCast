@@ -49,7 +49,7 @@ def video():
     logger.debug("Control command received: " + control)
 
     if control == "pause":
-        controller.pause_video(True)
+        controller.play_pause_video(True)
     elif control == "stop":
         controller.stop_video()
     elif control == "next":

@@ -23,11 +23,11 @@ class OmxPlayer(object):
         self.stopped = False
         self.queue = deque()
 
-        self.cv = threading.Condition()
-        self.volume_ = default_volume
-        self._make_fifo()
+        self.volume = default_volume
         self.state = PlayerState.stopped
+
         self.player = None
+        self.cv = threading.Condition()
         self.monitor = threading.Thread(target=self._monitor)
         self.monitor.start()
 
@@ -42,53 +42,49 @@ class OmxPlayer(object):
             self.queue.append(video)
             self.cv.notify()
 
-    def volume(self):
-        return self.volume_
-
     # Omx player calls
 
     def stop(self):
-        self.state = PlayerState.stopped
-        self._stop_video()
+        with self.cv:
+            self._exec_command('stop')
+            self.state = PlayerState.stopped
 
     def next(self):
-        self._stop_video()        
+        self._exec_command('stop')
         self.play()
 
-    def _stop_video(self):
-        os.system("echo -n q > /tmp/cmd &")
-
-    def start(self):
-        os.system("echo -n . > /tmp/cmd &")
-
-    def pause(self):
-        os.system("echo -n p > /tmp/cmd &")
+    def play_pause(self):
+        with self.cv:
+            if self.state is PlayerState.playing:
+                self._exec_command('play_pause')
+            else:
+                self.play()
 
     def show_subtitles(self, show):
         if show:
-            os.system("echo -n w > /tmp/cmd &")
+            self._exec_command('show_subtitles')
         else:
-            os.system("echo -n x > /tmp/cmd &")
+            self._exec_command('hide_subtitles')
 
     def change_volume(self, increase):
-        if increase:
-            os.system("echo -n + > /tmp/cmd &")
-            self._set_volume(self.volume() + 300)
-        else:
-            os.system("echo -n - > /tmp/cmd &")
-            self._set_volume(self.volume() - 300)
+        with self.cv:
+            if increase:
+                self.volume += 100
+            else:
+                self.volume -= 100
+            self._exec_command('set_volume', self.volume)
 
     def seek(self, forward, long):
         if forward:
-            if long:    # Up arrow
-                os.system("echo -n $'\x1b\x5b\x41' > /tmp/cmd &")
-            else:       # Right arrow
-                os.system("echo -n $'\x1b\x5b\x43' > /tmp/cmd &")
+            if long:    # Up arrow, + 5 minutes
+                self._exec_command('seek', 300)
+            else:       # Right arrow, + 30 seconds
+                self._exec_command('seek', 30)
         else:
-            if long:    # Down arrow
-                os.system("echo -n $'\x1b\x5b\x42' > /tmp/cmd &")
-            else:       # Left arrow
-                os.system("echo -n $'\x1b\x5b\x44' > /tmp/cmd &")
+            if long:    # Down arrow, - 5 minutees
+                self._exec_command('seek', -300)
+            else:       # Left arrow, - 30 seconds
+                self._exec_command('seek', -30)
 
     def play(self, video=None):
         with self.cv:
@@ -98,15 +94,17 @@ class OmxPlayer(object):
             self.cv.notify()
 
     def _play(self):
-        self.state = PlayerState.playing
         video = self.queue.popleft()
         logger.info("Playing: %r" % (video))
         if self.player is None:
-            self.player = OMXPlayer(video['path'], dbus_name=
+            self.player = OMXPlayer(video['path'],
+                                    ['--vol', str(self.volume)],
+                                    dbus_name=
                                     'org.mpris.MediaPlayer2.omxplayer1')
-            logger.debug("LEAVE AFTER STARTING VIDEO")
         else:
             self.player.load(video['path'])
+            self.player.set_volume(self.volume)
+        self.state = PlayerState.playing
 
     def _check_status(self):
         if self.state is PlayerState.playing:
@@ -121,7 +119,8 @@ class OmxPlayer(object):
                 while (self.stopped is False
                        and (self.state is not PlayerState.ready
                             or len(self.queue) == 0)):
-                    # Check every seconds that the process is still alive
+                    # Add wakup delay until the player wrapper library
+                    # finally merges the onExit event.
                     self.cv.wait(1)
                     self._check_status()
                 if self.stopped:
@@ -129,16 +128,10 @@ class OmxPlayer(object):
 
                 self._play()
 
-    def _set_volume(self, volume):
-        self.volume_ = volume
-
-    def _make_fifo(self):
-        try:
-            os.mkfifo("/tmp/cmd")
-        except OSError as e:
-            # 17 means the file already exists.
-            if e.errno != 17:
-                raise
+    def _exec_command(self, command, *args, **kwargs):
+        with self.cv:
+            if self.player is not None and self.state is PlayerState.playing:
+                getattr(self.player, command)(*args, **kwargs)
 
 
 def make_player(default_volume):
