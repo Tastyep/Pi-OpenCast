@@ -1,10 +1,10 @@
 import logging
 import youtube_dl
-import omxplayer
+import media_player
 import video_downloader
 
 logger = logging.getLogger("App")
-player = omxplayer.make_player(0)
+player = media_player.make_player(0)
 downloader = video_downloader.make_video_downloader(lambda video:
                                                     player.queue_video(video))
 
@@ -33,6 +33,11 @@ def stream_video(url):
 def stop_video():
     logger.debug('Stop current video')
     player.stop()
+
+
+def next_video():
+    logger.debug('Next video')
+    player.next()
 
 
 def pause_video(pause):

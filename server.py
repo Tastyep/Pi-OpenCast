@@ -50,8 +50,10 @@ def video():
 
     if control == "pause":
         controller.pause_video(True)
-    elif control in ["stop", "next"]:
+    elif control == "stop":
         controller.stop_video()
+    elif control == "next":
+        controller.next_video()
     elif control == "right":
         controller.seek_time(True, False)
     elif control == "left":
