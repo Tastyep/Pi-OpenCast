@@ -27,7 +27,7 @@ class VideoDownloader(object):
             'noplaylist': True,
             'ignoreerrors': True,
             'merge_output_format': 'mp4',
-            'outtmpl': video.path
+            'outtmpl': str(video.path)
         })
         with ydl:  # Download the video
             ydl.download([video.url])

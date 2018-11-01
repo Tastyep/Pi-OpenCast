@@ -31,7 +31,7 @@ class Video(object):
 
     @path.setter
     def path(self, path):
-        self._path = path
+        self._path = Path(path)
         self._load_subtitles()
 
     @property
@@ -49,4 +49,4 @@ class Video(object):
         return self._path is not None
 
     def _load_subtitles(self):
-        self._subtitles = subtitle.load_from_video_path(Path(self._path))
+        self._subtitles = subtitle.load_from_video_path(self._path)
