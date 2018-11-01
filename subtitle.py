@@ -8,7 +8,7 @@ def load_from_video_path(path):
     video_path = path.parents[0]
 
     srtFiles = list(video_path.glob('*.srt'))
-    matchingSubs = [srt for srt in srtFiles if video_name in srt]
+    matchingSubs = [str(srt) for srt in srtFiles if video_name in str(srt)]
 
     return matchingSubs
 
