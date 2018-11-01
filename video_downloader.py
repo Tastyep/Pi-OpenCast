@@ -20,43 +20,43 @@ class VideoDownloader(object):
         self.thread.join()
 
     def download(self, video, dl_callback):
-        video['path'] = '/tmp/' + video['title'] + '.mp4'
+        video.path = '/tmp/' + video.title + '.mp4'
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
                       'bestvideo+bestaudio/best',
+            'noplaylist': True,
             'ignoreerrors': True,
             'merge_output_format': 'mp4',
-            'outtmpl': video['path']
+            'outtmpl': video.path
         })
         with ydl:  # Download the video
-            ydl.download([video['url']])
+            ydl.download([video.url])
         dl_callback(video)
 
-    def queue_downloads(self, urls):
+    def queue_downloads(self, videos):
         Thread(target=self.__queue_downloads,
-               args=(urls,)).start()
+               args=(videos,)).start()
 
-    def fetch_metadata(self, url):
+    def list_queue(self):
+        return list(self.queue)
+
+    def fetch_metadata(self, video):
         ydl = youtube_dl.YoutubeDL(
             {
                 'noplaylist': True,
                 'ignoreerrors': True,
             })
         with ydl:  # Download the video data without downloading it.
-            data = ydl.extract_info(url, download=False)
-        if data is None:
-            # NOTE log error
-            return None
+            data = ydl.extract_info(video.url, download=False)
+        video.title = data['title']
 
-        return {'title': data['title'],
-                'url':   url}
+        return data is not None
 
-    def __queue_downloads(self, urls):
+    def __queue_downloads(self, videos):
         with self.cv:
-            for url in urls:
-                metadata = self.fetch_metadata(url)
-                if metadata is not None:
-                    self.queue.append(metadata)
+            for video in videos:
+                if self.fetch_metadata(video):
+                    self.queue.append(video)
             self.cv.notify()
 
     def __download_queued_videos(self, dl_callback):

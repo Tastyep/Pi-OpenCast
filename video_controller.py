@@ -3,6 +3,8 @@ import youtube_dl
 import media_player
 import video_downloader
 
+from video import Video
+
 logger = logging.getLogger("App")
 player = media_player.make_player(0)
 downloader = video_downloader.make_video_downloader(lambda video:
@@ -13,17 +15,23 @@ def stream_video(url):
     logger.debug('stream video, URL="' + url + '"')
     player.stop()
 
+    video = Video(url)
+    if video.is_local():
+        player.play(video)
+        return
+
     if '/playlist' in url:
         urls = parse_playlist(url)
-        url = urls[0]
-        logger.debug("Playlist url unwound to %r" % (urls))
-        downloader.queue_downloads(urls[1:])
+        videos = [Video(u) for u in urls]
+        video = videos[0]
+        logger.debug("Playlist url unwound to %r" % (videos))
+        # NOTE pass on_download callback here.
+        downloader.queue_downloads(videos[1:])
         # Change the player's state so that it automatically plays videos added
         # to its queue
         player.play()
 
-    video = downloader.fetch_metadata(url)
-    if video is None:
+    if not downloader.fetch_metadata(video):
         return
 
     downloader.download(video,
@@ -57,7 +65,7 @@ def play_pause_video(pause):
 
 def change_volume(increase):
     player.change_volume(increase)
-    logger.debug('Change player volume, volume=' + str(player.volume()))
+    logger.debug('Change player volume, volume=' + str(player.volume))
 
 
 def seek_time(forward, long):
