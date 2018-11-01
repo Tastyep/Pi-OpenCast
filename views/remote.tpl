@@ -11,9 +11,9 @@
 	<body>
 		<center>
 		<div id="whole">
-				
-				<div id="message"></div>			
-				
+
+				<div id="message"></div>
+
 				<form id="stream_form" class="form-inline">
 						<div class="input-group">
 							<input type="search" class="form-control input-lg" id="media_url" placeholder="Media's URL" aria-hidden="true">
@@ -95,13 +95,13 @@
 					<div id="history-div" style="display:none">
 					</div>
 				</div>
-			
+
 		</div>
 		</center>
-		
+
 
 		<!-- script references -->
-		
+
 		<script src="{{get_url('static', filename='jquery-2.1.3.min.js') }}"></script>
 		<script src="{{get_url('static', filename='history.js') }}"></script>
 		<script src="{{get_url('static', filename='remote.js') }}"></script>
