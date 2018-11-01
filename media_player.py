@@ -1,6 +1,6 @@
-import os
 import logging
 import threading
+import time
 
 from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 from dbus import DBusException
@@ -42,15 +42,22 @@ class OmxPlayer(object):
             self.queue.append(video)
             self.cv.notify()
 
+    def list_queue(self):
+        return list(self.queue)
+
     # Omx player calls
 
     def stop(self):
         with self.cv:
             self._exec_command('stop')
+            logger.debug("Waiting for omxplayer to stop")
+            while self._check_status() is True:
+                time.sleep(1)
+            logger.debug("omxplayer stopped")
             self.state = PlayerState.stopped
 
     def next(self):
-        self._exec_command('stop')
+        self.stop()
         self.play()
 
     def play_pause(self):
@@ -96,22 +103,28 @@ class OmxPlayer(object):
     def _play(self):
         video = self.queue.popleft()
         logger.info("Playing: %r" % (video))
-        if self.player is None:
-            self.player = OMXPlayer(video['path'],
-                                    ['--vol', str(self.volume)],
-                                    dbus_name=
-                                    'org.mpris.MediaPlayer2.omxplayer1')
-        else:
-            self.player.load(video['path'])
-            self.player.set_volume(self.volume)
+
+        command = ['--vol', str(self.volume)]
+        for sub in video.subtitles:
+            command += ['--subtitles', sub]
+
+        self.player = OMXPlayer(video.path,
+                                command,
+                                dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+        # Wait for the DBus interface to be initialised
+        logger.debug("Waiting for omxplayer start")
+        while self._check_status() is False:
+            time.sleep(1)
+        logger.debug("omxplayer started")
         self.state = PlayerState.playing
 
     def _check_status(self):
         if self.state is PlayerState.playing:
             try:
-                self.player.is_playing()
+                return self.player.is_playing()
             except (OMXPlayerDeadError, DBusException):
                 self.state = PlayerState.ready
+                return False
 
     def _monitor(self):
         while (True):
