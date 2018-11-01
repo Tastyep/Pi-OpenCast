@@ -2,16 +2,18 @@
 
 import sys
 import logging
+import os
 
 import video_controller as controller
 
 from bottle import Bottle, SimpleTemplate, request, response, \
-                   template, run, static_file
+                   template, run, static_file, TEMPLATE_PATH
 
 
 logger = logging.getLogger("App")
 app = Bottle()
 SimpleTemplate.defaults["get_url"] = app.get_url
+app_path = os.path.dirname(os.path.realpath(__file__))
 
 
 @app.hook('after_request')
@@ -21,7 +23,7 @@ def enable_cors():
 
 @app.route('/static/<filename>', name='static')
 def server_static(filename):
-    return static_file(filename, root='static')
+    return static_file(filename, root=os.path.join(app_path, 'static'))
 
 
 @app.route('/')
@@ -93,6 +95,8 @@ def main():
     formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     root.addHandler(ch)
+
+    TEMPLATE_PATH.insert(0, os.path.join(app_path, 'views'))
 
     run(app, reloader=False, host='0.0.0.0', debug=True, quiet=True, port=2020)
 
