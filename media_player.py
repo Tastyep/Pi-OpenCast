@@ -20,49 +20,69 @@ class PlayerState(Enum):
 # OmxPlayer documentation: https://elinux.org/Omxplayer
 class OmxPlayer(object):
     def __init__(self, default_volume):
-        self.stopped = False
-        self.queue = deque()
+        self._stopped = False
+        self._queue = deque()
 
-        self.volume = default_volume
-        self.state = PlayerState.stopped
+        self._volume = default_volume
+        self._state = PlayerState.ready
 
-        self.player = None
-        self.cv = threading.Condition()
-        self.monitor = threading.Thread(target=self._monitor)
-        self.monitor.start()
+        self._player = None
+        self._cv = threading.Condition()
+        self._monitor = threading.Thread(target=self._monitor)
+        self._monitor.start()
 
     def __del__(self):
-        with self.cv:
-            self.stopped = True
+        with self._cv:
+            self._stopped = True
             self.stop()
 
-    def queue_video(self, video):
-        with self.cv:
-            logger.debug("Queue video: %r" % (video))
-            self.queue.append(video)
-            self.cv.notify()
+    def queue(self, video, first=False):
+        with self._cv:
+            logger.debug("[player] Queue video: %r" % (video))
+            if first:
+                # Position the video with the videos of the same playlist.
+                if video.playlistId is not None:
+                    videos = list(self._queue)
+                    index = 0
+                    for i, v in enumerate(reversed(videos)):
+                        if v.playlistId == video.playlistId:
+                            index = len(videos) - i
+                            break
+                    if index is 0:
+                        self._queue.appendleft(video)
+                    else:
+                        videos.insert(index, video)
+                        self._queue = deque(videos)
+                else:
+                    self._queue.appendleft(video)
+            else:
+                self._queue.append(video)
+            logger.debug("player queue contains:")
+            for v in self._queue:
+                logger.debug(v)
+            self._cv.notify()
 
     def list_queue(self):
-        return list(self.queue)
+        return list(self._queue)
 
     # Omx player calls
 
     def stop(self):
-        with self.cv:
+        with self._cv:
             self._exec_command('stop')
             logger.debug("Waiting for omxplayer to stop")
             while self._check_status() is True:
                 time.sleep(1)
             logger.debug("omxplayer stopped")
-            self.state = PlayerState.stopped
+            self._state = PlayerState.stopped
 
     def next(self):
         self.stop()
         self.play()
 
     def play_pause(self):
-        with self.cv:
-            if self.state is PlayerState.playing:
+        with self._cv:
+            if self._state is PlayerState.playing:
                 self._exec_command('play_pause')
             else:
                 self.play()
@@ -74,12 +94,12 @@ class OmxPlayer(object):
             self._exec_command('hide_subtitles')
 
     def change_volume(self, increase):
-        with self.cv:
+        with self._cv:
             if increase:
-                self.volume += 100
+                self._volume += 100
             else:
-                self.volume -= 100
-            self._exec_command('set_volume', self.volume)
+                self._volume -= 100
+            self._exec_command('set_volume', self._volume)
 
     def seek(self, forward, long):
         if forward:
@@ -94,57 +114,57 @@ class OmxPlayer(object):
                 self._exec_command('seek', -30)
 
     def play(self, video=None):
-        with self.cv:
+        with self._cv:
             if video is not None:
-                self.queue.appendleft(video)
-            self.state = PlayerState.ready
-            self.cv.notify()
+                self._queue.appendleft(video)
+            self._state = PlayerState.ready
+            self._cv.notify()
 
     def _play(self):
-        video = self.queue.popleft()
+        video = self._queue.popleft()
         logger.info("Playing: %r" % (video))
 
-        command = ['--vol', str(self.volume)]
+        command = ['--vol', str(self._volume)]
         for sub in video.subtitles:
             command += ['--subtitles', sub]
 
-        self.player = OMXPlayer(video.path,
-                                command,
-                                dbus_name='org.mpris.MediaPlayer2.omxplayer1')
+        self._player = OMXPlayer(video.path,
+                                 command,
+                                 dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         # Wait for the DBus interface to be initialised
         logger.debug("Waiting for omxplayer start")
         while self._check_status() is False:
             time.sleep(1)
         logger.debug("omxplayer started")
-        self.state = PlayerState.playing
+        self._state = PlayerState.playing
 
     def _check_status(self):
-        if self.state is PlayerState.playing:
+        if self._state is PlayerState.playing:
             try:
-                return self.player.is_playing()
+                return self._player.is_playing()
             except (OMXPlayerDeadError, DBusException):
-                self.state = PlayerState.ready
+                self._state = PlayerState.ready
                 return False
 
     def _monitor(self):
         while (True):
-            with self.cv:
-                while (self.stopped is False
-                       and (self.state is not PlayerState.ready
-                            or len(self.queue) == 0)):
+            with self._cv:
+                while (self._stopped is False
+                       and (self._state is not PlayerState.ready
+                            or len(self._queue) == 0)):
                     # Add wakup delay until the player wrapper library
                     # finally merges the onExit event.
-                    self.cv.wait(1)
+                    self._cv.wait(1)
                     self._check_status()
-                if self.stopped:
+                if self._stopped:
                     return
 
                 self._play()
 
     def _exec_command(self, command, *args, **kwargs):
-        with self.cv:
-            if self.player is not None and self.state is PlayerState.playing:
-                getattr(self.player, command)(*args, **kwargs)
+        with self._cv:
+            if self._player is not None and self._state is PlayerState.playing:
+                getattr(self._player, command)(*args, **kwargs)
 
 
 def make_player(default_volume):

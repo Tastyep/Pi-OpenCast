@@ -7,11 +7,12 @@ logger = logging.getLogger("App")
 
 
 class Video(object):
-    def __init__(self, url):
+    def __init__(self, url, playlistId=None):
         self._url = url
         self._subtitles = []
         self._path = None
         self._title = None
+        self._playlistId = playlistId
 
         path = Path(url)
         if path.is_file():
@@ -42,8 +43,13 @@ class Video(object):
     def title(self, title):
         self._title = title
 
+    @property
+    def playlistId(self):
+        return self._playlistId
+
     def __repr__(self):
-        return str(self._url)
+        title = '' if self._title is None else str(self._title)
+        return str({'title': title, 'url': str(self._url)})
 
     def is_local(self):
         return self._path is not None

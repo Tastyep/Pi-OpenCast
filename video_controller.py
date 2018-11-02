@@ -2,13 +2,18 @@ import logging
 import youtube_dl
 import media_player
 import video_downloader
+import uuid
 
 from video import Video
 
 logger = logging.getLogger("App")
 player = media_player.make_player(0)
-downloader = video_downloader.make_video_downloader(lambda video:
-                                                    player.queue_video(video))
+downloader = video_downloader.make_video_downloader()
+
+
+def play_video(video):
+    player.queue(video, first=True)
+    player.play()
 
 
 def stream_video(url):
@@ -21,21 +26,18 @@ def stream_video(url):
         return
 
     if '/playlist' in url:
+        # Generate a unique ID for the playlist
+        playlistId = uuid.uuid4()
         urls = parse_playlist(url)
-        videos = [Video(u) for u in urls]
-        video = videos[0]
-        logger.debug("Playlist url unwound to %r" % (videos))
-        # NOTE pass on_download callback here.
-        downloader.queue_downloads(videos[1:])
-        # Change the player's state so that it automatically plays videos added
-        # to its queue
-        player.play()
-
-    if not downloader.fetch_metadata(video):
+        videos = [Video(u, playlistId) for u in urls]
+        downloader.queue(videos,
+                         play_video,
+                         first=True)
         return
 
-    downloader.download(video,
-                        lambda video: player.play(video))
+    downloader.queue([video],
+                     play_video,
+                     first=True)
 
 
 def queue_video(url):
@@ -43,10 +45,11 @@ def queue_video(url):
 
     if '/playlist' in url:
         urls = parse_playlist(url)
-        logger.debug("Playlist url unwound to %r" % (urls))
-        downloader.queue_downloads(urls)
+        videos = [Video(u) for u in urls]
+        logger.debug("Playlist url unwound to %r" % (videos))
+        downloader.queue(urls, lambda video: player.queue(video))
     else:
-        downloader.queue_downloads([url])
+        downloader.queue([url], lambda video: player.queue(video))
 
 
 def stop_video():
