@@ -41,7 +41,7 @@ class Video(object):
 
     @title.setter
     def title(self, title):
-        self._title = title
+        self._title = title.encode('ascii', 'ignore')
 
     @property
     def playlistId(self):

@@ -36,6 +36,10 @@ class OmxPlayer(object):
             self._stopped = True
             self.stop()
 
+    @property
+    def volume(self):
+        return self._volume
+
     def queue(self, video, first=False):
         with self._cv:
             logger.debug("[player] Queue video: %r" % (video))
