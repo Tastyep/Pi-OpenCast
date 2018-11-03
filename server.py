@@ -4,7 +4,7 @@ import sys
 import logging
 import os
 
-import video_controller as controller
+import video_controller
 
 from bottle import Bottle, SimpleTemplate, request, response, \
                    template, run, static_file, TEMPLATE_PATH
@@ -14,6 +14,7 @@ logger = logging.getLogger("App")
 app = Bottle()
 SimpleTemplate.defaults["get_url"] = app.get_url
 app_path = os.path.dirname(os.path.realpath(__file__))
+controller = video_controller.make_video_controller()
 
 
 @app.hook('after_request')
