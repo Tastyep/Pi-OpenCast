@@ -21,8 +21,8 @@ function start() {
 
 function stop() {
   echo "Killing RaspberryCast..."
-  sudo killall omxplayer.bin >/dev/null 2>&1
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
+  sudo killall omxplayer.bin >/dev/null 2>&1
   echo "Done."
 }
 
