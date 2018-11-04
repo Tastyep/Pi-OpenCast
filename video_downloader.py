@@ -22,7 +22,6 @@ class VideoDownloader(object):
         self._thread.join()
 
     def queue(self, videos, dl_callback, first=False):
-        logger.debug("[player] Queue videos: %r" % (videos))
         Thread(target=self._queue_downloads,
                args=(videos, dl_callback, first,)).start()
 
@@ -42,14 +41,20 @@ class VideoDownloader(object):
         return data is not None
 
     def _queue_downloads(self, videos, dl_callback, first):
-        with self._cv:
-            accessible_videos = [(video, dl_callback) for video in videos
-                                 if self._fetch_metadata(video)]
-            if first:
-                self._queue.extendleft(reversed(accessible_videos))
-            else:
-                self._queue.extendRight(accessible_videos)
-            self._cv.notify()
+        for video in videos:
+            with self._cv:
+                if not self._fetch_metadata(video):
+                    continue
+                # Position the video with the videos of the same playlist.
+                index = 0 if first else len(self._queue)
+                if first and video.playlistId is not None:
+                    for i, v in enumerate(reversed(self._queue)):
+                        if v[0].playlistId == video.playlistId:
+                            index = len(self._queue) - i
+                            break
+                logger.info("[downloader] queue video %r" % (video, index))
+                self._queue.insert(index, (video, dl_callback))
+                self._cv.notify()
 
     def _download_queued_videos(self):
         while not self._stopped:
@@ -63,6 +68,7 @@ class VideoDownloader(object):
 
     def _download(self, video, dl_callback):
         video.path = '/tmp/' + video.title + '.mp4'
+        logger.debug("[downloader] starting download for: %r" % (video.title))
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
                       'bestvideo+bestaudio/best',
@@ -73,6 +79,7 @@ class VideoDownloader(object):
         })
         with ydl:  # Download the video
             ydl.download([video.url])
+        logger.debug("[downloader] video downloaded: %r" % (video))
         dl_callback(video)
 
 

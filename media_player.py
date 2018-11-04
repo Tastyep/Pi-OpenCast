@@ -6,15 +6,23 @@ from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 from dbus import DBusException
 from collections import deque
 from enum import Enum
+from functools import total_ordering
 
 logger = logging.getLogger("App")
 
 
 # Video player status enumeration
+@total_ordering
 class PlayerState(Enum):
-    stopped = 0
-    ready = 1
-    playing = 2
+    stopped = 1
+    ready = 2
+    paused = 3
+    playing = 4
+
+    def __lt__(self, other):
+        if self.__class__ is not other.__class__:
+            return NotImplemented
+        return self.value < other.value
 
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
@@ -40,36 +48,30 @@ class OmxPlayer(object):
     def volume(self):
         return self._volume
 
+    def play(self, video=None):
+        with self._cv:
+            if video is not None:
+                self.queue(video, first=True)
+            if self._state < PlayerState.ready:
+                self._state = PlayerState.ready
+            self._cv.notify()
+
     def queue(self, video, first=False):
         with self._cv:
-            logger.debug("[player] Queue video: %r" % (video))
-            if first:
-                # Position the video with the videos of the same playlist.
-                if video.playlistId is not None:
-                    videos = list(self._queue)
-                    index = 0
-                    for i, v in enumerate(reversed(videos)):
-                        if v.playlistId == video.playlistId:
-                            index = len(videos) - i
-                            break
-                    if index is 0:
-                        self._queue.appendleft(video)
-                    else:
-                        videos.insert(index, video)
-                        self._queue = deque(videos)
-                else:
-                    self._queue.appendleft(video)
-            else:
-                self._queue.append(video)
-            logger.debug("player queue contains:")
-            for v in self._queue:
-                logger.debug(v)
+            logger.info("[player] Queue video: %r" % (video))
+            # Position the video with the videos of the same playlist.
+            index = 0 if first else len(self._queue)
+            if first and video.playlistId is not None:
+                for i, v in enumerate(reversed(self._queue)):
+                    if v.playlistId == video.playlistId:
+                        index = len(self._queue) - i
+                        break
+            self._queue.insert(index, video)
+            logger.debug("player queue contains: %r" % (self._queue))
             self._cv.notify()
 
     def list_queue(self):
         return list(self._queue)
-
-    # Omx player calls
 
     def stop(self):
         with self._cv:
@@ -85,11 +87,7 @@ class OmxPlayer(object):
         self.play()
 
     def play_pause(self):
-        with self._cv:
-            if self._state is PlayerState.playing:
-                self._exec_command('play_pause')
-            else:
-                self.play()
+        self._exec_command('play_pause')
 
     def show_subtitles(self, show):
         if show:
@@ -117,13 +115,6 @@ class OmxPlayer(object):
             else:       # Left arrow, - 30 seconds
                 self._exec_command('seek', -30)
 
-    def play(self, video=None):
-        with self._cv:
-            if video is not None:
-                self._queue.appendleft(video)
-            self._state = PlayerState.ready
-            self._cv.notify()
-
     def _play(self):
         video = self._queue.popleft()
         logger.info("Playing: %r" % (video))
@@ -137,18 +128,23 @@ class OmxPlayer(object):
                                  dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         # Wait for the DBus interface to be initialised
         logger.debug("Waiting for omxplayer start")
+        self._state = PlayerState.playing
         while self._check_status() is False:
             time.sleep(1)
         logger.debug("omxplayer started")
-        self._state = PlayerState.playing
 
     def _check_status(self):
-        if self._state is PlayerState.playing:
-            try:
-                return self._player.is_playing()
-            except (OMXPlayerDeadError, DBusException):
-                self._state = PlayerState.ready
-                return False
+        if self._state <= PlayerState.ready:
+            return False
+        try:
+            if self._player.is_playing():
+                self._state = PlayerState.playing
+            else:
+                self._state = PlayerState.paused
+        except (OMXPlayerDeadError, DBusException):
+            self._state = PlayerState.ready
+
+        return self._state > PlayerState.ready
 
     def _monitor(self):
         while (True):
@@ -167,7 +163,7 @@ class OmxPlayer(object):
 
     def _exec_command(self, command, *args, **kwargs):
         with self._cv:
-            if self._player is not None and self._state is PlayerState.playing:
+            if self._player is not None and self._state > PlayerState.ready:
                 getattr(self._player, command)(*args, **kwargs)
 
 

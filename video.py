@@ -1,7 +1,7 @@
 import logging
 import subtitle
 
-from pathlib2 import Path
+from pathlib import Path
 
 logger = logging.getLogger("App")
 
@@ -41,7 +41,7 @@ class Video(object):
 
     @title.setter
     def title(self, title):
-        self._title = title.encode('ascii', 'ignore')
+        self._title = str(title.encode('ascii', 'ignore'))
 
     @property
     def playlistId(self):
