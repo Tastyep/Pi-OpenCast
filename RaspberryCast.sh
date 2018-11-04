@@ -8,18 +8,21 @@ function start() {
     return
   fi
   echo "Checking for updates."
-  (cd "$ROOT" && git pull)
+
+  cd "$ROOT"
+
+  git pull
+  pipenv install
   echo "Starting RaspberryCast server."
-  "$ROOT/server.py" &
+  pipenv run "./server.py" &
   echo "Done."
+
 }
 
 function stop() {
   echo "Killing RaspberryCast..."
   sudo killall omxplayer.bin >/dev/null 2>&1
-  sudo killall python >/dev/null 2>&1
-  kill "$(lsof -t -i :2020)" >/dev/null 2>&1
-  rm "$ROOT/*.srt" >/dev/null 2>&1
+  lsof -t -i :2020 | xargs kill >/dev/null 2>&1
   echo "Done."
 }
 

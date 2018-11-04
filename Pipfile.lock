@@ -1,0 +1,92 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "13b5233df76fec8fa0c3d99699d0da53bb888d7f020143026a60fcdb2c07d499"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.5"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "bottle": {
+            "hashes": [
+                "sha256:39b751aee0b167be8dffb63ca81b735bbf1dd0905b3bc42761efedee8f123355"
+            ],
+            "index": "pypi",
+            "version": "==0.12.13"
+        },
+        "dbus-python": {
+            "hashes": [
+                "sha256:abf12bbb765e300bf8e2a1b2f32f85949eab06998dbda127952c31cb63957b6f"
+            ],
+            "version": "==1.2.8"
+        },
+        "decorator": {
+            "hashes": [
+                "sha256:2c51dff8ef3c447388fe5e4453d24a2bf128d3a4c32af3fabef1f01c6851ab82",
+                "sha256:c39efa13fbdeb4506c476c9b3babf6a718da943dab7811c206005a4a956c080c"
+            ],
+            "version": "==4.3.0"
+        },
+        "evento": {
+            "hashes": [
+                "sha256:2644a88e4e0a395f0d372ce0b5627506cb29547788bdd97e8fb2240dfe341b13"
+            ],
+            "version": "==1.0.1"
+        },
+        "mock": {
+            "hashes": [
+                "sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1",
+                "sha256:b158b6df76edd239b8208d481dc46b6afd45a846b7812ff0ce58971cf5bc8bba"
+            ],
+            "index": "pypi",
+            "version": "==2.0.0"
+        },
+        "omxplayer-wrapper": {
+            "hashes": [
+                "sha256:32238004e46e3aec8176b38e8aa8d574b74cc7ff4a67cdd69246fcccd8e94f79",
+                "sha256:b10138910e22ebba70632abaea4145925a9457207ed09d9f3772e747a74e5e7d"
+            ],
+            "index": "pypi",
+            "version": "==0.3.1"
+        },
+        "pathlib2": {
+            "hashes": [
+                "sha256:8eb170f8d0d61825e09a95b38be068299ddeda82f35e96c3301a8a5e7604cb83",
+                "sha256:d1aa2a11ba7b8f7b21ab852b1fb5afb277e1bb99d5dfc663380b5015c0d80c5a"
+            ],
+            "version": "==2.3.2"
+        },
+        "pbr": {
+            "hashes": [
+                "sha256:8fc938b1123902f5610b06756a31b1e6febf0d105ae393695b0c9d4244ed2910",
+                "sha256:f20ec0abbf132471b68963bb34d9c78e603a5cf9e24473f14358e66551d47475"
+            ],
+            "version": "==5.1.0"
+        },
+        "six": {
+            "hashes": [
+                "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",
+                "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb"
+            ],
+            "version": "==1.11.0"
+        },
+        "youtube-dl": {
+            "hashes": [
+                "sha256:14ad7e55f325a9352a565913506dbf19f13ec64cec3689f8881a9a44e183ea09",
+                "sha256:726399202f1798cfd51571e99e319332050addf69d7ee98b53bb5ad66b6f916f"
+            ],
+            "index": "pypi",
+            "version": "==2018.11.3"
+        }
+    },
+    "develop": {}
+}
