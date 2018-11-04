@@ -52,7 +52,7 @@ class VideoDownloader(object):
                         if v[0].playlistId == video.playlistId:
                             index = len(self._queue) - i
                             break
-                logger.info("[downloader] queue video %r" % (video, index))
+                logger.info("[downloader] queue video %r" % (video))
                 self._queue.insert(index, (video, dl_callback))
                 self._cv.notify()
 

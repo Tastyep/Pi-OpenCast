@@ -7,7 +7,7 @@ import uuid
 from video import Video
 
 logger = logging.getLogger("App")
-player = media_player.make_player(0)
+player = media_player.make_player(1.0)
 downloader = video_downloader.make_video_downloader()
 
 
