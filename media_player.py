@@ -86,7 +86,10 @@ class OmxPlayer(object):
         self.play()
 
     def play_pause(self):
-        self._exec_command('play_pause')
+        with self._cv:
+            self._exec_command('play_pause')
+            if self._state == PlayerState.stopped:
+                self.play()
 
     def show_subtitles(self, show):
         if show:
@@ -100,6 +103,7 @@ class OmxPlayer(object):
                 self._volume += 0.1
             else:
                 self._volume -= 0.1
+            self._volume = max(min(2, self._volume), 0)
             self._exec_command('set_volume', self._volume)
 
     def seek(self, forward, long):
@@ -116,7 +120,8 @@ class OmxPlayer(object):
 
     def _sync_with_bus(self):
         try:
-            return self._player.is_playing()
+            self._player.is_playing()
+            return True
         except (OMXPlayerDeadError, DBusException):
             return False
 
@@ -136,8 +141,13 @@ class OmxPlayer(object):
         # Wait for the DBus interface to be initialised
         logger.debug("[player] starting ...")
         self._state = PlayerState.playing
-        while self._sync_with_bus() is False:
+
+        for i in range(10):
+            if self._sync_with_bus() is True:
+                break
             time.sleep(1)
+        else:
+            logger.debug("[player] couldn't connect to dbus")
         logger.debug("[player] started")
 
     def _monitor(self):
