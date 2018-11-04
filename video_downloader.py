@@ -1,5 +1,6 @@
 import youtube_dl
 import logging
+import time
 
 from threading import Thread, Condition
 from collections import deque
@@ -55,6 +56,7 @@ class VideoDownloader(object):
                 logger.info("[downloader] queue video %r" % (video))
                 self._queue.insert(index, (video, dl_callback))
                 self._cv.notify()
+            time.sleep(0.1)
 
     def _download_queued_videos(self):
         while not self._stopped:
