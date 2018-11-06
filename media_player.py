@@ -79,7 +79,11 @@ class OmxPlayer(object):
                 return
             logger.debug("[player] stopping ...")
             self._exec_command('stop')
-            self._state = PlayerState.stopped
+            self._state = PlayerState.ready
+        if not self._sync(5000,
+                          500,
+                          self._wait_stopped):
+            logger.error("[player] couldn't stop")
 
     def next(self):
         self.stop()
@@ -118,6 +122,18 @@ class OmxPlayer(object):
             else:       # Left arrow, - 30 seconds
                 self._exec_command('seek', -30)
 
+    def _sync(self, timeout, interval, condition):
+        step = round(timeout / interval)
+        for i in range(step):
+            if condition():
+                return True
+            time.sleep(interval / 1000.0)
+        return False
+
+    def _wait_stopped(self):
+        with self._cv:
+            return self._state is PlayerState.stopped
+
     def _sync_with_bus(self):
         try:
             self._player.is_playing()
@@ -129,7 +145,7 @@ class OmxPlayer(object):
         video = self._queue.popleft()
         logger.info("[player] playing: %r" % (video))
 
-        command = ['--vol', str(self._volume)]
+        command = ['--vol', str(100 * (self._volume - 1.0))]
         for sub in video.subtitles:
             command += ['--subtitles', sub]
 
@@ -142,12 +158,10 @@ class OmxPlayer(object):
         logger.debug("[player] starting ...")
         self._state = PlayerState.playing
 
-        for i in range(10):
-            if self._sync_with_bus() is True:
-                break
-            time.sleep(1)
-        else:
-            logger.debug("[player] couldn't connect to dbus")
+        if not self._sync(5000,
+                          500,
+                          self._sync_with_bus):
+            logger.error("[player] couldn't connect to dbus")
         logger.debug("[player] started")
 
     def _monitor(self):
@@ -169,10 +183,15 @@ class OmxPlayer(object):
 
     def _on_exit(self, player, code):
         with self._cv:
-            logger.debug("omxplayer stopped")
+            logger.debug("[player] stopped")
+
             if self._state is PlayerState.playing:
+                logger.debug("[player] ready")
                 self._state = PlayerState.ready
                 self._cv.notify()
+                return
+
+            self._state = PlayerState.stopped
 
 
 def make_player(default_volume):
