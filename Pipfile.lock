@@ -67,10 +67,10 @@
         },
         "pbr": {
             "hashes": [
-                "sha256:8fc938b1123902f5610b06756a31b1e6febf0d105ae393695b0c9d4244ed2910",
-                "sha256:f20ec0abbf132471b68963bb34d9c78e603a5cf9e24473f14358e66551d47475"
+                "sha256:f59d71442f9ece3dffc17bc36575768e1ee9967756e6b6535f0ee1f0054c3d68",
+                "sha256:f6d5b23f226a2ba58e14e49aa3b1bfaf814d0199144b95d78458212444de1387"
             ],
-            "version": "==5.1.0"
+            "version": "==5.1.1"
         },
         "six": {
             "hashes": [
@@ -81,11 +81,11 @@
         },
         "youtube-dl": {
             "hashes": [
-                "sha256:14ad7e55f325a9352a565913506dbf19f13ec64cec3689f8881a9a44e183ea09",
-                "sha256:726399202f1798cfd51571e99e319332050addf69d7ee98b53bb5ad66b6f916f"
+                "sha256:eeb1aa9fb8ca974c50f06f3da592d8211bba342e69a517f2d29bd08f07a64d95",
+                "sha256:f9b4a65e544b4a2b958ef693cd4b71ab5a5709ab1c7a9fc47c1a967dcca46f4a"
             ],
             "index": "pypi",
-            "version": "==2018.11.3"
+            "version": "==2018.11.7"
         }
     },
     "develop": {}

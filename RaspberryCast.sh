@@ -12,7 +12,7 @@ function start() {
   cd "$ROOT"
 
   git pull
-  pipenv install
+  pipenv install --skip-lock
   echo "Starting RaspberryCast server."
   pipenv run "./server.py" &
   echo "Done."
