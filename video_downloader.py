@@ -37,9 +37,10 @@ class VideoDownloader(object):
             })
         with ydl:  # Download the video data without downloading it.
             data = ydl.extract_info(video.url, download=False)
-        video.title = data['title']
-
-        return data is not None
+        if data is not None:
+            video.title = data['title']
+            return True
+        return False
 
     def _queue_downloads(self, videos, dl_callback, first):
         for video in videos:
