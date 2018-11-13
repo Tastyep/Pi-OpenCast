@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
 import logging
+import logging.config
 import os
+import yaml
 
 import video_controller
 
 from bottle import Bottle, SimpleTemplate, request, response, \
-                   template, run, static_file, TEMPLATE_PATH
+    template, run, static_file, TEMPLATE_PATH
 
 
-logger = logging.getLogger("App")
 app = Bottle()
-SimpleTemplate.defaults["get_url"] = app.get_url
+logger = logging.getLogger("App")
 app_path = os.path.dirname(os.path.realpath(__file__))
 controller = video_controller.make_video_controller()
 
@@ -80,25 +80,19 @@ def webstate():
     return 0
 
 
-def main():
-    logging.basicConfig(
-        filename='RaspberryCast.log',
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        datefmt='%m-%d %H:%M:%S',
-        level=logging.DEBUG
-    )
+def make_logger():
+    path = os.path.join(app_path, 'RaspberryCast.log')
+    return logging.FileHandler(path)
 
-    # Creating handler to print messages on stdout
-    root = logging.getLogger()
-    root.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    root.addHandler(ch)
+
+def main():
+    with open('{}/RaspberryCast.yml'.format(app_path), 'r') as data:
+        config = yaml.load(data)
+    logging.config.dictConfig(config)
 
     TEMPLATE_PATH.insert(0, os.path.join(app_path, 'views'))
 
+    SimpleTemplate.defaults["get_url"] = app.get_url
     run(app, reloader=False, host='0.0.0.0', debug=True, quiet=True, port=2020)
 
 

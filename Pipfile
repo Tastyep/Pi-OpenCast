@@ -10,6 +10,7 @@ bottle = "*"
 omxplayer-wrapper = "*"
 youtube-dl = "*"
 mock = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.5"
