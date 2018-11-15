@@ -13,7 +13,7 @@ from bottle import Bottle, SimpleTemplate, request, response, \
 
 app = Bottle()
 logger = logging.getLogger("App")
-app_path = os.path.dirname(os.path.realpath(__file__))
+app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 controller = video_controller.make_video_controller()
 
 

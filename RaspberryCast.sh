@@ -1,12 +1,13 @@
 #!/bin/bash
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_NAME="$(basename $ROOT)"
 LOG_DIR="log"
-LOG_FILE="$(basename $ROOT).log"
+LOG_FILE="$PROJECT_NAME.log"
 
 function start() {
   if [ "$(lsof -t -i :2020)" ]; then
-    echo "RaspberryCast server is already running."
+    echo "$PROJECT_NAME server is already running."
     return
   fi
   echo "Checking for updates."
@@ -16,14 +17,14 @@ function start() {
   git pull
   mkdir -p "$LOG_DIR"
   pipenv install --skip-lock
-  echo "Starting RaspberryCast server."
-  pipenv run "./server.py" &
+  echo "Starting $PROJECT_NAME server."
+  pipenv run "$PROJECT_NAME/server.py" &
   echo "Done."
 
 }
 
 function stop() {
-  echo "Killing RaspberryCast..."
+  echo "Killing $PROJECT_NAME..."
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
   sudo killall omxplayer.bin >/dev/null 2>&1
   echo "Done."
@@ -34,7 +35,7 @@ function restart() {
 }
 
 function status() {
-  echo -n "RaspberryCast is ... "
+  echo -n "$PROJECT_NAME is ... "
   [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
 }
 
