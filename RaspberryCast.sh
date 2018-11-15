@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
+LOG_DIR="log"
+LOG_FILE="$(basename $ROOT).log"
 
 function start() {
   if [ "$(lsof -t -i :2020)" ]; then
@@ -12,6 +14,7 @@ function start() {
   cd "$ROOT"
 
   git pull
+  mkdir -p "$LOG_DIR"
   pipenv install --skip-lock
   echo "Starting RaspberryCast server."
   pipenv run "./server.py" &
@@ -35,6 +38,10 @@ function status() {
   [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
 }
 
+function logs() {
+  tail -n 50 -f "$ROOT/$LOG_DIR/$LOG_FILE"
+}
+
 if [ "$(id -u)" = "0" ]; then
   echo "Please start this script without root privileges!"
   echo "Try again without sudo."
@@ -54,7 +61,10 @@ restart)
 status)
   status
   ;;
+logs)
+  logs
+  ;;
 *)
-  echo "Usage: $0 {start|stop|restart|status}"
+  echo "Usage: $0 {start|stop|restart|status|logs}"
   ;;
 esac
