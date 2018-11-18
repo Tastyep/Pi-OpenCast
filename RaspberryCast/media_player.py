@@ -8,7 +8,7 @@ from collections import deque
 from enum import Enum
 from functools import total_ordering
 
-logger = logging.getLogger("App")
+logger = logging.getLogger(__name__)
 
 
 # Video player status enumeration

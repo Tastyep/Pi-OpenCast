@@ -5,7 +5,8 @@ import time
 from threading import Thread, Condition
 from collections import deque
 
-logger = logging.getLogger("App")
+logger = logging.getLogger(__name__)
+ydl_logger = logging.getLogger('ydl')
 
 
 class VideoDownloader(object):
@@ -34,6 +35,8 @@ class VideoDownloader(object):
             {
                 'noplaylist': True,
                 'ignoreerrors': True,
+                'debug_printtraffic': False,
+                'logger': logger
             })
         with ydl:  # Download the video data without downloading it.
             data = ydl.extract_info(video.url, download=False)
@@ -78,7 +81,9 @@ class VideoDownloader(object):
             'noplaylist': True,
             'ignoreerrors': True,
             'merge_output_format': 'mp4',
-            'outtmpl': str(video.path)
+            'outtmpl': str(video.path),
+            'debug_printtraffic': False,
+            'logger': ydl_logger
         })
         with ydl:  # Download the video
             ydl.download([video.url])

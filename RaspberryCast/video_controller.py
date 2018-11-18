@@ -1,18 +1,19 @@
 import logging
 import youtube_dl
-import media_player
-import video_downloader
 import uuid
 
-from video import Video
+from . import media_player
+from . import video_downloader
+from .video import Video
 
-logger = logging.getLogger("App")
+logger = logging.getLogger(__name__)
 player = media_player.make_player(1.0)
 downloader = video_downloader.make_video_downloader()
 
 
 class VideoController(object):
     def stream_video(self, url):
+        logger.debug("name is: " + __name__)
         logger.debug('[controller] stream video, URL="' + url + '"')
         player.stop()
 
@@ -78,7 +79,8 @@ class VideoController(object):
     def _parse_playlist(self, url):
         ydl_opts = {
             'ignoreerrors': True,
-            'extract_flat': 'in_playlist'
+            'extract_flat': 'in_playlist',
+            'logger': logger
         }
         ydl = youtube_dl.YoutubeDL(ydl_opts)
         with ydl:  # Download the playlist data without downloading the videos.

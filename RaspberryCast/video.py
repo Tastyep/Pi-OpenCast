@@ -1,9 +1,9 @@
 import logging
-import subtitle
 
 from pathlib import Path
+from . import subtitle
 
-logger = logging.getLogger("App")
+logger = logging.getLogger(__name__)
 
 
 class Video(object):

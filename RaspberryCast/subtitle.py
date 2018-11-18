@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("App")
+logger = logging.getLogger(__name__)
 
 
 def load_from_video_path(path):

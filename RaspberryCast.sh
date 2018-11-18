@@ -18,9 +18,8 @@ function start() {
   mkdir -p "$LOG_DIR"
   pipenv install --skip-lock
   echo "Starting $PROJECT_NAME server."
-  pipenv run "$PROJECT_NAME/server.py" &
-  echo "Done."
-
+  chmod +x "$PROJECT_NAME/server.py"
+  pipenv run python -m "$PROJECT_NAME" &
 }
 
 function stop() {

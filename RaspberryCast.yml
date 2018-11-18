@@ -18,7 +18,11 @@ handlers:
     backupCount: 5
     formatter: file
 loggers:
-  App:
+  RaspberryCast:
     level: DEBUG
+    handlers: [console, file]
+    propagate: no
+  ydl:
+    level: INFO
     handlers: [console, file]
     propagate: no

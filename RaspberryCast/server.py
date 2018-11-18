@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 
 import logging
-import logging.config
 import os
-import yaml
 
-import video_controller
+from bottle import (
+    Bottle,
+    SimpleTemplate,
+    request,
+    response,
+    template,
+    run,
+    static_file,
+    TEMPLATE_PATH,
+)
 
-from bottle import Bottle, SimpleTemplate, request, response, \
-    template, run, static_file, TEMPLATE_PATH
+from . import video_controller
 
 
 app = Bottle()
-logger = logging.getLogger("App")
+logger = logging.getLogger(__name__)
 app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 controller = video_controller.make_video_controller()
 
@@ -85,16 +91,8 @@ def make_logger():
     return logging.FileHandler(path)
 
 
-def main():
-    with open('{}/RaspberryCast.yml'.format(app_path), 'r') as data:
-        config = yaml.load(data)
-    logging.config.dictConfig(config)
-
+def run_server():
+    logger.info('[server] started')
     TEMPLATE_PATH.insert(0, os.path.join(app_path, 'views'))
-
     SimpleTemplate.defaults["get_url"] = app.get_url
     run(app, reloader=False, host='0.0.0.0', debug=True, quiet=True, port=2020)
-
-
-if __name__ == '__main__':
-    main()
