@@ -3,17 +3,20 @@ import os
 import yaml
 import logging
 import logging.config
-
-from .server import run_server
+from . import server
+from .config import config
 
 
 def _real_main(argv):
     app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-    with open('{}/RaspberryCast.yml'.format(app_path), 'r') as data:
-        config = yaml.load(data)
-    logging.config.dictConfig(config)
-    run_server()
+    with open('{}/RaspberryCast.yml'.format(app_path), 'r') as file:
+        cfg = yaml.load(file)
+        logging.config.dictConfig(cfg)
+
+    config.load('{}/config.ini'.format(app_path))
+
+    server.run_server()
 
 
 def main(argv=None):

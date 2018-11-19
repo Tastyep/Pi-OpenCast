@@ -8,6 +8,7 @@ from collections import deque
 from enum import Enum
 from functools import total_ordering
 
+from .config import config
 logger = logging.getLogger(__name__)
 
 
@@ -66,7 +67,7 @@ class OmxPlayer(object):
                         index = len(self._queue) - i
                         break
             self._queue.insert(index, video)
-            logger.debug("player queue contains: %r" % (self._queue))
+            logger.debug("[player] queue contains: %r" % (self._queue))
             self._cv.notify()
 
     def list_queue(self):
@@ -77,6 +78,7 @@ class OmxPlayer(object):
             if self._state is not PlayerState.playing:
                 logger.debug("[player] is already stopped")
                 return
+
             logger.debug("[player] stopping ...")
             self._exec_command('stop')
             self._state = PlayerState.ready
@@ -148,16 +150,17 @@ class OmxPlayer(object):
         command = ['--vol', str(100 * (self._volume - 1.0))]
         for sub in video.subtitles:
             command += ['--subtitles', sub]
+        if config.hide_background is True:
+            command += ['--blank']
 
+        logger.debug("[player] starting player with opt: {}".format(command))
         self._player = OMXPlayer(video.path,
                                  command,
                                  dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         self._player.exitEvent += self._on_exit
-
-        # Wait for the DBus interface to be initialised
-        logger.debug("[player] starting ...")
         self._state = PlayerState.playing
 
+        # Wait for the DBus interface to be initialised
         if not self._sync(5000,
                           500,
                           self._sync_with_bus):
