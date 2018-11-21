@@ -4,9 +4,11 @@ import time
 
 from threading import Thread, Condition
 from collections import deque
+from .config import config
 
 logger = logging.getLogger(__name__)
 ydl_logger = logging.getLogger('ydl')
+config = config["Downloader"]
 
 
 class VideoDownloader(object):
@@ -73,7 +75,7 @@ class VideoDownloader(object):
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
-        video.path = '/tmp/' + video.title + '.mp4'
+        video.path = config.dl_directory + '/' + video.title + '.mp4'
         logger.debug("[downloader] starting download for: %r" % (video.title))
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'

@@ -9,7 +9,9 @@ from enum import Enum
 from functools import total_ordering
 
 from .config import config
+
 logger = logging.getLogger(__name__)
+config = config["VideoPlayer"]
 
 
 # Video player status enumeration
