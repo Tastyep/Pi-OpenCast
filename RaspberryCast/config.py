@@ -13,6 +13,7 @@ class Singleton(type):
 
 class VideoPlayer(object):
     hide_background = True
+    history_size = 15
 
 
 class Downloader(object):

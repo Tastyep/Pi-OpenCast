@@ -8,6 +8,7 @@ from collections import deque
 from enum import Enum
 from functools import total_ordering
 
+from .history import History
 from .config import config
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ class OmxPlayer(object):
     def __init__(self, default_volume):
         self._stopped = False
         self._queue = deque()
+        self._history = History()
 
         self._volume = default_volume
         self._state = PlayerState.ready
@@ -147,6 +149,7 @@ class OmxPlayer(object):
 
     def _play(self):
         video = self._queue.popleft()
+        self._history.push(video)
         logger.info("[player] playing: %r" % (video))
 
         command = ['--vol', str(100 * (self._volume - 1.0))]

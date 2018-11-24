@@ -13,7 +13,6 @@ downloader = video_downloader.make_video_downloader()
 
 class VideoController(object):
     def stream_video(self, url):
-        logger.debug("name is: " + __name__)
         logger.debug('[controller] stream video, URL="' + url + '"')
         player.stop()
 
