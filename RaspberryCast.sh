@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ROOT="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_NAME="$(basename $ROOT)"
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_NAME="$(basename "$PROJECT_DIR")"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 
@@ -10,9 +10,9 @@ function start() {
     echo "$PROJECT_NAME server is already running."
     return
   fi
-  echo "Checking for updates."
 
-  cd "$ROOT"
+  echo "Checking for updates."
+  cd "$PROJECT_DIR" || exit 1
 
   git pull
   mkdir -p "$LOG_DIR"
@@ -39,14 +39,8 @@ function status() {
 }
 
 function logs() {
-  tail -n 50 -f "$ROOT/$LOG_DIR/$LOG_FILE"
+  tail -n 50 -f "$PROJECT_DIR/$LOG_DIR/$LOG_FILE"
 }
-
-if [ "$(id -u)" = "0" ]; then
-  echo "Please start this script without root privileges!"
-  echo "Try again without sudo."
-  exit 0
-fi
 
 case "$1" in
 start)

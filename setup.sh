@@ -1,106 +1,55 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ "$(id -u)" != "0" ]
-then
-  echo "Please run this script with root privileges!"
-  echo "Try again with sudo."
-  exit 0
-fi
+USER="$(whoami)"
+PROJECT="RaspberryCast"
 
-echo "This script will install RaspberryCast"
+function info() {
+  local yel="\\033[1;33m"
+  local nc="\\033[0m"
 
+  echo -e "$yel>>$nc $1"
+}
+
+function error() {
+  local red="\\033[0;31m"
+  local nc="\\033[0m"
+
+  echo -e "$red!!$nc $1"
+  exit 1
+}
+
+# Get the user to install as
 # shellcheck disable=SC2039
-read -r -p "Which user do you want to install RaspberryCast as? (Leave blank to set to default): " USER
+read -r -p "Install $PROJECT as ? (default:$USER): " u
+[ ! -z "$u" ] && USER="$u"
 
-if ! [ -n "$USER" ]; then
-    echo "Setting user to default value 'pi'."
-    USER="pi"
+homedir="$(getent passwd "$USER" | cut -d: -f6)"
+if [ -z "$homedir" ]; then
+  error "User '$USER' does not exist."
+  exit 1
 fi
 
-if ! getent passwd $USER > /dev/null 2>&1; then
-    echo "User $USER does not exist. Exiting."
-    exit
-fi
+# Download project
+info "Downloading $PROJECT in $homedir"
+git clone "https://github.com/Tastyep/$PROJECT" "$homedir/$PROJECT"
 
-echo "Your system will be rebooted on completion"
-echo "Do you wish to continue? (y/n)"
+# Install dependencies
+info "Installing dependencies..."
+sudo apt-get update
+sudo apt-get install -y lsof python-pip ||
+  error "failed to install dependencies"
+pip install --user pipenv ||
+  error "failed to install dependencies"
 
-while true; do
-  # shellcheck disable=SC2039
-  read -r -p "" yn
-  case $yn in
-      [Yy]* ) break;;
-      [Nn]* ) exit 0;;
-      * ) echo "Please answer with Yes or No [y|n].";;
-  esac
-done
-echo ""
-echo "============================================================"
-echo ""
-echo "Installing necessary dependencies... (This could take a while)"
-echo ""
-echo "============================================================"
+# Configure boot options
+info "Adding to startup options (/etc/rc.local)"
+# Add to rc.local startup
+sudo sed -i /"exit 0"/d /etc/rc.local
+printf "~%s/$PROJECT/$PROJECT.sh start\\nexit 0\\n" "$USER" 2>&1 | sudo tee -a /etc/rc.local >/dev/null
 
-apt-get update
-apt-get install -y lsof python-pip git wget omxplayer libnss-mdns fbi
-echo "============================================================"
-
-if [ "$?" = "1" ]
-then
-  echo "An unexpected error occured during apt-get!"
-  exit 0
-fi
-
-pip install youtube-dl bottle livestreamer
-
-if [ "$?" = "1" ]
-then
-  echo "An unexpected error occured during pip install!"
-  exit 0
-fi
-
-echo ""
-echo "============================================================"
-echo ""
-echo "Cloning project from GitHub.."
-echo ""
-echo "============================================================"
-
-su - $USER -c "git clone https://github.com/vincelwt/RaspberryCast.git"
-chmod +x ./RaspberryCast/RaspberryCast.sh
-
-echo ""
-echo "============================================================"
-echo ""
-echo "Adding project to startup sequence and custom options"
-echo ""
-echo "============================================================"
-
-#Gives right to all user to get out of screen standby
-chmod 666 /dev/tty1
-
-#Add to rc.local startup
-sed -i '$ d' /etc/rc.local
-echo "su - $USER -c \"cd ./RaspberryCast/ && ./RaspberryCast.sh start\"" >> /etc/rc.local
-echo "exit 0" >> /etc/rc.local
-
-#Adding right to current pi user to shutdown
-chmod +s /sbin/shutdown
-
-#Adding right to sudo fbi without password
-echo "$USER ALL = (root) NOPASSWD: /usr/bin/fbi" >> /etc/sudoers
-
-rm setup.sh
-
-echo "============================================================"
-echo "Setup was successful."
-echo "Do not delete the 'RaspberryCast' folder as it contains all application data!"
-echo "Rebooting system now..."
-echo "============================================================"
-
-sleep 2
-
-#Reboot to ensure cleaness of Pi memory and displaying of log
-reboot
+# Starting RaspberryCast
+info "Starting $PROJECT"
+chmod +x "$homedir/$PROJECT/$PROJECT.sh"
+"$homedir/$PROJECT/$PROJECT.sh" start
 
 exit 0
