@@ -10,7 +10,7 @@ from .config import config
 def _real_main(argv):
     app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-    with open('{}/RaspberryCast.yml'.format(app_path), 'r') as file:
+    with open('{}/logging.yml'.format(app_path), 'r') as file:
         cfg = yaml.load(file)
         logging.config.dictConfig(cfg)
 

@@ -7,7 +7,6 @@ from collections import deque
 from .config import config
 
 logger = logging.getLogger(__name__)
-ydl_logger = logging.getLogger('ydl')
 config = config["Downloader"]
 
 
@@ -83,9 +82,7 @@ class VideoDownloader(object):
             'noplaylist': True,
             'ignoreerrors': True,
             'merge_output_format': 'mp4',
-            'outtmpl': str(video.path),
-            'debug_printtraffic': False,
-            'logger': ydl_logger
+            'outtmpl': str(video.path)
         })
         with ydl:  # Download the video
             ydl.download([video.url])

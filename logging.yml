@@ -22,7 +22,3 @@ loggers:
     level: DEBUG
     handlers: [console, file]
     propagate: no
-  ydl:
-    level: INFO
-    handlers: [console, file]
-    propagate: no
