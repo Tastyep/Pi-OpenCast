@@ -17,6 +17,7 @@ class Video(object):
         path = Path(url)
         if path.is_file():
             self.path = url
+            self._title = self._path.name
 
     @property
     def url(self):

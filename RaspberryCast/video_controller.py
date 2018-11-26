@@ -7,60 +7,69 @@ from . import video_downloader
 from .video import Video
 
 logger = logging.getLogger(__name__)
-player = media_player.make_player(1.0)
-downloader = video_downloader.make_video_downloader()
 
 
 class VideoController(object):
+    def __init__(self):
+        self._player = media_player.make_player(1.0)
+        self._downloader = video_downloader.make_video_downloader()
+
     def stream_video(self, url):
         logger.debug('[controller] stream video, URL="' + url + '"')
-        player.stop()
+        self._player.stop()
 
         video = Video(url)
         if video.is_local():
-            player.play(video)
+            self._player.play(video)
             return
 
         self._queue_video(video, self._play_video, first=True)
 
     def queue_video(self, url):
         logger.debug('[controller] queue video, URL="' + url + '"')
-        self._queue_video(Video(url), player.queue, first=False)
+
+        video = Video(url)
+        if video.is_local():
+            self._player.queue(video)
+            return
+
+        self._queue_video(video, self._player.queue, first=False)
 
     def stop_video(self):
         logger.debug('[controller] stop current video')
-        player.stop()
+        self._player.stop()
 
     def next_video(self):
         logger.debug('[controller] next video')
-        player.next()
+        self._player.next()
 
     def play_pause_video(self, pause):
-        player.play_pause()
+        self._player.play_pause()
 
     def change_volume(self, increase):
-        player.change_volume(increase)
+        self._player.change_volume(increase)
         logger.debug(
-            '[controller] change player volume, volume=' + str(player.volume))
+            '[controller] change player volume, volume='
+            + str(self._player.volume))
 
     def seek_time(self, forward, long):
         logger.debug('[controller] seek video time, forward=%r, long=%r'
                      % (forward, long))
-        player.seek(forward, long)
+        self._player.seek(forward, long)
 
     # Getter methods
 
     def list_queued_videos(self):
-        videos = player.get_queue()
-        videos.extend(downloader.get_queue())
+        videos = self._player.get_queue()
+        videos.extend(self._downloader.get_queue())
 
         return videos
 
     # Private methods
 
     def _play_video(self, video):
-        player.queue(video, first=True)
-        player.play()
+        self._player.queue(video, first=True)
+        self._player.play()
 
     def _queue_video(self, video, dl_callback, first):
         if '/playlist' in video.url:
@@ -70,10 +79,10 @@ class VideoController(object):
             urls = self._parse_playlist(video.url)
             videos = [Video(u, playlistId) for u in urls]
             logger.debug("[controller] playlist url unfolded to %r" % (videos))
-            downloader.queue(videos, dl_callback, first)
+            self._downloader.queue(videos, dl_callback, first)
         else:
             logger.debug("[controller] queue single video: %r" % (video))
-            downloader.queue([video], dl_callback, first)
+            self._downloader.queue([video], dl_callback, first)
 
     def _parse_playlist(self, url):
         ydl_opts = {

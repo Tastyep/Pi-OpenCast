@@ -86,9 +86,14 @@ class OmxPlayer(object):
             logger.debug("[player] stopping ...")
             self._exec_command('stop')
             self._state = PlayerState.ready
+
+        def is_stopped():
+            with self._cv:
+                return self._state is PlayerState.stopped
+
         if not self._sync(5000,
                           500,
-                          self._wait_stopped):
+                          is_stopped):
             logger.error("[player] couldn't stop")
 
     def next(self):
@@ -136,17 +141,6 @@ class OmxPlayer(object):
             time.sleep(interval / 1000.0)
         return False
 
-    def _wait_stopped(self):
-        with self._cv:
-            return self._state is PlayerState.stopped
-
-    def _sync_with_bus(self):
-        try:
-            self._player.is_playing()
-            return True
-        except (OMXPlayerDeadError, DBusException):
-            return False
-
     def _play(self):
         video = self._queue.popleft()
         self._history.push(video)
@@ -165,10 +159,17 @@ class OmxPlayer(object):
         self._player.exitEvent += self._on_exit
         self._state = PlayerState.playing
 
+        def sync_with_bus():
+            try:
+                self._player.is_playing()
+                return True
+            except (OMXPlayerDeadError, DBusException):
+                return False
+
         # Wait for the DBus interface to be initialised
         if not self._sync(5000,
                           500,
-                          self._sync_with_bus):
+                          sync_with_bus):
             logger.error("[player] couldn't connect to dbus")
         logger.debug("[player] started")
 
