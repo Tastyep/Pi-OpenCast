@@ -52,50 +52,35 @@
 					</button>
 				</div>
 				<br>
-				<a id="link-text" onClick="advanced()">More options ▾</a>
-				<div id="advanced" style="display:none">
-					<form id="shut_form" class="form-inline">
-						<div class="form-group">
-							<div class="input-group">
-								<input type="number" class="form-control input-lg" id="time_shut" placeholder="Delayed shutdown (minutes)" pattern="\d*" min="0" max="400" step="5">
-								<div class="input-group-btn"><button id="shutbtn" class="btn btn-lg btn-info form_button" type="button"><span class="glyphicon glyphicon-time" aria-hidden="true"></button></div>
-							</div>
-						</div>
-					</form>
-					<div>
-						<button id="cancelshut" type="button" title="Cancel shutdown" class="fifty btn btn-danger">
-							<span class="tb">Cancel shutdown </span><span class="glyphicon glyphicon-remove-circle pull-left" aria-hidden="true"></span>
-						</button>
-						<button id="nextqueue" type="button" title="Next video in playlist" class="fifty btn btn-primary">
-							<span class="tb">Next video </span><span class="glyphicon glyphicon-step-forward pull-right" aria-hidden="true"></span>
-						</button>
-					</div>
-					<div>
-						<button id="long-backward" type="button" title="Long skip backwards" class="fifty btn btn-info">
-							<span class="tb">
-								<span class="glyphicon glyphicon-backward  pull-left" aria-hidden="true"></span>
-								-10 minutes
-							</span>
-						</button>
-						<button id="long-forward" type="button" title="Long skip backwards" class="fifty btn btn-info">
-							<span class="tb">+10 minutes
-								<span class="glyphicon glyphicon-forward pull-right" aria-hidden="true"></span>
-							</span>
-						</button>
-					</div>
-					<!-- History and playlist management -->
-					<div id="last-div">
-						<button id="history-button" onClick="showHistory()" type="button" title="History" class="ninety btn btn-warning">
-							<span class="tb">
-								<span class="glyphicon glyphicon-list-alt  pull-left" aria-hidden="true"></span>
-								History
-							</span>
-						</button>
-					</div>
-					<div id="history-div" style="display:none">
-					</div>
+				<div>
+					<button id="nextqueue" type="button" title="Next video in playlist" class="fifty btn btn-primary">
+						<span class="tb">Next video </span><span class="glyphicon glyphicon-step-forward pull-right" aria-hidden="true"></span>
+					</button>
 				</div>
-
+				<div>
+					<button id="long-backward" type="button" title="Long skip backwards" class="fifty btn btn-info">
+						<span class="tb">
+							<span class="glyphicon glyphicon-backward  pull-left" aria-hidden="true"></span>
+							-10 minutes
+						</span>
+					</button>
+					<button id="long-forward" type="button" title="Long skip backwards" class="fifty btn btn-info">
+						<span class="tb">+10 minutes
+							<span class="glyphicon glyphicon-forward pull-right" aria-hidden="true"></span>
+						</span>
+					</button>
+				</div>
+				<!-- History and playlist management -->
+				<div id="last-div">
+					<button id="history-button" onClick="showHistory()" type="button" title="History" class="ninety btn btn-warning">
+						<span class="tb">
+							<span class="glyphicon glyphicon-list-alt  pull-left" aria-hidden="true"></span>
+							History
+						</span>
+					</button>
+				</div>
+				<div id="history-div" style="display:none">
+				</div>
 		</div>
 		</center>
 

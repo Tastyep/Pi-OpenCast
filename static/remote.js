@@ -13,16 +13,6 @@ function message(msg, importance) {
 	}, 3000);
 }
 
-function advanced() {
-	$("#advanced").toggle("fast");
-
-	if($("#link-text").html() === "More options ▾") {
-		$("#link-text").html("More options ▴");
-	} else {
-		$("#link-text").html("More options ▾");
-	}
-}
-
 function showHistory() {
 	//Only update history when div is being toggled ON
 	if (!$("#history-div").is(":visible"))
@@ -92,23 +82,11 @@ $(function() {
 		}
 	});
 
-	$("#shutbtn").click(function() {
-		if ( $("#time_shut").val() !== "") {
-			var time = $("#time_shut").val();
-			console.log($("#time_shut").val());
-			message("Trying to program shutdown. ", 0);
-			mkRequest("/shutdown?time=" + time, function(jsonData) {
-				message("Success! Shutdown has been successfully scheduled.", 1);
-			})
-		} else {
-			message("You must enter a duration !", 2)
-		}
+	$("#pause").click(function() {
+		mkRequest("/video?control=pause")
 	});
-
-	$("#cancelshut").click(function() {
-		mkRequest("/shutdown?time=cancel", function(jsonData) {
-			message("Success! Shutdown has been cancelled.", 1);
-		})
+	$("#stop").click(function() {
+		mkRequest("/video?control=stop")
 	});
 
 	$("#nextqueue").click(function() {
@@ -117,18 +95,16 @@ $(function() {
 		})
 	});
 
-	$("#pause").click(function() {
-		mkRequest("/video?control=pause")
+	$("#vol_down").click(function() {
+		mkRequest("/sound?vol=less");
 	});
-
-	$("#stop").click(function() {
-		mkRequest("/video?control=stop")
+	$("#vol_up").click(function() {
+		mkRequest("/sound?vol=more");
 	});
 
 	$("#backward").click(function() {
 		mkRequest("/video?control=left");
 	});
-
 	$("#forward").click(function() {
 		mkRequest("/video?control=right");
 	});
@@ -136,16 +112,7 @@ $(function() {
 	$("#long-backward").click(function() {
 		mkRequest("/video?control=longleft");
 	});
-
 	$("#long-forward").click(function() {
 		mkRequest("/video?control=longright");
-	});
-
-	$("#vol_down").click(function() {
-		mkRequest("/sound?vol=less");
-	});
-
-	$("#vol_up").click(function() {
-		mkRequest("/sound?vol=more");
 	});
 });
