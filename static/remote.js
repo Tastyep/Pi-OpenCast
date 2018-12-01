@@ -40,8 +40,8 @@ function mkRequest(url, onSuccess) {
 }
 
 $(function() {
-	$("#castbtn").click(function() {
-		var url = $("#media_url").val();
+	$("#cast-btn").click(function() {
+		var url = $("#media-url").val();
 		if (url === "") {
 			message("You must enter a link !", 2)
 			return
@@ -55,8 +55,8 @@ $(function() {
 		})
 	});
 
-	$("#addqueue").click(function() {
-		var url = $("#media_url").val();
+	$("#queue-btn").click(function() {
+		var url = $("#media-url").val();
 		if ( url === "") {
 			message("You must enter a link !", 2)
 			return
@@ -69,50 +69,50 @@ $(function() {
 		})
 	});
 
-	$("#clear_search").click(function(){
-		$("#media_url").val('');
-		$("#clear_search").hide();
+	$("#clear-search").click(function(){
+		$("#media-url").val('');
+		$("#clear-search").hide();
 	});
 
-	$("#media_url").keyup(function(){
+	$("#media-url").keyup(function(){
 		if ($(this).val()) {
-			$("#clear_search").show();
+			$("#clear-search").show();
 		} else {
-			$("#clear_search").hide();
+			$("#clear-search").hide();
 		}
 	});
 
-	$("#pause").click(function() {
+	$("#pause-btn").click(function() {
 		mkRequest("/video?control=pause")
 	});
-	$("#stop").click(function() {
+	$("#stop-btn").click(function() {
 		mkRequest("/video?control=stop")
 	});
 
-	$("#nextqueue").click(function() {
+	$("#next-video-btn").click(function() {
 		mkRequest("/video?control=next", function(jsonData) {
 			message("Success! Next video will start to play", 1);
 		})
 	});
 
-	$("#vol_down").click(function() {
+	$("#vol-down-btn").click(function() {
 		mkRequest("/sound?vol=less");
 	});
-	$("#vol_up").click(function() {
+	$("#vol-up-btn").click(function() {
 		mkRequest("/sound?vol=more");
 	});
 
-	$("#backward").click(function() {
+	$("#backward-btn").click(function() {
 		mkRequest("/video?control=left");
 	});
-	$("#forward").click(function() {
+	$("#forward-btn").click(function() {
 		mkRequest("/video?control=right");
 	});
 
-	$("#long-backward").click(function() {
+	$("#long-backward-btn").click(function() {
 		mkRequest("/video?control=longleft");
 	});
-	$("#long-forward").click(function() {
+	$("#long-forward-btn").click(function() {
 		mkRequest("/video?control=longright");
 	});
 });

@@ -9,76 +9,66 @@
 		<link rel="icon" type="image/png" sizes="192x192" href="{{get_url('static', filename='favicon.png') }}" />
 	</head>
 	<body>
-		<center>
-		<div id="whole">
-
+		<div id="content">
 				<div id="message"></div>
 
-				<form id="stream_form" class="form-inline">
-						<div class="input-group">
-							<input type="search" class="form-control input-lg" id="media_url" placeholder="Media's URL" aria-hidden="true">
-							<span id="clear_search" class="glyphicon glyphicon-remove-circle"></span>
-						</div>
-						<br>
-						<br>
-						<div>
-							<button id="castbtn" class="btn btn-lg btn-success fifty" title="Cast now" type="button">Cast<span class="glyphicon glyphicon-send pull-right" aria-hidden="true"></button>
-							<button id="addqueue" title="Add current video to queue" class="btn btn-lg btn-info fifty" type="button">Queue<span class="glyphicon glyphicon-menu-hamburger pull-right" aria-hidden="true" ></button>
-						</div>
+				<form class="input-group">
+					<input type="search" class="form-control input-lg" id="media-url" placeholder="Media's URL">
+					<span id="clear-search" class="glyphicon glyphicon-remove-circle"></span>
 				</form>
-				<div>
-					<button id="pause" type="button" title="Play/pause" class="fifty btn btn-info">
-						<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-						<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-					</button>
-					<button id="stop" type="button" title="Stop video/Next queue video" class="fifty btn btn-danger">
-						<span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
-					</button>
-				</div>
-				<div>
-					<button id="backward" type="button" title="Backward" class="fifty btn btn-warning">
-						<span class="glyphicon glyphicon-backward" aria-hidden="true"></span><span class="tb"> -30s</span>
-					</button>
-					<button id="forward" type="button" title="Forward" class="fifty btn btn-warning">
-						<span class="tb">+30s </span><span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
-					</button>
-				</div>
-				<div>
-					<button id="vol_down" type="button" title="Volume -" class="fifty btn btn-primary">
-						<span class="glyphicon glyphicon-volume-down" aria-hidden="true"></span>
-					</button>
-					<button id="vol_up" type="button" title="Volume +" class="fifty btn btn-primary">
-						<span class="glyphicon glyphicon-volume-up" aria-hidden="true"></span>
-					</button>
-				</div>
-				<br>
-				<div>
-					<button id="nextqueue" type="button" title="Next video in playlist" class="fifty btn btn-primary">
-						<span class="tb">Next video </span><span class="glyphicon glyphicon-step-forward pull-right" aria-hidden="true"></span>
-					</button>
-				</div>
-				<div>
-					<button id="long-backward" type="button" title="Long skip backwards" class="fifty btn btn-info">
-						<span class="tb">
-							<span class="glyphicon glyphicon-backward  pull-left" aria-hidden="true"></span>
-							-10 minutes
-						</span>
-					</button>
-					<button id="long-forward" type="button" title="Long skip backwards" class="fifty btn btn-info">
-						<span class="tb">+10 minutes
-							<span class="glyphicon glyphicon-forward pull-right" aria-hidden="true"></span>
-						</span>
-					</button>
-				</div>
+
+				<button id="cast-btn" class="btn btn-lg btn-success fifty" title="Cast now" type="button">
+					<span class="tb">Cast</span>
+					<span class="glyphicon glyphicon-send pull-right">
+				</button>
+				<button id="queue-btn" class="btn btn-lg btn-info fifty" title="Add current video to queue" type="button">
+					<span class="tb">Queue</span>
+					<span class="glyphicon glyphicon-menu-hamburger pull-right" >
+				</button>
+
+				<button id="pause-btn" class="fifty btn btn-info" type="button" title="Play/pause">
+					<span class="glyphicon glyphicon-play"></span>
+					<span class="glyphicon glyphicon-pause"></span>
+				</button>
+				<button id="stop-btn" class="fifty btn btn-danger" type="button" title="Stop video/Next queue video">
+					<span class="glyphicon glyphicon-stop"></span>
+				</button>
+
+				<button id="backward-btn" class="fifty btn btn-warning" type="button" title="Backward">
+					<span class="glyphicon glyphicon-backward pull-left"></span>
+					<span class="tb">-30 seconds</span>
+				</button>
+				<button id="forward-btn" class="fifty btn btn-warning" type="button" title="Forward">
+					<span class="tb">+30 seconds</span>
+					<span class="glyphicon glyphicon-forward pull-right"></span>
+				</button>
+
+				<button id="vol-down-btn" class="fifty btn btn-primary" type="button" title="Lower volume">
+					<span class="glyphicon glyphicon-volume-down"></span>
+				</button>
+				<button id="vol-up-btn" class="fifty btn btn-primary" type="button" title="Increase volume">
+					<span class="glyphicon glyphicon-volume-up"></span>
+				</button>
+
+				<button id="next-video-btn" class="fifty btn btn-primary" type="button" title="Next video in playlist">
+					<span class="tb">Next video</span>
+					<span class="glyphicon glyphicon-step-forward pull-right"></span>
+				</button>
+
+				<button id="long-backward-btn" class="fifty btn btn-info" type="button" title="Long skip backwards">
+					<span class="glyphicon glyphicon-backward pull-left"></span>
+					<span class="tb">-10 minutes</span>
+				</button>
+				<button id="long-forward-btn" class="fifty btn btn-info" type="button" title="Long skip backwards">
+					<span class="tb">+10 minutes</span>
+					<span class="glyphicon glyphicon-forward pull-right"></span>
+				</button>
+
 				<!-- History and playlist management -->
-				<div id="last-div">
-					<button id="history-button" onClick="showHistory()" type="button" title="History" class="ninety btn btn-warning">
-						<span class="tb">
-							<span class="glyphicon glyphicon-list-alt  pull-left" aria-hidden="true"></span>
-							History
-						</span>
-					</button>
-				</div>
+				<button id="history-button-btn" class="ninety btn btn-warning" type="button" title="History" onClick="showHistory()">
+					<span class="glyphicon glyphicon-list-alt  pull-left"></span>
+					<span class="tb">History</span>
+				</button>
 				<div id="history-div" style="display:none">
 				</div>
 		</div>
