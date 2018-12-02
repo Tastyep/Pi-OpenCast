@@ -52,6 +52,10 @@ class Video(object):
         title = '' if self._title is None else str(self._title)
         return str({'title': title, 'url': str(self._url)})
 
+    def __eq__(self, other):
+        return (self._url is other._url and
+                self._playlistId is other._playlistId)
+
     def is_local(self):
         return self._path is not None
 

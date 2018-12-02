@@ -41,11 +41,14 @@ class OmxPlayer(object):
 
     def play(self, video=None):
         with self._cv:
+            self._continue = True
             if video is not None:
+                # Cancel next() done in at_exit()
+                self._history.prev()
+                self._history.stop_browsing()
                 self.queue(video, first=True)
                 return
 
-            self._continue = True
             self._cv.notify()
 
     def queue(self, video, first=False):
@@ -81,9 +84,22 @@ class OmxPlayer(object):
             if not self._sync(5000, 500, is_stopped):
                 logger.error("[player] cannot stop")
 
+    def prev(self):
+        with self._cv:
+            if not self._history.prev():
+                return
+
+            if self._playing():
+                self.stop()
+            # Call prev() again to compensate the call to next() in at_exit()
+            self._history.prev()
+            self.play()
+
     def next(self):
-        self.stop()
-        self.play()
+        with self._cv:
+            if self._playing():
+                self.stop()
+            self.play()
 
     def play_pause(self):
         with self._cv:
@@ -144,16 +160,19 @@ class OmxPlayer(object):
         if config.hide_background is True:
             command += ['--blank']
 
-        logger.debug("[player] making new player with opt: {}".format(command))
+        logger.debug("[player] opening {} with opt: {}".format(video, command))
         self._player = OMXPlayer(video.path,
                                  command,
                                  dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         self._player.exitEvent += self._on_exit
 
     def _play(self):
-        video = self._queue.popleft()
-        self._history.push(video)
-        logger.info("[player] playing: %r" % (video))
+        video = None
+        if self._history.browsing():
+            video = self._history.current_item()
+        else:
+            video = self._queue.popleft()
+            self._history.push(video)
 
         with self._playerMutex:
             self._make_player(video)
@@ -174,7 +193,9 @@ class OmxPlayer(object):
         while (True):
             with self._cv:
                 while (self._stopped is False
-                       and (len(self._queue) == 0 or self._playing())):
+                       and (self._playing() or
+                            (len(self._queue) == 0 and
+                             not self._history.browsing()))):
                     self._cv.wait()
                 if self._stopped:
                     return
@@ -189,11 +210,17 @@ class OmxPlayer(object):
             return True
 
     def _on_exit(self, player, code):
+        # NOTE: No need of using 'with self._cv' as
+        # stop synchronizes the destruction.
         logger.info("[player] stopped")
+        if self._history.browsing():
+            self._history.next()
         self._reset_player()
-        if self._continue:
-            with self._cv:
-                self._cv.notify()
+
+        with self._cv:
+            if not self._continue:
+                return
+            self._cv.notify()
 
 
 def make_player(default_volume):

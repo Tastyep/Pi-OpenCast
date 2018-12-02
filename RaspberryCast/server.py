@@ -61,8 +61,6 @@ def video():
         controller.play_pause_video(True)
     elif control == "stop":
         controller.stop_video()
-    elif control == "next":
-        controller.next_video()
     elif control == "right":
         controller.seek_time(True, False)
     elif control == "left":
@@ -71,6 +69,10 @@ def video():
         controller.seek_time(True, True)
     elif control == "longleft":
         controller.seek_time(False, True)
+    elif control == "prev":
+        controller.prev_video()
+    elif control == "next":
+        controller.next_video()
     return "1"
 
 

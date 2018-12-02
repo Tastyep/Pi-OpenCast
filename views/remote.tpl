@@ -34,15 +34,6 @@
 					<span class="glyphicon glyphicon-stop"></span>
 				</button>
 
-				<button id="backward-btn" class="fifty btn btn-warning" type="button" title="Backward">
-					<span class="glyphicon glyphicon-backward pull-left"></span>
-					<span class="tb">-30 seconds</span>
-				</button>
-				<button id="forward-btn" class="fifty btn btn-warning" type="button" title="Forward">
-					<span class="tb">+30 seconds</span>
-					<span class="glyphicon glyphicon-forward pull-right"></span>
-				</button>
-
 				<button id="vol-down-btn" class="fifty btn btn-primary" type="button" title="Lower volume">
 					<span class="glyphicon glyphicon-volume-down"></span>
 				</button>
@@ -50,9 +41,13 @@
 					<span class="glyphicon glyphicon-volume-up"></span>
 				</button>
 
-				<button id="next-video-btn" class="fifty btn btn-primary" type="button" title="Next video in playlist">
-					<span class="tb">Next video</span>
-					<span class="glyphicon glyphicon-step-forward pull-right"></span>
+				<button id="backward-btn" class="fifty btn btn-warning" type="button" title="Backward">
+					<span class="glyphicon glyphicon-backward pull-left"></span>
+					<span class="tb">-30 seconds</span>
+				</button>
+				<button id="forward-btn" class="fifty btn btn-warning" type="button" title="Forward">
+					<span class="tb">+30 seconds</span>
+					<span class="glyphicon glyphicon-forward pull-right"></span>
 				</button>
 
 				<button id="long-backward-btn" class="fifty btn btn-info" type="button" title="Long skip backwards">
@@ -64,8 +59,17 @@
 					<span class="glyphicon glyphicon-forward pull-right"></span>
 				</button>
 
+				<button id="prev-video-btn" class="fifty btn btn-primary" type="button" title="Previous video">
+					<span class="glyphicon glyphicon-step-backward pull-left"></span>
+					<span class="tb">Previous video</span>
+				</button>
+				<button id="next-video-btn" class="fifty btn btn-primary" type="button" title="Next video">
+					<span class="tb">Next video</span>
+					<span class="glyphicon glyphicon-step-forward pull-right"></span>
+				</button>
+
 				<!-- History and playlist management -->
-				<button id="history-button-btn" class="ninety btn btn-warning" type="button" title="History" onClick="showHistory()">
+				<button id="history-button-btn" class="btn btn-warning" type="button" title="History" onClick="showHistory()">
 					<span class="glyphicon glyphicon-list-alt  pull-left"></span>
 					<span class="tb">History</span>
 				</button>

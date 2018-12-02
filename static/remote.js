@@ -1,9 +1,9 @@
 function message(msg, importance) {
 	$("#message").html("");
 	$("#message").show("slow");
-	if (importance == 1) {
+	if (importance === 1) {
 		$("#message").html("<p class='bg-success'>"+msg+"</p>");
-	} else if (importance == 2) {
+	} else if (importance === 2) {
 		$("#message").html("<p class='bg-danger'>"+msg+"</p>");
 	} else {
 		$("#message").html("<p class='bg-info'>"+msg+"</p>");
@@ -89,12 +89,6 @@ $(function() {
 		mkRequest("/video?control=stop")
 	});
 
-	$("#next-video-btn").click(function() {
-		mkRequest("/video?control=next", function(jsonData) {
-			message("Success! Next video will start to play", 1);
-		})
-	});
-
 	$("#vol-down-btn").click(function() {
 		mkRequest("/sound?vol=less");
 	});
@@ -114,5 +108,16 @@ $(function() {
 	});
 	$("#long-forward-btn").click(function() {
 		mkRequest("/video?control=longright");
+	});
+
+	$("#prev-video-btn").click(function() {
+		mkRequest("/video?control=prev", function(jsonData) {
+			message("Success! Previous video will start to play", 1);
+		})
+	});
+	$("#next-video-btn").click(function() {
+		mkRequest("/video?control=next", function(jsonData) {
+			message("Success! Next video will start to play", 1);
+		})
 	});
 });
