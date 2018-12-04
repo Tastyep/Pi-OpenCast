@@ -3,50 +3,23 @@
 	max-width: 500px;
 	margin-left: auto;
   margin-right: auto;
+	padding-left: 2px;
+	padding-right: 2px;
 }
 
-.fifty {
-	width: 45%;
-	max-width: 250px;
-	margin: 10px 5px;
+#history-btn {
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 5px;
 }
-
-button {
-	height: 70px;
-}
-
-.input-group {
-	margin-top: 20px;
-	margin-bottom: 10px;
-	width: 93%;
-	max-width: 500px;
-}
-
-.form-control {
-	height: 70px !important;
-}
-
-span.glyphicon {
-	font-size: 1.4em;
-}
-
-span.tb {
-	top: -20px;
-	font-size: 1.2em;
-}
-
-#last-div {
-	padding-bottom: 20px;
-}
-
 
 #history-div {
-	width: 93%;
+	width: 100%;
 	text-align: left;
 	font-size: 1.2em;
 }
 
-#clear-history-link-item {
+#clear-history {
 	font-style: bold;
 	color: red;
 }
@@ -62,4 +35,44 @@ span.tb {
     cursor: pointer;
     z-index: 2;
     display: none
+}
+
+button {
+	height: 70px;
+}
+
+.button-line {
+	width: 100%;
+	margin-top: 10px;
+}
+
+.button-left {
+	width: 48%;
+	max-width: 250px;
+	margin-right: 3px;
+}
+
+.button-right {
+	width: 48%;
+	max-width: 250px;
+	margin-left: 3px;
+}
+
+.input-group {
+	width: 100%;
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+
+.form-control {
+	height: 70px !important;
+}
+
+span.glyphicon {
+	font-size: 1.4em;
+}
+
+span.tb {
+	top: -20px;
+	font-size: 1.2em;
 }

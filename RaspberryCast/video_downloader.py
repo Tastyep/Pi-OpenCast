@@ -65,8 +65,9 @@ class VideoDownloader(object):
 
     def _download_queued_videos(self):
         while not self._stopped:
+            video, dl_callback = (None, None)
             with self._cv:
-                while len(self._queue) == 0 and not self._stopped:
+                while not self._stopped and len(self._queue) == 0:
                     self._cv.wait()
                 if self._stopped:
                     return

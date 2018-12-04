@@ -74,7 +74,7 @@ function updateHistoryDiv() {
     }
 
     var clearHistoryLink =
-      $("<a id='clear-history-link-item' href=''>Clear history</a>")
+      $("<a id='clear-history' href=''>Clear history</a>")
       .click(function() {
         localStorage.clear();
         $("#history-div").toggle("fast");
