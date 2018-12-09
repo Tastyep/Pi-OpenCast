@@ -33,7 +33,10 @@ class OmxPlayer(object):
     def __del__(self):
         with self._cv:
             self._stopped = True
-            self.stop()
+            if self._playing():
+                self.stop()
+            else:
+                self._cv.notify()
 
     @property
     def volume(self):

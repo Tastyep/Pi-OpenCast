@@ -2,6 +2,7 @@
 import sys
 import RaspberryCast
 
+
 if __package__ is None and not hasattr(sys, 'frozen'):
     # direct call of __main__.py
     import os.path

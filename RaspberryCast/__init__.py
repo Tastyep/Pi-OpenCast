@@ -3,7 +3,7 @@ import os
 import yaml
 import logging
 import logging.config
-from . import server
+from .server import Server
 from .config import config
 
 
@@ -16,7 +16,8 @@ def _real_main(argv):
 
     config.load('{}/config.ini'.format(app_path))
 
-    server.run_server()
+    s = Server()
+    s.run()
 
 
 def main(argv=None):
