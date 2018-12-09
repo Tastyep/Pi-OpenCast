@@ -4,6 +4,8 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="$(basename "$PROJECT_DIR")"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
+TEST_DIR="tests"
+UNIT_TEST_DIR="unit"
 
 function start() {
   if [ "$(lsof -t -i :2020)" ]; then
@@ -16,7 +18,6 @@ function start() {
 
   git pull
   mkdir -p "$LOG_DIR"
-  pipenv install --skip-lock
   echo "Starting $PROJECT_NAME server."
   chmod +x "$PROJECT_NAME/server.py"
   pipenv run python -m "$PROJECT_NAME" &
@@ -42,6 +43,11 @@ function logs() {
   tail -n 50 -f "$PROJECT_DIR/$LOG_DIR/$LOG_FILE"
 }
 
+function tests() {
+  cd "$PROJECT_DIR" || exit 1
+  pipenv run python -m unittest discover -v -s "$TEST_DIR/$UNIT_TEST_DIR" -p "*_test.py"
+}
+
 case "$1" in
 start)
   start
@@ -58,7 +64,10 @@ status)
 logs)
   logs
   ;;
+test)
+  tests
+  ;;
 *)
-  echo "Usage: $0 {start|stop|restart|status|logs}"
+  echo "Usage: $0 {start|stop|restart|status|logs|test}"
   ;;
 esac
