@@ -4,8 +4,6 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="$(basename "$PROJECT_DIR")"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
-TEST_DIR="tests"
-UNIT_TEST_DIR="unit"
 
 function start() {
   if [ "$(lsof -t -i :2020)" ]; then
@@ -45,7 +43,7 @@ function logs() {
 
 function tests() {
   cd "$PROJECT_DIR" || exit 1
-  pipenv run python -m unittest discover -v -s "$TEST_DIR/$UNIT_TEST_DIR" -p "*_test.py"
+  pipenv run python -m unittest discover -v -p "*_test.py"
 }
 
 case "$1" in
