@@ -5,6 +5,7 @@ import time
 from omxplayer.player import OMXPlayer, OMXPlayerDeadError
 from dbus import DBusException
 from collections import deque
+from pathlib import Path
 
 from .history import History
 from .config import config
@@ -176,6 +177,10 @@ class OmxPlayer(object):
         else:
             video = self._queue.popleft()
             self._history.push(video)
+
+        if not Path(video.path).is_file():
+            logger.error("[player] file not found: {}".format(video))
+            return
 
         with self._playerMutex:
             self._make_player(video)
