@@ -1,4 +1,3 @@
-# Allow direct execution
 import unittest
 
 
