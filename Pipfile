@@ -11,6 +11,7 @@ omxplayer-wrapper = "*"
 youtube-dl = "*"
 mock = "*"
 pyyaml = "*"
+"hurry.filesize" = "*"
 
 [requires]
 python_version = "3.5"
