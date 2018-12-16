@@ -9,14 +9,15 @@ logger = logging.getLogger(__name__)
 class Video(object):
     def __init__(self, url, playlistId=None):
         self._url = url
-        self._subtitles = []
+        self._playlistId = playlistId
         self._path = None
         self._title = None
-        self._playlistId = playlistId
+        self._subtitles = []
 
         path = Path(url)
         if path.is_file():
             self.path = url
+            self._playlistId = self._path.parent
             self._title = self._path.name
 
     @property
