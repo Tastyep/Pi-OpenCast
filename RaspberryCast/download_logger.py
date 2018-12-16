@@ -18,13 +18,20 @@ class DownloadLogger(object):
                                .format(d))
         elif d['status'] == 'finished':
             self._logger.debug("[downloader] finished downloading {}"
-                               "({} bytes),"
-                               "now converting ..."
-                               .format(d['filename'], d['total_bytes']))
+                               " ({})"
+                               .format(d['filename'], size(d['total_bytes'])))
 
     def _format_ratio(self, d):
+        downloaded = d['downloaded_bytes']
+        total = d['total_bytes']
+
+        if downloaded is None or total is None:
+            return "unknown %"
         return "{0:.2f}%".format(100 *
                                  (d['downloaded_bytes'] / d['total_bytes']))
 
     def _format_speed(self, d):
-        return "{}/s".format(size(int(d['speed']), system=alternative))
+        speed = d['speed']
+        if d['speed'] is None:
+            speed = 0
+        return "{}/s".format(size(int(speed), system=alternative))
