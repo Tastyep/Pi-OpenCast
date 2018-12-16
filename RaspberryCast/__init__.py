@@ -14,7 +14,7 @@ def _real_main(argv):
         cfg = yaml.load(file)
         logging.config.dictConfig(cfg)
 
-    config.load('{}/config.ini'.format(app_path))
+    config.load_from_file('{}/config.ini'.format(app_path))
 
     s = Server()
     s.run()

@@ -75,7 +75,7 @@ class VideoDownloader(object):
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
-        video.path = config.dl_directory + '/' + video.title + '.mp4'
+        video.path = config.output_directory + '/' + video.title + '.mp4'
         logger.debug("[downloader] starting download for: %r" % (video.title))
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'

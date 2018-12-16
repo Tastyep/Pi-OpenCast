@@ -17,23 +17,27 @@ class VideoPlayer(object):
 
 
 class Downloader(object):
-    dl_directory = "/tmp"
+    output_directory = "/tmp"
 
 
 class Config(object):
     __metaclass__ = Singleton
 
     def __init__(self):
-        self._parser = configparser.RawConfigParser()
+        self._parser = configparser.ConfigParser()
         self._init_cache()
 
     def __getitem__(self, key):
         return self._entries.get(key)
 
-    def load(self, path):
+    def load_from_file(self, path):
         with open(path, 'r') as file:
             self._parser.read_file(file)
             self._load_cache()
+
+    def load_from_dict(self, dict):
+        self._parser.read_dict(dict)
+        self._load_cache()
 
     def _init_cache(self):
         self._entries = {
