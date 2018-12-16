@@ -5,6 +5,7 @@ import time
 from threading import Thread, Condition
 from collections import deque
 from .config import config
+from .download_logger import DownloadLogger
 
 logger = logging.getLogger(__name__)
 config = config["Downloader"]
@@ -15,6 +16,7 @@ class VideoDownloader(object):
         self._stopped = False
         self._queue = deque()
         self._cv = Condition()
+        self._logger = DownloadLogger()
         self._thread = Thread(target=self._download_queued_videos)
         self._thread.start()
 
@@ -76,6 +78,10 @@ class VideoDownloader(object):
 
     def _download(self, video, dl_callback):
         video.path = config.output_directory + '/' + video.title + '.mp4'
+
+        def download_hook(d):
+            self._logger.log_download(d)
+
         logger.debug("[downloader] starting download for: %r" % (video.title))
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
@@ -83,7 +89,8 @@ class VideoDownloader(object):
             'noplaylist': True,
             'ignoreerrors': True,
             'merge_output_format': 'mp4',
-            'outtmpl': str(video.path)
+            'outtmpl': str(video.path),
+            'progress_hooks': [download_hook]
         })
         with ydl:  # Download the video
             ydl.download([video.url])
