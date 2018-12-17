@@ -4,7 +4,7 @@ import logging
 from .config import config
 
 logger = logging.getLogger(__name__)
-config = config["VideoPlayer"]
+config = config['VideoPlayer']
 
 
 class History(object):
@@ -27,7 +27,7 @@ class History(object):
             file_path = str(last_item.path)
 
             if os.path.isfile(file_path):
-                logger.info('[history] deleting {}'.format(file_path))
+                logger.info("[history] deleting {}".format(file_path))
                 os.remove(file_path)
         logger.debug("[history] {}".format(self))
 

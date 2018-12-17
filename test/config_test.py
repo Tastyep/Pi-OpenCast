@@ -9,16 +9,16 @@ from RaspberryCast.config import (
 
 class ConfigTest(TestCase):
     def test_categories(self):
-        self.assertIsInstance(config["VideoPlayer"], VideoPlayer)
-        self.assertIsInstance(config["Downloader"], Downloader)
+        self.assertIsInstance(config['VideoPlayer'], VideoPlayer)
+        self.assertIsInstance(config['Downloader'], Downloader)
 
     def test_default_values(self):
-        vp = config["VideoPlayer"]
+        vp = config['VideoPlayer']
         self.assertTrue(vp.hide_background)
         self.assertEqual(15, vp.history_size)
 
-        dl = config["Downloader"]
-        self.assertEqual("/tmp", dl.output_directory)
+        dl = config['Downloader']
+        self.assertEqual('/tmp', dl.output_directory)
 
     def test_parse_video_player_config(self):
         config.load_from_dict({
@@ -28,7 +28,7 @@ class ConfigTest(TestCase):
             }
         })
 
-        vp = config["VideoPlayer"]
+        vp = config['VideoPlayer']
         self.assertFalse(vp.hide_background)
         self.assertEqual(10, vp.history_size)
 
@@ -39,5 +39,5 @@ class ConfigTest(TestCase):
             }
         })
 
-        dl = config["Downloader"]
+        dl = config['Downloader']
         self.assertEqual('/Video', dl.output_directory)

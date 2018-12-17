@@ -11,7 +11,7 @@ from .history import History
 from .config import config
 
 logger = logging.getLogger(__name__)
-config = config["VideoPlayer"]
+config = config['VideoPlayer']
 
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
@@ -57,7 +57,7 @@ class OmxPlayer(object):
 
     def queue(self, video, first=False):
         with self._cv:
-            logger.info("[player] queue video: %r" % (video))
+            logger.info("[player] queue video: {}".format(video))
             # Position the video with the videos of the same playlist.
             index = 0 if first else len(self._queue)
             if first and video.playlistId is not None:
@@ -66,7 +66,7 @@ class OmxPlayer(object):
                         index = len(self._queue) - i
                         break
             self._queue.insert(index, video)
-            logger.debug("[player] queue contains: %r" % (self._queue))
+            logger.debug("[player] queue contains: {}".format(self._queue))
             if self._continue:
                 self._cv.notify()
 

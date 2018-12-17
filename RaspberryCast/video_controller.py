@@ -15,7 +15,7 @@ class VideoController(object):
         self._downloader = video_downloader.make_video_downloader()
 
     def stream_video(self, url):
-        logger.debug('[controller] stream video, URL="' + url + '"')
+        logger.debug("[controller] stream video, URL='{}'".format(url))
         self._player.stop()
 
         video = Video(url)
@@ -26,7 +26,7 @@ class VideoController(object):
         self._queue_video(video, self._play_video, first=True)
 
     def queue_video(self, url):
-        logger.debug('[controller] queue video, URL="' + url + '"')
+        logger.debug("[controller] queue video, URL='{}'".format(url))
 
         video = Video(url)
         if video.is_local():
@@ -36,15 +36,15 @@ class VideoController(object):
         self._queue_video(video, self._player.queue, first=False)
 
     def stop_video(self):
-        logger.debug('[controller] stop current video')
+        logger.debug("[controller] stop current video")
         self._player.stop()
 
     def prev_video(self):
-        logger.debug('[controller] prev video')
+        logger.debug("[controller] prev video")
         self._player.prev()
 
     def next_video(self):
-        logger.debug('[controller] next video')
+        logger.debug("[controller] next video")
         self._player.next()
 
     def play_pause_video(self, pause):
@@ -52,13 +52,12 @@ class VideoController(object):
 
     def change_volume(self, increase):
         self._player.change_volume(increase)
-        logger.debug(
-            '[controller] change player volume, volume='
-            + str(self._player.volume))
+        logger.debug("[controller] change player volume, volume={}"
+                     .format(self._player.volume))
 
     def seek_time(self, forward, long):
-        logger.debug('[controller] seek video time, forward=%r, long=%r'
-                     % (forward, long))
+        logger.debug("[controller] seek video time, forward={}, long={}"
+                     .format(forward, long))
         self._player.seek(forward, long)
 
     # Getter methods
@@ -82,10 +81,11 @@ class VideoController(object):
             playlistId = uuid.uuid4()
             urls = self._parse_playlist(video.url)
             videos = [Video(u, playlistId) for u in urls]
-            logger.debug("[controller] playlist url unfolded to %r" % (videos))
+            logger.debug("[controller] playlist url unfolded to {}"
+                         .format(videos))
             self._downloader.queue(videos, dl_callback, first)
         else:
-            logger.debug("[controller] queue single video: %r" % (video))
+            logger.debug("[controller] queue single video: {}".format(video))
             self._downloader.queue([video], dl_callback, first)
 
     def _parse_playlist(self, url):

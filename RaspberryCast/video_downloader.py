@@ -8,7 +8,7 @@ from .config import config
 from .download_logger import DownloadLogger
 
 logger = logging.getLogger(__name__)
-config = config["Downloader"]
+config = config['Downloader']
 
 
 class VideoDownloader(object):
@@ -60,7 +60,7 @@ class VideoDownloader(object):
                         if v[0].playlistId == video.playlistId:
                             index = len(self._queue) - i
                             break
-                logger.info("[downloader] queue video %r" % (video))
+                logger.info("[downloader] queue video {}".format(video))
                 self._queue.insert(index, (video, dl_callback))
                 self._cv.notify()
             time.sleep(0.1)
@@ -82,7 +82,8 @@ class VideoDownloader(object):
         def download_hook(d):
             self._logger.log_download(d)
 
-        logger.debug("[downloader] starting download for: %r" % (video.title))
+        logger.debug("[downloader] starting download for: {}"
+                     .format(video.title))
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
                       'bestvideo+bestaudio/best',
@@ -94,7 +95,7 @@ class VideoDownloader(object):
         })
         with ydl:  # Download the video
             ydl.download([video.url])
-        logger.debug("[downloader] video downloaded: %r" % (video))
+        logger.debug("[downloader] video downloaded: {}".format(video))
         dl_callback(video)
 
 

@@ -24,9 +24,9 @@ class DownloadLogger(object):
     def _format_ratio(self, d):
         downloaded = d['downloaded_bytes']
         total = d['total_bytes']
-
         if downloaded is None or total is None:
             return "unknown %"
+
         return "{0:.2f}%".format(100 *
                                  (d['downloaded_bytes'] / d['total_bytes']))
 
@@ -34,4 +34,5 @@ class DownloadLogger(object):
         speed = d['speed']
         if d['speed'] is None:
             speed = 0
+
         return "{}/s".format(size(int(speed), system=alternative))

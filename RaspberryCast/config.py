@@ -17,7 +17,7 @@ class VideoPlayer(object):
 
 
 class Downloader(object):
-    output_directory = "/tmp"
+    output_directory = '/tmp'
 
 
 class Config(object):

@@ -24,11 +24,11 @@ class Server(object):
         self._controller = video_controller.make_video_controller()
 
         TEMPLATE_PATH.insert(0, os.path.join(app_path, 'views'))
-        SimpleTemplate.defaults["get_url"] = self._app.get_url
+        SimpleTemplate.defaults['get_url'] = self._app.get_url
 
     def run(self):
         self._set_routes()
-        logger.info('[server] started')
+        logger.info("[server] started")
         run(self._app, host='0.0.0.0', port=2020,
             reloader=False, debug=True, quiet=True)
 
@@ -54,7 +54,7 @@ class Server(object):
     def _stream(self):
         url = request.query['url']
         self._controller.stream_video(url)
-        return "1"
+        return '1'
 
     def _queue(self):
         url = request.query['url']
@@ -62,30 +62,30 @@ class Server(object):
 
     def _video(self):
         control = request.query['control']
-        logger.debug("Control command received: " + control)
+        logger.debug("Control command received: {}".format(control))
 
-        if control == "pause":
+        if control == 'pause':
             self._controller.play_pause_video(True)
-        elif control == "stop":
+        elif control == 'stop':
             self._controller.stop_video()
-        elif control == "right":
+        elif control == 'right':
             self._controller.seek_time(True, False)
-        elif control == "left":
+        elif control == 'left':
             self._controller.seek_time(False, False)
-        elif control == "longright":
+        elif control == 'longright':
             self._controller.seek_time(True, True)
-        elif control == "longleft":
+        elif control == 'longleft':
             self._controller.seek_time(False, True)
-        elif control == "prev":
+        elif control == 'prev':
             self._controller.prev_video()
-        elif control == "next":
+        elif control == 'next':
             self._controller.next_video()
-        return "1"
+        return '1'
 
     def _sound(self):
         vol = request.query['vol']
-        self._controller.change_volume(vol == "more")
-        return "1"
+        self._controller.change_volume(vol == 'more')
+        return '1'
 
     def _running(self):
         return 1
