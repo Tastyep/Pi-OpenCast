@@ -12,6 +12,7 @@ from bottle import (
     TEMPLATE_PATH,
 )
 
+from . import config
 from . import video_controller
 
 logger = logging.getLogger(__name__)
@@ -27,9 +28,11 @@ class Server(object):
         SimpleTemplate.defaults['get_url'] = self._app.get_url
 
     def run(self):
+        serverConfig = config.config['Server']
+
         self._set_routes()
-        logger.info("[server] started")
-        run(self._app, host='0.0.0.0', port=2020,
+        logger.info("[server] started on {}:{}".format(serverConfig.host, serverConfig.port))
+        run(self._app, host=serverConfig.host, port=serverConfig.port,
             reloader=False, debug=True, quiet=True)
 
     def _set_routes(self):

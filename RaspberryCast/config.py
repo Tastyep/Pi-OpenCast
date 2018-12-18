@@ -11,6 +11,11 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+class Server(object):
+    host = '0.0.0.0'
+    port = 2020
+
+
 class VideoPlayer(object):
     hide_background = True
     history_size = 15
@@ -41,6 +46,7 @@ class Config(object):
 
     def _init_cache(self):
         self._entries = {
+            'Server': Server(),
             'VideoPlayer': VideoPlayer(),
             'Downloader': Downloader()
         }
