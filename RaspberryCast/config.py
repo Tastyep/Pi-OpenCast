@@ -67,18 +67,21 @@ class Config(object):
 
     def _parse_entry(self, parser, category, entry_name):
         entry = getattr(category, entry_name)
-        entry_value = entry
+        value = entry
 
         if type(entry) is int:
-            entry_value = parser.getint(entry_name, fallback=entry)
+            value = parser.getint(entry_name, fallback=entry)
         elif type(entry) is float:
-            entry_value = parser.getfloat(entry_name, fallback=entry)
+            value = parser.getfloat(entry_name, fallback=entry)
         elif type(entry) is bool:
-            entry_value = parser.getboolean(entry_name, fallback=entry)
+            value = parser.getboolean(entry_name, fallback=entry)
         else:
-            entry_value = parser.get(entry_name, fallback=entry)
-
-        setattr(category, entry_name, entry_value)
+            value = parser.get(entry_name, fallback=entry)
+            if (type(entry) is str and
+                    (value.startswith(("'", '"')) and
+                     value[0] is value[-1])):
+                value = value[1:-1]
+        setattr(category, entry_name, value)
 
 
 config = Config()

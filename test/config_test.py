@@ -1,6 +1,7 @@
 from .util import TestCase
 
 from RaspberryCast.config import (
+    Server,
     VideoPlayer,
     Downloader,
     config,
@@ -9,16 +10,17 @@ from RaspberryCast.config import (
 
 class ConfigTest(TestCase):
     def test_categories(self):
+        self.assertIsInstance(config['Server'], Server)
         self.assertIsInstance(config['VideoPlayer'], VideoPlayer)
         self.assertIsInstance(config['Downloader'], Downloader)
 
     def test_default_values(self):
         vp = config['VideoPlayer']
         self.assertTrue(vp.hide_background)
-        self.assertEqual(15, vp.history_size)
+        self.assertEqual(vp.history_size, 15)
 
         dl = config['Downloader']
-        self.assertEqual('/tmp', dl.output_directory)
+        self.assertEqual(dl.output_directory, '/tmp')
 
     def test_parse_video_player_config(self):
         config.load_from_dict({
@@ -30,7 +32,7 @@ class ConfigTest(TestCase):
 
         vp = config['VideoPlayer']
         self.assertFalse(vp.hide_background)
-        self.assertEqual(10, vp.history_size)
+        self.assertEqual(vp.history_size, 10)
 
     def test_parse_downloader_config(self):
         config.load_from_dict({
@@ -40,4 +42,26 @@ class ConfigTest(TestCase):
         })
 
         dl = config['Downloader']
-        self.assertEqual('/Video', dl.output_directory)
+        self.assertEqual(dl.output_directory, '/Video')
+
+    def test_parse_server_config(self):
+        config.load_from_dict({
+            'Server': {
+                'host': 'host',
+                'port': 42
+            }
+        })
+
+        sv = config['Server']
+        self.assertEqual(sv.host, 'host')
+        self.assertEqual(sv.port, 42)
+
+    def test_parse_quoted_string(self):
+        config.load_from_dict({
+            'Server': {
+                'host': '"host"',
+            }
+        })
+
+        sv = config['Server']
+        self.assertEqual(sv.host, 'host')
