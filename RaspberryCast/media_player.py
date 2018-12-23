@@ -39,10 +39,6 @@ class OmxPlayer(object):
             else:
                 self._cv.notify()
 
-    @property
-    def volume(self):
-        return self._volume
-
     def play(self, video=None):
         with self._cv:
             self._continue = True

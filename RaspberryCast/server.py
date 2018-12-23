@@ -31,7 +31,8 @@ class Server(object):
         serverConfig = config.config['Server']
 
         self._set_routes()
-        logger.info("[server] started on {}:{}".format(serverConfig.host, serverConfig.port))
+        logger.info("[server] started on {}:{}"
+                    .format(serverConfig.host, serverConfig.port))
         run(self._app, host=serverConfig.host, port=serverConfig.port,
             reloader=False, debug=True, quiet=True)
 

@@ -1,5 +1,4 @@
 import logging
-import youtube_dl
 import uuid
 
 from . import media_player
@@ -52,8 +51,8 @@ class VideoController(object):
 
     def change_volume(self, increase):
         self._player.change_volume(increase)
-        logger.debug("[controller] change player volume, volume={}"
-                     .format(self._player.volume))
+        logger.debug("[controller] change player volume, increase: {}"
+                     .format(increase))
 
     def seek_time(self, forward, long):
         logger.debug("[controller] seek video time, forward={}, long={}"
@@ -79,7 +78,7 @@ class VideoController(object):
             logger.debug("[controller] playlist detected, unfolding...")
             # Generate a unique ID for the playlist
             playlistId = uuid.uuid4()
-            urls = self._parse_playlist(video.url)
+            urls = self._downloader.extract_playlist(video.url)
             videos = [Video(u, playlistId) for u in urls]
             logger.debug("[controller] playlist url unfolded to {}"
                          .format(videos))
@@ -87,21 +86,6 @@ class VideoController(object):
         else:
             logger.debug("[controller] queue single video: {}".format(video))
             self._downloader.queue([video], dl_callback, first)
-
-    def _parse_playlist(self, url):
-        ydl_opts = {
-            'ignoreerrors': True,
-            'extract_flat': 'in_playlist',
-            'logger': logger
-        }
-        ydl = youtube_dl.YoutubeDL(ydl_opts)
-        with ydl:  # Download the playlist data without downloading the videos.
-            data = ydl.extract_info(url, download=False)
-
-        base_url = url.split('/playlist', 1)[0]
-        urls = [base_url + '/watch?v=' + entry['id']
-                for entry in data['entries']]
-        return urls
 
 
 def make_video_controller():

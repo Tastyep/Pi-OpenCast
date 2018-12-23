@@ -7,19 +7,22 @@ class DownloadLogger(object):
     def __init__(self):
         self._logger = logging.getLogger('Downloader')
 
+    def is_enabled_for(self, level):
+        return self._logger.isEnabledFor(level)
+
     def log_download(self, d):
         if d['status'] == 'downloading':
-            self._logger.debug("[downloader] {} | {} | {}"
-                               .format(d['filename'],
-                                       self._format_ratio(d),
-                                       self._format_speed(d)))
+            self._logger.info("[downloader] {} | {} | {}"
+                              .format(d['filename'],
+                                      self._format_ratio(d),
+                                      self._format_speed(d)))
         elif d['status'] == 'error':
             self._logger.error("[downloader] error downloading {}"
                                .format(d))
         elif d['status'] == 'finished':
-            self._logger.debug("[downloader] finished downloading {}"
-                               " ({})"
-                               .format(d['filename'], size(d['total_bytes'])))
+            self._logger.info("[downloader] finished downloading {}"
+                              " ({})"
+                              .format(d['filename'], size(d['total_bytes'])))
 
     def _format_ratio(self, d):
         downloaded = d['downloaded_bytes']

@@ -17,6 +17,7 @@ class VideoDownloader(object):
         self._queue = deque()
         self._cv = Condition()
         self._logger = DownloadLogger()
+        self._log_debug = self._logger.is_enabled_for(logging.DEBUG)
         self._thread = Thread(target=self._download_queued_videos)
         self._thread.start()
 
@@ -30,15 +31,30 @@ class VideoDownloader(object):
         Thread(target=self._queue_downloads,
                args=(videos, dl_callback, first,)).start()
 
+    def extract_playlist(self, url):
+        ydl_opts = {
+            'extract_flat': 'in_playlist',
+            'logger': logger
+        }
+        ydl = youtube_dl.YoutubeDL(ydl_opts)
+        with ydl:  # Download the playlist data without downloading the videos.
+            data = ydl.extract_info(url, download=False)
+
+        # NOTE(specific) youtube specific
+        base_url = url.split('/playlist', 1)[0]
+        urls = [base_url + '/watch?v=' + entry['id']
+                for entry in data['entries']]
+        return urls
+
     def list_queue(self):
         return list(self._queue)
 
     def _fetch_metadata(self, video):
+        logger.debug("[downloader] fetching metadata")
         ydl = youtube_dl.YoutubeDL(
             {
                 'noplaylist': True,
-                'ignoreerrors': True,
-                'debug_printtraffic': False,
+                'debug_printtraffic': self._log_debug,
                 'logger': logger
             })
         with ydl:  # Download the video data without downloading it.
@@ -87,8 +103,8 @@ class VideoDownloader(object):
         ydl = youtube_dl.YoutubeDL({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
                       'bestvideo+bestaudio/best',
+            'debug_printtraffic': self._log_debug,
             'noplaylist': True,
-            'ignoreerrors': True,
             'merge_output_format': 'mp4',
             'outtmpl': str(video.path),
             'progress_hooks': [download_hook]
