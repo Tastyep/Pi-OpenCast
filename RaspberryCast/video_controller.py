@@ -1,8 +1,10 @@
 import logging
 import uuid
 
-from . import media_player
-from . import video_downloader
+from . import (
+    media_player,
+    video_downloader,
+)
 from .video import Video
 
 logger = logging.getLogger(__name__)

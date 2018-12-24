@@ -1,9 +1,13 @@
-import youtube_dl
 import logging
 import time
-
-from threading import Thread, Condition
 from collections import deque
+from threading import (
+    Condition,
+    Thread,
+)
+
+import youtube_dl
+
 from .config import config
 from .download_logger import DownloadLogger
 

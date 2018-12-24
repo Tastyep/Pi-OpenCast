@@ -2,18 +2,20 @@ import logging
 import os
 
 from bottle import (
+    TEMPLATE_PATH,
     Bottle,
     SimpleTemplate,
     request,
     response,
-    template,
     run,
     static_file,
-    TEMPLATE_PATH,
+    template,
 )
 
-from . import config
-from . import video_controller
+from . import (
+    config,
+    video_controller,
+)
 
 logger = logging.getLogger(__name__)
 app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))

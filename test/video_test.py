@@ -1,7 +1,8 @@
-from .util import TestCase
+from pathlib import Path
 
 from RaspberryCast.video import Video
-from pathlib import Path
+
+from .util import TestCase
 
 
 class VideoTest(TestCase):

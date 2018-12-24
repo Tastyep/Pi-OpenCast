@@ -1,6 +1,6 @@
-from .util import TestCase
-
 from RaspberryCast.history import History
+
+from .util import TestCase
 
 
 class HistoryTest(TestCase):

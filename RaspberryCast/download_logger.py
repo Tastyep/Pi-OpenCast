@@ -1,6 +1,9 @@
 import logging
 
-from hurry.filesize import alternative, size
+from hurry.filesize import (
+    alternative,
+    size,
+)
 
 
 class DownloadLogger(object):

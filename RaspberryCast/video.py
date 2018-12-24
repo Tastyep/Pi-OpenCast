@@ -1,6 +1,6 @@
 import logging
-
 from pathlib import Path
+
 from . import subtitle
 
 logger = logging.getLogger(__name__)

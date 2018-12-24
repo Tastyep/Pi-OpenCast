@@ -1,11 +1,11 @@
-from .util import TestCase
-
 from RaspberryCast.config import (
+    Downloader,
     Server,
     VideoPlayer,
-    Downloader,
     config,
 )
+
+from .util import TestCase
 
 
 class ConfigTest(TestCase):

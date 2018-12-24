@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
-import RaspberryCast
 
+import RaspberryCast
 
 if __package__ is None and not hasattr(sys, 'frozen'):
     # direct call of __main__.py

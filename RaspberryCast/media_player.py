@@ -1,14 +1,18 @@
 import logging
 import threading
 import time
-
-from omxplayer.player import OMXPlayer, OMXPlayerDeadError
-from dbus import DBusException
 from collections import deque
 from pathlib import Path
 
-from .history import History
+from dbus import DBusException
+
+from omxplayer.player import (
+    OMXPlayer,
+    OMXPlayerDeadError,
+)
+
 from .config import config
+from .history import History
 
 logger = logging.getLogger(__name__)
 config = config['VideoPlayer']
