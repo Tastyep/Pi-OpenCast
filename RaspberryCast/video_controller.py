@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class VideoController(object):
-    def __init__(self):
-        self._player = media_player.make_player(1.0)
-        self._downloader = video_downloader.make_video_downloader()
+    def __init__(self, player, downloader):
+        self._player = player
+        self._downloader = downloader
 
     def stream_video(self, url):
         logger.debug("[controller] stream video, URL='{}'".format(url))
@@ -48,7 +48,7 @@ class VideoController(object):
         logger.debug("[controller] next video")
         self._player.next()
 
-    def play_pause_video(self, pause):
+    def play_pause_video(self):
         self._player.play_pause()
 
     def change_volume(self, increase):
@@ -91,4 +91,7 @@ class VideoController(object):
 
 
 def make_video_controller():
-    return VideoController()
+    player = media_player.make_player(1.0)
+    downloader = video_downloader.make_video_downloader()
+
+    return VideoController(player, downloader)
