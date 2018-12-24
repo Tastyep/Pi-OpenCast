@@ -71,7 +71,7 @@ class Server(object):
         logger.debug("Control command received: {}".format(control))
 
         if control == 'pause':
-            self._controller.play_pause_video(True)
+            self._controller.play_pause_video()
         elif control == 'stop':
             self._controller.stop_video()
         elif control == 'right':

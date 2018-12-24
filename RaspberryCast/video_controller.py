@@ -79,9 +79,9 @@ class VideoController(object):
         if '/playlist' in video.url:
             logger.debug("[controller] playlist detected, unfolding...")
             # Generate a unique ID for the playlist
-            playlistId = uuid.uuid4()
+            playlist_id = uuid.uuid4()
             urls = self._downloader.extract_playlist(video.url)
-            videos = [Video(u, playlistId) for u in urls]
+            videos = [Video(u, playlist_id) for u in urls]
             logger.debug("[controller] playlist url unfolded to {}"
                          .format(videos))
             self._downloader.queue(videos, dl_callback, first)

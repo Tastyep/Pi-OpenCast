@@ -60,9 +60,9 @@ class OmxPlayer(object):
             logger.info("[player] queue video: {}".format(video))
             # Position the video with the videos of the same playlist.
             index = 0 if first else len(self._queue)
-            if first and video.playlistId is not None:
+            if first and video.playlist_id is not None:
                 for i, v in enumerate(reversed(self._queue)):
-                    if v.playlistId == video.playlistId:
+                    if v.playlist_id == video.playlist_id:
                         index = len(self._queue) - i
                         break
             self._queue.insert(index, video)

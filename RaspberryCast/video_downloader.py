@@ -75,9 +75,9 @@ class VideoDownloader(object):
                     continue
                 # Position the video with the videos of the same playlist.
                 index = 0 if first else len(self._queue)
-                if first and video.playlistId is not None:
+                if first and video.playlist_id is not None:
                     for i, v in enumerate(reversed(self._queue)):
-                        if v[0].playlistId == video.playlistId:
+                        if v[0].playlist_id == video.playlist_id:
                             index = len(self._queue) - i
                             break
                 logger.info("[downloader] queue video {}".format(video))

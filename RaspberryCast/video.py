@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 
 
 class Video(object):
-    def __init__(self, url, playlistId=None):
+    def __init__(self, url, playlist_id=None):
         self._url = url
-        self._playlistId = playlistId
+        self._playlist_id = playlist_id
         self._path = None
         self._title = None
         self._subtitles = []
@@ -17,8 +17,19 @@ class Video(object):
         path = Path(url)
         if path.is_file():
             self.path = url
-            self._playlistId = self._path.parent
+            self._playlist_id = self._path.parent
             self._title = self._path.name
+
+    def __repr__(self):
+        title = '' if self._title is None else str(self._title)
+        playlist_id = '' if self._playlist_id is None else str(self._playlist_id)
+        return str({'title': title,
+                    'url': str(self._url),
+                    'playlist_id': playlist_id})
+
+    def __eq__(self, other):
+        return (self._url is other._url and
+                self._playlist_id is other._playlist_id)
 
     @property
     def url(self):
@@ -46,16 +57,8 @@ class Video(object):
         self._title = str(title.encode('ascii', 'ignore'))
 
     @property
-    def playlistId(self):
-        return self._playlistId
-
-    def __repr__(self):
-        title = '' if self._title is None else str(self._title)
-        return str({'title': title, 'url': str(self._url)})
-
-    def __eq__(self, other):
-        return (self._url is other._url and
-                self._playlistId is other._playlistId)
+    def playlist_id(self):
+        return self._playlist_id
 
     def is_local(self):
         return self._path is not None

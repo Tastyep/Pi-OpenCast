@@ -14,18 +14,18 @@ class VideoTest(TestCase):
         video = Video(url)
 
         self.assertEqual(video.url, url)
-        self.assertIsNone(video.playlistId)
+        self.assertIsNone(video.playlist_id)
         self.assertIsNone(video.path)
         self.assertIsNone(video.title)
         self.assertEmpty(video.subtitles)
 
     def test_construction_from_playlist_url(self):
         url = 'https://domain.com/video=test&playlist=playlist'
-        playlistId = 'id'
-        video = Video(url, playlistId)
+        playlist_id = 'id'
+        video = Video(url, playlist_id)
 
         self.assertEqual(video.url, url)
-        self.assertEqual(video.playlistId, playlistId)
+        self.assertEqual(video.playlist_id, playlist_id)
         self.assertIsNone(video.path)
         self.assertIsNone(video.title)
         self.assertEmpty(video.subtitles)
@@ -37,7 +37,7 @@ class VideoTest(TestCase):
         self.make_file(path)
 
         self.assertEqual(video.url, path)
-        self.assertEqual(video.playlistId, Path(path).parent)
+        self.assertEqual(video.playlist_id, Path(path).parent)
         self.assertEqual(video.path, Path(path))
         self.assertEqual(video.title, 'test')
         self.assertEmpty(video.subtitles)
@@ -51,5 +51,5 @@ class VideoTest(TestCase):
         self.make_file('/tmp/foo')
         self.make_file('/tmp/bar')
 
-        self.assertEqual(Video('/tmp/foo').playlistId,
-                         Video('/tmp/bar').playlistId)
+        self.assertEqual(Video('/tmp/foo').playlist_id,
+                         Video('/tmp/bar').playlist_id)
