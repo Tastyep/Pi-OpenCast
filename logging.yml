@@ -23,6 +23,6 @@ loggers:
     handlers: [console, file]
     propagate: no
   Downloader:
-    level: DEBUG
+    level: INFO
     handlers: [file]
     propagate: no

@@ -14,31 +14,40 @@ class DownloadLogger(object):
         return self._logger.isEnabledFor(level)
 
     def log_download(self, d):
-        if d['status'] == 'downloading':
-            self._logger.info("[downloader] {} | {} | {}"
-                              .format(d['filename'],
-                                      self._format_ratio(d),
-                                      self._format_speed(d)))
-        elif d['status'] == 'error':
-            self._logger.error("[downloader] error downloading {}"
-                               .format(d))
-        elif d['status'] == 'finished':
-            self._logger.info("[downloader] finished downloading {}"
-                              " ({})"
-                              .format(d['filename'], size(d['total_bytes'])))
+        status = d.get('status', 'N/A')
+        if status is 'downloading':
+            self._log_download_info(d)
+        elif status is 'error':
+            self._log_download_error(d)
+        elif status is 'finished':
+            self._log_download_finished(d)
+
+    def _log_download_info(self, d):
+        filename = d.get('filename', 'unknown')
+        self._logger.info("[downloader] {} | {} | {}"
+                          .format(filename,
+                                  self._format_ratio(d),
+                                  self._format_speed(d)))
+
+    def _log_download_error(self, d):
+        filename = d.get('filename', 'unknown')
+        self._logger.error("[downloader] error downloading {}: {}"
+                           .format(filename, d))
+
+    def _log_download_finished(self, d):
+        filename = d.get('filename', 'unknown')
+        total = d.get('total_bytes', 0)
+        self._logger.info("[downloader] finished downloading {} ({})"
+                          .format(filename, size(total)))
 
     def _format_ratio(self, d):
-        downloaded = d['downloaded_bytes']
-        total = d['total_bytes']
+        downloaded = d.get('downloaded_bytes', None)
+        total = d.get('total_bytes', None)
         if downloaded is None or total is None:
-            return "unknown %"
+            return "N/A %"
 
-        return "{0:.2f}%".format(100 *
-                                 (d['downloaded_bytes'] / d['total_bytes']))
+        return "{0:.2f}%".format(100 * (downloaded / total))
 
     def _format_speed(self, d):
-        speed = d['speed']
-        if d['speed'] is None:
-            speed = 0
-
+        speed = d.get('speed', 0)
         return "{}/s".format(size(int(speed), system=alternative))
