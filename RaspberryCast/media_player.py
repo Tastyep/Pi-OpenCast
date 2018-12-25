@@ -28,7 +28,7 @@ class OmxPlayer(object):
         self._volume = default_volume
 
         self._player = None
-        self._continue = True
+        self._autoplay = True
         self._playerMutex = threading.RLock()
 
         self._cv = threading.Condition()
@@ -45,10 +45,8 @@ class OmxPlayer(object):
 
     def play(self, video=None):
         with self._cv:
-            self._continue = True
+            self._autoplay = True
             if video is not None:
-                # Cancel next() done in at_exit()
-                self._history.prev()
                 self._history.stop_browsing()
                 self.queue(video, first=True)
                 return
@@ -67,7 +65,7 @@ class OmxPlayer(object):
                         break
             self._queue.insert(index, video)
             logger.debug("[player] queue contains: {}".format(self._queue))
-            if self._continue:
+            if self._autoplay:
                 self._cv.notify()
 
     def list_queue(self):
@@ -80,7 +78,7 @@ class OmxPlayer(object):
                 return
 
             logger.info("[player] stopping ...")
-            self._continue = False
+            self._autoplay = False
             self._exec_command('stop')
 
             def is_stopped():
@@ -226,7 +224,7 @@ class OmxPlayer(object):
         self._reset_player()
 
         with self._cv:
-            if not self._continue:
+            if not self._autoplay:
                 return
             self._cv.notify()
 
