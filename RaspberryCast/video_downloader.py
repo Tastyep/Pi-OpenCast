@@ -1,5 +1,4 @@
 import logging
-import time
 from collections import deque
 from threading import (
     Condition,
@@ -32,8 +31,21 @@ class VideoDownloader(object):
         self._thread.join()
 
     def queue(self, videos, dl_callback, first=False):
-        Thread(target=self._queue_downloads,
-               args=(videos, dl_callback, first,)).start()
+        with self._cv:
+            for video in videos:
+                # Position the video with the videos of the same playlist.
+                index = 0 if first else len(self._queue)
+                if first and video.playlist_id is not None:
+                    for i, v in enumerate(reversed(self._queue)):
+                        if v[0].playlist_id == video.playlist_id:
+                            index = len(self._queue) - i
+                            break
+                logger.info("[downloader] queue video {}".format(video))
+                self._queue.insert(index, (video, dl_callback))
+            self._cv.notify()
+
+    def list(self):
+        return list(self._queue)
 
     def extract_playlist(self, url):
         ydl_opts = {
@@ -50,41 +62,6 @@ class VideoDownloader(object):
                 for entry in data['entries']]
         return urls
 
-    def list_queue(self):
-        return list(self._queue)
-
-    def _fetch_metadata(self, video):
-        logger.debug("[downloader] fetching metadata")
-        ydl = youtube_dl.YoutubeDL(
-            {
-                'noplaylist': True,
-                'debug_printtraffic': self._log_debug,
-                'logger': logger
-            })
-        with ydl:  # Download the video data without downloading it.
-            data = ydl.extract_info(video.url, download=False)
-        if data is not None:
-            video.title = data['title']
-            return True
-        return False
-
-    def _queue_downloads(self, videos, dl_callback, first):
-        for video in videos:
-            with self._cv:
-                if not self._fetch_metadata(video):
-                    continue
-                # Position the video with the videos of the same playlist.
-                index = 0 if first else len(self._queue)
-                if first and video.playlist_id is not None:
-                    for i, v in enumerate(reversed(self._queue)):
-                        if v[0].playlist_id == video.playlist_id:
-                            index = len(self._queue) - i
-                            break
-                logger.info("[downloader] queue video {}".format(video))
-                self._queue.insert(index, (video, dl_callback))
-                self._cv.notify()
-            time.sleep(0.1)
-
     def _download_queued_videos(self):
         while not self._stopped:
             video, dl_callback = (None, None)
@@ -97,6 +74,9 @@ class VideoDownloader(object):
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
+        if not self._fetch_metadata(video):
+            return
+
         video.path = config.output_directory + '/' + video.title + '.mp4'
 
         def download_hook(d):
@@ -117,6 +97,22 @@ class VideoDownloader(object):
             ydl.download([video.url])
         logger.debug("[downloader] video downloaded: {}".format(video))
         dl_callback(video)
+
+    def _fetch_metadata(self, video):
+        logger.debug("[downloader] fetching metadata")
+        ydl = youtube_dl.YoutubeDL(
+            {
+                'noplaylist': True,
+                'debug_printtraffic': self._log_debug,
+                'logger': logger
+            })
+        with ydl:  # Download the video data without downloading it.
+            data = ydl.extract_info(video.url, download=False)
+        if data is None:
+            return False
+
+        video.title = data['title']
+        return True
 
 
 def make_video_downloader():
