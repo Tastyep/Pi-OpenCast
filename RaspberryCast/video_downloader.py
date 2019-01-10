@@ -48,13 +48,13 @@ class VideoDownloader(object):
         return list(self._queue)
 
     def extract_playlist(self, url):
-        ydl_opts = {
+        options = {
             'extract_flat': 'in_playlist',
-            'logger': logger
         }
-        ydl = youtube_dl.YoutubeDL(ydl_opts)
-        with ydl:  # Download the playlist data without downloading the videos.
-            data = ydl.extract_info(url, download=False)
+        # Download the playlist data without downloading the videos.
+        data = self._fetch_metadata(url, options)
+        if data is None:
+            return []
 
         # NOTE(specific) youtube specific
         base_url = url.split('/playlist', 1)[0]
@@ -74,9 +74,14 @@ class VideoDownloader(object):
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
-        if not self._fetch_metadata(video):
+        options = {
+            'noplaylist': True,
+        }
+        data = self._fetch_metadata(video.url, options)
+        if data is None:
             return
 
+        video.title = data['title']
         video.path = config.output_directory + '/' + video.title + '.mp4'
 
         def download_hook(d):
@@ -84,7 +89,7 @@ class VideoDownloader(object):
 
         logger.debug("[downloader] starting download for: {}"
                      .format(video.title))
-        ydl = youtube_dl.YoutubeDL({
+        options = {
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
                       'bestvideo+bestaudio/best',
             'debug_printtraffic': self._log_debug,
@@ -92,27 +97,34 @@ class VideoDownloader(object):
             'merge_output_format': 'mp4',
             'outtmpl': str(video.path),
             'progress_hooks': [download_hook]
-        })
+        }
+        ydl = youtube_dl.YoutubeDL(options)
         with ydl:  # Download the video
-            ydl.download([video.url])
+            try:
+                ydl.download([video.url])
+            except Exception as e:
+                logger.error("[downloader] error downloading '{}': {}"
+                             .format(video, str(e)))
+                return
+
         logger.debug("[downloader] video downloaded: {}".format(video))
         dl_callback(video)
 
-    def _fetch_metadata(self, video):
+    def _fetch_metadata(self, url, options):
         logger.debug("[downloader] fetching metadata")
-        ydl = youtube_dl.YoutubeDL(
-            {
-                'noplaylist': True,
-                'debug_printtraffic': self._log_debug,
-                'logger': logger
-            })
-        with ydl:  # Download the video data without downloading it.
-            data = ydl.extract_info(video.url, download=False)
-        if data is None:
-            return False
-
-        video.title = data['title']
-        return True
+        options.update({
+            'ignoreerrors': True,   # Causes ydl to return None on error
+            'debug_printtraffic': self._log_debug,
+            'logger': logger
+        })
+        ydl = youtube_dl.YoutubeDL(options)
+        with ydl:
+            try:
+                return ydl.extract_info(url, download=False)
+            except Exception as e:
+                logger.error("[downloader] error fetch metadata for '{}': {}"
+                             .format(url, str(e)))
+        return None
 
 
 def make_video_downloader():
