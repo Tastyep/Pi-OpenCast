@@ -10,8 +10,8 @@ config = config['VideoPlayer']
 class History(object):
     def __init__(self, items=[]):
         self._index = 0
-        self._items = items
         self._browsing = False
+        self._items = items
 
     def __repr__(self):
         return str(self._items)
@@ -32,7 +32,8 @@ class History(object):
         logger.debug("[history] {}".format(self))
 
     def prev(self):
-        pos = self._index + 1
+        step = int(self._browsing)
+        pos = self._index + step
         if pos >= len(self._items):
             return False
 
@@ -46,8 +47,10 @@ class History(object):
             return False
 
         self._index -= 1
-        self._browsing = self._index > 0
         return True
+
+    def can_prev(self):
+        return self._index + int(self._browsing) < len(self._items)
 
     def current_item(self):
         return self._items[self._index]
@@ -56,6 +59,6 @@ class History(object):
         return self._browsing
 
     def stop_browsing(self):
-        self._browsing = False
         self._index = 0
+        self._browsing = False
         logger.debug("[history] browsing turned off: {}".format(self))
