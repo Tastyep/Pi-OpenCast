@@ -3,3 +3,4 @@ rcast.log
 *.tmp
 *.pyc
 *~
+*.xpi

@@ -50,4 +50,6 @@ class DownloadLogger(object):
 
     def _format_speed(self, d):
         speed = d.get('speed', 0)
-        return "{}/s".format(size(int(speed), system=alternative))
+        if speed is None:
+            speed = 0
+        return "{}/s".format(size(speed, system=alternative))
