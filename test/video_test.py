@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from RaspberryCast.video import Video
+from OpenCast.video import Video
 
 from .util import TestCase
 

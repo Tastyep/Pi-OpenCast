@@ -19,4 +19,4 @@ install:
 
 # command to run tests
 script:
-  - ./RaspberryCast.sh test
+  - ./OpenCast.sh test

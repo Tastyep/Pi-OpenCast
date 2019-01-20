@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 
-import RaspberryCast
+import OpenCast
 
 if __package__ is None and not hasattr(sys, 'frozen'):
     # direct call of __main__.py
@@ -10,4 +10,4 @@ if __package__ is None and not hasattr(sys, 'frozen'):
     sys.path.insert(0, os.path.dirname(os.path.dirname(path)))
 
 if __name__ == '__main__':
-    RaspberryCast.main()
+    OpenCast.main()

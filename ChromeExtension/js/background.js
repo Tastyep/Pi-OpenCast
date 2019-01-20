@@ -20,7 +20,7 @@ function mkrequest(url, response) {
 	try {
 		var newURL = "http://"+localStorage.getItem('raspip')+":2020"+url;
 		if (response == 1) {
-			notif("RaspberryCast", "Processing video. Please wait ~ 10 seconds.");
+			notif("OpenCast", "Processing video. Please wait ~ 10 seconds.");
 		}
 		var req = new XMLHttpRequest();
 		req.open('GET', newURL, true);
@@ -29,9 +29,9 @@ function mkrequest(url, response) {
 				if (req.status == 200) {
 					if (response == 1) {
 						if (req.responseText == "1") {
-							notif("RaspberryCast", "Video should now start playing.");	
+							notif("OpenCast", "Video should now start playing.");	
 						} else if (req.responseText == "2") {
-							notif("RaspberryCast", "Video has been added to queue.");	
+							notif("OpenCast", "Video has been added to queue.");	
 						} else {
 							notif("Error", "Please make sure the link is compatible");
 						}

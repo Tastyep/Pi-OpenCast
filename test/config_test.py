@@ -1,4 +1,4 @@
-from RaspberryCast.config import (
+from OpenCast.config import (
     Downloader,
     Server,
     VideoPlayer,

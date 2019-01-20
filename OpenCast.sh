@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_NAME="$(basename "$PROJECT_DIR")"
+PROJECT_NAME="OpenCast"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 
@@ -17,7 +17,6 @@ function start() {
   git pull
   mkdir -p "$LOG_DIR"
   echo "Starting $PROJECT_NAME server."
-  chmod +x "$PROJECT_NAME/server.py"
   pipenv run python -m "$PROJECT_NAME" &
 }
 

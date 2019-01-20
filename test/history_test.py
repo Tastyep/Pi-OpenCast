@@ -1,4 +1,4 @@
-from RaspberryCast.history import History
+from OpenCast.history import History
 
 from .util import TestCase
 

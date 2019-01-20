@@ -12,13 +12,13 @@ handlers:
     stream: ext://sys.stdout
   file:
     class: logging.handlers.TimedRotatingFileHandler
-    filename: 'log/RaspberryCast.log'
+    filename: 'log/OpenCast.log'
     when: 'D'
     level: DEBUG
     backupCount: 5
     formatter: file
 loggers:
-  RaspberryCast:
+  OpenCast:
     level: DEBUG
     handlers: [console, file]
     propagate: no

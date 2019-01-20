@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USER="$(whoami)"
-PROJECT="RaspberryCast"
+PROJECT="$(basename "$PROJECT_DIR")"
 
 function info() {
   local yel="\\033[1;33m"
@@ -47,7 +47,7 @@ info "Adding to startup options (/etc/rc.local)"
 sudo sed -i /"exit 0"/d /etc/rc.local
 printf "~%s/$PROJECT/$PROJECT.sh start\\nexit 0\\n" "$USER" 2>&1 | sudo tee -a /etc/rc.local >/dev/null
 
-# Starting RaspberryCast
+# Starting OpenCast
 info "Starting $PROJECT"
 chmod +x "$homedir/$PROJECT/$PROJECT.sh"
 "$homedir/$PROJECT/$PROJECT.sh" start

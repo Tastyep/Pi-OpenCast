@@ -2,7 +2,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<meta charset="utf-8">
-		<title>RaspberryCast</title>
+		<title>OpenCast</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link href="{{get_url('static', filename='remote.css') }}" rel="stylesheet">
 		<link href="{{get_url('static', filename='bootstrap.min.css') }}" rel="stylesheet">
