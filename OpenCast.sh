@@ -18,6 +18,8 @@ function start() {
   mkdir -p "$LOG_DIR"
   echo "Starting $PROJECT_NAME server."
   pipenv run python -m "$PROJECT_NAME" &
+  pid="$(pgrep -f "python -m $PROJECT_NAME")"
+  echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
 
 function stop() {
