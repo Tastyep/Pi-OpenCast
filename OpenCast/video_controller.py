@@ -17,7 +17,7 @@ class VideoController(object):
 
     def stream_video(self, url):
         logger.debug("[controller] stream video, URL='{}'".format(url))
-        self._player.stop()
+        self._player.stop(stop_browsing=True)
 
         video = Video(url)
         if video.is_local():
@@ -38,7 +38,7 @@ class VideoController(object):
 
     def stop_video(self):
         logger.debug("[controller] stop current video")
-        self._player.stop()
+        self._player.stop(next_video=True)
 
     def prev_video(self):
         logger.debug("[controller] prev video")

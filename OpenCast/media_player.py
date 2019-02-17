@@ -29,6 +29,7 @@ class OmxPlayer(object):
 
         self._player = None
         self._autoplay = False
+        self._next_video = True
         self._playerMutex = threading.RLock()
 
         self._cv = threading.Condition()
@@ -71,14 +72,18 @@ class OmxPlayer(object):
     def list_queue(self):
         return list(self._queue)
 
-    def stop(self, next_video=True):
+    def stop(self, next_video=True, stop_browsing=False):
         with self._cv:
             if not self._playing():
                 logger.debug("[player] is already stopped")
                 return
 
+            if stop_browsing is True:
+                self._history.stop_browsing()
+
             logger.info("[player] stopping ...")
-            self._autoplay = next_video
+            self._autoplay = False
+            self._next_video = next_video
             self._exec_command('stop')
 
             def is_stopped():
@@ -93,6 +98,8 @@ class OmxPlayer(object):
 
             if self._playing():
                 self.stop(next_video=False)
+            else:  # Come back on the last played video
+                self._history.prev()
 
             self._history.prev()
             self.play()
@@ -100,7 +107,7 @@ class OmxPlayer(object):
     def next(self):
         with self._cv:
             if self._playing():
-                self.stop()
+                self.stop(next_video=True)
             self.play()
 
     def play_pause(self):
@@ -222,7 +229,7 @@ class OmxPlayer(object):
         # NOTE: No need of using 'with self._cv' as
         # stop synchronizes the destruction.
         logger.info("[player] stopped")
-        if self._history.browsing() and self._autoplay:
+        if self._history.browsing() and self._next_video:
             self._history.next()
         self._reset_player()
 
