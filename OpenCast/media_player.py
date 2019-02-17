@@ -178,6 +178,9 @@ class OmxPlayer(object):
 
         if not Path(video.path).is_file():
             logger.error("[player] file not found: {}".format(video))
+            if self._history.browsing():
+                self._history.remove(video)
+                self._history.stop_browsing()
             return
 
         with self._playerMutex:

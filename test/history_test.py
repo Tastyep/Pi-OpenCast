@@ -17,6 +17,18 @@ class HistoryTest(TestCase):
         history.push(1)
         self.assertEqual(history.current_item(), 0)
 
+    def test_remove(self):
+        history = History([0])
+
+        self.assertTrue(history.remove(0))
+        self.assertEqual(history.size(), 0)
+
+    def test_remove_inexistant(self):
+        history = History([0])
+
+        self.assertFalse(history.remove(1))
+        self.assertEqual(history.size(), 1)
+
     def test_can_prev_success(self):
         history = History([0])
 
@@ -69,4 +81,27 @@ class HistoryTest(TestCase):
 
         history.stop_browsing()
         self.assertEqual(history.current_item(), 0)
+        self.assertFalse(history.browsing())
+
+    def test_integration(self):
+        history = History([0])
+
+        self.assertTrue(history.prev())  # 0
+        self.assertTrue(history.browsing())
+
+        self.assertTrue(history.remove(0))
+        self.assertFalse(history.browsing())
+        self.assertEqual(history.size(), 0)
+
+        history.push(1)
+        history.push(2)
+        self.assertTrue(history.prev())  # 2
+        self.assertTrue(history.prev())  # 1
+        self.assertTrue(history.browsing())
+        self.assertEqual(history.current_item(), 1)
+
+        self.assertTrue(history.remove(2))
+        self.assertEqual(history.current_item(), 1)
+
+        self.assertFalse(history.next())
         self.assertFalse(history.browsing())

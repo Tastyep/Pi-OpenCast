@@ -31,6 +31,23 @@ class History(object):
                 os.remove(file_path)
         logger.debug("[history] {}".format(self))
 
+    def remove(self, object):
+        if object not in self._items:
+            return False
+
+        index = self._items.index(object)
+        if self._index >= index and self._index is not 0:
+            self._index -= 1
+
+        self._items.remove(object)
+        if self.size() is 0:
+            self.stop_browsing()
+
+        return True
+
+    def size(self):
+        return len(self._items)
+
     def prev(self):
         step = int(self._browsing)
         pos = self._index + step
