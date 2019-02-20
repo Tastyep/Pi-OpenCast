@@ -38,7 +38,7 @@ class VideoController(object):
 
     def stop_video(self):
         logger.debug("[controller] stop current video")
-        self._player.stop(next_video=True)
+        self._player.stop()
 
     def prev_video(self):
         logger.debug("[controller] prev video")

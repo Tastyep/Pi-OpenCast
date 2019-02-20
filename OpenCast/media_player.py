@@ -29,8 +29,7 @@ class OmxPlayer(object):
 
         self._player = None
         self._autoplay = False
-        self._next_video = True
-        self._playerMutex = threading.RLock()
+        self._player_mutex = threading.RLock()
 
         self._cv = threading.Condition()
         self._video_player = threading.Thread(target=self._play_videos)
@@ -72,7 +71,7 @@ class OmxPlayer(object):
     def list_queue(self):
         return list(self._queue)
 
-    def stop(self, next_video=True, stop_browsing=False):
+    def stop(self, stop_browsing=False):
         with self._cv:
             if not self._playing():
                 logger.debug("[player] is already stopped")
@@ -83,7 +82,6 @@ class OmxPlayer(object):
 
             logger.info("[player] stopping ...")
             self._autoplay = False
-            self._next_video = next_video
             self._exec_command('stop')
 
             def is_stopped():
@@ -97,9 +95,9 @@ class OmxPlayer(object):
                 return
 
             if self._playing():
-                self.stop(next_video=False)
-            else:  # Come back on the last played video
-                self._history.prev()
+                self.stop()
+                self._history.prev()  # Come back on the previously played video
+                self.prev()
 
             self._history.prev()
             self.play()
@@ -107,7 +105,7 @@ class OmxPlayer(object):
     def next(self):
         with self._cv:
             if self._playing():
-                self.stop(next_video=True)
+                self.stop()  # Stop and let the player transition to the next video
             self.play()
 
     def play_pause(self):
@@ -155,11 +153,11 @@ class OmxPlayer(object):
         return False
 
     def _playing(self):
-        with self._playerMutex:
+        with self._player_mutex:
             return self._player is not None
 
     def _reset_player(self):
-        with self._playerMutex:
+        with self._player_mutex:
             self._player = None
 
     def _make_player(self, video):
@@ -190,7 +188,7 @@ class OmxPlayer(object):
                 self._history.stop_browsing()
             return
 
-        with self._playerMutex:
+        with self._player_mutex:
             self._make_player(video)
 
         def sync_with_bus():
@@ -219,9 +217,10 @@ class OmxPlayer(object):
                 self._play()
 
     def _exec_command(self, command, *args, **kwargs):
-        with self._cv and self._playerMutex:
+        with self._cv and self._player_mutex:
             if not self._playing():
                 return False
+            logger.debug("[player] executing command {}".format(command))
             getattr(self._player, command)(*args, **kwargs)
             return True
 
