@@ -48,6 +48,9 @@ class History(object):
     def size(self):
         return len(self._items)
 
+    def index(self):
+        return self._index
+
     def prev(self):
         step = int(self._browsing)
         pos = self._index + step

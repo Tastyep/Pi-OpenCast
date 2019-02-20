@@ -176,6 +176,8 @@ class OmxPlayer(object):
     def _play(self):
         video = None
         if self._history.browsing():
+            logger.debug("[player] picking video from history at index ({})"
+                         .format(self._history.index()))
             video = self._history.current_item()
         else:
             video = self._queue.popleft()
