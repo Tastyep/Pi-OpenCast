@@ -228,8 +228,18 @@ class OmxPlayer(object):
         # NOTE: No need of using 'with self._cv' as
         # stop synchronizes the destruction.
         logger.info("[player] stopped")
-        if self._history.browsing() and self._next_video:
-            self._history.next()
+        if self._history.browsing():
+            # If there is no next video in the history and no video available in the queue,
+            # then if configured, play the last video of the history
+            if not (
+                config.loop_last and
+                self._history.index() is 0 and
+                len(self._queue) is 0
+            ):
+                self._history.next()
+        elif config.loop_last and len(self._queue) is 0 and self._autoplay:
+            # Push in the queue the last played video
+            self._queue.append(self._history.current_item())
         self._reset_player()
 
         with self._cv:

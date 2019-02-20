@@ -18,6 +18,7 @@ class Server(object):
 
 class VideoPlayer(object):
     hide_background = True
+    loop_last = True
     history_size = 15
 
 

@@ -26,12 +26,14 @@ class ConfigTest(TestCase):
         config.load_from_dict({
             'VideoPlayer': {
                 'hide_background': False,
+                'loop_last': False,
                 'history_size': 10
             }
         })
 
         vp = config['VideoPlayer']
         self.assertFalse(vp.hide_background)
+        self.assertFalse(vp.loop_last)
         self.assertEqual(vp.history_size, 10)
 
     def test_parse_downloader_config(self):
