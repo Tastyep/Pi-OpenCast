@@ -28,8 +28,8 @@ class Video(object):
                     'playlist_id': playlist_id})
 
     def __eq__(self, other):
-        return (self._url is other._url and
-                self._playlist_id is other._playlist_id)
+        return (self._url == other._url and
+                self._playlist_id == other._playlist_id)
 
     @property
     def url(self):

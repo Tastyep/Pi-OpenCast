@@ -46,6 +46,7 @@ class VideoTest(TestCase):
         self.assertEqual(Video('test'), Video('test'))
         self.assertEqual(Video('test', 0), Video('test', 0))
         self.assertNotEqual(Video('test', 0), Video('test', 1))
+        self.assertNotEqual(Video('test1', 0), Video('test2', 0))
 
     def test_local_video_same_parent(self):
         self.make_file('/tmp/foo')
