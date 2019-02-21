@@ -7,12 +7,6 @@
 	padding-right: 2px;
 }
 
-#history-btn {
-	width: 100%;
-	margin-top: 10px;
-	margin-bottom: 5px;
-}
-
 #history-div {
 	width: 100%;
 	text-align: left;
@@ -46,6 +40,11 @@ button {
 	margin-top: 10px;
 }
 
+.button-large {
+	width: 98%;
+	margin-top: 10px;
+}
+
 .button-left {
 	width: 48%;
 	max-width: 250px;
@@ -59,7 +58,7 @@ button {
 }
 
 .input-group {
-	width: 100%;
+	width: 98%;
 	margin-top: 20px;
 	margin-bottom: 10px;
 }

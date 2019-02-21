@@ -51,6 +51,9 @@ class VideoController(object):
     def play_pause_video(self):
         self._player.play_pause()
 
+    def toggle_subtitle(self):
+        self._player.toggle_subtitle()
+
     def change_volume(self, increase):
         self._player.change_volume(increase)
         logger.debug("[controller] change player volume, increase: {}"

@@ -120,4 +120,8 @@ $(function() {
 			message("Success! Next video will start to play", 1);
 		})
 	});
+
+	$("#toggle-subtitle-btn").click(function() {
+		mkRequest("/subtitle?action=toggle")
+	});
 });

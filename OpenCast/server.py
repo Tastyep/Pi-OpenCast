@@ -46,6 +46,7 @@ class Server(object):
         self._app.route('/stream', callback=self._stream)
         self._app.route('/queue', callback=self._queue)
         self._app.route('/video', callback=self._video)
+        self._app.route('/subtitle', callback=self._subtitle)
         self._app.route('/sound', callback=self._sound)
         self._app.route('/running', callback=self._running)
 
@@ -68,8 +69,8 @@ class Server(object):
 
     def _video(self):
         control = request.query['control']
-        logger.debug("Control command received: {}".format(control))
 
+        logger.debug("Control command received: {}".format(control))
         if control == 'pause':
             self._controller.play_pause_video()
         elif control == 'stop':
@@ -92,6 +93,13 @@ class Server(object):
         vol = request.query['vol']
         self._controller.change_volume(vol == 'more')
         return '1'
+
+    def _subtitle(self):
+        action = request.query['action']
+
+        logger.debug("Subtitle command received: {}".format(action))
+        if action == 'toggle':
+            self._controller.toggle_subtitle()
 
     def _running(self):
         return 1

@@ -26,6 +26,7 @@ class OmxPlayer(object):
         self._history = History()
 
         self._volume = default_volume
+        self._show_subtitle = True
 
         self._player = None
         self._autoplay = False
@@ -115,8 +116,9 @@ class OmxPlayer(object):
             else:
                 self._exec_command('play_pause')
 
-    def show_subtitles(self, show):
-        if show:
+    def toggle_subtitle(self):
+        self._show_subtitle = not self._show_subtitle
+        if self._show_subtitle:
             self._exec_command('show_subtitles')
         else:
             self._exec_command('hide_subtitles')

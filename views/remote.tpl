@@ -80,11 +80,20 @@
 					</button>
 				</div>
 
+				<div class='button-line'>
+					<button id="toggle-subtitle-btn" class="btn btn-warning button-large" type="button" title="Toggle subtitle">
+						<span class="glyphicon glyphicon-subtitles pull-left"></span>
+						<span class="tb">Toggle subtitle</span>
+					</button>
+				</div>
+
 				<!-- History and playlist management -->
-				<button id="history-btn" class="btn btn-warning" type="button" title="History" onClick="showHistory()">
-					<span class="glyphicon glyphicon-list-alt  pull-left"></span>
-					<span class="tb">History</span>
-				</button>
+				<div class='button-line'>
+					<button id="history-btn" class="btn btn-warning button-large" type="button" title="History" onClick="showHistory()">
+						<span class="glyphicon glyphicon-list-alt pull-left"></span>
+						<span class="tb">History</span>
+					</button>
+				</div>
 				<div id="history-div" style="display:none">
 				</div>
 		</div>
