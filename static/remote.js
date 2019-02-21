@@ -124,4 +124,12 @@ $(function() {
 	$("#toggle-subtitle-btn").click(function() {
 		mkRequest("/subtitle?action=toggle")
 	});
+
+	$("#inc-subtitle-delay").click(function() {
+		mkRequest("/subtitle?action=increase")
+	});
+	$("#dec-subtitle-delay").click(function() {
+		mkRequest("/subtitle?action=decrease")
+	});
+
 });

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from dbus import DBusException
 
+from omxplayer import keys
 from omxplayer.player import (
     OMXPlayer,
     OMXPlayerDeadError,
@@ -122,6 +123,12 @@ class OmxPlayer(object):
             self._exec_command('show_subtitles')
         else:
             self._exec_command('hide_subtitles')
+
+    def increase_subtitle_delay(self):
+        self._exec_command('action', keys.INCREASE_SUBTITLE_DELAY)
+
+    def decrease_subtitle_delay(self):
+        self._exec_command('action', keys.DECREASE_SUBTITLE_DELAY)
 
     def change_volume(self, increase):
         with self._cv:

@@ -61,10 +61,10 @@
 				<div class='button-line'>
 					<button id="long-backward-btn" class="button-left btn btn-info" type="button" title="Long skip backwards">
 						<span class="glyphicon glyphicon-backward pull-left"></span>
-						<span class="tb">-10 minutes</span>
+						<span class="tb">-5 minutes</span>
 					</button>
 					<button id="long-forward-btn" class="button-right btn btn-info" type="button" title="Long skip backwards">
-						<span class="tb">+10 minutes</span>
+						<span class="tb">+5 minutes</span>
 						<span class="glyphicon glyphicon-forward pull-right"></span>
 					</button>
 				</div>
@@ -84,6 +84,17 @@
 					<button id="toggle-subtitle-btn" class="btn btn-warning button-large" type="button" title="Toggle subtitle">
 						<span class="glyphicon glyphicon-subtitles pull-left"></span>
 						<span class="tb">Toggle subtitle</span>
+					</button>
+				</div>
+
+				<div class='button-line'>
+					<button id="dec-subtitle-delay" class="button-left btn btn-primary" type="button" title="Decrease delay">
+						<span class="glyphicon glyphicon-backward pull-left"></span>
+						<span class="tb">Decrease delay</span>
+					</button>
+					<button id="inc-subtitle-delay" class="button-right btn btn-primary" type="button" title="Increase delay">
+						<span class="tb">Increase delay</span>
+						<span class="glyphicon glyphicon-forward pull-right"></span>
 					</button>
 				</div>
 

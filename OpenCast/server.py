@@ -100,6 +100,10 @@ class Server(object):
         logger.debug("Subtitle command received: {}".format(action))
         if action == 'toggle':
             self._controller.toggle_subtitle()
+        elif action == 'increase':
+            self._controller.shift_subtitle(True)
+        elif action == 'decrease':
+            self._controller.shift_subtitle(False)
 
     def _running(self):
         return 1

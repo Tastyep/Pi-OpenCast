@@ -54,6 +54,12 @@ class VideoController(object):
     def toggle_subtitle(self):
         self._player.toggle_subtitle()
 
+    def shift_subtitle(self, increase):
+        if increase:
+            self._player.increase_subtitle_delay()
+        else:
+            self._player.decrease_subtitle_delay()
+
     def change_volume(self, increase):
         self._player.change_volume(increase)
         logger.debug("[controller] change player volume, increase: {}"
