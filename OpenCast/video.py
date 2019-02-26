@@ -17,8 +17,8 @@ class Video(object):
         path = Path(url)
         if path.is_file():
             self.path = url
-            self._playlist_id = self._path.parent
-            self._title = self._path.name
+            self._playlist_id = path.parent
+            self._title = path.name
 
     def __repr__(self):
         title = '' if self._title is None else str(self._title)
@@ -45,7 +45,7 @@ class Video(object):
 
     @path.setter
     def path(self, path):
-        self._path = Path(path)
+        self._path = path
         self._load_subtitles()
 
     @property

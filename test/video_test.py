@@ -1,14 +1,15 @@
 from pathlib import Path
 
+from mock import (
+    PropertyMock,
+    patch,
+)
 from OpenCast.video import Video
 
 from .util import TestCase
 
 
 class VideoTest(TestCase):
-    def make_file(self, file):
-        Path(file).touch()
-
     def test_construction_from_url(self):
         url = 'https://domain.com/video=test'
         video = Video(url)
@@ -30,15 +31,20 @@ class VideoTest(TestCase):
         self.assertIsNone(video.title)
         self.assertEmpty(video.subtitles)
 
-    def test_construction_from_path(self):
+    @patch('OpenCast.video.Path.parent', new_callable=PropertyMock)
+    @patch('OpenCast.video.Path.name', new_callable=PropertyMock)
+    @patch('OpenCast.video.Path.is_file')
+    def test_construction_from_path(self, m_is_file, m_name, m_parent):
+        m_is_file.return_value = True
+        m_parent.return_value = '/tmp'
+        m_name.return_value = 'test'
+
         path = '/tmp/test'
         video = Video(path)
 
-        self.make_file(path)
-
         self.assertEqual(video.url, path)
         self.assertEqual(video.playlist_id, Path(path).parent)
-        self.assertEqual(video.path, Path(path))
+        self.assertEqual(video.path, path)
         self.assertEqual(video.title, 'test')
         self.assertEmpty(video.subtitles)
 
@@ -48,9 +54,9 @@ class VideoTest(TestCase):
         self.assertNotEqual(Video('test', 0), Video('test', 1))
         self.assertNotEqual(Video('test1', 0), Video('test2', 0))
 
-    def test_local_video_same_parent(self):
-        self.make_file('/tmp/foo')
-        self.make_file('/tmp/bar')
+    @patch('OpenCast.video.Path')
+    def test_playlist_id_equality_same_directory(self, path_mock):
+        path_mock.is_file.return_value = True
 
         self.assertEqual(Video('/tmp/foo').playlist_id,
                          Video('/tmp/bar').playlist_id)

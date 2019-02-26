@@ -95,7 +95,7 @@ class VideoDownloader(object):
             'debug_printtraffic': self._log_debug,
             'noplaylist': True,
             'merge_output_format': 'mp4',
-            'outtmpl': str(video.path),
+            'outtmpl': video.path,
             'progress_hooks': [download_hook]
         }
         ydl = youtube_dl.YoutubeDL(options)

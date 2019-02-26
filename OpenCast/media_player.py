@@ -177,7 +177,7 @@ class OmxPlayer(object):
             command += ['--blank']
 
         logger.debug("[player] opening {} with opt: {}".format(video, command))
-        self._player = OMXPlayer(video.path,
+        self._player = OMXPlayer(Path(video.path),
                                  command,
                                  dbus_name='org.mpris.MediaPlayer2.omxplayer1')
         self._player.exitEvent += self._on_exit
