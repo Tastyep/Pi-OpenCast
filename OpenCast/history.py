@@ -13,6 +13,9 @@ class History(object):
         self._browsing = False
         self._items = items
 
+    def __enter__(self):
+        return self
+
     def __repr__(self):
         return str(self._items)
 
