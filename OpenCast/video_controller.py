@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from . import (
-    media_player,
+    player_wrapper,
     video_downloader,
 )
 from .video import Video
@@ -100,7 +100,7 @@ class VideoController(object):
 
 
 def make_video_controller():
-    player = media_player.make_player(1.0)
+    player = player_wrapper.make_wrapper()
     downloader = video_downloader.make_video_downloader()
 
     return VideoController(player, downloader)
