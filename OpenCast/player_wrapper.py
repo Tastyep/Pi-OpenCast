@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 from pathlib import Path
 
+import psutil
 from dbus import DBusException
 
 from omxplayer import keys
@@ -213,14 +214,23 @@ class PlayerWrapper(object):
         if config.hide_background is True:
             command += ['--blank']
 
-        logger.debug("[player] opening {} with opt: {}".format(video, command))
-        try:
-            self._player = self._player_factory(video.path,
-                                                command,
-                                                'org.mpris.MediaPlayer2.omxplayer1',
-                                                self._on_exit)
-        except SystemError:
-            logger.error("[player] couldn't connect to dbus")
+        for tries in range(5):
+            logger.debug("[player] opening {} with opt: {}".format(video, command))
+            try:
+                self._player = self._player_factory(video.path,
+                                                    command,
+                                                    'org.mpris.MediaPlayer2.omxplayer1',
+                                                    self._on_exit)
+                return True
+            except SystemError:
+                logger.error("[player] couldn't connect to dbus")
+            # Kill instance if it is a dbus problem
+            for proc in psutil.process_iter():
+                if "omxplayer" in proc.name():
+                    logger.debug("[player] killing process {}".format(proc.name()))
+                    proc.kill()
+
+        return False
 
     def _play(self):
         with self._player_cv:
@@ -240,14 +250,17 @@ class PlayerWrapper(object):
             if not Path(video.path).is_file():
                 logger.error("[player] file not found: {}".format(video))
                 if self._history.browsing():
+                    logger.error("[player] removing video")
                     self._history.remove(video)
                     self._history.stop_browsing()
                 return
 
-            self._make_player(video)
-            self._state = PlayerState.STARTED
-
-            logger.info("[player] started")
+            if self._make_player(video):
+                self._state = PlayerState.STARTED
+                logger.info("[player] started")
+            else:
+                logger.error("[player] couldn't start")
+                self._history.remove(video)
 
     def _play_videos(self):
         def should_play():
