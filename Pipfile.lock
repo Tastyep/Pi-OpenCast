@@ -114,11 +114,11 @@
         },
         "youtube-dl": {
             "hashes": [
-                "sha256:31844229a4f4d7003e03ab309ff2caff1b16ce0acbd3cfb7a13276058af13056",
-                "sha256:a751bd293e2d7ee963910de14b3eb95b88837021899be488fade0b8abe815650"
+                "sha256:4b34f9da88a5ba1e4fb3cbf296b13252bc61e3f14ce25bcd8dc90a8bfa55dadd",
+                "sha256:fe71aa725dc0f86deacdcc91f38492317d53b0ca8ec0f8bddc9961c205b4fea4"
             ],
             "index": "pypi",
-            "version": "==2019.4.30"
+            "version": "==2019.5.11"
         }
     },
     "develop": {}
