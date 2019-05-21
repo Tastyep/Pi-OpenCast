@@ -94,8 +94,7 @@ class PlayerWrapper(object):
                     break
         self._queue.insert(index, video)
         logger.debug("[player] queue contains: {}".format(self._queue))
-        if self._play:
-            self._notify_player()
+        self._notify_player()
 
     def list_queue(self):
         return list(self._queue)
@@ -265,6 +264,8 @@ class PlayerWrapper(object):
     def _play_videos(self):
         def should_play():
             def impl():
+                logger.debug("[player] should_play: playing: {}, play_next: {}, qSize: {}, browsing: {}, loop {}, hSize: {}"
+                             .format(self.playing(), self._play_next, len(self._queue), self._history.browsing(), config.loop_last, self._history.size()))
                 return (self._stopped or
                         (not self.playing() and self._play_next and
                          (len(self._queue) > 0 or self._history.browsing() or
@@ -273,6 +274,7 @@ class PlayerWrapper(object):
                          )
                         )
 
+            logger.debug("[player] should_play()")
             f = self._executor.submit(impl)
             self._player_cv.release()
             result = f.result()
