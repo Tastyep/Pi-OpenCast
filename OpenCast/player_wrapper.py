@@ -7,13 +7,9 @@ from enum import Enum
 from pathlib import Path
 
 import psutil
-from dbus import DBusException
 
 from omxplayer import keys
-from omxplayer.player import (
-    OMXPlayer,
-    OMXPlayerDeadError,
-)
+from omxplayer.player import OMXPlayer
 
 from .config import config
 from .history import History
