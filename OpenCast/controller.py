@@ -10,7 +10,7 @@ from .video import Video
 logger = logging.getLogger(__name__)
 
 
-class VideoController(object):
+class Controller(object):
     def __init__(self, player, downloader):
         self._player = player
         self._downloader = downloader
@@ -99,8 +99,8 @@ class VideoController(object):
             self._downloader.queue([video], dl_callback, first)
 
 
-def make_video_controller():
+def make_controller():
     player = player_wrapper.make_wrapper()
     downloader = video_downloader.make_video_downloader()
 
-    return VideoController(player, downloader)
+    return Controller(player, downloader)

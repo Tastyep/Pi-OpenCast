@@ -3,18 +3,18 @@ from mock import (
     Mock,
     patch,
 )
+from OpenCast.controller import Controller
 from OpenCast.video import Video
-from OpenCast.video_controller import VideoController
 
 from .util import TestCase
 
 
-class VideoControllerTest(TestCase):
+class ControllerTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.player = Mock()
         cls.downloader = Mock()
-        cls.controller = VideoController(cls.player, cls.downloader)
+        cls.controller = Controller(cls.player, cls.downloader)
 
     def tearDown(self):
         self.player.reset_mock()
@@ -25,14 +25,14 @@ class VideoControllerTest(TestCase):
         self.downloader.queue.assert_called_once_with(
             [Video('url')], ANY, True)
 
-    @patch('OpenCast.video_controller.Video')
+    @patch('OpenCast.controller.Video')
     def test_stream_video_local_path(self, video_mock):
         video_mock.is_local.return_value = True
 
         self.controller.stream_video('url')
         self.player.play.assert_called_once_with(ANY)
 
-    @patch('OpenCast.video_controller.uuid')
+    @patch('OpenCast.controller.uuid')
     def test_stream_video_playlist(self, uuid_mock):
         uuid_mock.uuid4.return_value = 'id'
         self.downloader.extract_playlist.return_value = ['url1', 'url2']
@@ -48,14 +48,14 @@ class VideoControllerTest(TestCase):
         self.downloader.queue.assert_called_once_with(
                 [Video('url')], ANY, False)
 
-    @patch('OpenCast.video_controller.Video')
+    @patch('OpenCast.controller.Video')
     def test_queue_video_local_path(self, video_mock):
         video_mock.is_local.return_value = True
 
         self.controller.queue_video('url')
         self.player.queue.assert_called_once_with(ANY)
 
-    @patch('OpenCast.video_controller.uuid')
+    @patch('OpenCast.controller.uuid')
     def test_queue_video_playlist(self, uuid_mock):
         uuid_mock.uuid4.return_value = 'id'
         self.downloader.extract_playlist.return_value = ['url1', 'url2']
