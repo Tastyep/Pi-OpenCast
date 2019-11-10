@@ -33,6 +33,11 @@ function restart() {
   stop && start
 }
 
+function update() {
+  pipenv update
+  restart
+}
+
 function status() {
   echo -n "$PROJECT_NAME is ... "
   [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
@@ -57,6 +62,9 @@ stop)
 restart)
   restart
   ;;
+update)
+  update
+  ;;
 status)
   status
   ;;
@@ -67,6 +75,6 @@ test)
   tests
   ;;
 *)
-  echo "Usage: $0 {start|stop|restart|status|logs|test}"
+  echo "Usage: $0 {start|stop|restart|update|status|logs|test}"
   ;;
 esac
