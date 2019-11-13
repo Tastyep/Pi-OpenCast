@@ -58,8 +58,9 @@ class VideoDownloader(object):
 
         # NOTE(specific) youtube specific
         base_url = url.split('/playlist', 1)[0]
-        urls = [base_url + '/watch?v=' + entry['id']
-                for entry in data['entries']]
+        urls = [
+            base_url + '/watch?v=' + entry['id'] for entry in data['entries']
+        ]
         return urls
 
     def _download_queued_videos(self):
@@ -82,16 +83,17 @@ class VideoDownloader(object):
             return
 
         video.title = data['title']
-        video.path = config.output_directory + '/' + video.title + '.mp4'
+        video.path = "{}/{}-{}.mp4".format(config.output_directory,
+                                           video.title, hash(video.url))
 
         def download_hook(d):
             self._logger.log_download(d)
 
-        logger.debug("[downloader] starting download for: {}"
-                     .format(video.title))
+        logger.debug("[downloader] starting download for: {}".format(
+            video.title))
         options = {
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
-                      'bestvideo+bestaudio/best',
+            'bestvideo+bestaudio/best',
             'debug_printtraffic': self._log_debug,
             'noplaylist': True,
             'merge_output_format': 'mp4',
@@ -103,8 +105,8 @@ class VideoDownloader(object):
             try:
                 ydl.download([video.url])
             except Exception as e:
-                logger.error("[downloader] error downloading '{}': {}"
-                             .format(video, str(e)))
+                logger.error("[downloader] error downloading '{}': {}".format(
+                    video, str(e)))
                 return
 
         logger.debug("[downloader] video downloaded: {}".format(video))
@@ -113,7 +115,7 @@ class VideoDownloader(object):
     def _fetch_metadata(self, url, options):
         logger.debug("[downloader] fetching metadata")
         options.update({
-            'ignoreerrors': True,   # Causes ydl to return None on error
+            'ignoreerrors': True,  # Causes ydl to return None on error
             'debug_printtraffic': self._log_debug,
             'logger': logger
         })
@@ -122,8 +124,9 @@ class VideoDownloader(object):
             try:
                 return ydl.extract_info(url, download=False)
             except Exception as e:
-                logger.error("[downloader] error fetch metadata for '{}': {}"
-                             .format(url, str(e)))
+                logger.error(
+                    "[downloader] error fetch metadata for '{}': {}".format(
+                        url, str(e)))
         return None
 
 

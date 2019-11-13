@@ -62,12 +62,13 @@ class Controller(object):
 
     def change_volume(self, increase):
         self._player.change_volume(increase)
-        logger.debug("[controller] change player volume, increase: {}"
-                     .format(increase))
+        logger.debug(
+            "[controller] change player volume, increase: {}".format(increase))
 
     def seek_time(self, forward, long):
-        logger.debug("[controller] seek video time, forward={}, long={}"
-                     .format(forward, long))
+        logger.debug(
+            "[controller] seek video time, forward={}, long={}".format(
+                forward, long))
         self._player.seek(forward, long)
 
     # Getter methods
@@ -91,8 +92,8 @@ class Controller(object):
             playlist_id = uuid.uuid4()
             urls = self._downloader.extract_playlist(video.url)
             videos = [Video(u, playlist_id) for u in urls]
-            logger.debug("[controller] playlist url unfolded to {}"
-                         .format(videos))
+            logger.debug(
+                "[controller] playlist url unfolded to {}".format(videos))
             self._downloader.queue(videos, dl_callback, first)
         else:
             logger.debug("[controller] queue single video: {}".format(video))

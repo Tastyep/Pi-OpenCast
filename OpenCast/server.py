@@ -33,13 +33,18 @@ class Server(object):
         serverConfig = config.config['Server']
 
         self._set_routes()
-        logger.info("[server] started on {}:{}"
-                    .format(serverConfig.host, serverConfig.port))
-        run(self._app, host=serverConfig.host, port=serverConfig.port,
-            reloader=False, debug=True, quiet=True)
+        logger.info("[server] started on {}:{}".format(serverConfig.host,
+                                                       serverConfig.port))
+        run(self._app,
+            host=serverConfig.host,
+            port=serverConfig.port,
+            reloader=False,
+            debug=True,
+            quiet=True)
 
     def _set_routes(self):
-        self._app.route('/static/<filename>', name='static',
+        self._app.route('/static/<filename>',
+                        name='static',
                         callback=self._serve_file)
         self._app.route('/', callback=self._remote)
         self._app.route('/remote', callback=self._remote)
