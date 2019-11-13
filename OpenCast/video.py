@@ -22,14 +22,17 @@ class Video(object):
 
     def __repr__(self):
         title = '' if self._title is None else str(self._title)
-        playlist_id = '' if self._playlist_id is None else str(self._playlist_id)
-        return str({'title': title,
-                    'url': str(self._url),
-                    'playlist_id': playlist_id})
+        playlist_id = '' if self._playlist_id is None else str(
+            self._playlist_id)
+        return str({
+            'title': title,
+            'url': str(self._url),
+            'playlist_id': playlist_id
+        })
 
     def __eq__(self, other):
-        return (self._url == other._url and
-                self._playlist_id == other._playlist_id)
+        return (self._url == other._url
+                and self._playlist_id == other._playlist_id)
 
     @property
     def url(self):

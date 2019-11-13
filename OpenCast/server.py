@@ -14,7 +14,7 @@ from bottle import (
 
 from . import (
     config,
-    video_controller,
+    controller,
 )
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 class Server(object):
     def __init__(self):
         self._app = Bottle()
-        self._controller = video_controller.make_video_controller()
+        self._controller = controller.make_controller()
 
         TEMPLATE_PATH.insert(0, os.path.join(app_path, 'views'))
         SimpleTemplate.defaults['get_url'] = self._app.get_url
@@ -33,13 +33,18 @@ class Server(object):
         serverConfig = config.config['Server']
 
         self._set_routes()
-        logger.info("[server] started on {}:{}"
-                    .format(serverConfig.host, serverConfig.port))
-        run(self._app, host=serverConfig.host, port=serverConfig.port,
-            reloader=False, debug=True, quiet=True)
+        logger.info("[server] started on {}:{}".format(serverConfig.host,
+                                                       serverConfig.port))
+        run(self._app,
+            host=serverConfig.host,
+            port=serverConfig.port,
+            reloader=False,
+            debug=True,
+            quiet=True)
 
     def _set_routes(self):
-        self._app.route('/static/<filename>', name='static',
+        self._app.route('/static/<filename>',
+                        name='static',
                         callback=self._serve_file)
         self._app.route('/', callback=self._remote)
         self._app.route('/remote', callback=self._remote)

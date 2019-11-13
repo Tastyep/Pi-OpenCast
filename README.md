@@ -33,13 +33,12 @@ Other features:
 #### Install
 - Clone this project and enter the Pi-Opencast directory.
 - Execute the setup script and follow the instructions.
-- Reboot your Raspberry-Pi (recommended).
 
 #### Use
-First of all, note the IP address of your Raspberry-Pi by executing `sudo ifconfig`.
+First of all, note the <address> of your Raspberry-Pi by executing `sudo ifconfig`.
 
 ###### Computer
-Open your favorite browser and go on `IP-address:2020`
+Open your favorite browser and go on `<address>:2020`
 
 
 ### License

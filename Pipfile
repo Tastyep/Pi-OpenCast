@@ -13,6 +13,4 @@ mock = "*"
 pyyaml = "*"
 "hurry.filesize" = "*"
 psutil = "*"
-
-[requires]
-python_version = "3.5"
+dbus-python = "*"

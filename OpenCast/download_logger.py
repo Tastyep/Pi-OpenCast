@@ -24,21 +24,19 @@ class DownloadLogger(object):
 
     def _log_download_info(self, d):
         filename = d.get('filename', 'unknown')
-        self._logger.info("[downloader] {} | {} | {}"
-                          .format(filename,
-                                  self._format_ratio(d),
-                                  self._format_speed(d)))
+        self._logger.info("[downloader] {} | {} | {}".format(
+            filename, self._format_ratio(d), self._format_speed(d)))
 
     def _log_download_error(self, d):
         filename = d.get('filename', 'unknown')
-        self._logger.error("[downloader] error downloading {}: {}"
-                           .format(filename, d))
+        self._logger.error("[downloader] error downloading {}: {}".format(
+            filename, d))
 
     def _log_download_finished(self, d):
         filename = d.get('filename', 'unknown')
         total = d.get('total_bytes', 0)
-        self._logger.info("[downloader] finished downloading {} ({})"
-                          .format(filename, size(total)))
+        self._logger.info("[downloader] finished downloading {} ({})".format(
+            filename, size(total)))
 
     def _format_ratio(self, d):
         downloaded = d.get('downloaded_bytes', None)

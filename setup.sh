@@ -4,7 +4,10 @@ USER="$(whoami)"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT="$(basename "$PROJECT_DIR")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
+SERVICE_NAME="${INTERNAL_NAME,,}"
+SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
 
+# Log an info message.
 function info() {
   local yel="\\033[1;33m"
   local nc="\\033[0m"
@@ -12,6 +15,7 @@ function info() {
   echo -e "$yel>>$nc $1"
 }
 
+# Log an error message and exit.
 function error() {
   local red="\\033[0;31m"
   local nc="\\033[0m"
@@ -20,39 +24,55 @@ function error() {
   exit 1
 }
 
-# Get the user to install as
-# shellcheck disable=SC2039
-read -r -p "Install $PROJECT as ? (default:$USER): " u
-[ ! -z "$u" ] && USER="$u"
+# Check if the script is executed from the project or standalone.
+# Clone the project and update PROJECT_DIR accordingly is executed in standalone mode.
+function setup_environment() {
+  if ! git ls-files --error-unmatch "$0" >/dev/null 2>&1; then
+    local homedir
 
-HOMEDIR="$(getent passwd "$USER" | cut -d: -f6)"
-if [ -z "$HOMEDIR" ]; then
-  error "User '$USER' does not exist."
-  exit 1
-fi
+    homedir="$(getent passwd "$USER" | cut -d: -f6)"
+    PROJECT_DIR="$homedir/$PROJECT"
 
-# Download project
-info "Downloading $PROJECT in $HOMEDIR"
-git clone "https://github.com/Tastyep/$PROJECT" "$HOMEDIR/$PROJECT"
+    # Download project
+    info "Cloning $PROJECT into $PROJECT_DIR"
+    git clone "https://github.com/Tastyep/$PROJECT" "$PROJECT_DIR"
+  fi
+}
 
-# Install dependencies
-info "Installing apt dependencies..."
-sudo apt-get update
-sudo apt-get install -y lsof python-pip ||
-  error "failed to install dependencies"
-info "Installing pip dependencies..."
-python -m pip install --user pipenv ||
-  error "failed to install pipenv"
+# Format and install the systemd config file.
+function start_at_boot() {
+  info "Setting up startup at boot"
 
-# Configure boot options
-info "Adding to startup options (/etc/rc.local)"
-# Add to rc.local startup
-sudo sed -i /"exit 0"/d /etc/rc.local
-printf "su %s -c '$HOMEDIR/$PROJECT/$INTERNAL_NAME.sh start'\\nexit 0\\n" "$USER" 2>&1 | sudo tee -a /etc/rc.local >/dev/null
+  local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"
+  sed -i "s/{ USER }/$USER/g" "$config"
+  sed -i "s#{ START_COMMAND }#$PROJECT_DIR/$INTERNAL_NAME.sh start -u#g" "$config"
+  sudo cp "$config" "$SYSTEMD_CONFIG_DIR"
+  sudo systemctl daemon-reload
+  sudo systemctl enable "$SERVICE_NAME"
+}
 
-# Starting OpenCast
-info "Starting $PROJECT"
-chmod +x "$HOMEDIR/$PROJECT/$INTERNAL_NAME.sh"
-"$HOMEDIR/$PROJECT/$INTERNAL_NAME.sh" start
+# Install dependencies.
+function install_deps() {
+  info "Installing dependencies..."
+
+  sudo apt-get update
+  sudo apt-get install -y lsof python-pip ||
+    error "failed to install dependencies"
+  sudo -H pip install -U pipenv ||
+    error "failed to install pipenv"
+}
+
+# Start the server as daemon.
+function launch() {
+  info "Starting $PROJECT"
+
+  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+  sudo systemctl start "$SERVICE_NAME"
+}
+
+setup_environment
+install_deps
+start_at_boot
+launch
 
 exit 0

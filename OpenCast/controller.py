@@ -10,7 +10,7 @@ from .video import Video
 logger = logging.getLogger(__name__)
 
 
-class VideoController(object):
+class Controller(object):
     def __init__(self, player, downloader):
         self._player = player
         self._downloader = downloader
@@ -62,12 +62,13 @@ class VideoController(object):
 
     def change_volume(self, increase):
         self._player.change_volume(increase)
-        logger.debug("[controller] change player volume, increase: {}"
-                     .format(increase))
+        logger.debug(
+            "[controller] change player volume, increase: {}".format(increase))
 
     def seek_time(self, forward, long):
-        logger.debug("[controller] seek video time, forward={}, long={}"
-                     .format(forward, long))
+        logger.debug(
+            "[controller] seek video time, forward={}, long={}".format(
+                forward, long))
         self._player.seek(forward, long)
 
     # Getter methods
@@ -91,16 +92,16 @@ class VideoController(object):
             playlist_id = uuid.uuid4()
             urls = self._downloader.extract_playlist(video.url)
             videos = [Video(u, playlist_id) for u in urls]
-            logger.debug("[controller] playlist url unfolded to {}"
-                         .format(videos))
+            logger.debug(
+                "[controller] playlist url unfolded to {}".format(videos))
             self._downloader.queue(videos, dl_callback, first)
         else:
             logger.debug("[controller] queue single video: {}".format(video))
             self._downloader.queue([video], dl_callback, first)
 
 
-def make_video_controller():
+def make_controller():
     player = player_wrapper.make_wrapper()
     downloader = video_downloader.make_video_downloader()
 
-    return VideoController(player, downloader)
+    return Controller(player, downloader)

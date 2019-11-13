@@ -18,7 +18,13 @@ def _real_main(argv):
     config.load_from_file('{}/config.ini'.format(app_path))
 
     s = Server()
-    s.run()
+    try:
+        s.run()
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.debug("opencast stopped: {}".format(str(e)))
+    finally:
+        pass
 
 
 def main(argv=None):

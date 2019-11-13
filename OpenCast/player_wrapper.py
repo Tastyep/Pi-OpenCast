@@ -112,6 +112,7 @@ class PlayerWrapper(object):
 
         def is_stopped():
             return not self.playing()
+
         if not self._sync(5000, 500, is_stopped):
             logger.error("[player] cannot stop")
 
@@ -177,14 +178,14 @@ class PlayerWrapper(object):
 
     def seek(self, forward, long):
         if forward:
-            if long:    # Up arrow, + 5 minutes
+            if long:  # Up arrow, + 5 minutes
                 self._exec_command('seek', 300)
-            else:       # Right arrow, + 30 seconds
+            else:  # Right arrow, + 30 seconds
                 self._exec_command('seek', 30)
         else:
-            if long:    # Down arrow, - 5 minutees
+            if long:  # Down arrow, - 5 minutees
                 self._exec_command('seek', -300)
-            else:       # Left arrow, - 30 seconds
+            else:  # Left arrow, - 30 seconds
                 self._exec_command('seek', -30)
 
     def playing(self):
@@ -210,19 +211,20 @@ class PlayerWrapper(object):
             command += ['--blank']
 
         for tries in range(5):
-            logger.debug("[player] opening {} with opt: {}".format(video, command))
+            logger.debug("[player] opening {} with opt: {}".format(
+                video, command))
             try:
-                self._player = self._player_factory(video.path,
-                                                    command,
-                                                    'org.mpris.MediaPlayer2.omxplayer1',
-                                                    self._on_exit)
+                self._player = self._player_factory(
+                    video.path, command, 'org.mpris.MediaPlayer2.omxplayer1',
+                    self._on_exit)
                 return True
             except SystemError:
                 logger.error("[player] couldn't connect to dbus")
             # Kill instance if it is a dbus problem
             for proc in psutil.process_iter():
                 if "omxplayer" in proc.name():
-                    logger.debug("[player] killing process {}".format(proc.name()))
+                    logger.debug("[player] killing process {}".format(
+                        proc.name()))
                     proc.kill()
 
         return False
@@ -234,8 +236,9 @@ class PlayerWrapper(object):
                 self._prev_impl()
 
             if self._history.browsing():
-                logger.debug("[player] picking video from history at index ({})"
-                             .format(self._history.index()))
+                logger.debug(
+                    "[player] picking video from history at index ({})".format(
+                        self._history.index()))
                 video = self._history.current_item()
                 self._history.next()
             else:
@@ -260,15 +263,15 @@ class PlayerWrapper(object):
     def _play_videos(self):
         def should_play():
             def impl():
-                logger.debug("[player] should_play: playing: {}, play_next: {}, qSize: {}, browsing: {}, loop {}, hSize: {}"
-                             .format(self.playing(), self._play_next, len(self._queue), self._history.browsing(), config.loop_last, self._history.size()))
+                logger.debug(
+                    "[player] should_play: playing: {}, play_next: {}, qSize: {}, browsing: {}, loop {}, hSize: {}"
+                    .format(self.playing(), self._play_next, len(self._queue),
+                            self._history.browsing(), config.loop_last,
+                            self._history.size()))
                 return (self._stopped or
                         (not self.playing() and self._play_next and
                          (len(self._queue) > 0 or self._history.browsing() or
-                          (config.loop_last and self._history.size() > 0)
-                          )
-                         )
-                        )
+                          (config.loop_last and self._history.size() > 0))))
 
             logger.debug("[player] should_play()")
             f = self._executor.submit(impl)
@@ -307,9 +310,7 @@ class PlayerWrapper(object):
 
 def player_factory():
     def make_player(path, command, dbus_name, exit_callback):
-        player = OMXPlayer(Path(path),
-                           command,
-                           dbus_name=dbus_name)
+        player = OMXPlayer(Path(path), command, dbus_name=dbus_name)
 
         player.exitEvent += exit_callback
         return player
