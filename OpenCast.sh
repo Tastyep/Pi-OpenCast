@@ -5,19 +5,40 @@ PROJECT_NAME="OpenCast"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 
+function is_server_running() {
+  lsof -t -i :2020
+}
+
+function wait_for_server() {
+  while [ ! "$(is_server_running)" ]; do
+    sleep 1
+  done
+}
+
+function element_in() {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
+
 function start() {
-  if [ "$(lsof -t -i :2020)" ]; then
+  if [ "$(is_server_running)" ]; then
     echo "$PROJECT_NAME server is already running."
     return
   fi
 
-  echo "Checking for updates."
-  cd "$PROJECT_DIR" || exit 1
+  if [[ "$1" == "-u" ]]; then
+    update
+  fi
 
-  git pull
+  cd "$PROJECT_DIR" || exit 1
   mkdir -p "$LOG_DIR"
+
   echo "Starting $PROJECT_NAME server."
   pipenv run python -m "$PROJECT_NAME" &
+
+  wait_for_server
   pid="$(pgrep -f "python -m $PROJECT_NAME")"
   echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
@@ -34,8 +55,9 @@ function restart() {
 }
 
 function update() {
-  pipenv update
-  restart
+  echo "Checking for updates."
+
+  (cd "$PROJECT_DIR" && git pull && pipenv update)
 }
 
 function status() {
@@ -52,29 +74,14 @@ function tests() {
   pipenv run python -m unittest discover -v -p "*_test.py"
 }
 
-case "$1" in
-start)
-  start
-  ;;
-stop)
-  stop
-  ;;
-restart)
-  restart
-  ;;
-update)
-  update
-  ;;
-status)
-  status
-  ;;
-logs)
-  logs
-  ;;
-test)
-  tests
-  ;;
-*)
-  echo "Usage: $0 {start|stop|restart|update|status|logs|test}"
-  ;;
-esac
+COMMANDS=("start" "stop" "restart" "update" "status" "logs" "tests")
+if element_in "$1" "${COMMANDS[@]}"; then
+  COMMAND="$1"
+  shift
+  "$COMMAND" "$@"
+else
+  echo "Usage: $0 {$(
+    IFS='|'
+    echo "${COMMANDS[*]}"
+  )}"
+fi
