@@ -213,20 +213,23 @@ class PlayerWrapper(object):
             command += ['--subtitles', video.subtitle]
 
         for tries in range(5):
-            logger.debug("[player] opening {} with opt: {}".format(
-                video, command))
+            logger.debug(
+                "[player] opening {} with opt: {}".format(video, command)
+            )
             try:
                 self._player = self._player_factory(
                     video.path, command, 'org.mpris.MediaPlayer2.omxplayer1',
-                    self._on_exit)
+                    self._on_exit
+                )
                 return True
             except SystemError:
                 logger.error("[player] couldn't connect to dbus")
             # Kill instance if it is a dbus problem
             for proc in psutil.process_iter():
                 if "omxplayer" in proc.name():
-                    logger.debug("[player] killing process {}".format(
-                        proc.name()))
+                    logger.debug(
+                        "[player] killing process {}".format(proc.name())
+                    )
                     proc.kill()
 
         return False
@@ -240,7 +243,9 @@ class PlayerWrapper(object):
             if self._history.browsing():
                 logger.debug(
                     "[player] picking video from history at index ({})".format(
-                        self._history.index()))
+                        self._history.index()
+                    )
+                )
                 video = self._history.current_item()
                 self._history.next()
             else:
@@ -267,13 +272,20 @@ class PlayerWrapper(object):
             def impl():
                 logger.debug(
                     "[player] should_play: playing: {}, play_next: {}, qSize: {}, browsing: {}, loop {}, hSize: {}"
-                    .format(self.playing(), self._play_next, len(self._queue),
-                            self._history.browsing(), config.loop_last,
-                            self._history.size()))
-                return (self._stopped or
-                        (not self.playing() and self._play_next and
-                         (len(self._queue) > 0 or self._history.browsing() or
-                          (config.loop_last and self._history.size() > 0))))
+                    .format(
+                        self.playing(), self._play_next, len(self._queue),
+                        self._history.browsing(), config.loop_last,
+                        self._history.size()
+                    )
+                )
+                return (
+                    self._stopped or (
+                        not self.playing() and self._play_next and (
+                            len(self._queue) > 0 or self._history.browsing() or
+                            (config.loop_last and self._history.size() > 0)
+                        )
+                    )
+                )
 
             logger.debug("[player] should_play()")
             f = self._executor.submit(impl)

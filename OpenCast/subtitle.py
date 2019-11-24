@@ -29,7 +29,7 @@ def load_from_video_path(path):
     for stream in probe['streams']:
         logger.debug("sub: {}".format(stream))
         if stream['codec_type'] == 'subtitle' and stream['tags'][
-            'language'] == config.language:
+                'language'] == config.language:
             channel = '0:{}'.format(stream['index'])
             logger.info("[subtitle] found matching sub: {}".format(subtitle))
             try:

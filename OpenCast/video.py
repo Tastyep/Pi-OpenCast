@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 
 class Video(object):
-
     def __init__(self, url, playlist_id=None):
         self._url = url
         self._playlist_id = playlist_id
@@ -26,13 +25,11 @@ class Video(object):
         playlist_id = '' if self._playlist_id is None else str(
             self._playlist_id
         )
-        return str(
-            {
-                'title': title,
-                'url': str(self._url),
-                'playlist_id': playlist_id
-            }
-        )
+        return str({
+            'title': title,
+            'url': str(self._url),
+            'playlist_id': playlist_id
+        })
 
     def __eq__(self, other):
         return (

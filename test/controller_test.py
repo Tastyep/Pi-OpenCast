@@ -22,8 +22,7 @@ class ControllerTest(TestCase):
 
     def test_stream_video_simple_url(self):
         self.controller.stream_video('url')
-        self.downloader.queue.assert_called_once_with(
-            [Video('url')], ANY, True)
+        self.downloader.queue.assert_called_once_with([Video('url')], ANY, True)
 
     @patch('OpenCast.controller.Video')
     def test_stream_video_local_path(self, video_mock):
@@ -39,14 +38,15 @@ class ControllerTest(TestCase):
 
         self.controller.stream_video('/playlist')
         self.downloader.extract_playlist.assert_called_once_with('/playlist')
-        self.downloader.queue.assert_called_once_with(
-            [Video('url1', playlist_id='id'), Video('url2', playlist_id='id')],
-            ANY, True)
+        self.downloader.queue.assert_called_once_with([
+            Video('url1', playlist_id='id'),
+            Video('url2', playlist_id='id')
+        ], ANY, True)
 
     def test_queue_video_simple_url(self):
         self.controller.queue_video('url')
-        self.downloader.queue.assert_called_once_with(
-                [Video('url')], ANY, False)
+        self.downloader.queue.assert_called_once_with([Video('url')], ANY,
+                                                      False)
 
     @patch('OpenCast.controller.Video')
     def test_queue_video_local_path(self, video_mock):
@@ -62,9 +62,10 @@ class ControllerTest(TestCase):
 
         self.controller.queue_video('/playlist')
         self.downloader.extract_playlist.assert_called_once_with('/playlist')
-        self.downloader.queue.assert_called_once_with(
-            [Video('url1', playlist_id='id'), Video('url2', playlist_id='id')],
-            ANY, False)
+        self.downloader.queue.assert_called_once_with([
+            Video('url1', playlist_id='id'),
+            Video('url2', playlist_id='id')
+        ], ANY, False)
 
     def test_stop_video(self):
         self.controller.stop_video()

@@ -83,21 +83,23 @@ class VideoDownloader(object):
             return
 
         video.title = data['title']
-        video.path = "{}/{}-{}.mp4".format(config.output_directory,
-                                           video.title, hash(video.url))
+        video.path = "{}/{}-{}.mp4".format(
+            config.output_directory, video.title, hash(video.url)
+        )
 
         def download_hook(d):
             self._logger.log_download(d)
 
-        logger.debug("[downloader] starting download for: {}".format(
-            video.title))
+        logger.debug(
+            "[downloader] starting download for: {}".format(video.title)
+        )
         options = {
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
             'bestvideo+bestaudio/best',
             'debug_printtraffic': self._log_debug,
             'noplaylist': True,
             'merge_output_format': 'mp4',
-            'outtmpl': video.path,
+            'outtmpl': str(video.path),
             'progress_hooks': [download_hook]
         }
         ydl = youtube_dl.YoutubeDL(options)
@@ -105,8 +107,11 @@ class VideoDownloader(object):
             try:
                 ydl.download([video.url])
             except Exception as e:
-                logger.error("[downloader] error downloading '{}': {}".format(
-                    video, str(e)))
+                logger.error(
+                    "[downloader] error downloading '{}': {}".format(
+                        video, str(e)
+                    )
+                )
                 return
 
         logger.debug("[downloader] video downloaded: {}".format(video))
@@ -126,7 +131,9 @@ class VideoDownloader(object):
             except Exception as e:
                 logger.error(
                     "[downloader] error fetch metadata for '{}': {}".format(
-                        url, str(e)))
+                        url, str(e)
+                    )
+                )
         return None
 
 

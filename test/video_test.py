@@ -58,5 +58,7 @@ class VideoTest(TestCase):
     def test_playlist_id_equality_same_directory(self, path_mock):
         path_mock.is_file.return_value = True
 
-        self.assertEqual(Video('/tmp/foo').playlist_id,
-                         Video('/tmp/bar').playlist_id)
+        self.assertEqual(
+            Video('/tmp/foo').playlist_id,
+            Video('/tmp/bar').playlist_id
+        )
