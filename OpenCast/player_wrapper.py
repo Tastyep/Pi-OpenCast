@@ -205,10 +205,12 @@ class PlayerWrapper(object):
 
     def _make_player(self, video):
         command = ['--vol', str(100 * (self._volume - 1.0))]
-        for sub in video.subtitles:
-            command += ['--subtitles', sub]
+
         if config.hide_background is True:
             command += ['--blank']
+
+        if video.subtitle is not None:
+            command += ['--subtitles', video.subtitle]
 
         for tries in range(5):
             logger.debug("[player] opening {} with opt: {}".format(
@@ -245,7 +247,7 @@ class PlayerWrapper(object):
                 video = self._queue.popleft()
                 self._history.push(video)
 
-            if not Path(video.path).is_file():
+            if not video.path.is_file():
                 logger.error("[player] file not found: {}".format(video))
                 if self._history.browsing():
                     logger.error("[player] removing video")

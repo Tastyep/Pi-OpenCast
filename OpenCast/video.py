@@ -7,12 +7,13 @@ logger = logging.getLogger(__name__)
 
 
 class Video(object):
+
     def __init__(self, url, playlist_id=None):
         self._url = url
         self._playlist_id = playlist_id
         self._path = None
         self._title = None
-        self._subtitles = []
+        self._subtitle = None
 
         path = Path(url)
         if path.is_file():
@@ -23,24 +24,28 @@ class Video(object):
     def __repr__(self):
         title = '' if self._title is None else str(self._title)
         playlist_id = '' if self._playlist_id is None else str(
-            self._playlist_id)
-        return str({
-            'title': title,
-            'url': str(self._url),
-            'playlist_id': playlist_id
-        })
+            self._playlist_id
+        )
+        return str(
+            {
+                'title': title,
+                'url': str(self._url),
+                'playlist_id': playlist_id
+            }
+        )
 
     def __eq__(self, other):
-        return (self._url == other._url
-                and self._playlist_id == other._playlist_id)
+        return (
+            self._url == other._url and self._playlist_id == other._playlist_id
+        )
 
     @property
     def url(self):
         return self._url
 
     @property
-    def subtitles(self):
-        return self._subtitles
+    def subtitle(self):
+        return self._subtitle
 
     @property
     def path(self):
@@ -48,8 +53,8 @@ class Video(object):
 
     @path.setter
     def path(self, path):
-        self._path = path
-        self._load_subtitles()
+        self._path = Path(path)
+        self._load_subtitle()
 
     @property
     def title(self):
@@ -66,5 +71,5 @@ class Video(object):
     def is_local(self):
         return self._path is not None
 
-    def _load_subtitles(self):
-        self._subtitles = subtitle.load_from_video_path(self._path)
+    def _load_subtitle(self):
+        self._subtitle = subtitle.load_from_video_path(self._path)
