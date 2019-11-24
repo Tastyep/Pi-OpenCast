@@ -26,6 +26,10 @@ class Downloader(object):
     output_directory = '/tmp'
 
 
+class Subtitle(object):
+    language = 'eng'
+
+
 class Config(object):
     __metaclass__ = Singleton
 
@@ -49,7 +53,8 @@ class Config(object):
         self._entries = {
             'Server': Server(),
             'VideoPlayer': VideoPlayer(),
-            'Downloader': Downloader()
+            'Downloader': Downloader(),
+            'Subtitle': Subtitle()
         }
 
     def _load_cache(self):
@@ -59,8 +64,10 @@ class Config(object):
             parser = self._parser[key]
 
             for entry_name in dir(category):
-                if (entry_name.startswith('__')
-                        or not self._parser.has_option(key, entry_name)):
+                if (
+                    entry_name.startswith('__')
+                    or not self._parser.has_option(key, entry_name)
+                ):
                     continue
                 self._parse_entry(parser, category, entry_name)
 
@@ -76,8 +83,10 @@ class Config(object):
             value = parser.getboolean(entry_name, fallback=entry)
         else:
             value = parser.get(entry_name, fallback=entry)
-            if (type(entry) is str and (value.startswith(
-                ("'", '"')) and value[0] is value[-1])):
+            if (
+                type(entry) is str
+                and (value.startswith(("'", '"')) and value[0] is value[-1])
+            ):
                 value = value[1:-1]
         setattr(category, entry_name, value)
 
