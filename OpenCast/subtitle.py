@@ -25,7 +25,13 @@ def load_from_video_path(path):
     logger.debug(
         "[subtitle] searching softcoded subtitles from {}".format(path)
     )
-    probe = ffmpeg.probe(str(path))
+    probe = dict()
+    try:
+        probe = ffmpeg.probe(str(path))
+    except ffmpeg.Error as e:
+        logger.error("[subtitle] ffprobe error: {}".format(str(e)))
+        return None
+
     for stream in probe['streams']:
         logger.debug("sub: {}".format(stream))
         if stream['codec_type'] == 'subtitle' and stream['tags'][

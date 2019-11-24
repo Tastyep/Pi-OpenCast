@@ -51,7 +51,8 @@ class Video(object):
     @path.setter
     def path(self, path):
         self._path = Path(path)
-        self._load_subtitle()
+        if self.is_local():
+            self._load_subtitle()
 
     @property
     def title(self):
@@ -66,7 +67,7 @@ class Video(object):
         return self._playlist_id
 
     def is_local(self):
-        return self._path is not None
+        return self._path is not None and str(self._path) == self._url
 
     def _load_subtitle(self):
         self._subtitle = subtitle.load_from_video_path(self._path)
