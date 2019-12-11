@@ -14,7 +14,7 @@ class VideoTest(TestCase):
         url = 'https://domain.com/video=test'
         video = Video(url)
 
-        self.assertEqual(video.url, url)
+        self.assertEqual(video.source, url)
         self.assertIsNone(video.playlist_id)
         self.assertIsNone(video.path)
         self.assertIsNone(video.title)
@@ -25,7 +25,7 @@ class VideoTest(TestCase):
         playlist_id = 'id'
         video = Video(url, playlist_id)
 
-        self.assertEqual(video.url, url)
+        self.assertEqual(video.source, url)
         self.assertEqual(video.playlist_id, playlist_id)
         self.assertIsNone(video.path)
         self.assertIsNone(video.title)
@@ -42,7 +42,7 @@ class VideoTest(TestCase):
         path = '/tmp/test'
         video = Video(path)
 
-        self.assertEqual(video.url, path)
+        self.assertEqual(video.source, path)
         self.assertEqual(video.playlist_id, Path(path).parent)
         self.assertEqual(video.path, path)
         self.assertEqual(video.title, 'test')

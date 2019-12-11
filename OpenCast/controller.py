@@ -3,10 +3,13 @@ import uuid
 
 from . import (
     player_wrapper,
+    subtitle,
     video_downloader,
 )
+from .config import config
 from .video import Video
 
+subConfig = config['Subtitle']
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +23,8 @@ class Controller(object):
         self._player.stop(stop_browsing=True)
 
         video = Video(url)
-        if video.is_local():
+        if video.from_disk():
+            video.subtitle = subtitle.load_from_video(video, subConfig.language)
             self._player.play(video)
             return
 
@@ -30,7 +34,8 @@ class Controller(object):
         logger.debug("[controller] queue video, URL='{}'".format(url))
 
         video = Video(url)
-        if video.is_local():
+        if video.from_disk():
+            video.subtitle = subtitle.load_from_video(video, subConfig.language)
             self._player.queue(video)
             return
 
@@ -89,11 +94,11 @@ class Controller(object):
         self._player.play()
 
     def _queue_video(self, video, dl_callback, first):
-        if '/playlist' in video.url:
+        if '/playlist' in video.source:
             logger.debug("[controller] playlist detected, unfolding...")
             # Generate a unique ID for the playlist
             playlist_id = uuid.uuid4()
-            urls = self._downloader.extract_playlist(video.url)
+            urls = self._downloader.extract_playlist(video.source)
             videos = [Video(u, playlist_id) for u in urls]
             logger.debug(
                 "[controller] playlist url unfolded to {}".format(videos)

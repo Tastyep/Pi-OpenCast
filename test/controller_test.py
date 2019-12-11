@@ -26,7 +26,7 @@ class ControllerTest(TestCase):
 
     @patch('OpenCast.controller.Video')
     def test_stream_video_local_path(self, video_mock):
-        video_mock.is_local.return_value = True
+        video_mock.from_disk.return_value = True
 
         self.controller.stream_video('url')
         self.player.play.assert_called_once_with(ANY)
@@ -50,7 +50,7 @@ class ControllerTest(TestCase):
 
     @patch('OpenCast.controller.Video')
     def test_queue_video_local_path(self, video_mock):
-        video_mock.is_local.return_value = True
+        video_mock.from_disk.return_value = True
 
         self.controller.queue_video('url')
         self.player.queue.assert_called_once_with(ANY)

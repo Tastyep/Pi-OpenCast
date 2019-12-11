@@ -1,22 +1,20 @@
 import logging
 from pathlib import Path
 
-from . import subtitle
-
 logger = logging.getLogger(__name__)
 
 
 class Video(object):
-    def __init__(self, url, playlist_id=None):
-        self._url = url
+    def __init__(self, source, playlist_id=None):
+        self._source = source
         self._playlist_id = playlist_id
         self._path = None
         self._title = None
         self._subtitle = None
 
-        path = Path(url)
+        path = Path(source)
         if path.is_file():
-            self.path = url
+            self.path = source
             self._playlist_id = path.parent
             self._title = path.name
 
@@ -27,47 +25,47 @@ class Video(object):
         )
         return str({
             'title': title,
-            'url': str(self._url),
+            'source': str(self._source),
             'playlist_id': playlist_id
         })
 
     def __eq__(self, other):
         return (
-            self._url == other._url and self._playlist_id == other._playlist_id
+            self._source == other._source
+            and self._playlist_id == other._playlist_id
         )
 
     @property
-    def url(self):
-        return self._url
-
-    @property
-    def subtitle(self):
-        return self._subtitle
+    def source(self):
+        return self._source
 
     @property
     def path(self):
         return self._path
 
-    @path.setter
-    def path(self, path):
-        self._path = Path(path)
-        if self.is_local():
-            self._load_subtitle()
-
     @property
     def title(self):
         return self._title
-
-    @title.setter
-    def title(self, title):
-        self._title = str(title.encode('ascii', 'ignore'))
 
     @property
     def playlist_id(self):
         return self._playlist_id
 
-    def is_local(self):
-        return self._path is not None and str(self._path) == self._url
+    @property
+    def subtitle(self):
+        return self._subtitle
 
-    def _load_subtitle(self):
-        self._subtitle = subtitle.load_from_video_path(self._path)
+    def from_disk(self):
+        return self._path is not None and str(self._path) == self._source
+
+    @path.setter
+    def path(self, path):
+        self._path = Path(path)
+
+    @title.setter
+    def title(self, title):
+        self._title = str(title.encode('ascii', 'ignore'))
+
+    @subtitle.setter
+    def subtitle(self, subtitle):
+        self._subtitle = subtitle

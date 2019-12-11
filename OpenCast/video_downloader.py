@@ -78,13 +78,13 @@ class VideoDownloader(object):
         options = {
             'noplaylist': True,
         }
-        data = self._fetch_metadata(video.url, options)
+        data = self._fetch_metadata(video.source, options)
         if data is None:
             return
 
         video.title = data['title']
         video.path = "{}/{}-{}.mp4".format(
-            config.output_directory, video.title, hash(video.url)
+            config.output_directory, video.title, hash(video.source)
         )
 
         def download_hook(d):
@@ -105,7 +105,7 @@ class VideoDownloader(object):
         ydl = youtube_dl.YoutubeDL(options)
         with ydl:  # Download the video
             try:
-                ydl.download([video.url])
+                ydl.download([video.source])
             except Exception as e:
                 logger.error(
                     "[downloader] error downloading '{}': {}".format(
