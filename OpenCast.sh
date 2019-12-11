@@ -57,7 +57,10 @@ function restart() {
 function update() {
   echo "Checking for updates."
 
-  (cd "$PROJECT_DIR" && git pull && pipenv update)
+  (cd "$PROJECT_DIR" && (
+    git pull
+    pipenv update
+  ))
 }
 
 function status() {
