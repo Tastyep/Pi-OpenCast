@@ -2,15 +2,20 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<meta charset="utf-8">
+
 		<title>OpenCast</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<link href="{{get_url('static', filename='remote.css') }}" rel="stylesheet">
-		<link href="{{get_url('static', filename='bootstrap.min.css') }}" rel="stylesheet">
-		<link rel="icon" type="image/png" sizes="192x192" href="{{get_url('static', filename='favicon.png') }}" />
+
+		<link type="text/css" href="/static/opencast/css/remote.css" rel="stylesheet">
+		<link type="text/css" href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link type="text/css" href="/static/bootstrap4-toggle/css/bootstrap4-toggle.css" rel="stylesheet">
+		<link type="image/png" href="/static/img/opencast.png" rel="icon" sizes="192x192"/>
 	</head>
 	<body>
 		<div id="content">
 				<div id="message"></div>
+
+				<input type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play' aria-hidden='true'></i> Video">
 
 				<form class="input-group">
 					<input type="search" class="form-control input-lg" id="media-url" placeholder="Media's URL">
@@ -110,11 +115,11 @@
 		</div>
 		</center>
 
-
 		<!-- script references -->
 
-		<script src="{{get_url('static', filename='jquery-2.1.3.min.js') }}"></script>
-		<script src="{{get_url('static', filename='history.js') }}"></script>
-		<script src="{{get_url('static', filename='remote.js') }}"></script>
+		<script src="/static/jquery/js/jquery-3.4.1.min.js"></script>
+		<script src="/static/bootstrap4-toggle/js/bootstrap4-toggle.js"></script>
+		<script src="/static/opencast/js/history.js"></script>
+		<script src="/static/opencast/js/remote.js"></script>
 	</body>
 </html>
