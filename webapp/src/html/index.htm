@@ -6,16 +6,17 @@
 		<title>OpenCast</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-		<link type="text/css" href="/static/opencast/css/remote.css" rel="stylesheet">
-		<link type="text/css" href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link type="text/css" href="/static/bootstrap4-toggle/css/bootstrap4-toggle.css" rel="stylesheet">
-		<link type="image/png" href="/static/img/opencast.png" rel="icon" sizes="192x192"/>
+		<link type="text/css" href="/app/css/remote.css" rel="stylesheet">
+		<link type="text/css" href="/static/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link type="text/css" href="/static/bootstrap4-toggle/css/bootstrap4-toggle.min.css" rel="stylesheet">
+		<link type="image/png" href="/public/img/opencast.png" rel="icon" sizes="192x192"/>
 	</head>
 	<body>
 		<div id="content">
 				<div id="message"></div>
 
-				<input type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play' aria-hidden='true'></i> Video">
+				<input type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play' aria-hidden='true'></i> Video"
+				 			 																							data-off="<i class='fa fa-play' aria-hidden='true'></i> Audio">
 
 				<form class="input-group">
 					<input type="search" class="form-control input-lg" id="media-url" placeholder="Media's URL">
@@ -117,9 +118,10 @@
 
 		<!-- script references -->
 
-		<script src="/static/jquery/js/jquery-3.4.1.min.js"></script>
-		<script src="/static/bootstrap4-toggle/js/bootstrap4-toggle.js"></script>
-		<script src="/static/opencast/js/history.js"></script>
-		<script src="/static/opencast/js/remote.js"></script>
+		<script src="/static/jquery/dist/jquery.min.js"></script>
+		<script src="/static/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="/static/bootstrap4-toggle/js/bootstrap4-toggle.min.js"></script>
+		<script src="/app/js/history.js"></script>
+		<script src="/app/js/remote.js"></script>
 	</body>
 </html>

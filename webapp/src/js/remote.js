@@ -22,7 +22,11 @@ function showHistory() {
 }
 
 function mkRequest(url, onSuccess) {
-	url = document.location.origin + url;
+	origin = document.location.origin;
+	sepIdx = origin.lastIndexOf(':')
+	// Todo hard-coded port
+	opencast_url = origin.substr(0, sepIdx) + ":2020"
+	url = opencast_url + url
 
 	var req = new XMLHttpRequest();
 	req.open("GET", url, true);
