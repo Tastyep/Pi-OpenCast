@@ -1,14 +1,10 @@
 import logging
 import os
-from mimetypes import guess_type
 
 from bottle import (
-    TEMPLATE_PATH,
     Bottle,
-    SimpleTemplate,
     response,
     run,
-    static_file,
     template,
 )
 
@@ -39,13 +35,5 @@ class Server(object):
 
         self._server.add_hook('after_request', impl)
 
-    def serve_file(self, filename, root):
-        fullpath = os.path.join(root, filename)
-        mimetype = guess_type(fullpath)[0]
-        return static_file(filename, root=root, mimetype=mimetype)
-
-    def add_template_path(self, path):
-        TEMPLATE_PATH.insert(0, path)
-
-    def template(self, file):
-        return template(file)
+    def template(self, *args, **kwargs):
+        return template(*args, **kwargs)

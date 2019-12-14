@@ -30,7 +30,7 @@ def _real_main(argv):
     player = player_wrapper.make_wrapper()
     downloader = video_downloader.make_video_downloader()
     service_module = ServiceModule(app_facade, player, downloader)
-    controller_module = ControllerModule(app_facade, app_path, server)
+    controller_module = ControllerModule(app_facade, server)
 
     try:
         server.run(serverConfig.host, serverConfig.port)
