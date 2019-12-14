@@ -4,6 +4,7 @@
   "description": "Opencast front end",
   "main": "server.js",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.0",
     "bootstrap": "^4.4.1",
     "bootstrap4-toggle": "^3.6.1",
     "express": "^4.17.1",

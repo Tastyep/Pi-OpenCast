@@ -41,6 +41,10 @@ button {
 	margin-top: 10px;
 }
 
+.button-text {
+	font-size: 1.1em;
+}
+
 .button-large {
 	width: 98%;
 	margin-top: 10px;
@@ -70,9 +74,4 @@ button {
 
 span.glyphicon {
 	font-size: 1.4em;
-}
-
-span.tb {
-	top: -20px;
-	font-size: 1.2em;
 }
