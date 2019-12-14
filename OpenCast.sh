@@ -36,6 +36,7 @@ function start() {
   mkdir -p "$LOG_DIR"
 
   echo "Starting $PROJECT_NAME server."
+  (cd ./webapp && npm start &)
   pipenv run python -m "$PROJECT_NAME" &
 
   wait_for_server
@@ -45,13 +46,15 @@ function start() {
 
 function stop() {
   echo "Killing $PROJECT_NAME..."
+  # Todo hardcoded port
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
+  lsof -t -i :8081 | xargs kill >/dev/null 2>&1
   sudo killall omxplayer.bin >/dev/null 2>&1
   echo "Done."
 }
 
 function restart() {
-  stop && start
+  stop && start ""
 }
 
 function update() {

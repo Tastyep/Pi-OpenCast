@@ -3,3 +3,6 @@
 *~
 *.xpi
 Pipfile.lock
+
+# node modules
+webapp/node_modules
