@@ -1,5 +1,9 @@
+import logging
+
+
 class CommandDispatcher(object):
     def __init__(self):
+        self._logger = logging.getLogger(__name__)
         self._handlers_map = {}
 
     def attach(self, cmd, handler):
@@ -9,6 +13,7 @@ class CommandDispatcher(object):
         self._handlers_map[cmd_id].append(handler)
 
     def dispatch(self, cmd):
+        self._logger.debug("dispatching: {}".format(cmd))
         cmd_id = id(type(cmd))
         if cmd_id in self._handlers_map:
             handlers = self._handlers_map[cmd_id]

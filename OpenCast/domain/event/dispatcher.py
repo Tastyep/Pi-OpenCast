@@ -26,7 +26,7 @@ class EventDispatcher(object):
         self._attach(evt, self._Handler(callback, 1))
 
     def dispatch(self, evt):
-        self._logger.debug("raising event: {}".format(evt))
+        self._logger.debug("raising: {}".format(evt))
         evt_id = id(type(evt))
         if evt_id in self._handlers_map:
             handlers = self._handlers_map[evt_id]

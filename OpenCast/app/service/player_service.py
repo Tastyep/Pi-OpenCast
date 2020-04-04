@@ -88,9 +88,6 @@ class PlayerService(Service):
     # Command handler interface implementation
 
     def _play_video(self, cmd):
-        # TODO: move this logs in cmd dispatcher
-        logger.debug("[service] stream video, URL='{}'".format(cmd.source))
-
         def play_video(*_):
             def play_video(video):
                 model = self._player_model()
@@ -118,7 +115,6 @@ class PlayerService(Service):
             play_video()
 
     def _queue_video(self, cmd):
-        logger.debug("[service] queue video, URL='{}'".format(cmd.source))
         video = Video(cmd.source)
 
         def queue_video(model, video):
@@ -136,7 +132,6 @@ class PlayerService(Service):
         self._download_video(video, dl_callback, first=False)
 
     def _stop_video(self, cmd):
-        logger.debug("[service] stop current video")
         self._player.stop()
 
     def _toggle_video_state(self, cmd):
@@ -147,17 +142,14 @@ class PlayerService(Service):
             self._player.unpause()
 
     def _seek_video(self, cmd):
-        logger.debug("[service] seek video time, duration={}".format(cmd.duration))
         self._player.seek(cmd.duration)
 
     def _change_volume(self, cmd):
-        logger.debug("[service] change player volume, amount: {}".format(cmd.amount))
         model = self._player_model()
         model.volume = model.volume + cmd.amount
         self._player.set_volume(model.volume)
 
     def _next_video(self, cmd):
-        logger.debug("[service] next video")
         model = self._player_model()
         next_video = model.next_video()
         if next_video is None:
@@ -177,7 +169,6 @@ class PlayerService(Service):
             play_next_video()
 
     def _prev_video(self, cmd):
-        logger.debug("[service] prev video")
         model = self._player_model()
         prev_video = model.prev_video()
         if prev_video is None:
