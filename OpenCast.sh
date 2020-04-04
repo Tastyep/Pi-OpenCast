@@ -36,7 +36,7 @@ function start() {
   mkdir -p "$LOG_DIR"
 
   echo "Starting $PROJECT_NAME server."
-  (cd ./webapp && npm start &)
+  (cd ./webapp && npm install && npm start &)
   pipenv run python -m "$PROJECT_NAME" &
 
   wait_for_server
@@ -60,10 +60,7 @@ function restart() {
 function update() {
   echo "Checking for updates."
 
-  (cd "$PROJECT_DIR" && (
-    git pull
-    pipenv update
-  ))
+  (cd "$PROJECT_DIR" && pipenv update)
 }
 
 function status() {
