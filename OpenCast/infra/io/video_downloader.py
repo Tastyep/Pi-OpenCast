@@ -135,9 +135,3 @@ class VideoDownloader(object):
                     )
                 )
         return None
-
-
-def make_video_downloader():
-    downloader = VideoDownloader()
-
-    return downloader
