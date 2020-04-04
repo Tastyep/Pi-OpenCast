@@ -8,8 +8,9 @@ class CommandDispatcher(object):
             self._handlers_map[cmd_id] = list()
         self._handlers_map[cmd_id].append(handler)
 
-    def dispatch(self, command):
-        cmd_id = id(type(command))
+    def dispatch(self, cmd):
+        cmd_id = id(type(cmd))
         if cmd_id in self._handlers_map:
-            for h in self._handlers_map[cmd_id]:
-                h(command)
+            handlers = self._handlers_map[cmd_id]
+            for handler in handlers:
+                handler(cmd)

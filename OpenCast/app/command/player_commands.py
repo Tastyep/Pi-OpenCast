@@ -27,16 +27,6 @@ class SeekVideo:
 
 
 @dataclass
-class IncreaseVolume:
-    amount: int
-
-
-@dataclass
-class DecreaseVolume:
-    amount: int
-
-
-@dataclass
 class NextVideo:
     pass
 
@@ -44,6 +34,11 @@ class NextVideo:
 @dataclass
 class PrevVideo:
     pass
+
+
+@dataclass
+class ChangeVolume:
+    amount: int
 
 
 @dataclass
