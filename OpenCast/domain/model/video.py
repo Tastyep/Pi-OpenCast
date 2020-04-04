@@ -1,7 +1,4 @@
-import logging
 from pathlib import Path
-
-logger = logging.getLogger(__name__)
 
 
 class Video(object):
@@ -19,19 +16,16 @@ class Video(object):
             self._title = path.name
 
     def __repr__(self):
-        title = '' if self._title is None else str(self._title)
-        playlist_id = '' if self._playlist_id is None else str(
-            self._playlist_id
+        title = "" if self._title is None else str(self._title)
+        playlist_id = "" if self._playlist_id is None else str(self._playlist_id)
+        return str(
+            {"title": title, "source": str(self._source), "playlist_id": playlist_id}
         )
-        return str({
-            'title': title,
-            'source': str(self._source),
-            'playlist_id': playlist_id
-        })
 
     def __eq__(self, other):
         return (
-            self._source == other._source
+            other is not None
+            and self._source == other._source
             and self._playlist_id == other._playlist_id
         )
 
@@ -64,7 +58,7 @@ class Video(object):
 
     @title.setter
     def title(self, title):
-        self._title = str(title.encode('ascii', 'ignore'))
+        self._title = str(title.encode("ascii", "ignore"))
 
     @subtitle.setter
     def subtitle(self, subtitle):

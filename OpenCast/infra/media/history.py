@@ -39,11 +39,11 @@ class History(object):
             return False
 
         index = self._items.index(object)
-        if self._index >= index and self._index is not 0:
+        if self._index >= index and self._index != 0:
             self._index -= 1
 
         self._items.remove(object)
-        if self.size() is 0:
+        if self.size() == 0:
             self.stop_browsing()
 
         return True
@@ -65,7 +65,7 @@ class History(object):
         return True
 
     def next(self):
-        if self._index is 0:
+        if self._index == 0:
             self._browsing = False
             return False
 
