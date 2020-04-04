@@ -2,6 +2,8 @@ import dataclasses
 import inspect
 import re
 
+from OpenCast.infra.data.repo.error import RepoError
+
 
 class Service(object):
     def __init__(self, app_facade, logger, derived, cmd_module, evt_module=None):
@@ -30,6 +32,18 @@ class Service(object):
             # Raise the exception as it is a developer error
             raise
 
-    def _register_handlers(self, cmd_handlers):
-        for cmd, handler in cmd_handlers.items():
-            self._cmd_dispatcher.attach(cmd, handler)
+    def _start_transation(self, repo, impl):
+        retry = True
+        while retry:
+            context = repo.make_context()
+            try:
+                impl(context)
+                models = context.commit()
+                retry = False
+                for model in models:
+                    events = model.release_events()
+                    for evt in events:
+                        self._evt_dispatcher.dispatch(evt)
+            except RepoError as e:
+                self._logger.error("caught repo error: {}".format(e))
+                # TODO: differenciate fatal from non fatal errors
