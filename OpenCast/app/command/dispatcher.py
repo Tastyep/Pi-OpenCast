@@ -1,7 +1,7 @@
 import logging
 
 
-class CommandDispatcher(object):
+class CommandDispatcher:
     def __init__(self):
         self._logger = logging.getLogger(__name__)
         self._handlers_map = {}

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 config = config["Downloader"]
 
 
-class VideoDownloader(object):
+class VideoDownloader:
     def __init__(self):
         self._stopped = False
         self._queue = deque()

@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 
-class Entity(object):
+class Entity:
     def __init__(self, id_):
         self._id = id_
         self._version = 0

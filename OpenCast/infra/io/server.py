@@ -3,7 +3,7 @@ import logging
 from bottle import Bottle, request, response, run, template
 
 
-class EnableCors(object):
+class EnableCors:
     def apply(self, fn, context):
         def _enable_cors(*args, **kwargs):
             # set CORS headers
@@ -20,7 +20,7 @@ class EnableCors(object):
         return _enable_cors
 
 
-class Server(object):
+class Server:
     def __init__(self):
         self._server = Bottle()
         self._server.install(EnableCors())

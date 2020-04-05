@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-class Video(object):
+class Video:
     def __init__(self, source, playlist_id=None):
         self._source = source
         self._playlist_id = playlist_id

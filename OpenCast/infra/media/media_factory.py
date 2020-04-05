@@ -5,7 +5,7 @@ from omxplayer.player import OMXPlayer
 from .player_wrapper import PlayerWrapper
 
 
-class MediaFactory(object):
+class MediaFactory:
     def __init__(self, evt_dispatcher):
         self._evt_dispatcher = evt_dispatcher
 

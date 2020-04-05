@@ -5,7 +5,7 @@ import re
 from OpenCast.infra.data.repo.error import RepoError
 
 
-class Service(object):
+class Service:
     def __init__(self, app_facade, logger, derived, cmd_module, evt_module=None):
         self._cmd_dispatcher = app_facade.cmd_dispatcher()
         self._evt_dispatcher = app_facade.evt_dispatcher()

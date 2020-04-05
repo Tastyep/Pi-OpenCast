@@ -1,4 +1,4 @@
-class Context(object):
+class Context:
     def __init__(self, repo):
         self._repo = repo
         self._transactions = []

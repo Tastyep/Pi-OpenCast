@@ -10,26 +10,26 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-class Server(object):
+class Server:
     host = "0.0.0.0"
     port = 2020
 
 
-class VideoPlayer(object):
+class VideoPlayer:
     hide_background = True
     loop_last = True
     history_size = 15
 
 
-class Downloader(object):
+class Downloader:
     output_directory = "/tmp"
 
 
-class Subtitle(object):
+class Subtitle:
     language = "eng"
 
 
-class Config(object):
+class Config:
     __metaclass__ = Singleton
 
     def __init__(self):

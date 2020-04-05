@@ -14,7 +14,7 @@ config = config["VideoPlayer"]
 
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
-class PlayerWrapper(object):
+class PlayerWrapper:
     def __init__(self, evt_dispatcher, player_factory):
         self._evt_dispatcher = evt_dispatcher
         self._player_factory = player_factory

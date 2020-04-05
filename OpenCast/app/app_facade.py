@@ -3,7 +3,7 @@ from OpenCast.domain.event.dispatcher import EventDispatcher
 from .command.dispatcher import CommandDispatcher
 
 
-class AppFacade(object):
+class AppFacade:
     def __init__(self):
         self._cmd_dispatcher = CommandDispatcher()
         self._evt_dispatcher = EventDispatcher()

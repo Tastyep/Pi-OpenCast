@@ -3,7 +3,7 @@ import logging
 from hurry.filesize import alternative, size
 
 
-class DownloadLogger(object):
+class DownloadLogger:
     def __init__(self):
         self._logger = logging.getLogger("Downloader")
 

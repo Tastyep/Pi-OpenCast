@@ -1,8 +1,8 @@
 import logging
 
 
-class EventDispatcher(object):
-    class _Handler(object):
+class EventDispatcher:
+    class _Handler:
         def __init__(self, functor, count=-1):
             self._functor = functor
             self._count = count

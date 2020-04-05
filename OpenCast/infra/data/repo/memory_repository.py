@@ -4,7 +4,7 @@ from .context import Context
 from .error import RepoError
 
 
-class MemoryRepository(object):
+class MemoryRepository:
     def __init__(self):
         self._table = []
 

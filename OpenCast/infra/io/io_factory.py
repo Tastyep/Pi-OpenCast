@@ -2,7 +2,7 @@ from .server import Server
 from .video_downloader import VideoDownloader
 
 
-class IoFactory(object):
+class IoFactory:
     def make_server(self):
         return Server()
 

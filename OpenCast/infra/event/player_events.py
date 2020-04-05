@@ -4,40 +4,40 @@ from OpenCast.domain.model.video import Video
 
 
 @dataclass
-class PlayerStarted(object):
+class PlayerStarted:
     video: Video
 
 
 @dataclass
-class PlayerStopped(object):
+class PlayerStopped:
     interrupted: bool
 
 
 @dataclass
-class PlayerPaused(object):
+class PlayerPaused:
     pass
 
 
 @dataclass
-class PlayerUnpaused(object):
+class PlayerUnpaused:
     pass
 
 
 @dataclass
-class SubtitleStateChanged(object):
+class SubtitleStateChanged:
     state: bool
 
 
 @dataclass
-class SubtitleDelayUpdated(object):
+class SubtitleDelayUpdated:
     amount: int
 
 
 @dataclass
-class VolumeUpdated(object):
+class VolumeUpdated:
     volume: int
 
 
 @dataclass
-class VideoSeeked(object):
+class VideoSeeked:
     pass

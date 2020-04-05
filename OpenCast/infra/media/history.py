@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 config = config["VideoPlayer"]
 
 
-class History(object):
+class History:
     def __init__(self, items=[]):
         self._index = 0
         self._browsing = False

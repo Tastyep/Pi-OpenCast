@@ -1,4 +1,4 @@
-class DataFacade(object):
+class DataFacade:
     def __init__(self, repo_factory):
         self._player_repo = repo_factory.make_player_repo()
         self._video_repo = repo_factory.make_video_repo()
