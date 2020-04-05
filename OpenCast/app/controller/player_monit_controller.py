@@ -1,4 +1,3 @@
-import logging
 import uuid
 
 from bottle import request
@@ -6,8 +5,6 @@ from OpenCast.domain.model.player import Player
 
 from ..command import player_commands as c
 from .controller import Controller
-
-logger = logging.getLogger(__name__)
 
 
 class PlayerMonitController(Controller):
@@ -40,7 +37,6 @@ class PlayerMonitController(Controller):
         control = request.query["control"]
         cmd = None
 
-        logger.debug("Control command received: {}".format(control))
         if control == "pause":
             cmd = c.ToggleVideoState()
         elif control == "stop":
@@ -76,7 +72,6 @@ class PlayerMonitController(Controller):
     def _subtitle(self):
         action = request.query["action"]
 
-        logger.debug("Subtitle command received: {}".format(action))
         if action == "toggle":
             self._cmd_dispatcher.dispatch(c.ToggleSubtitle())
         elif action == "increase":

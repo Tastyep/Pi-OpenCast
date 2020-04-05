@@ -31,7 +31,7 @@ class PlayerWrapper(object):
             command += ["--subtitles", video.subtitle]
 
         def open_player():
-            logger.debug("[player] opening {} with opt: {}".format(video, command))
+            logger.debug(f"opening {video} with opt: {command}")
             try:
                 self._player = self._player_factory(
                     video.path,
@@ -41,11 +41,11 @@ class PlayerWrapper(object):
                 )
                 return True
             except SystemError:
-                logger.error("[player] couldn't connect to dbus")
+                logger.error(f"couldn't connect to dbus")
                 # Kill instance if it is a dbus problem
                 for proc in psutil.process_iter():
                     if "omxplayer" in proc.name():
-                        logger.debug("[player] killing process {}".format(proc.name()))
+                        logger.debug(f"killing process {proc.name()}")
                         proc.kill()
                 return False
 

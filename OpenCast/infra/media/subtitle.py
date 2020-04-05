@@ -11,28 +11,28 @@ def load_from_video(video, language):
     parent_path = video.path.parents[0]
     subtitle = "{}/{}.srt".format(parent_path, video_name)
 
-    logger.debug("[subtitle] loading subtitles for {}".format(video))
+    logger.debug(f"loading subtitles for {video}")
     srtFiles = list(parent_path.glob("*.srt"))
     if Path(subtitle) in srtFiles:
-        logger.debug("[subtitle] found matching susbtitle file: {}".format(subtitle))
+        logger.debug(f"found matching susbtitle file: {subtitle}")
         return subtitle
 
-    logger.debug("[subtitle] searching softcoded subtitles from {}".format(video))
+    logger.debug(f"searching softcoded subtitles from {video}")
     probe = dict()
     try:
         probe = ffmpeg.probe(str(video.path))
     except ffmpeg.Error as e:
-        logger.error("[subtitle] ffprobe error: {}".format(str(e)))
+        logger.error(f"ffprobe error: {e}")
         return None
 
     for stream in probe["streams"]:
-        logger.debug("sub: {}".format(stream))
+        logger.debug(f"sub: {stream}")
         if (
             stream["codec_type"] == "subtitle"
             and stream["tags"]["language"] == language
         ):
             channel = "0:{}".format(stream["index"])
-            logger.info("[subtitle] found matching sub: {}".format(subtitle))
+            logger.info(f"found matching sub: {subtitle}")
             try:
                 ffmpeg.input(str(video.path)).output(subtitle, map=channel).global_args(
                     "-n"
@@ -41,7 +41,7 @@ def load_from_video(video, language):
             except ffmpeg.Error as e:
                 if e is None:  # The file probably exists
                     return subtitle
-                logger.error("[subtitle] extraction error: {}".format(e.stderr))
+                logger.error(f"extraction error: {e.stderr}")
 
-    logger.info("[subtitle] no subtitle found for: {}".format(video))
+    logger.info(f"no subtitle found for: {video}")
     return None

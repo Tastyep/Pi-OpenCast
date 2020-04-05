@@ -205,15 +205,15 @@ class PlayerService(Service):
     def _download_video(self, video, dl_callback, first):
         # TODO: move this logic in extractors
         if "/playlist" in video.source:
-            logger.debug("[service] playlist detected, unfolding...")
+            logger.debug("playlist detected, unfolding...")
             # Generate a unique ID for the playlist
             playlist_id = uuid.uuid4()
             urls = self._downloader.extract_playlist(video.source)
             videos = [Video(u, playlist_id) for u in urls]
-            logger.debug("[service] playlist url unfolded to {}".format(videos))
+            logger.debug(f"playlist url unfolded to {videos}")
             self._downloader.queue(videos, dl_callback, first)
         else:
-            logger.debug("[service] queue single video: {}".format(video))
+            logger.debug(f"queue single video: {video}")
             self._downloader.queue([video], dl_callback, first)
 
     def _update(self, mutator, *args, **kwargs):

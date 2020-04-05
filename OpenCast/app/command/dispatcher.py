@@ -13,7 +13,7 @@ class CommandDispatcher(object):
         self._handlers_map[cmd_id].append(handler)
 
     def dispatch(self, cmd):
-        self._logger.debug("dispatching: {}".format(cmd))
+        self._logger.debug(f"dispatching: {cmd}")
         cmd_id = id(type(cmd))
         if cmd_id in self._handlers_map:
             handlers = self._handlers_map[cmd_id]

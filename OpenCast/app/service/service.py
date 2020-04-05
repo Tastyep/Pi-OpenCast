@@ -27,7 +27,7 @@ class Service(object):
             dispatcher.attach(obj, handler)
         except AttributeError:
             self._logger.error(
-                "No handler '{}' found for '{}'".format(handler_name, obj.__name__)
+                f"No handler '{handler_name}' found for '{obj.__name__}'"
             )
             # Raise the exception as it is a developer error
             raise
@@ -45,5 +45,5 @@ class Service(object):
                     for evt in events:
                         self._evt_dispatcher.dispatch(evt)
             except RepoError as e:
-                self._logger.error("caught repo error: {}".format(e))
+                self._logger.error(f"caught repo error: {e}")
                 # TODO: differenciate fatal from non fatal errors

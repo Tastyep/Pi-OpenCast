@@ -30,7 +30,7 @@ class Server(object):
         self._server.route(route, *args, **kwargs)
 
     def run(self, host, port):
-        self._logger.info("[server] started on {}:{}".format(host, port))
+        self._logger.info(f"[server] started on {host}:{port}")
 
         run(self._server, host=host, port=port, reloader=False, debug=True, quiet=True)
 

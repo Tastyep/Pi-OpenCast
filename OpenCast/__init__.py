@@ -46,7 +46,7 @@ def _real_main():
         server = io_facade.server()
         server.run(server_config.host, server_config.port)
     except Exception as e:
-        logger.debug("opencast stopped: {}".format(str(e)))
+        logger.debug(f"opencast stopped: {e}")
 
 
 def main(argv=None):
