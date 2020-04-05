@@ -44,7 +44,7 @@ class VideoDownloader:
     def list(self):
         return list(self._queue)
 
-    def extract_playlist(self, url):
+    def unfold_playlist(self, url):
         options = {
             "extract_flat": "in_playlist",
         }
@@ -120,5 +120,5 @@ class VideoDownloader:
             try:
                 return ydl.extract_info(url, download=False)
             except Exception as e:
-                logger.error(f"error fetch metadata for '{url}': {e}")
+                logger.error(f"error fetching metadata for '{url}': {e}")
         return None

@@ -1,5 +1,4 @@
 import logging
-import uuid
 from functools import partial
 
 from OpenCast.app.command import player_commands
@@ -18,13 +17,16 @@ logger = logging.getLogger(__name__)
 
 
 class PlayerService(Service):
-    def __init__(self, app_facade, data_facade, io_facade, media_facade):
+    def __init__(
+        self, app_facade, data_facade, io_facade, media_facade, service_factory
+    ):
         super(PlayerService, self).__init__(
             app_facade, logger, self, player_commands, infra_events
         )
+        self._downloader = io_facade.video_downloader()
+        self._playlist_service = service_factory.make_playlist_service(self._downloader)
         self._player_repo = data_facade.player_repo()
         self._player = media_facade.player()
-        self._downloader = io_facade.video_downloader()
 
     # Infra event handler interface implementation
 
@@ -203,17 +205,10 @@ class PlayerService(Service):
         return self._player_repo.get_player()
 
     def _download_video(self, video, dl_callback, first):
-        # TODO: move this logic in extractors
-        if "/playlist" in video.source:
-            logger.debug("playlist detected, unfolding...")
-            # Generate a unique ID for the playlist
-            playlist_id = uuid.uuid4()
-            urls = self._downloader.extract_playlist(video.source)
-            videos = [Video(u, playlist_id) for u in urls]
-            logger.debug(f"playlist url unfolded to {videos}")
+        if self._playlist_service.is_playlist(video.source):
+            videos = self._playlist_service.unfold(video.source)
             self._downloader.queue(videos, dl_callback, first)
         else:
-            logger.debug(f"queue single video: {video}")
             self._downloader.queue([video], dl_callback, first)
 
     def _update(self, mutator, *args, **kwargs):

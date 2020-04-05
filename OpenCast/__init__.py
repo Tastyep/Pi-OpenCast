@@ -9,6 +9,7 @@ from .app.app_facade import AppFacade
 from .app.controller.module import ControllerModule
 from .app.service.module import ServiceModule
 from .config import config
+from .domain.service.factory import ServiceFactory
 from .infra.data.data_facade import DataFacade
 from .infra.data.repo.factory import RepoFactory
 from .infra.io.io_facade import IoFacade
@@ -30,6 +31,8 @@ def _real_main():
 
     app_facade = AppFacade()
 
+    service_factory = ServiceFactory()
+
     repo_factory = RepoFactory()
     data_facade = DataFacade(repo_factory)
 
@@ -40,7 +43,9 @@ def _real_main():
     media_facade = MediaFacade(media_factory)
 
     controller_module = ControllerModule(app_facade, data_facade, io_facade)
-    service_module = ServiceModule(app_facade, data_facade, io_facade, media_facade)
+    service_module = ServiceModule(
+        app_facade, data_facade, io_facade, media_facade, service_factory
+    )
 
     try:
         server = io_facade.server()
