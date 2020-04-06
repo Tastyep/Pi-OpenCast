@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from .memory_repository import MemoryRepository
+from .memory import MemoryRepository
 
 
 class PlayerRepo(MemoryRepository):

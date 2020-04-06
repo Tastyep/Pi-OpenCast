@@ -1,4 +1,4 @@
-from .memory_repository import MemoryRepository
+from .memory import MemoryRepository
 
 
 class VideoRepo(MemoryRepository):

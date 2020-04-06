@@ -1,13 +1,13 @@
 import logging
 from functools import partial
 
-from OpenCast.app.command import player_commands
+from OpenCast.app.command import player as player_cmds
 from OpenCast.app.error import CommandFailure
 from OpenCast.config import config
-from OpenCast.domain.event import player_events as model_events
+from OpenCast.domain.event import player as model_events
 from OpenCast.domain.model.player_state import PlayerState
 from OpenCast.domain.model.video import Video
-from OpenCast.infra.event import player_events as infra_events
+from OpenCast.infra.event import player as infra_events
 
 from .service import Service
 
@@ -20,7 +20,7 @@ class PlayerService(Service):
         self, app_facade, data_facade, io_facade, media_facade, service_factory
     ):
         super(PlayerService, self).__init__(
-            app_facade, logger, self, player_commands, infra_events
+            app_facade, logger, self, player_cmds, infra_events
         )
         self._downloader = io_facade.video_downloader()
         self._playlist_service = service_factory.make_playlist_service(self._downloader)
@@ -127,7 +127,9 @@ class PlayerService(Service):
             model.queue(video)
 
         def queue_local_video(model):
-            video.subtitle = subtitle.load_from_video(video, sub_config.language)
+            video.subtitle = self._subtitle_service.load_from_disk(
+                video, sub_config.language
+            )
             queue_video(model, video)
 
         if video.from_disk():

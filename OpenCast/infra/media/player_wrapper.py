@@ -3,7 +3,7 @@ from threading import Lock
 
 import psutil
 
-import OpenCast.infra.event.player_events as e
+import OpenCast.infra.event.player as e
 from omxplayer import keys
 from OpenCast.config import config
 

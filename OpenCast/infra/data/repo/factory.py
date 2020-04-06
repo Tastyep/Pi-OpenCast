@@ -1,5 +1,5 @@
-from .player_repo import PlayerRepo
-from .video_repo import VideoRepo
+from .player import PlayerRepo
+from .video import VideoRepo
 
 
 class RepoFactory:

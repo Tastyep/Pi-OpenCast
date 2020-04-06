@@ -3,7 +3,7 @@ import uuid
 from bottle import request
 from OpenCast.domain.model.player import Player
 
-from ..command import player_commands as c
+from ..command import player as c
 from .controller import Controller
 
 

@@ -1,6 +1,6 @@
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
-from OpenCast.domain.event import player_events as e
+from OpenCast.domain.event import player as e
 
 from .entity import Entity
 from .player_state import PlayerState

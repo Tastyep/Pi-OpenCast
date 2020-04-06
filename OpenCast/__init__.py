@@ -5,17 +5,17 @@ import sys
 
 import yaml
 
-from .app.app_facade import AppFacade
 from .app.controller.module import ControllerModule
+from .app.facade import AppFacade
 from .app.service.module import ServiceModule
 from .config import config
 from .domain.service.factory import ServiceFactory
-from .infra.data.data_facade import DataFacade
+from .infra.data.facade import DataFacade
 from .infra.data.repo.factory import RepoFactory
-from .infra.io.io_facade import IoFacade
-from .infra.io.io_factory import IoFactory
-from .infra.media.media_facade import MediaFacade
-from .infra.media.media_factory import MediaFactory
+from .infra.io.facade import IoFacade
+from .infra.io.factory import IoFactory
+from .infra.media.facade import MediaFacade
+from .infra.media.factory import MediaFactory
 
 
 def _real_main():

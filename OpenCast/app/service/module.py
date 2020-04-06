@@ -1,4 +1,4 @@
-from .player_service import PlayerService
+from .player import PlayerService
 
 
 class ServiceModule:
