@@ -8,7 +8,6 @@ from OpenCast.domain.event import player_events as model_events
 from OpenCast.domain.model.player_state import PlayerState
 from OpenCast.domain.model.video import Video
 from OpenCast.infra.event import player_events as infra_events
-from OpenCast.infra.media import subtitle
 
 from .service import Service
 
@@ -25,6 +24,9 @@ class PlayerService(Service):
         )
         self._downloader = io_facade.video_downloader()
         self._playlist_service = service_factory.make_playlist_service(self._downloader)
+        self._subtitle_service = service_factory.make_subtitle_service(
+            io_facade.ffmpeg_wrapper()
+        )
         self._player_repo = data_facade.player_repo()
         self._player = media_facade.player()
 
@@ -104,7 +106,9 @@ class PlayerService(Service):
 
             video = Video(cmd.source)
             if video.from_disk():
-                video.subtitle = subtitle.load_from_video(video, sub_config.language)
+                video.subtitle = self._subtitle_service.load_from_disk(
+                    video, sub_config.language
+                )
                 play_video(video)
             else:
                 self._download_video(video, play_video, first=True)
