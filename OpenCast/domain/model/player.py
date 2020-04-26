@@ -1,6 +1,6 @@
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
-from OpenCast.domain.event import player as e
+from OpenCast.domain.event import player as Evt
 
 from .entity import Entity
 from .player_state import PlayerState
@@ -18,26 +18,26 @@ class Player(Entity):
         self._sub_delay = 0
         self._volume = 100
 
-    def play(self, video=None):
-        print("video: {} || active: {}".format(video, self.active_video))
-        if video is not None and video != self.active_video:
-            self._queue.insert(self._index, video)
+    def __repr__(self):
+        return f"Player: {self._state}, video: {self._index}/{len(self._queue)}"
+
+    def play(self, video):
+        if video not in self._queue:
+            raise DomainError(f"playing unknown video: {video}")
+
+        self._index = self._queue.index(video)
         self._state = PlayerState.PLAYING
-        self._record(e.PlayerStarted())
+        self._record(Evt.PlayerStarted, video.id)
 
     def stop(self):
         if self._state is PlayerState.STOPPED:
             raise DomainError("the player is already stopped")
         self._state = PlayerState.STOPPED
         self._sub_delay = 0
-        self._record(e.PlayerStopped())
+        self._record(Evt.PlayerStopped)
 
-    def queue(self, video, first=False):
+    def queue(self, video, with_priority=False):
         idx = len(self._queue)
-        if first:
-            idx = self._index
-            if self._state is not PlayerState.STOPPED:
-                idx += 1
 
         # Try to order videos from the same playlist together
         next_videos = self._queue[self._index :]
@@ -47,39 +47,35 @@ class Player(Entity):
                 break
 
         self._queue.insert(idx, video)
-        self._record(e.VideoQueued())
+        self._record(Evt.VideoQueued, video.id)
 
     def pause(self):
         if self._state is not PlayerState.PLAYING:
             raise DomainError(f"the player is not playing")
         self._state = PlayerState.PAUSED
-        self._record(e.PlayerPause())
+        self._record(Evt.PlayerPaused)
 
     def unpause(self):
         if self._state is not PlayerState.PAUSED:
             raise DomainError(f"the player is not paused")
         self._state = PlayerState.PLAYING
-        self._record(e.PlayerUnpaused())
+        self._record(Evt.PlayerUnpaused)
 
     def next_video(self):
-        print("IDX: {}, videos: {}".format(self._index, self._queue))
         if self._index + 1 >= len(self._queue):
             if player_config.loop_last is True:
                 return self._queue[self._index]
-            self.stop()
             return None
 
-        self._index += 1
-        return self._queue[self._index]
+        return self._queue[self._index + 1]
 
     def prev_video(self):
         if self._index == 0:
             return self._queue[0]
-        self._index -= 1
-        return self._queue[self._index]
+        return self._queue[self._index - 1]
 
     def seek_video(self):
-        self._record(e.VideoSeeked())
+        self._record(Evt.VideoSeeked)
 
     @property
     def state(self):
@@ -97,23 +93,17 @@ class Player(Entity):
     def volume(self):
         return self._volume
 
-    @property
-    def active_video(self):
-        if self._index < len(self._queue):
-            return self._queue[self._index]
-        return None
-
     @subtitle_state.setter
     def subtitle_state(self, state):
         self._sub_state = state
-        self._record(e.SubtitleStateUpdated())
+        self._record(Evt.SubtitleStateUpdated)
 
     @subtitle_delay.setter
     def subtitle_delay(self, delay):
         self._sub_delay = delay
-        self._record(e.SubtitleDelayUpdated())
+        self._record(Evt.SubtitleDelayUpdated)
 
     @volume.setter
     def volume(self, v):
         self._volume = max(min(200, v), 0)
-        self._record(e.VolumeUpdated())
+        self._record(Evt.VolumeUpdated)
