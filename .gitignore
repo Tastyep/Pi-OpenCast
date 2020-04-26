@@ -2,7 +2,12 @@
 *.pyc
 *~
 *.xpi
+
 Pipfile.lock
+OpenCast.pid
 
 # node modules
 webapp/node_modules
+
+# logging directory
+log/
