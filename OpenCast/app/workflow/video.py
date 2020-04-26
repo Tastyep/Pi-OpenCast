@@ -24,8 +24,8 @@ class VideoWorkflow(Workflow):
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
+        ["_identify",               States.INITIAL,     States.COMPLETED,  "is_complete"],  # noqa: E501
         ["_identify",               States.INITIAL,     States.IDENTIFYING],
-        ["_create",                 States.IDENTIFYING, States.COMPLETED,  "is_complete"],  # noqa: E501
         ["_create",                 States.IDENTIFYING, States.CREATING],
         ["_video_created",          States.CREATING,    States.FINALISING, "is_disk_available"],  # noqa: E501
         ["_video_created",          States.CREATING,    States.DOWNLOADING],
@@ -97,7 +97,7 @@ class VideoWorkflow(Workflow):
 
     def on_enter_COMPLETED(self, evt):
         model_id = None
-        if self.States[evt.transition.source] is self.States.IDENTIFYING:
+        if self.States[evt.transition.source] is self.States.INITIAL:
             model_id = evt.args[0]
         else:
             model_id = evt.args[0].model_id
