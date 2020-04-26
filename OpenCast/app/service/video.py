@@ -7,7 +7,6 @@ from OpenCast.domain.model.video import Video
 from .service import Service
 
 
-# TODO: Implement fsm
 class VideoService(Service):
     def __init__(self, app_facade, data_facade, io_facade, service_factory):
         logger = logging.getLogger(__name__)
