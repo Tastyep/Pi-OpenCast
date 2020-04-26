@@ -12,10 +12,9 @@ class Context:
     def delete(self, entity):
         self._transactions.append((entity, self._repo.delete))
 
+    def entities(self):
+        return [transaction[0] for transaction in self._transactions]
+
     def commit(self):
-        entities = []
         for entity, transaction in self._transactions:
             transaction(entity)
-            entities.append(entity)
-
-        return entities
