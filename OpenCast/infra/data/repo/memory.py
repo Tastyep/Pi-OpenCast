@@ -36,5 +36,8 @@ class MemoryRepository:
             return None
         return deepcopy(model)
 
+    def exists(self, id_):
+        return next((e for e in self._table if e.id == id_), None) is not None
+
     def make_context(self):
         return Context(self)
