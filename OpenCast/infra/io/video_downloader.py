@@ -1,20 +1,17 @@
 import logging
-from collections import deque
 from threading import Condition, Thread
 
 import youtube_dl
-from OpenCast.config import config
 
 from .download_logger import DownloadLogger
 
 logger = logging.getLogger(__name__)
-config = config["Downloader"]
 
 
 class VideoDownloader:
     def __init__(self):
         self._stopped = False
-        self._queue = deque()
+        self._queue = []
         self._cv = Condition()
         self._logger = DownloadLogger()
         self._log_debug = self._logger.is_enabled_for(logging.DEBUG)
@@ -27,22 +24,27 @@ class VideoDownloader:
             self._cv.notifyAll()
         self._thread.join()
 
-    def queue(self, videos, dl_callback, first=False):
+    def queue(self, video, dl_callback, priority=False):
         with self._cv:
-            for video in videos:
-                # Position the video with the videos of the same playlist.
-                index = 0 if first else len(self._queue)
-                if first and video.playlist_id is not None:
-                    for i, v in enumerate(reversed(self._queue)):
-                        if v[0].playlist_id == video.playlist_id:
-                            index = len(self._queue) - i
-                            break
-                logger.info(f"queue video {video}")
-                self._queue.insert(index, (video, dl_callback))
+            # Position the video with videos from the same playlist.
+            index = 0 if priority else len(self._queue)
+            if priority and video.playlist_id is not None:
+                for i, v in enumerate(reversed(self._queue)):
+                    if v[0].playlist_id == video.playlist_id:
+                        index = len(self._queue) - i
+                        break
+            logger.debug(f"queue video {video}")
+            self._queue.insert(index, (video, dl_callback))
             self._cv.notify()
 
-    def list(self):
-        return list(self._queue)
+    def fetch_metadata(self, url, fields):
+        options = {
+            "noplaylist": True,
+        }
+        data = self._fetch_metadata(url, options)
+        if data is None:
+            return None
+        return {k: data[k] for k in fields}
 
     def unfold_playlist(self, url):
         options = {
@@ -66,23 +68,11 @@ class VideoDownloader:
                     self._cv.wait()
                 if self._stopped:
                     return
-                video, dl_callback = self._queue.popleft()
+                video, dl_callback = self._queue.pop(0)
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
-        options = {
-            "noplaylist": True,
-        }
-        data = self._fetch_metadata(video.source, options)
-        if data is None:
-            return
-
-        video.title = data["title"]
-        video.path = "{}/{}-{}.mp4".format(
-            config.output_directory, video.title, hash(video.source)
-        )
-
-        def download_hook(d):
+        def progress_hook(d):
             self._logger.log_download(d)
 
         logger.debug(f"starting download for: {video.title}")
@@ -93,7 +83,7 @@ class VideoDownloader:
             "noplaylist": True,
             "merge_output_format": "mp4",
             "outtmpl": str(video.path),
-            "progress_hooks": [download_hook],
+            "progress_hooks": [progress_hook],
         }
         ydl = youtube_dl.YoutubeDL(options)
         with ydl:  # Download the video
