@@ -22,8 +22,14 @@ class SubtitleService:
         # Find subtitle with matching language
         self._logger.debug(f"searching softcoded subtitles from {video}")
         metadata = self._ffmpeg_wrapper.probe(video.path)
+        stream_data = [
+            "index",
+            "codec_type",
+            "codec_long_name",
+        ]
         for stream in metadata["streams"]:
-            self._logger.debug(f"{stream}")
+            stream_info = {k: stream[k] for k in stream_data}
+            self._logger.debug(f"{stream_info}")
             if (
                 stream["codec_type"] == "subtitle"
                 and stream["tags"]["language"] == language
