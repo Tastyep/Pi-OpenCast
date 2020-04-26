@@ -16,19 +16,19 @@ class Service:
             self._register_handlers(self._evt_dispatcher, evt_module)
 
     def _register_handlers(self, dispatcher, module):
-        for _, obj in inspect.getmembers(module, inspect.isclass):
-            if dataclasses.is_dataclass(obj):
-                self._register_handler(dispatcher, obj)
+        classes = inspect.getmembers(module, inspect.isclass)
+        for _, cls in classes:
+            if cls.__module__ == module.__name__:
+                self._register_handler(dispatcher, cls)
 
-    def _register_handler(self, dispatcher, obj):
-        handler_name = re.sub("([A-Z]+)", r"_\1", obj.__name__).lower()
+    def _register_handler(self, dispatcher, cls):
+        cls_name = cls.__name__
+        handler_name = re.sub("([A-Z]+)", r"_\1", cls_name).lower()
         try:
             handler = getattr(self.__derived, handler_name)
-            dispatcher.attach(obj, handler)
+            dispatcher.observe(cls, handler)
         except AttributeError:
-            self._logger.error(
-                f"No handler '{handler_name}' found for '{obj.__name__}'"
-            )
+            self._logger.error(f"No handler '{handler_name}' found for '{cls_name}'")
             # Raise the exception as it is a developer error
             raise
 
