@@ -11,7 +11,7 @@ class MemoryRepository:
     def create(self, model):
         if self.get(model.id) is not None:
             raise RepoError("cannot create: model '{}' already exists".format(model.id))
-        self._table.append(model)
+        self._table.append(deepcopy(model))
 
     def update(self, model):
         e = self.get(model.id)
