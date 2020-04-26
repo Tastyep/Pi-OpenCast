@@ -1,7 +1,6 @@
 import logging
 import logging.config
 import os
-import sys
 
 import yaml
 
@@ -18,7 +17,7 @@ from .infra.media.facade import MediaFacade
 from .infra.media.factory import MediaFactory
 
 
-def _real_main():
+def main(argv=None):
     app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     with open("{}/logging.yml".format(app_path), "r") as file:
@@ -42,7 +41,9 @@ def _real_main():
     media_factory = MediaFactory(app_facade.evt_dispatcher())
     media_facade = MediaFacade(media_factory)
 
-    controller_module = ControllerModule(app_facade, data_facade, io_facade)
+    controller_module = ControllerModule(
+        app_facade, data_facade, io_facade, service_factory
+    )
     service_module = ServiceModule(
         app_facade, data_facade, io_facade, media_facade, service_factory
     )
@@ -52,10 +53,3 @@ def _real_main():
         server.run(server_config.host, server_config.port)
     except Exception as e:
         logger.debug(f"opencast stopped: {e}")
-
-
-def main(argv=None):
-    try:
-        _real_main()
-    except KeyboardInterrupt:
-        sys.exit("\nERROR: Interrupted by user")
