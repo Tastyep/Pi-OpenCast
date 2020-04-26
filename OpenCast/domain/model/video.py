@@ -1,26 +1,25 @@
 from pathlib import Path
 
+from OpenCast.domain.event import video as Evt
 
-class Video:
-    def __init__(self, source, playlist_id=None):
+from .entity import Entity
+
+
+class Video(Entity):
+    def __init__(self, id_, source, playlist_id, title, path):
+        super(Video, self).__init__(id_)
         self._source = source
         self._playlist_id = playlist_id
-        self._path = None
-        self._title = None
+        self._title = title
+        self._path = Path(path)
         self._subtitle = None
 
-        path = Path(source)
-        if path.is_file():
-            self.path = source
-            self._playlist_id = path.parent
-            self._title = path.name
+        self._record(
+            Evt.VideoCreated, self._source, self._playlist_id, self._title, self._path
+        )
 
     def __repr__(self):
-        title = "" if self._title is None else str(self._title)
-        playlist_id = "" if self._playlist_id is None else str(self._playlist_id)
-        return str(
-            {"title": title, "source": str(self._source), "playlist_id": playlist_id}
-        )
+        return f"Video: title: {self._title}, playlist_id: {self._playlist_id}"
 
     def __eq__(self, other):
         return (
@@ -49,13 +48,6 @@ class Video:
     def subtitle(self):
         return self._subtitle
 
-    def from_disk(self):
-        return self._path is not None and str(self._path) == self._source
-
-    @path.setter
-    def path(self, path):
-        self._path = Path(path)
-
     @title.setter
     def title(self, title):
         self._title = str(title.encode("ascii", "ignore"))
@@ -63,3 +55,10 @@ class Video:
     @subtitle.setter
     def subtitle(self, subtitle):
         self._subtitle = subtitle
+        self._record(Evt.VideoSubtitleFetched, self._subtitle)
+
+    def downloaded(self):
+        self._record(Evt.VideoDownloaded)
+
+    def is_file(self):
+        return self._path.is_file()
