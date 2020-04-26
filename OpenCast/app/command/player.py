@@ -1,56 +1,59 @@
 from dataclasses import dataclass
+from uuid import UUID
+
+from .command import Command
 
 
 @dataclass
-class PlayVideo:
-    source: str
+class PlayVideo(Command):
+    video_id: UUID
 
 
 @dataclass
-class QueueVideo:
-    source: str
+class QueueVideo(Command):
+    video_id: UUID
 
 
 @dataclass
-class StopVideo:
+class StopVideo(Command):
     pass
 
 
 @dataclass
-class ToggleVideoState:
+class ToggleVideoState(Command):
     pass
 
 
 @dataclass
-class SeekVideo:
+class SeekVideo(Command):
     duration: int
 
 
 @dataclass
-class NextVideo:
+class NextVideo(Command):
     pass
 
 
 @dataclass
-class PrevVideo:
+class PrevVideo(Command):
     pass
 
 
 @dataclass
-class ChangeVolume:
+class ChangeVolume(Command):
     amount: int
 
 
 @dataclass
-class ToggleSubtitle:
+class ToggleSubtitle(Command):
     pass
 
 
 @dataclass
-class IncreaseSubtitleDelay:
+class IncreaseSubtitleDelay(Command):
     pass
 
 
 @dataclass
-class DecreaseSubtitleDelay:
+class DecreaseSubtitleDelay(Command):
     pass
