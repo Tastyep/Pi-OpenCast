@@ -1,56 +1,49 @@
 from dataclasses import dataclass
+from uuid import UUID
+
+from .event import Event
 
 
 @dataclass
-class PlayerStarted:
+class PlayerStarted(Event):
+    video_id: UUID
+
+
+@dataclass
+class VideoQueued(Event):
+    video_id: UUID
+
+
+@dataclass
+class PlayerStopped(Event):
     pass
 
 
 @dataclass
-class VideoQueued:
+class PlayerPaused(Event):
     pass
 
 
 @dataclass
-class PlayerStopped:
+class PlayerUnpaused(Event):
     pass
 
 
 @dataclass
-class PlayerPause:
+class VideoSeeked(Event):
     pass
 
 
 @dataclass
-class PlayerUnpaused:
+class VolumeUpdated(Event):
     pass
 
 
 @dataclass
-class VideoNexted:
+class SubtitleStateUpdated(Event):
     pass
 
 
 @dataclass
-class VideoPreved:
-    pass
-
-
-@dataclass
-class VideoSeeked:
-    pass
-
-
-@dataclass
-class VolumeUpdated:
-    pass
-
-
-@dataclass
-class SubtitleStateUpdated:
-    pass
-
-
-@dataclass
-class SubtitleDelayUpdated:
+class SubtitleDelayUpdated(Event):
     pass
