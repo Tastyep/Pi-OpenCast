@@ -20,9 +20,9 @@ class PlayerWrapper:
         self._player_factory = player_factory
         self._player = None
         self._player_lock = Lock()
-        self._interrupted = False
+        self._stop_operation_id = None
 
-    def play(self, video, volume):
+    def play(self, cmd_id, video, volume):
         command = ["--vol", self._downscale(volume)]
         if config.hide_background is True:
             command += ["--blank"]
@@ -52,67 +52,67 @@ class PlayerWrapper:
         with self._player_lock:
             for _ in range(5):
                 if open_player():
-                    self._dispatch(e.PlayerStarted(video))
+                    self._dispatch(e.PlayerStarted(cmd_id, video))
                     return
         raise PlayerError("could not start the player, check your logs")
 
-    def stop(self):
+    def stop(self, cmd_id):
         def impl():
-            self._interrupted = True
+            self._stop_operation_id = cmd_id
             self._player.stop()
             # Event is dispatched from _on_exit
 
         self._exec_command(impl)
 
-    def pause(self):
+    def pause(self, cmd_id):
         def impl():
             self._player.play_pause()
-            self._dispatch(e.PlayerPaused())
+            self._dispatch(e.PlayerPaused(cmd_id))
 
         self._exec_command(impl)
 
-    def unpause(self):
+    def unpause(self, cmd_id):
         def impl():
             self._player.play_pause()
-            self._dispatch(e.PlayerUnpaused())
+            self._dispatch(e.PlayerUnpaused(cmd_id))
 
         self._exec_command(impl)
 
-    def update_subtitle_state(self, state):
+    def update_subtitle_state(self, cmd_id, state):
         def impl():
             if state is True:
                 self._player.show_subtitles()
             else:
                 self._player.hide_subtitles()
-            self._dispatch(e.SubtitleStateChanged(state))
+            self._dispatch(e.SubtitleStateChanged(cmd_id, state))
 
         self._exec_command(impl)
 
-    def increase_subtitle_delay(self):
+    def increase_subtitle_delay(self, cmd_id):
         def impl():
             self._player.action(keys.INCREASE_SUBTITLE_DELAY)
-            self._dispatch(e.SubtitleDelayUpdated(250))
+            self._dispatch(e.SubtitleDelayUpdated(cmd_id, 250))
 
         self._exec_command(impl)
 
-    def decrease_subtitle_delay(self):
+    def decrease_subtitle_delay(self, cmd_id):
         def impl():
             self._player.action(keys.DECREASE_SUBTITLE_DELAY)
-            self._dispatch(e.SubtitleDelayUpdated(-250))
+            self._dispatch(e.SubtitleDelayUpdated(cmd_id, -250))
 
         self._exec_command(impl)
 
-    def set_volume(self, volume):
+    def set_volume(self, cmd_id, volume):
         def impl():
             self._player.set_volume(self._downscale(volume))
-            self._dispatch(e.VolumeUpdated(volume))
+            self._dispatch(e.VolumeUpdated(cmd_id, volume))
 
         self._exec_command(impl)
 
-    def seek(self, duration):
+    def seek(self, cmd_id, duration):
         def impl():
             self._player.seek(duration)
-            self._dispatch(e.VideoSeeked())
+            self._dispatch(e.VideoSeeked(cmd_id))
 
         self._exec_command(impl)
 
@@ -129,9 +129,8 @@ class PlayerWrapper:
         self._evt_dispatcher.dispatch(event)
 
     def _on_exit(self, player, code):
-        cmd = None
         with self._player_lock:
-            cmd = e.PlayerStopped(self._interrupted)
-            self._interrupted = False
+            evt = e.PlayerStopped(self._stop_operation_id)
+            self._stop_operation_id = None
             self._player = None
-        self._dispatch(cmd)
+            self._dispatch(evt)
