@@ -10,4 +10,4 @@ OpenCast.pid
 webapp/node_modules
 
 # logging directory
-log/
+/log/
