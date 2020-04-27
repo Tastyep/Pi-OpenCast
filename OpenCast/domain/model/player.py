@@ -5,8 +5,6 @@ from OpenCast.domain.event import player as Evt
 from .entity import Entity
 from .player_state import PlayerState
 
-player_config = config["VideoPlayer"]
-
 
 class Player(Entity):
     def __init__(self, id_):
@@ -63,7 +61,7 @@ class Player(Entity):
 
     def next_video(self):
         if self._index + 1 >= len(self._queue):
-            if player_config.loop_last is True:
+            if config["player.loop_last"] is True:
                 return self._queue[self._index]
             return None
 

@@ -9,8 +9,6 @@ from OpenCast.config import config
 
 from .error import PlayerError
 
-config = config["VideoPlayer"]
-
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
 class PlayerWrapper:
@@ -24,7 +22,7 @@ class PlayerWrapper:
 
     def play(self, cmd_id, video, volume):
         command = ["--vol", self._downscale(volume)]
-        if config.hide_background is True:
+        if config["player.hide_background"] is True:
             command += ["--blank"]
 
         if video.subtitle is not None:

@@ -1,91 +1,67 @@
-import configparser
+import yaml
 
-
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class Server:
-    host = "0.0.0.0"
-    port = 2020
-
-
-class VideoPlayer:
-    hide_background = True
-    loop_last = True
-    history_size = 15
-
-
-class Downloader:
-    output_directory = "/tmp"
-
-
-class Subtitle:
-    language = "eng"
+import structlog
 
 
 class Config:
-    __metaclass__ = Singleton
-
-    def __init__(self):
-        self._parser = configparser.ConfigParser()
-        self._init_cache()
+    def __init__(self, content: dict):
+        self._logger = structlog.get_logger(__name__)
+        self._content = content
 
     def __getitem__(self, key):
-        return self._entries.get(key)
+        keys = key.split(".") if "." in key else [key]
 
-    def load_from_file(self, path):
-        with open(path, "r") as file:
-            self._parser.read_file(file)
-            self._load_cache()
+        content = self._content
+        for k in keys:
+            content = content[k]
+        if type(content) is dict:
+            return Config(content)
+        return content
 
-    def load_from_dict(self, dict):
-        self._parser.read_dict(dict)
-        self._load_cache()
+    def load_from_file(self, path: str):
+        try:
+            stream = open(path, "r")
+        except OSError as e:
+            self._logger.error("Can't open the configuration", error=e)
+            return
 
-    def _init_cache(self):
-        self._entries = {
-            "Server": Server(),
-            "VideoPlayer": VideoPlayer(),
-            "Downloader": Downloader(),
-            "Subtitle": Subtitle(),
-        }
+        with stream:
+            try:
+                content = yaml.safe_load(stream)
+                self.load_from_dict(content)
+            except yaml.YAMLError as e:
+                self._logger.error("invalid file", error=e)
 
-    def _load_cache(self):
-        for key, category in self._entries.items():
-            if not self._parser.has_section(key):
+    def load_from_dict(self, content: dict):
+        self._unpack_dict(content, self._content, [])
+
+    def _unpack_dict(self, source, dest, path):
+        for k, v in source.items():
+            if k not in dest:
+                self._logger.error("invalid key", key=".".join([*path, k]))
                 continue
-            parser = self._parser[key]
-
-            for entry_name in dir(category):
-                if entry_name.startswith("__") or not self._parser.has_option(
-                    key, entry_name
-                ):
-                    continue
-                self._parse_entry(parser, category, entry_name)
-
-    def _parse_entry(self, parser, category, entry_name):
-        entry = getattr(category, entry_name)
-        value = entry
-
-        if type(entry) is int:
-            value = parser.getint(entry_name, fallback=entry)
-        elif type(entry) is float:
-            value = parser.getfloat(entry_name, fallback=entry)
-        elif type(entry) is bool:
-            value = parser.getboolean(entry_name, fallback=entry)
-        else:
-            value = parser.get(entry_name, fallback=entry)
-            if type(entry) is str and (
-                value.startswith(("'", '"')) and value[0] == value[-1]
-            ):
-                value = value[1:-1]
-        setattr(category, entry_name, value)
+            if type(v) is dict:
+                self._unpack_dict(source[k], dest[k], [*path, k])
+                continue
+            dest[k] = v
 
 
-config = Config()
+# fmt: off
+config = Config({
+    "server": {
+        "host": "0.0.0.0",
+        "port": 2020
+    },
+    "player": {
+        "hide_background": True,
+        "loop_last": True,
+        "history_size": 15
+    },
+    "downloader": {
+        "output_directory": "/tmp"
+    },
+    "subtitle": {
+        "language": "eng"
+    }
+})
+# fmt: on

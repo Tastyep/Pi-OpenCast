@@ -66,7 +66,7 @@ class VideoWorkflow(Workflow):
             path = Path(source)
             title = path.parent
         else:
-            output_dir = config["Downloader"].output_directory
+            output_dir = config["downloader.output_directory"]
             title = metadata["title"]
             path = f"{output_dir}/{title}-{hash(source)}.mp4"
 
@@ -92,7 +92,7 @@ class VideoWorkflow(Workflow):
             VideoEvt.VideoSubtitleFetched,
             Cmd.FetchVideoSubtitle,
             evt.model_id,
-            config["Subtitle"].language,
+            config["subtitle.language"],
         )
 
     def on_enter_COMPLETED(self, evt):

@@ -22,8 +22,7 @@ def main(argv=None):
     init_logging(__name__)
     logger = structlog.get_logger(__name__)
 
-    config.load_from_file("{}/config.ini".format(app_path))
-    server_config = config["Server"]
+    config.load_from_file("{}/config.yml".format(app_path))
 
     app_facade = AppFacade()
 
@@ -38,15 +37,11 @@ def main(argv=None):
     media_factory = MediaFactory(app_facade.evt_dispatcher())
     media_facade = MediaFacade(media_factory)
 
-    controller_module = ControllerModule(
-        app_facade, data_facade, io_facade, service_factory
-    )
-    service_module = ServiceModule(
-        app_facade, data_facade, io_facade, media_facade, service_factory
-    )
+    ControllerModule(app_facade, data_facade, io_facade, service_factory)
+    ServiceModule(app_facade, data_facade, io_facade, media_facade, service_factory)
 
     try:
         server = io_facade.server()
-        server.run(server_config.host, server_config.port)
+        server.run(config["server.host"], config["server.port"])
     except Exception as e:
         logger.error(f"{__name__} stopped", error=e)
