@@ -34,9 +34,9 @@ class PlayerWrapperTest(TestCase):
         self._player_mock.exit_event = [exit_callback]
         return self._player_mock
 
-    @patch('OpenCast.video.Path.parent', new_callable=PropertyMock)
-    @patch('OpenCast.video.Path.name', new_callable=PropertyMock)
-    @patch('OpenCast.video.Path.is_file')
+    @patch("OpenCast.video.Path.parent", new_callable=PropertyMock)
+    @patch("OpenCast.video.Path.name", new_callable=PropertyMock)
+    @patch("OpenCast.video.Path.is_file")
     def test_play(self, m_is_file, m_name, m_parent):
         video = self.make_video(m_is_file, m_name, m_parent, "/tmp/test")
         f = Future()
@@ -54,9 +54,9 @@ class PlayerWrapperTest(TestCase):
             self.assertEqual(1, len(self._player_mock.exit_event))
             self._player_mock.exit_event[0](None, None)
 
-    @patch('OpenCast.video.Path.parent', new_callable=PropertyMock)
-    @patch('OpenCast.video.Path.name', new_callable=PropertyMock)
-    @patch('OpenCast.video.Path.is_file')
+    @patch("OpenCast.video.Path.parent", new_callable=PropertyMock)
+    @patch("OpenCast.video.Path.name", new_callable=PropertyMock)
+    @patch("OpenCast.video.Path.is_file")
     def test_play_queued(self, m_is_file, m_name, m_parent):
         video = self.make_video(m_is_file, m_name, m_parent, "/tmp/test")
         f = Future()

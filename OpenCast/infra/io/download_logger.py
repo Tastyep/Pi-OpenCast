@@ -1,60 +1,53 @@
-import logging
-
-from hurry.filesize import (
-    alternative,
-    size,
-)
+from hurry.filesize import alternative, size
 
 
-class DownloadLogger(object):
-    def __init__(self):
-        self._logger = logging.getLogger('Downloader')
+class DownloadLogger:
+    def __init__(self, logger):
+        self._logger = logger
 
     def is_enabled_for(self, level):
-        return self._logger.isEnabledFor(level)
+        return False
+        # return self._logger.isEnabledFor(level)
 
-    def log_download(self, d):
-        status = d.get('status', 'N/A')
-        if status is 'downloading':
-            self._log_download_info(d)
-        elif status is 'error':
-            self._log_download_error(d)
-        elif status is 'finished':
-            self._log_download_finished(d)
+    def log_progress(self, d):
+        status = d.get("status", "N/A")
+        if status not in ["downloading", "error", "finished"]:
+            return
 
-    def _log_download_info(self, d):
-        filename = d.get('filename', 'unknown')
+        getattr(self, f"_log_{status}")(d)
+
+    def _log_downloading(self, d):
+        filename = d.get("filename", "unknown")
         self._logger.info(
-            "[downloader] {} | {} | {}".format(
-                filename, self._format_ratio(d), self._format_speed(d)
-            )
+            "Downloading",
+            filename=filename,
+            ratio=self._format_ratio(d),
+            speed=self._format_speed(d),
         )
 
-    def _log_download_error(self, d):
-        filename = d.get('filename', 'unknown')
-        self._logger.error(
-            "[downloader] error downloading {}: {}".format(filename, d)
-        )
+    def _log_error(self, d):
+        filename = d.get("filename", "unknown")
+        self._logger.error("Error downloading", filename=filename, error=d)
 
-    def _log_download_finished(self, d):
-        filename = d.get('filename', 'unknown')
-        total = d.get('total_bytes', 0)
+    def _log_finished(self, d):
+        filename = d.get("filename", "unknown")
+        total = d.get("total_bytes", 0)
         self._logger.info(
-            "[downloader] finished downloading {} ({})".format(
-                filename, size(total)
-            )
+            "Finished downloading",
+            filename=filename,
+            size=size(total, system=alternative),
         )
 
     def _format_ratio(self, d):
-        downloaded = d.get('downloaded_bytes', None)
-        total = d.get('total_bytes', None)
+        downloaded = d.get("downloaded_bytes", None)
+        total = d.get("total_bytes", None)
         if downloaded is None or total is None:
             return "N/A %"
 
-        return "{0:.2f}%".format(100 * (downloaded/total))
+        return "{0:.2f}%".format(100 * (downloaded / total))
 
     def _format_speed(self, d):
-        speed = d.get('speed', 0)
+        speed = d.get("speed", 0)
         if speed is None:
             speed = 0
         return "{}/s".format(size(speed, system=alternative))

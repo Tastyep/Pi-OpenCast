@@ -1,26 +1,20 @@
-import logging
-from collections import deque
-from threading import (
-    Condition,
-    Thread,
-)
+from threading import Condition, Thread
 
 import youtube_dl
-from OpenCast.config import config
+
+import structlog
 
 from .download_logger import DownloadLogger
 
-logger = logging.getLogger(__name__)
-config = config['Downloader']
 
-
-class VideoDownloader(object):
+class VideoDownloader:
     def __init__(self):
         self._stopped = False
-        self._queue = deque()
+        self._queue = []
         self._cv = Condition()
-        self._logger = DownloadLogger()
-        self._log_debug = self._logger.is_enabled_for(logging.DEBUG)
+        self._logger = structlog.get_logger(__name__)
+        self._dl_logger = DownloadLogger(self._logger)
+        self._log_debug = False  # self._dl_logger.is_enabled_for(logging.DEBUG)
         self._thread = Thread(target=self._download_queued_videos)
         self._thread.start()
 
@@ -30,26 +24,31 @@ class VideoDownloader(object):
             self._cv.notifyAll()
         self._thread.join()
 
-    def queue(self, videos, dl_callback, first=False):
+    def queue(self, video, dl_callback, priority=False):
         with self._cv:
-            for video in videos:
-                # Position the video with the videos of the same playlist.
-                index = 0 if first else len(self._queue)
-                if first and video.playlist_id is not None:
-                    for i, v in enumerate(reversed(self._queue)):
-                        if v[0].playlist_id == video.playlist_id:
-                            index = len(self._queue) - i
-                            break
-                logger.info("[downloader] queue video {}".format(video))
-                self._queue.insert(index, (video, dl_callback))
+            # Position the video with videos from the same playlist.
+            index = 0 if priority else len(self._queue)
+            if priority and video.playlist_id is not None:
+                for i, v in enumerate(reversed(self._queue)):
+                    if v[0].playlist_id == video.playlist_id:
+                        index = len(self._queue) - i
+                        break
+            self._logger.debug("Queueing", video=video, position=index)
+            self._queue.insert(index, (video, dl_callback))
             self._cv.notify()
 
-    def list(self):
-        return list(self._queue)
-
-    def extract_playlist(self, url):
+    def fetch_metadata(self, url, fields):
         options = {
-            'extract_flat': 'in_playlist',
+            "noplaylist": True,
+        }
+        data = self._fetch_metadata(url, options)
+        if data is None:
+            return None
+        return {k: data[k] for k in fields}
+
+    def unfold_playlist(self, url):
+        options = {
+            "extract_flat": "in_playlist",
         }
         # Download the playlist data without downloading the videos.
         data = self._fetch_metadata(url, options)
@@ -57,10 +56,8 @@ class VideoDownloader(object):
             return []
 
         # NOTE(specific) youtube specific
-        base_url = url.split('/playlist', 1)[0]
-        urls = [
-            base_url + '/watch?v=' + entry['id'] for entry in data['entries']
-        ]
+        base_url = url.split("/playlist", 1)[0]
+        urls = [base_url + "/watch?v=" + entry["id"] for entry in data["entries"]]
         return urls
 
     def _download_queued_videos(self):
@@ -71,73 +68,46 @@ class VideoDownloader(object):
                     self._cv.wait()
                 if self._stopped:
                     return
-                video, dl_callback = self._queue.popleft()
+                video, dl_callback = self._queue.pop(0)
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
+        self._logger.debug("Starting downloading", video=video)
         options = {
-            'noplaylist': True,
-        }
-        data = self._fetch_metadata(video.source, options)
-        if data is None:
-            return
-
-        video.title = data['title']
-        video.path = "{}/{}-{}.mp4".format(
-            config.output_directory, video.title, hash(video.source)
-        )
-
-        def download_hook(d):
-            self._logger.log_download(d)
-
-        logger.debug(
-            "[downloader] starting download for: {}".format(video.title)
-        )
-        options = {
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/'
-            'bestvideo+bestaudio/best',
-            'debug_printtraffic': self._log_debug,
-            'noplaylist': True,
-            'merge_output_format': 'mp4',
-            'outtmpl': str(video.path),
-            'progress_hooks': [download_hook]
+            "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
+            "bestvideo+bestaudio/best",
+            "debug_printtraffic": self._log_debug,
+            "noplaylist": True,
+            "merge_output_format": "mp4",
+            "outtmpl": str(video.path),
+            "quiet": True,
+            "progress_hooks": [self._dl_logger.log_progress],
         }
         ydl = youtube_dl.YoutubeDL(options)
         with ydl:  # Download the video
             try:
                 ydl.download([video.source])
             except Exception as e:
-                logger.error(
-                    "[downloader] error downloading '{}': {}".format(
-                        video, str(e)
-                    )
-                )
+                self._logger.error("Download error", video=video, error=e)
                 return
 
-        logger.debug("[downloader] video downloaded: {}".format(video))
+        self._logger.debug("Download success", video=video)
         dl_callback(video)
 
     def _fetch_metadata(self, url, options):
-        logger.debug("[downloader] fetching metadata")
-        options.update({
-            'ignoreerrors': True,  # Causes ydl to return None on error
-            'debug_printtraffic': self._log_debug,
-            'logger': logger
-        })
+        self._logger.debug("Fetching metadata", url=url)
+        options.update(
+            {
+                "ignoreerrors": True,  # Causes ydl to return None on error
+                "debug_printtraffic": self._log_debug,
+                "quiet": True,
+                "progress_hooks": [self._dl_logger.log_progress],
+            }
+        )
         ydl = youtube_dl.YoutubeDL(options)
         with ydl:
             try:
                 return ydl.extract_info(url, download=False)
             except Exception as e:
-                logger.error(
-                    "[downloader] error fetch metadata for '{}': {}".format(
-                        url, str(e)
-                    )
-                )
+                self._logger.error("Fetching metadata error", url=url, error=e)
         return None
-
-
-def make_video_downloader():
-    downloader = VideoDownloader()
-
-    return downloader

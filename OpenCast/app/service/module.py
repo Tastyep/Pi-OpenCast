@@ -1,7 +1,12 @@
-from .player_service import PlayerService
+from .player import PlayerService
+from .video import VideoService
 
 
-class ServiceModule(object):
-    def __init__(self, app_facade, player, downloader):
-        cmd_dispatcher = app_facade.cmd_dispatcher()
-        self._player_service = PlayerService(cmd_dispatcher, player, downloader)
+class ServiceModule:
+    def __init__(
+        self, app_facade, data_facade, io_facade, media_facade, service_factory
+    ):
+        self._player_service = PlayerService(app_facade, data_facade, media_facade)
+        self._video_service = VideoService(
+            app_facade, data_facade, io_facade, service_factory
+        )

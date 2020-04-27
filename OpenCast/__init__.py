@@ -1,45 +1,52 @@
-import sys
 import os
-import yaml
-import logging
-import logging.config
 
-from .config import config
-from .infra.io.server import Server
-from .infra.io import video_downloader
-from .infra.media import player_wrapper
+import structlog
 
-from .app.app_facade import AppFacade
 from .app.controller.module import ControllerModule
+from .app.facade import AppFacade
 from .app.service.module import ServiceModule
-
-
-def _real_main(argv):
-    app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-
-    with open('{}/logging.yml'.format(app_path), 'r') as file:
-        cfg = yaml.load(file, Loader=yaml.Loader)
-        logging.config.dictConfig(cfg)
-    logger = logging.getLogger(__name__)
-
-    config.load_from_file('{}/config.ini'.format(app_path))
-    serverConfig = config['Server']
-
-    app_facade = AppFacade()
-    server = Server()
-    player = player_wrapper.make_wrapper()
-    downloader = video_downloader.make_video_downloader()
-    service_module = ServiceModule(app_facade, player, downloader)
-    controller_module = ControllerModule(app_facade, server)
-
-    try:
-        server.run(serverConfig.host, serverConfig.port)
-    except Exception as e:
-        logger.debug("opencast stopped: {}".format(str(e)))
+from .config import config
+from .domain.service.factory import ServiceFactory
+from .infra.data.facade import DataFacade
+from .infra.data.repo.factory import RepoFactory
+from .infra.io.facade import IoFacade
+from .infra.io.factory import IoFactory
+from .infra.log.module import init as init_logging
+from .infra.media.facade import MediaFacade
+from .infra.media.factory import MediaFactory
 
 
 def main(argv=None):
+    app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+    init_logging(__name__)
+    logger = structlog.get_logger(__name__)
+
+    config.load_from_file("{}/config.ini".format(app_path))
+    server_config = config["Server"]
+
+    app_facade = AppFacade()
+
+    service_factory = ServiceFactory()
+
+    repo_factory = RepoFactory()
+    data_facade = DataFacade(repo_factory)
+
+    io_factory = IoFactory()
+    io_facade = IoFacade(io_factory)
+
+    media_factory = MediaFactory(app_facade.evt_dispatcher())
+    media_facade = MediaFacade(media_factory)
+
+    controller_module = ControllerModule(
+        app_facade, data_facade, io_facade, service_factory
+    )
+    service_module = ServiceModule(
+        app_facade, data_facade, io_facade, media_facade, service_factory
+    )
+
     try:
-        _real_main(argv)
-    except KeyboardInterrupt:
-        sys.exit('\nERROR: Interrupted by user')
+        server = io_facade.server()
+        server.run(server_config.host, server_config.port)
+    except Exception as e:
+        logger.error(f"{__name__} stopped", error=e)

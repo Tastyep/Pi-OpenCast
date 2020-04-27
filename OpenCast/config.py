@@ -6,31 +6,30 @@ class Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton,
-                                        cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
-class Server(object):
-    host = '0.0.0.0'
+class Server:
+    host = "0.0.0.0"
     port = 2020
 
 
-class VideoPlayer(object):
+class VideoPlayer:
     hide_background = True
     loop_last = True
     history_size = 15
 
 
-class Downloader(object):
-    output_directory = '/tmp'
+class Downloader:
+    output_directory = "/tmp"
 
 
-class Subtitle(object):
-    language = 'eng'
+class Subtitle:
+    language = "eng"
 
 
-class Config(object):
+class Config:
     __metaclass__ = Singleton
 
     def __init__(self):
@@ -41,7 +40,7 @@ class Config(object):
         return self._entries.get(key)
 
     def load_from_file(self, path):
-        with open(path, 'r') as file:
+        with open(path, "r") as file:
             self._parser.read_file(file)
             self._load_cache()
 
@@ -51,10 +50,10 @@ class Config(object):
 
     def _init_cache(self):
         self._entries = {
-            'Server': Server(),
-            'VideoPlayer': VideoPlayer(),
-            'Downloader': Downloader(),
-            'Subtitle': Subtitle()
+            "Server": Server(),
+            "VideoPlayer": VideoPlayer(),
+            "Downloader": Downloader(),
+            "Subtitle": Subtitle(),
         }
 
     def _load_cache(self):
@@ -64,8 +63,9 @@ class Config(object):
             parser = self._parser[key]
 
             for entry_name in dir(category):
-                if (entry_name.startswith('__')
-                        or not self._parser.has_option(key, entry_name)):
+                if entry_name.startswith("__") or not self._parser.has_option(
+                    key, entry_name
+                ):
                     continue
                 self._parse_entry(parser, category, entry_name)
 
@@ -81,8 +81,9 @@ class Config(object):
             value = parser.getboolean(entry_name, fallback=entry)
         else:
             value = parser.get(entry_name, fallback=entry)
-            if (type(entry) is str and (value.startswith(
-                ("'", '"')) and value[0] is value[-1])):
+            if type(entry) is str and (
+                value.startswith(("'", '"')) and value[0] == value[-1]
+            ):
                 value = value[1:-1]
         setattr(category, entry_name, value)
 

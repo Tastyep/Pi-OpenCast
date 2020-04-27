@@ -21,51 +21,52 @@ class ControllerTest(TestCase):
         self.downloader.reset_mock()
 
     def test_stream_video_simple_url(self):
-        self.controller.stream_video('url')
-        self.downloader.queue.assert_called_once_with([Video('url')], ANY, True)
+        self.controller.stream_video("url")
+        self.downloader.queue.assert_called_once_with([Video("url")], ANY, True)
 
-    @patch('OpenCast.controller.Video')
+    @patch("OpenCast.controller.Video")
     def test_stream_video_local_path(self, video_mock):
         video_mock.from_disk.return_value = True
 
-        self.controller.stream_video('url')
+        self.controller.stream_video("url")
         self.player.play.assert_called_once_with(ANY)
 
-    @patch('OpenCast.controller.uuid')
+    @patch("OpenCast.controller.uuid")
     def test_stream_video_playlist(self, uuid_mock):
-        uuid_mock.uuid4.return_value = 'id'
-        self.downloader.extract_playlist.return_value = ['url1', 'url2']
+        uuid_mock.uuid4.return_value = "id"
+        self.downloader.extract_playlist.return_value = ["url1", "url2"]
 
-        self.controller.stream_video('/playlist')
-        self.downloader.extract_playlist.assert_called_once_with('/playlist')
-        self.downloader.queue.assert_called_once_with([
-            Video('url1', playlist_id='id'),
-            Video('url2', playlist_id='id')
-        ], ANY, True)
+        self.controller.stream_video("/playlist")
+        self.downloader.extract_playlist.assert_called_once_with("/playlist")
+        self.downloader.queue.assert_called_once_with(
+            [Video("url1", playlist_id="id"), Video("url2", playlist_id="id")],
+            ANY,
+            True,
+        )
 
     def test_queue_video_simple_url(self):
-        self.controller.queue_video('url')
-        self.downloader.queue.assert_called_once_with([Video('url')], ANY,
-                                                      False)
+        self.controller.queue_video("url")
+        self.downloader.queue.assert_called_once_with([Video("url")], ANY, False)
 
-    @patch('OpenCast.controller.Video')
+    @patch("OpenCast.controller.Video")
     def test_queue_video_local_path(self, video_mock):
         video_mock.from_disk.return_value = True
 
-        self.controller.queue_video('url')
+        self.controller.queue_video("url")
         self.player.queue.assert_called_once_with(ANY)
 
-    @patch('OpenCast.controller.uuid')
+    @patch("OpenCast.controller.uuid")
     def test_queue_video_playlist(self, uuid_mock):
-        uuid_mock.uuid4.return_value = 'id'
-        self.downloader.extract_playlist.return_value = ['url1', 'url2']
+        uuid_mock.uuid4.return_value = "id"
+        self.downloader.extract_playlist.return_value = ["url1", "url2"]
 
-        self.controller.queue_video('/playlist')
-        self.downloader.extract_playlist.assert_called_once_with('/playlist')
-        self.downloader.queue.assert_called_once_with([
-            Video('url1', playlist_id='id'),
-            Video('url2', playlist_id='id')
-        ], ANY, False)
+        self.controller.queue_video("/playlist")
+        self.downloader.extract_playlist.assert_called_once_with("/playlist")
+        self.downloader.queue.assert_called_once_with(
+            [Video("url1", playlist_id="id"), Video("url2", playlist_id="id")],
+            ANY,
+            False,
+        )
 
     def test_stop_video(self):
         self.controller.stop_video()
