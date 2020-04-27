@@ -1,9 +1,9 @@
-import logging
+import structlog
 
 
 class CommandDispatcher:
     def __init__(self, executor):
-        self._logger = logging.getLogger(__name__)
+        self._logger = structlog.get_logger(__name__)
         self._executor = executor
         self._handlers_map = {}
 
@@ -15,7 +15,7 @@ class CommandDispatcher:
 
     def dispatch(self, cmd):
         def impl(cmd):
-            self._logger.debug(f"dispatching: {cmd}")
+            self._logger.debug(type(cmd).__name__, cmd=cmd)
             cmd_id = id(type(cmd))
             if cmd_id in self._handlers_map:
                 handlers = self._handlers_map[cmd_id]

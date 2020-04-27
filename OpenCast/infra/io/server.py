@@ -1,9 +1,10 @@
-import logging
-
+import structlog
 from bottle import Bottle, request, response, run, template
 
 
 class EnableCors:
+    api = 2
+
     def apply(self, fn, context):
         def _enable_cors(*args, **kwargs):
             # set CORS headers
@@ -24,13 +25,13 @@ class Server:
     def __init__(self):
         self._server = Bottle()
         self._server.install(EnableCors())
-        self._logger = logging.getLogger(__name__)
+        self._logger = structlog.get_logger(__name__)
 
     def route(self, route, *args, **kwargs):
         self._server.route(route, *args, **kwargs)
 
     def run(self, host, port):
-        self._logger.info(f"[server] started on {host}:{port}")
+        self._logger.info(f"Started", host=host, port=port)
 
         run(self._server, host=host, port=port, reloader=False, debug=True, quiet=True)
 

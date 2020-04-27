@@ -1,6 +1,6 @@
-import logging
 import re
 
+import structlog
 from transitions import Machine
 
 
@@ -13,7 +13,7 @@ class Workflow(Machine):
             *args,
             **kwargs,
         )
-        self._logger = logging.getLogger(__name__)
+        self._logger = structlog.get_logger(__name__)
 
         self.id = id
         self._cmd_dispatcher = cmd_dispatcher
@@ -61,7 +61,7 @@ class Workflow(Machine):
             return getattr(self.__derived, handler_name)
         except AttributeError:
             self._logger.error(
-                f"No handler '{handler_name}' found for '{evt.__name__}'"
+                "Missing handler", handler=handler_name, cls=evt.__name__
             )
             # Raise the exception as it is a developer error
             raise

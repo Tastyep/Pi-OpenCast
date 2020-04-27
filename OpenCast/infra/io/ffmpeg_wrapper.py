@@ -1,17 +1,16 @@
-import logging
-
 import ffmpeg
+import structlog
 
 
 class FFmpegWrapper:
     def __init__(self):
-        self._logger = logging.getLogger(__name__)
+        self._logger = structlog.get_logger(__name__)
 
     def probe(self, file_path):
         try:
             return ffmpeg.probe(str(file_path))
         except ffmpeg.Error as e:
-            self._logger.error(f"ffprobe error: {e}")
+            self._logger.error("Probing error", error=e)
             return None
 
     def extract_stream(self, src, dest, stream_idx, override):
@@ -27,5 +26,5 @@ class FFmpegWrapper:
         except ffmpeg.Error as e:
             if e is None and override is True:  # The file probably exists
                 return dest
-            self._logger.error(f"stream extraction error: {e.stderr}")
+            self._logger.error("Extraction error", error=e.stderr)
             return None

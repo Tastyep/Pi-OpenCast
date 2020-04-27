@@ -1,11 +1,10 @@
-import logging
 from threading import Condition, Thread
 
 import youtube_dl
 
-from .download_logger import DownloadLogger
+import structlog
 
-logger = logging.getLogger(__name__)
+from .download_logger import DownloadLogger
 
 
 class VideoDownloader:
@@ -13,8 +12,9 @@ class VideoDownloader:
         self._stopped = False
         self._queue = []
         self._cv = Condition()
-        self._logger = DownloadLogger()
-        self._log_debug = self._logger.is_enabled_for(logging.DEBUG)
+        self._logger = structlog.get_logger(__name__)
+        self._dl_logger = DownloadLogger(self._logger)
+        self._log_debug = False  # self._dl_logger.is_enabled_for(logging.DEBUG)
         self._thread = Thread(target=self._download_queued_videos)
         self._thread.start()
 
@@ -33,7 +33,7 @@ class VideoDownloader:
                     if v[0].playlist_id == video.playlist_id:
                         index = len(self._queue) - i
                         break
-            logger.debug(f"queue video {video}")
+            self._logger.debug("Queueing", video=video, position=index)
             self._queue.insert(index, (video, dl_callback))
             self._cv.notify()
 
@@ -72,10 +72,7 @@ class VideoDownloader:
             self._download(video, dl_callback)
 
     def _download(self, video, dl_callback):
-        def progress_hook(d):
-            self._logger.log_download(d)
-
-        logger.debug(f"starting download for: {video.title}")
+        self._logger.debug("Starting downloading", video=video)
         options = {
             "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
             "bestvideo+bestaudio/best",
@@ -83,26 +80,28 @@ class VideoDownloader:
             "noplaylist": True,
             "merge_output_format": "mp4",
             "outtmpl": str(video.path),
-            "progress_hooks": [progress_hook],
+            "quiet": True,
+            "progress_hooks": [self._dl_logger.log_progress],
         }
         ydl = youtube_dl.YoutubeDL(options)
         with ydl:  # Download the video
             try:
                 ydl.download([video.source])
             except Exception as e:
-                logger.error(f"error downloading {video}: {e}")
+                self._logger.error("Download error", video=video, error=e)
                 return
 
-        logger.debug(f"video downloaded: {video}")
+        self._logger.debug("Download success", video=video)
         dl_callback(video)
 
     def _fetch_metadata(self, url, options):
-        logger.debug(f"fetching metadata")
+        self._logger.debug("Fetching metadata", url=url)
         options.update(
             {
                 "ignoreerrors": True,  # Causes ydl to return None on error
                 "debug_printtraffic": self._log_debug,
-                "logger": logger,
+                "quiet": True,
+                "progress_hooks": [self._dl_logger.log_progress],
             }
         )
         ydl = youtube_dl.YoutubeDL(options)
@@ -110,5 +109,5 @@ class VideoDownloader:
             try:
                 return ydl.extract_info(url, download=False)
             except Exception as e:
-                logger.error(f"error fetching metadata for '{url}': {e}")
+                self._logger.error("Fetching metadata error", url=url, error=e)
         return None

@@ -28,7 +28,7 @@ class Service:
             handler = getattr(self.__derived, handler_name)
             dispatcher.observe(cls, handler)
         except AttributeError:
-            self._logger.error(f"No handler '{handler_name}' found for '{cls_name}'")
+            self._logger.error("Missing handler", handler=handler_name, cls=cls_name)
             # Raise the exception as it is a developer error
             raise
 
@@ -52,6 +52,6 @@ class Service:
                     for event in model_events:
                         self._evt_dispatcher.dispatch(event)
             except (RepoError, PlayerError) as e:
-                self._logger.error(f"caught repo error: {e}")
+                self._logger.error("Repo error", error=e)
                 retry_count -= 1
                 # TODO: differenciate fatal from non fatal errors

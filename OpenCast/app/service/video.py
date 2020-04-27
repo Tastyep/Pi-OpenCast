@@ -1,6 +1,6 @@
-import logging
 from functools import partial
 
+import structlog
 from OpenCast.app.command import video as video_cmds
 from OpenCast.domain.model.video import Video
 
@@ -9,7 +9,7 @@ from .service import Service
 
 class VideoService(Service):
     def __init__(self, app_facade, data_facade, io_facade, service_factory):
-        logger = logging.getLogger(__name__)
+        logger = structlog.get_logger(__name__)
         super(VideoService, self).__init__(app_facade, logger, self, video_cmds)
         self._video_repo = data_facade.video_repo()
         self._downloader = io_facade.video_downloader()

@@ -1,4 +1,4 @@
-import logging
+import structlog
 from functools import partial
 
 from OpenCast.app.command import player as player_cmds
@@ -12,7 +12,7 @@ from .service import Service
 
 class PlayerService(Service):
     def __init__(self, app_facade, data_facade, media_facade):
-        logger = logging.getLogger(__name__)
+        logger = structlog.get_logger(__name__)
         super(PlayerService, self).__init__(
             app_facade, logger, self, player_cmds, infra_events
         )

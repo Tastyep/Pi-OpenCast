@@ -1,8 +1,6 @@
-import logging
-import logging.config
 import os
 
-import yaml
+import structlog
 
 from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
@@ -13,6 +11,7 @@ from .infra.data.facade import DataFacade
 from .infra.data.repo.factory import RepoFactory
 from .infra.io.facade import IoFacade
 from .infra.io.factory import IoFactory
+from .infra.log.module import init as init_logging
 from .infra.media.facade import MediaFacade
 from .infra.media.factory import MediaFactory
 
@@ -20,10 +19,8 @@ from .infra.media.factory import MediaFactory
 def main(argv=None):
     app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-    with open("{}/logging.yml".format(app_path), "r") as file:
-        cfg = yaml.load(file, Loader=yaml.Loader)
-        logging.config.dictConfig(cfg)
-    logger = logging.getLogger(__name__)
+    init_logging(__name__)
+    logger = structlog.get_logger(__name__)
 
     config.load_from_file("{}/config.ini".format(app_path))
     server_config = config["Server"]
@@ -52,4 +49,4 @@ def main(argv=None):
         server = io_facade.server()
         server.run(server_config.host, server_config.port)
     except Exception as e:
-        logger.debug(f"opencast stopped: {e}")
+        logger.error(f"{__name__} stopped", error=e)

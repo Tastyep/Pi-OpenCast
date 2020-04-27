@@ -19,7 +19,7 @@ class Video(Entity):
         )
 
     def __repr__(self):
-        return f"Video: title: {self._title}, playlist_id: {self._playlist_id}"
+        return f"{Video.__name__}(title='{self._title}', playlist={self._playlist_id})"
 
     def __eq__(self, other):
         return (

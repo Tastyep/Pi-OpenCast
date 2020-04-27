@@ -1,10 +1,11 @@
-import logging
 from pathlib import Path
+
+import structlog
 
 
 class SubtitleService:
     def __init__(self, ffmpeg_wrapper):
-        self._logger = logging.getLogger(__name__)
+        self._logger = structlog.get_logger(__name__)
         self._ffmpeg_wrapper = ffmpeg_wrapper
 
     def load_from_disk(self, video, language):
@@ -15,26 +16,24 @@ class SubtitleService:
         # Find the matching subtitle from a .srt file
         srtFiles = list(parent_path.glob("*.srt"))
         if Path(subtitle) in srtFiles:
-            self._logger.debug(f"matching susbtitle file: {subtitle}")
+            self._logger.debug("Found srt file", subtitle=subtitle)
             return subtitle
 
         # Extract file metadata
         # Find subtitle with matching language
-        self._logger.debug(f"searching softcoded subtitles from {video}")
+        self._logger.debug("Searching softcoded subtitles", video=video)
         metadata = self._ffmpeg_wrapper.probe(video.path)
-        stream_data = [
-            "index",
-            "codec_type",
-            "codec_long_name",
-        ]
         for stream in metadata["streams"]:
-            stream_info = {k: stream[k] for k in stream_data}
-            self._logger.debug(f"{stream_info}")
+            self._logger.debug(
+                f"Channel #{stream['index']}",
+                type=stream["codec_type"],
+                name=stream["codec_long_name"],
+            )
             if (
                 stream["codec_type"] == "subtitle"
                 and stream["tags"]["language"] == language
             ):
-                self._logger.info(f"match: {subtitle}")
+                self._logger.debug(f"Match: {subtitle}")
                 return self._ffmpeg_wrapper.extract_stream(
                     src=video.path,
                     dest=subtitle,

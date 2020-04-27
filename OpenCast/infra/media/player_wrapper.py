@@ -1,21 +1,21 @@
-import logging
 from threading import Lock
 
 import psutil
 
 import OpenCast.infra.event.player as e
+import structlog
 from omxplayer import keys
 from OpenCast.config import config
 
 from .error import PlayerError
 
-logger = logging.getLogger(__name__)
 config = config["VideoPlayer"]
 
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
 class PlayerWrapper:
     def __init__(self, evt_dispatcher, player_factory):
+        self._logger = structlog.get_logger(__name__)
         self._evt_dispatcher = evt_dispatcher
         self._player_factory = player_factory
         self._player = None
@@ -31,7 +31,7 @@ class PlayerWrapper:
             command += ["--subtitles", video.subtitle]
 
         def open_player():
-            logger.debug(f"opening {video} with opt: {command}")
+            self._logger.debug("Opening video", video=video, opt=command)
             try:
                 self._player = self._player_factory(
                     video.path,
@@ -41,11 +41,11 @@ class PlayerWrapper:
                 )
                 return True
             except SystemError:
-                logger.error(f"couldn't connect to dbus")
+                self._logger.error("Dbus error", error="Couldn't connect")
                 # Kill instance if it is a dbus problem
                 for proc in psutil.process_iter():
                     if "omxplayer" in proc.name():
-                        logger.debug(f"killing process {proc.name()}")
+                        self._logger.debug(f"Killing process", process=proc.name())
                         proc.kill()
                 return False
 
@@ -54,7 +54,7 @@ class PlayerWrapper:
                 if open_player():
                     self._dispatch(e.PlayerStarted(cmd_id, video))
                     return
-        raise PlayerError("could not start the player, check your logs")
+        raise PlayerError("error starting the player")
 
     def stop(self, cmd_id):
         def impl():

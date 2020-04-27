@@ -1,5 +1,6 @@
-import logging
 from threading import Lock
+
+import structlog
 
 
 class EventDispatcher:
@@ -17,7 +18,7 @@ class EventDispatcher:
             return self._count == 0
 
     def __init__(self, executor):
-        self._logger = logging.getLogger(__name__)
+        self._logger = structlog.get_logger(__name__)
         self._executor = executor
         self._handlers_map = {}
         self._lock = Lock()
@@ -33,7 +34,7 @@ class EventDispatcher:
 
     def dispatch(self, evt):
         def impl(evt):
-            self._logger.debug(f"raising: {evt}")
+            self._logger.debug(type(evt).__name__, evt=evt)
 
             evt_cls = type(evt)
             handlers = []
