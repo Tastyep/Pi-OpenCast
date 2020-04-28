@@ -1,6 +1,7 @@
 import logging.config
 
 import structlog
+from OpenCast.config import config
 
 
 def init(module_name):
@@ -46,7 +47,7 @@ def init(module_name):
             "loggers": {
                 module_name: {
                     "handlers": ["default", "file"],
-                    "level": "DEBUG",
+                    "level": config["log.level"],
                     "propagate": True,
                 }
             },
