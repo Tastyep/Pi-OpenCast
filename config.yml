@@ -1,3 +1,7 @@
+log:
+  # The level of the module's logger
+  level: INFO
+
 server:
   # The IP from where the service is accessible
   host: 0.0.0.0

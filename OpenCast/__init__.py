@@ -1,3 +1,4 @@
+import logging
 import os
 
 import structlog
@@ -5,7 +6,7 @@ import structlog
 from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
 from .app.service.module import ServiceModule
-from .config import config
+from .config import ConfigError, config
 from .domain.service.factory import ServiceFactory
 from .infra.data.facade import DataFacade
 from .infra.data.repo.factory import RepoFactory
@@ -20,9 +21,15 @@ def main(argv=None):
     app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
     init_logging(__name__)
-    logger = structlog.get_logger(__name__)
 
-    config.load_from_file("{}/config.yml".format(app_path))
+    try:
+        config.load_from_file("{}/config.yml".format(app_path))
+    except ConfigError:
+        return
+
+    # Get and update the log level
+    logging.get_logger(__name__).setLevel(config["log.level"])
+    logger = structlog.get_logger(__name__)
 
     app_facade = AppFacade()
 
