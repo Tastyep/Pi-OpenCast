@@ -72,12 +72,12 @@ function logs() {
   tail -n 50 -f "$PROJECT_DIR/$LOG_DIR/$LOG_FILE"
 }
 
-function tests() {
+function test() {
   cd "$PROJECT_DIR" || exit 1
-  pipenv run python -m unittest discover -v -p "*_test.py"
+  pipenv run python -m unittest discover -v
 }
 
-COMMANDS=("start" "stop" "restart" "update" "status" "logs" "tests")
+COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test")
 if element_in "$1" "${COMMANDS[@]}"; then
   COMMAND="$1"
   shift
