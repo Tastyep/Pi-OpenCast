@@ -2,15 +2,17 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="OpenCast"
+PROJECT_API_PORT="2020"
+PROJECT_WEBAPP_PORT="8081"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 
-function is_server_running() {
-  lsof -t -i :2020
+function is_port_bound() {
+  lsof -t -i ":$1"
 }
 
 function wait_for_server() {
-  while [ ! "$(is_server_running)" ]; do
+  while [ ! "$(is_port_bound $1)" ]; do
     sleep 1
   done
 }
@@ -23,7 +25,7 @@ function element_in() {
 }
 
 function start() {
-  if [ "$(is_server_running)" ]; then
+  if [ "$(is_port_bound $PROJECT_API_PORT)" ]; then
     echo "$PROJECT_NAME server is already running."
     return
   fi
@@ -37,9 +39,9 @@ function start() {
 
   echo "Starting $PROJECT_NAME server."
   (cd ./webapp && npm install && npm start &)
-  pipenv run python -m "$PROJECT_NAME" &
+  wait_for_server "$PROJECT_WEBAPP_PORT"
 
-  wait_for_server
+  pipenv run python -m "$PROJECT_NAME" &
   pid="$(pgrep -f "python -m $PROJECT_NAME")"
   echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
