@@ -34,14 +34,14 @@ class ConfigTest(TestCase):
         with self.assertRaises(ConfigContentError) as ctx:
             config.load_from_dict({"b": 2})
         self.assertEqual(1, len(ctx.exception.errors))
-        self.assertEqual([("b", "not found")], ctx.exception.errors)
+        self.assertEqual({"b": "not found"}, ctx.exception.errors)
 
     def test_load_from_dict_multiple_invalid_keys(self):
         config = Config({"a": 1})
         with self.assertRaises(ConfigContentError) as ctx:
             config.load_from_dict({"b": 2, "c": {"d": 1}})
         self.assertEqual(2, len(ctx.exception.errors))
-        self.assertEqual([("b", "not found"), ("c", "not found")], ctx.exception.errors)
+        self.assertEqual({"b": "not found", "c": "not found"}, ctx.exception.errors)
 
     def test_load_from_dict_invalid_value_type(self):
         old_value = 1
@@ -51,12 +51,9 @@ class ConfigTest(TestCase):
             config.load_from_dict({"a": new_value})
         self.assertEqual(1, len(ctx.exception.errors))
         self.assertEqual(
-            [
-                (
-                    "a",
-                    f"type is '{type(new_value).__name__}' should be '{type(old_value).__name__}'",
-                )
-            ],
+            {
+                "a": f"type is '{type(new_value).__name__}' should be '{type(old_value).__name__}'",
+            },
             ctx.exception.errors,
         )
 
