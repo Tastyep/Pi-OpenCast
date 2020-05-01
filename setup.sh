@@ -27,7 +27,7 @@ function error() {
 # Check if the script is executed from the project or standalone.
 # Clone the project and update PROJECT_DIR accordingly is executed in standalone mode.
 function setup_environment() {
-  if ! git ls-files --error-unmatch "$0" >/dev/null 2>&1; then
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     local homedir
 
     homedir="$(getent passwd "$USER" | cut -d: -f6)"
