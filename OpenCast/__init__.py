@@ -28,7 +28,7 @@ def main(argv=None):
         return
 
     # Get and update the log level
-    logging.get_logger(__name__).setLevel(config["log.level"])
+    logging.getLogger(__name__).setLevel(config["log.level"])
     logger = structlog.get_logger(__name__)
 
     app_facade = AppFacade()
