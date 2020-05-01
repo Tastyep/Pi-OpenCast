@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "Opencast"
+version = "0.1.0"
+description = "A client-server media player that transforms your Raspberry Pi into an awesome streaming device"
+authors = [
+"Luc Sinet <luc.sinet@gmail.com>"
+]
+license = "MIT"
+
+readme = 'README.md'  # Markdown files are supported
+
+repository = "https://github.com/Tastyep/Pi-OpenCast"
+keywords = ['raspberry', 'opencast', 'chromecast']
+
+[tool.poetry.dependencies]
+python = "^3.6"
+toml = "^0.9"
+bottle = "^0.12.18"
+omxplayer-wrapper = "^0.3.3"
+youtube-dl = ">= 2020.3.24"
+pyyaml = "^5.3.1"
+"hurry.filesize" = "^0.9"
+psutil = "^5.7.0"
+dbus-python = "^1.2.16"
+ffmpeg-python = "^0.2.0"
+transitions = "^0.8.1"
+structlog = "^20.1.0"
+colorama = "^0.4.3"
+sphinx = "^3.0.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+pytest-cov = "^2.4"
+
+[tool.poetry.scripts]
+my-script = 'OpenCast:main'

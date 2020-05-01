@@ -3,8 +3,6 @@
 *~
 *.xpi
 
-Pipfile.lock
-OpenCast.pid
 
 # node modules
 webapp/node_modules
@@ -14,3 +12,6 @@ webapp/node_modules
 
 # Generated directories
 build
+
+#  Generated files
+OpenCast.pid

@@ -56,10 +56,9 @@ function install_deps() {
   info "Installing dependencies..."
 
   sudo apt-get update
-  sudo apt-get install -y lsof python-pip ||
+  sudo apt-get install -y curl lsof python-pip ||
     error "failed to install dependencies"
-  sudo -H pip install -U pipenv ||
-    error "failed to install pipenv"
+  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
 }
 
 # Start the server as daemon.

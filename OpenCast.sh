@@ -41,7 +41,7 @@ function start() {
   (cd ./webapp && npm install && npm start &)
   wait_for_server "$PROJECT_WEBAPP_PORT"
 
-  pipenv run python -m "$PROJECT_NAME" &
+  poetry run python -m "$PROJECT_NAME" &
   pid="$(pgrep -f "python -m $PROJECT_NAME")"
   echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
@@ -62,7 +62,7 @@ function restart() {
 function update() {
   echo "Checking for updates."
 
-  (cd "$PROJECT_DIR" && pipenv update)
+  (cd "$PROJECT_DIR" && poetry update)
 }
 
 function status() {
@@ -76,7 +76,7 @@ function logs() {
 
 function test() {
   cd "$PROJECT_DIR" || exit 1
-  pipenv run python -m unittest discover -v
+  poetry run python -m unittest discover -v
 }
 
 COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test")
