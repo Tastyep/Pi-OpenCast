@@ -11,3 +11,6 @@ webapp/node_modules
 
 # logging directory
 /log/
+
+# Generated directories
+build
