@@ -43,6 +43,8 @@ function setup_environment() {
 function start_at_boot() {
   info "Setting up startup at boot"
 
+  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+
   local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"
   sed -i "s/{ USER }/$USER/g" "$config"
   sed -i "s#{ START_COMMAND }#$PROJECT_DIR/$INTERNAL_NAME.sh start -u#g" "$config"
@@ -61,17 +63,10 @@ function install_deps() {
   curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
 }
 
-# Start the server as daemon.
-function launch() {
-  info "Starting $PROJECT"
-
-  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
-  sudo systemctl start "$SERVICE_NAME"
-}
-
 setup_environment
 install_deps
 start_at_boot
-launch
+
+info "Installation successful, reboot to finish."
 
 exit 0

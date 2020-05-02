@@ -79,6 +79,10 @@ function test() {
   poetry run python -m unittest discover -v
 }
 
+# Source profile file as poetry use it to modify the PATH
+# This is likely to be done by the display manager, but not always (lightdm).
+source ~/.profile
+
 COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test")
 if element_in "$1" "${COMMANDS[@]}"; then
   COMMAND="$1"
