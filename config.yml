@@ -1,6 +1,6 @@
 log:
   # The level of the module's logger
-  level: INFO
+  level: DEBUG
 
 server:
   # The IP from where the service is accessible
