@@ -9,13 +9,16 @@ from .event import Event
 class VideoCreated(Event):
     source: str
     playlist_id: UUID
-    title: str
-    path: Path
 
 
 @dataclass
-class VideoDownloaded(Event):
-    pass
+class VideoIdentified(Event):
+    title: str
+
+
+@dataclass
+class VideoRetrieved(Event):
+    path: Path
 
 
 @dataclass

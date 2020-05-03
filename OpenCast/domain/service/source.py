@@ -11,14 +11,7 @@ class SourceService:
     def unfold(self, source):
         return self._downloader.unfold_playlist(source)
 
-    def fetch_metadata(self, source):
-        path = Path(source)
-        if path.is_file():
-            return {"online": False, "title": path.parent}
-
-        data = {"online": True}
-        metadata = self._downloader.fetch_metadata(source, ["title"])
-        if metadata is None:
-            data["error"] = "Not available"
-            return data
-        return {**data, **metadata}
+    def fetch_metadata(self, video):
+        if video.is_file():
+            return {"title": str(Path(video.source).name)}
+        return self._downloader.fetch_metadata(video.source, ["title"])

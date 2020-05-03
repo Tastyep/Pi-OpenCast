@@ -6,17 +6,15 @@ from .entity import Entity
 
 
 class Video(Entity):
-    def __init__(self, id_, source, playlist_id, title, path):
+    def __init__(self, id_, source, playlist_id):
         super(Video, self).__init__(id_)
         self._source = source
         self._playlist_id = playlist_id
-        self._title = title
-        self._path = Path(path)
+        self._title = None
+        self._path = None
         self._subtitle = None
 
-        self._record(
-            Evt.VideoCreated, self._source, self._playlist_id, self._title, self._path
-        )
+        self._record(Evt.VideoCreated, self._source, self._playlist_id)
 
     def __repr__(self):
         return f"{Video.__name__}(title='{self._title}', playlist={self._playlist_id})"
@@ -52,13 +50,20 @@ class Video(Entity):
     def title(self, title):
         self._title = str(title.encode("ascii", "ignore"))
 
+    @title.setter
+    def title(self, title: str):
+        self._title = title
+        self._record(Evt.VideoIdentified, self._title)
+
+    @path.setter
+    def path(self, path: Path):
+        self._path = path
+        self._record(Evt.VideoRetrieved, self._path)
+
     @subtitle.setter
     def subtitle(self, subtitle):
         self._subtitle = subtitle
         self._record(Evt.VideoSubtitleFetched, self._subtitle)
 
-    def downloaded(self):
-        self._record(Evt.VideoDownloaded)
-
     def is_file(self):
-        return self._path.is_file()
+        return Path(self._source).is_file()
