@@ -7,12 +7,12 @@ class IdentityService:
     PLAYLIST_NS = uuid4()
 
     @staticmethod
-    def id_workflow(workflow_cls, component_id):
-        return uuid3(component_id, workflow_cls.__name__)
+    def id_workflow(workflow_cls, model_id):
+        return uuid3(model_id, workflow_cls.__name__)
 
     @staticmethod
-    def id_command(command_cls, component_id):
-        return uuid3(component_id, command_cls.__name__)
+    def id_command(command_cls, model_id):
+        return uuid3(model_id, command_cls.__name__)
 
     @classmethod
     def id_player(cls):
