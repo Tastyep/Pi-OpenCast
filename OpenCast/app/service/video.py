@@ -36,7 +36,8 @@ class VideoService(Service):
         video = self._video_repo.get(cmd.model_id)
         metadata = self._source_service.fetch_metadata(video)
         if metadata is None:
-            self.abort_operation(cmd, "can't fetch metadata")
+            self._abort_operation(cmd, "can't fetch metadata")
+            return
 
         self._start_transaction(self._video_repo, cmd.id, impl, video, metadata)
 

@@ -5,6 +5,7 @@ import youtube_dl
 import structlog
 
 from .download_logger import DownloadLogger
+from .error import DownloadError
 
 
 class VideoDownloader:
@@ -89,7 +90,7 @@ class VideoDownloader:
                 ydl.download([video.source])
             except Exception as e:
                 self._logger.error("Download error", video=video, error=e)
-                return
+                raise DownloadError(str(e))
 
         self._logger.debug("Download success", video=video)
         dl_callback(video)
