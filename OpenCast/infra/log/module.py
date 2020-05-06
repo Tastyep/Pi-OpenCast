@@ -49,7 +49,12 @@ def init(module_name):
                     "handlers": ["default", "file"],
                     "level": config["log.level"],
                     "propagate": True,
-                }
+                },
+                "transitions": {
+                    "handlers": ["default", "file"],
+                    "level": "CRITICAL",
+                    "propagate": True,
+                },
             },
         }
     )
