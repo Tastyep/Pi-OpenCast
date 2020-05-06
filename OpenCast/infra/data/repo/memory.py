@@ -21,11 +21,11 @@ class MemoryRepository:
             raise RepoError("cannot update: model '{}' is outdated".format(model.id))
         self._table = [model if e.id == model.id else e for e in self._table]
 
-    def delete(self, id_):
+    def delete(self, model):
         prev_size = len(self._table)
-        self._table = [e for e in self._table if e.id != id_]
+        self._table = [e for e in self._table if e.id != model.id]
         if len(self._table) == prev_size:
-            raise RepoError("cannot delete: model '{}' doesn't exist".format(id_))
+            raise RepoError("cannot delete: model '{}' doesn't exist".format(model.id))
 
     def list(self):
         return self._table

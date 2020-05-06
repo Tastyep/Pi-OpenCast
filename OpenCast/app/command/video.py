@@ -11,6 +11,11 @@ class CreateVideo(Command):
 
 
 @dataclass
+class DeleteVideo(Command):
+    pass
+
+
+@dataclass
 class IdentifyVideo(Command):
     pass
 

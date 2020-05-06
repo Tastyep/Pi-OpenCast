@@ -65,5 +65,8 @@ class Video(Entity):
         self._subtitle = subtitle
         self._record(Evt.VideoSubtitleFetched, self._subtitle)
 
+    def delete(self):
+        self._record(Evt.VideoDeleted)
+
     def is_file(self):
         return Path(self._source).is_file()

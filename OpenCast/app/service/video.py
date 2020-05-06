@@ -28,6 +28,14 @@ class VideoService(Service):
 
         self._start_transaction(self._video_repo, cmd.id, impl)
 
+    def _delete_video(self, cmd):
+        def impl(ctx):
+            video = self._video_repo.get(cmd.model_id)
+            video.delete()
+            ctx.delete(video)
+
+        self._start_transaction(self._video_repo, cmd.id, impl)
+
     def _identify_video(self, cmd):
         def impl(ctx, video, metadata):
             video.title = metadata["title"]

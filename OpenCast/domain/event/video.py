@@ -12,6 +12,11 @@ class VideoCreated(Event):
 
 
 @dataclass
+class VideoDeleted(Event):
+    pass
+
+
+@dataclass
 class VideoIdentified(Event):
     title: str
 
