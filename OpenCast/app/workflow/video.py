@@ -1,6 +1,7 @@
 from collections import namedtuple
 from enum import Enum, auto
 
+import structlog
 from OpenCast.app.command import video as Cmd
 from OpenCast.config import config
 from OpenCast.domain.event import video as VideoEvt
@@ -9,8 +10,8 @@ from .workflow import Workflow
 
 
 class VideoWorkflow(Workflow):
-    Completed = namedtuple("VideoWorkflowCompleted", ("id", "video_id"))
-    Aborted = namedtuple("VideoWorkflowAborted", ("id", "video_id"))
+    Completed = namedtuple("VideoWorkflowCompleted", ("id"))
+    Aborted = namedtuple("VideoWorkflowAborted", ("id"))
 
     # fmt: off
     class States(Enum):
@@ -20,6 +21,7 @@ class VideoWorkflow(Workflow):
         RETRIEVING = auto()
         FINALISING = auto()
         COMPLETED = auto()
+        DELETING = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
@@ -30,11 +32,17 @@ class VideoWorkflow(Workflow):
         ["_video_identified",       States.IDENTIFYING, States.RETRIEVING],
         ["_video_retrieved",        States.RETRIEVING,  States.FINALISING],
         ["_video_subtitle_fetched", States.FINALISING,  States.COMPLETED],
+
+        ["_operation_error",        States.CREATING,    States.ABORTED],
+        ["_operation_error",        '*',                States.DELETING],
+        ["_video_deleted",          States.DELETING,    States.ABORTED],
     ]
     # fmt: on
 
     def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, source_service):
+        logger = structlog.get_logger(__name__)
         super(VideoWorkflow, self).__init__(
+            logger,
             self,
             id,
             cmd_dispatcher,
@@ -79,16 +87,17 @@ class VideoWorkflow(Workflow):
             config["subtitle.language"],
         )
 
-    def on_enter_COMPLETED(self, evt):
-        model_id = None
-        if self.States[evt.transition.source] is self.States.INITIAL:
-            model_id = evt.args[0]
-        else:
-            model_id = evt.args[0].model_id
-        self._complete(model_id)
+    def on_enter_DELETING(self, evt):
+        (error,) = evt.args
+        self._observe_dispatch(
+            VideoEvt.VideoDeleted, Cmd.DeleteVideo, error.cmd.model_id
+        )
 
-    def on_enter_ABORTED(self, evt):
-        self._abort(evt.video_id)
+    def on_enter_COMPLETED(self, _):
+        self._complete()
+
+    def on_enter_ABORTED(self, _):
+        self._abort()
 
     # Conditions
     def is_complete(self, evt):

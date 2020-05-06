@@ -1,11 +1,14 @@
 import re
 
-import structlog
+from OpenCast.app.service.error import OperationError
+from OpenCast.domain.service.identity import IdentityService
 from transitions import Machine
 
 
 class Workflow(Machine):
-    def __init__(self, derived, id, cmd_dispatcher, evt_dispatcher, *args, **kwargs):
+    def __init__(
+        self, logger, derived, id, cmd_dispatcher, evt_dispatcher, *args, **kwargs
+    ):
         super(Workflow, self).__init__(
             model=self,
             states=derived.States,
@@ -13,7 +16,7 @@ class Workflow(Machine):
             *args,
             **kwargs,
         )
-        self._logger = structlog.get_logger(__name__)
+        self._logger = logger
 
         self.id = id
         self._cmd_dispatcher = cmd_dispatcher
@@ -43,25 +46,27 @@ class Workflow(Machine):
         return workflow
 
     def _observe_start(self, workflow, *args, **kwargs):
-        self._observe(workflow.Completed)
-        self._observe(workflow.Aborted)
+        self._observe(self.id, [workflow.Completed, workflow.Aborted])
         workflow.start(*args, **kwargs)
 
-    def _observe(self, evt):
-        handler = self._event_handler(evt)
-        self._evt_dispatcher.observe_id(evt, self.id, handler, times=1)
+    def _observe_dispatch(self, evt_cls, cmd_cls, model_id, *args, **kwargs):
+        cmd_id = IdentityService.id_command(cmd_cls, model_id)
+        self._observe(cmd_id, [evt_cls, OperationError])
+        self._cmd_dispatcher.dispatch(cmd_cls(cmd_id, model_id, *args, **kwargs))
 
-    def _observe_dispatch(self, evt, cmd, *args, **kwargs):
-        self._observe(evt)
-        self._cmd_dispatcher.dispatch(cmd(self.id, *args, **kwargs))
+    def _observe(self, cmd_id, evt_clss: list):
+        evtcls_to_handler = {
+            evt_cls: self._event_handler(evt_cls) for evt_cls in evt_clss
+        }
+        self._evt_dispatcher.observe(cmd_id, evtcls_to_handler, times=1)
 
-    def _event_handler(self, evt):
-        handler_name = re.sub("([A-Z]+)", r"_\1", evt.__name__).lower()
+    def _event_handler(self, evt_cls):
+        handler_name = re.sub("([A-Z]+)", r"_\1", evt_cls.__name__).lower()
         try:
             return getattr(self.__derived, handler_name)
         except AttributeError:
             self._logger.error(
-                "Missing handler", handler=handler_name, cls=evt.__name__
+                "Missing handler", handler=handler_name, cls=evt_cls.__name__
             )
             # Raise the exception as it is a developer error
             raise
