@@ -546,7 +546,7 @@ description = "YouTube video downloader"
 name = "youtube-dl"
 optional = false
 python-versions = "*"
-version = "2020.5.3"
+version = "2020.5.8"
 
 [[package]]
 category = "dev"
@@ -562,8 +562,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "f86eb49574b2f1d685b6db8a8d65b566ffc690af4dd80c3d0eb1e12a7b52748d"
-python-versions = "^3.6"
+content-hash = "088668d325e05f65d65e13e4af2ecdb020e35339c0ce9b024708970ba8e7da52"
+python-versions = "^3.7"
 
 [metadata.files]
 alabaster = [
@@ -834,8 +834,8 @@ urllib3 = [
     {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
 ]
 youtube-dl = [
-    {file = "youtube_dl-2020.5.3-py2.py3-none-any.whl", hash = "sha256:609eb20c65dafbfdcb40852431d9e4042c5cae5bfb14b22503189bbcff0a2a11"},
-    {file = "youtube_dl-2020.5.3.tar.gz", hash = "sha256:e7a400a61e35b7cb010296864953c992122db4b0d6c9c6e2630f3e0b9a655043"},
+    {file = "youtube_dl-2020.5.8-py2.py3-none-any.whl", hash = "sha256:0b5d3280522469968eb62eecb1f966f422b2be22f000a801bf87cb2172d8ea39"},
+    {file = "youtube_dl-2020.5.8.tar.gz", hash = "sha256:22da6788b55b7b267c6d59bcdfaf10e67a9ac980976d50d29a670473ad2a05bb"},
 ]
 zipp = [
     {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
