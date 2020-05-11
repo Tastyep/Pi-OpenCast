@@ -41,7 +41,7 @@ function start() {
   (cd ./webapp && npm install && npm start &)
   wait_for_server "$PROJECT_WEBAPP_PORT"
 
-  poetry run python -m "$PROJECT_NAME" &
+  run_in_env poetry run python -m "$PROJECT_NAME" &
   pid="$(pgrep -f "python -m $PROJECT_NAME")"
   echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
@@ -76,7 +76,12 @@ function logs() {
 
 function test() {
   cd "$PROJECT_DIR" || exit 1
-  poetry run python -m unittest discover -v
+  run_in_env python -m unittest discover -v
+}
+
+function run_in_env() {
+  poetry install
+  poetry run "$@"
 }
 
 # Source profile file as poetry use it to modify the PATH
@@ -87,6 +92,7 @@ COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test")
 if element_in "$1" "${COMMANDS[@]}"; then
   COMMAND="$1"
   shift
+
   "$COMMAND" "$@"
 else
   echo "Usage: $0 {$(

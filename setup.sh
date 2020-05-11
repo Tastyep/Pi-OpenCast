@@ -39,15 +39,18 @@ function setup_environment() {
   fi
 }
 
-# Install dependencies.
-function install_deps() {
-  info "Installing dependencies..."
+# Install system dependencies.
+function install_system_deps() {
+  info "Installing system dependencies..."
 
   sudo apt-get update
-  sudo apt-get install -y curl lsof python-pip python-dbus ||
+  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip libdbus-glib-1-dev libdbus-1-dev ||
     error "failed to install dependencies"
   curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+}
 
+# Install project dependencies.
+function install_project_deps() {
   chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
   "$PROJECT_DIR/$INTERNAL_NAME.sh" update
 }
@@ -64,8 +67,9 @@ function start_at_boot() {
   sudo systemctl enable "$SERVICE_NAME"
 }
 
+install_system_deps
 setup_environment
-install_deps
+install_project_deps
 start_at_boot
 
 info "Installation successful, reboot to finish."

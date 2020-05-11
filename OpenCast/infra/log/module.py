@@ -1,4 +1,5 @@
 import logging.config
+from pathlib import Path
 
 import structlog
 from OpenCast.config import config
@@ -13,6 +14,8 @@ def init(module_name):
         timestamper,
     ]
 
+    log_dir = "log"
+    Path(log_dir).mkdir(parents=True, exist_ok=True)
     logging.config.dictConfig(
         {
             "version": 1,
@@ -37,7 +40,7 @@ def init(module_name):
                 },
                 "file": {
                     "level": "DEBUG",
-                    "filename": "log/OpenCast.log",
+                    "filename": f"{log_dir}/OpenCast.log",
                     "class": "logging.handlers.TimedRotatingFileHandler",
                     "when": "D",
                     "backupCount": 5,
