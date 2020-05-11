@@ -39,11 +39,22 @@ function setup_environment() {
   fi
 }
 
+# Install dependencies.
+function install_deps() {
+  info "Installing dependencies..."
+
+  sudo apt-get update
+  sudo apt-get install -y curl lsof python-pip python-dbus ||
+    error "failed to install dependencies"
+  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+
+  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+  "$PROJECT_DIR/$INTERNAL_NAME.sh" update
+}
+
 # Format and install the systemd config file.
 function start_at_boot() {
   info "Setting up startup at boot"
-
-  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
 
   local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"
   sed -i "s/{ USER }/$USER/g" "$config"
@@ -51,16 +62,6 @@ function start_at_boot() {
   sudo cp "$config" "$SYSTEMD_CONFIG_DIR"
   sudo systemctl daemon-reload
   sudo systemctl enable "$SERVICE_NAME"
-}
-
-# Install dependencies.
-function install_deps() {
-  info "Installing dependencies..."
-
-  sudo apt-get update
-  sudo apt-get install -y curl lsof python-pip ||
-    error "failed to install dependencies"
-  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
 }
 
 setup_environment
