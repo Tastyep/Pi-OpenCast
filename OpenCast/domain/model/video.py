@@ -19,13 +19,6 @@ class Video(Entity):
     def __repr__(self):
         return f"{Video.__name__}(title='{self._title}', playlist={self._playlist_id})"
 
-    def __eq__(self, other):
-        return (
-            other is not None
-            and self._source == other._source
-            and self._playlist_id == other._playlist_id
-        )
-
     @property
     def source(self):
         return self._source
@@ -61,7 +54,7 @@ class Video(Entity):
         self._record(Evt.VideoRetrieved, self._path)
 
     @subtitle.setter
-    def subtitle(self, subtitle):
+    def subtitle(self, subtitle: str):
         self._subtitle = subtitle
         self._record(Evt.VideoSubtitleFetched, self._subtitle)
 
