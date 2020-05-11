@@ -4,6 +4,7 @@ from OpenCast.domain.event import player as Evt
 
 from .entity import Entity
 from .player_state import PlayerState
+from .video import Video
 
 
 class Player(Entity):
@@ -19,9 +20,9 @@ class Player(Entity):
     def __repr(self):
         return f"{Player.__name__}(id={self.id}, state={self._state}, video_idx={self._index / len(self._queue)})"
 
-    def play(self, video):
+    def play(self, video: Video):
         if video not in self._queue:
-            raise DomainError(f"playing unknown video: {video}")
+            raise DomainError(f"unknown video: {video}")
 
         self._index = self._queue.index(video)
         self._state = PlayerState.PLAYING
@@ -34,7 +35,7 @@ class Player(Entity):
         self._sub_delay = 0
         self._record(Evt.PlayerStopped)
 
-    def queue(self, video, with_priority=False):
+    def queue(self, video: Video, with_priority=False):
         idx = len(self._queue)
 
         # Try to order videos from the same playlist together
@@ -49,7 +50,7 @@ class Player(Entity):
 
     def pause(self):
         if self._state is not PlayerState.PLAYING:
-            raise DomainError(f"the player is not playing")
+            raise DomainError(f"the player is not started")
         self._state = PlayerState.PAUSED
         self._record(Evt.PlayerPaused)
 
@@ -78,6 +79,10 @@ class Player(Entity):
     @property
     def state(self):
         return self._state
+
+    @property
+    def video_queue(self):
+        return self._queue
 
     @property
     def subtitle_state(self):
