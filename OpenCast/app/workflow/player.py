@@ -1,12 +1,13 @@
 from collections import namedtuple
 from enum import Enum, auto
+from typing import List
 
 import structlog
 from OpenCast.app.command import player as PlayerCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .video import VideoWorkflow
+from .video import Video, VideoWorkflow
 from .workflow import Workflow
 
 
@@ -32,7 +33,7 @@ class QueueVideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, source_service):
+    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(QueueVideoWorkflow, self).__init__(
             logger,
@@ -42,23 +43,20 @@ class QueueVideoWorkflow(Workflow):
             evt_dispatcher,
             initial=QueueVideoWorkflow.States.INITIAL,
         )
-        self._video_workflow = self._child_workflow(
-            VideoWorkflow, video_repo, source_service
-        )
+        self._video_repo = video_repo
+        self._video = video
 
     # States
-    def on_enter_COLLECTING(self, video_id, source, playlist_id):
-        self._video_id = video_id
-        self._observe_start(
-            self._video_workflow, video_id, source, playlist_id, with_priority=False
-        )
+    def on_enter_COLLECTING(self):
+        workflow = self._child_workflow(VideoWorkflow, self._video_repo, self._video)
+        self._observe_start(workflow, with_priority=False)
 
     def on_enter_QUEUEING(self, evt):
         self._observe_dispatch(
             PlayerEvt.VideoQueued,
             PlayerCmd.QueueVideo,
             IdentityService.id_player(),
-            self._video_id,
+            self._video.id,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -89,7 +87,9 @@ class QueuePlaylistWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, source_service):
+    def __init__(
+        self, id, cmd_dispatcher, evt_dispatcher, video_repo, videos: List[Video]
+    ):
         logger = structlog.get_logger(__name__)
         super(QueuePlaylistWorkflow, self).__init__(
             logger,
@@ -99,25 +99,18 @@ class QueuePlaylistWorkflow(Workflow):
             evt_dispatcher,
             initial=StreamVideoWorkflow.States.INITIAL,
         )
-        self._queue_video_workflow = self._child_workflow(
-            QueueVideoWorkflow, video_repo, source_service
-        )
+        self._video_repo = video_repo
+        self._videos = videos[::-1]
 
-    def start(self, video_ids, sources, playlist_id):
-        self._video_ids = video_ids[::-1]
-        self._sources = sources[::-1]
-        self._playlist_id = playlist_id
+    def start(self,):
         self._queue_videos(None)
 
     # States
     def on_enter_QUEUEING(self, _):
-        self._queue_video_workflow.reset()
-        self._observe_start(
-            self._queue_video_workflow,
-            self._video_ids.pop(),
-            self._sources.pop(),
-            self._playlist_id,
+        workflow = self._child_workflow(
+            QueueVideoWorkflow, self._video_repo, self._videos.pop()
         )
+        self._observe_start(workflow)
 
     def on_enter_COMPLETED(self, _):
         self._complete()
@@ -127,7 +120,7 @@ class QueuePlaylistWorkflow(Workflow):
 
     # Conditions
     def _is_last_video(self, evt):
-        return len(self._video_ids) == 0
+        return len(self._videos) == 0
 
 
 class StreamVideoWorkflow(Workflow):
@@ -152,7 +145,7 @@ class StreamVideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, source_service):
+    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(StreamVideoWorkflow, self).__init__(
             logger,
@@ -163,23 +156,19 @@ class StreamVideoWorkflow(Workflow):
             initial=StreamVideoWorkflow.States.INITIAL,
         )
 
-        self._video_workflow = self._child_workflow(
-            VideoWorkflow, video_repo, source_service
-        )
+        self._video = video
 
     # States
-    def on_enter_COLLECTING(self, video_id, source, playlist_id):
-        self._video_id = video_id
-        self._observe_start(
-            self._video_workflow, video_id, source, playlist_id, with_priority=True
-        )
+    def on_enter_COLLECTING(self):
+        workflow = self._child_workflow(VideoWorkflow, self._video_repo, self._video)
+        self._observe_start(workflow, with_priority=True)
 
     def on_enter_STARTING(self, evt):
         self._observe_dispatch(
             PlayerEvt.PlayerStarted,
             PlayerCmd.PlayVideo,
             IdentityService.id_player(),
-            self._video_id,
+            self._video.id,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -216,7 +205,9 @@ class StreamPlaylistWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, source_service):
+    def __init__(
+        self, id, cmd_dispatcher, evt_dispatcher, video_repo, videos: List[Video],
+    ):
         logger = structlog.get_logger(__name__)
         super(StreamPlaylistWorkflow, self).__init__(
             logger,
@@ -226,37 +217,25 @@ class StreamPlaylistWorkflow(Workflow):
             evt_dispatcher,
             initial=StreamVideoWorkflow.States.INITIAL,
         )
-        self._stream_video_workflow = self._child_workflow(
-            StreamVideoWorkflow, video_repo, source_service
-        )
-        self._queue_video_workflow = self._child_workflow(
-            QueueVideoWorkflow, video_repo, source_service
-        )
 
-    def start(self, video_ids, sources, playlist_id):
-        self._video_ids = video_ids[::-1]
-        self._sources = sources[::-1]
-        self._playlist_id = playlist_id
+        self._video_repo = video_repo
+        self._videos = videos[::-1]
+
+    def start(self):
         self._play_video(None)
 
     # States
     def on_enter_PLAYING(self, _):
-        self._stream_video_workflow.reset()
-        self._observe_start(
-            self._stream_video_workflow,
-            self._video_ids.pop(),
-            self._sources.pop(),
-            self._playlist_id,
+        workflow = self._child_workflow(
+            StreamVideoWorkflow, self._video_repo, self._videos.pop()
         )
+        self._observe_start(workflow,)
 
     def on_enter_QUEUEING(self, _):
-        self._queue_video_workflow.reset()
-        self._observe_start(
-            self._queue_video_workflow,
-            self._video_ids.pop(),
-            self._sources.pop(),
-            self._playlist_id,
+        workflow = self._child_workflow(
+            QueueVideoWorkflow, self._video_repo, self._videos.pop()
         )
+        self._observe_start(workflow,)
 
     def on_enter_COMPLETED(self, _):
         self._complete()
@@ -266,4 +245,4 @@ class StreamPlaylistWorkflow(Workflow):
 
     # Conditions
     def _is_last_video(self, _):
-        return len(self._video_ids) == 0
+        return len(self._videos) == 0

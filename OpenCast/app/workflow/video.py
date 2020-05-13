@@ -1,5 +1,7 @@
 from collections import namedtuple
+from dataclasses import astuple, dataclass
 from enum import Enum, auto
+from uuid import UUID
 
 import structlog
 from OpenCast.app.command import video as Cmd
@@ -7,6 +9,16 @@ from OpenCast.config import config
 from OpenCast.domain.event import video as VideoEvt
 
 from .workflow import Workflow
+
+
+@dataclass
+class Video:
+    id: UUID
+    source: str
+    playlist_id: UUID
+
+    def to_tuple(self):
+        return astuple(self)
 
 
 class VideoWorkflow(Workflow):
@@ -39,7 +51,7 @@ class VideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, source_service):
+    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(VideoWorkflow, self).__init__(
             logger,
@@ -48,58 +60,51 @@ class VideoWorkflow(Workflow):
             cmd_dispatcher,
             evt_dispatcher,
             initial=VideoWorkflow.States.INITIAL,
-            send_event=True,
         )
         self._video_repo = video_repo
-        self._source_service = source_service
+        self._video = video
+        self._with_priority = False
 
-    def start(self, video_id, source, playlist_id, with_priority):
+    def start(self, with_priority):
         self._with_priority = with_priority
-        self._create(video_id, source, playlist_id)
+        self._create()
 
     # States
-    def on_enter_CREATING(self, evt):
+    def on_enter_CREATING(self):
         self._observe_dispatch(
-            VideoEvt.VideoCreated, Cmd.CreateVideo, *evt.args, **evt.kwargs
+            VideoEvt.VideoCreated, Cmd.CreateVideo, *self._video.to_tuple()
         )
 
-    def on_enter_IDENTIFYING(self, evt):
-        (evt,) = evt.args
+    def on_enter_IDENTIFYING(self, _):
         self._observe_dispatch(
-            VideoEvt.VideoIdentified, Cmd.IdentifyVideo, evt.model_id,
+            VideoEvt.VideoIdentified, Cmd.IdentifyVideo, self._video.id,
         )
 
-    def on_enter_RETRIEVING(self, evt):
-        (evt,) = evt.args
+    def on_enter_RETRIEVING(self, _):
         self._observe_dispatch(
             VideoEvt.VideoRetrieved,
             Cmd.RetrieveVideo,
-            evt.model_id,
+            self._video.id,
             self._with_priority,
         )
 
-    def on_enter_FINALISING(self, evt):
-        (evt,) = evt.args
+    def on_enter_FINALISING(self, _):
         self._observe_dispatch(
             VideoEvt.VideoSubtitleFetched,
             Cmd.FetchVideoSubtitle,
-            evt.model_id,
+            self._video.id,
             config["subtitle.language"],
         )
 
-    def on_enter_DELETING(self, evt):
-        (error,) = evt.args
-        self._observe_dispatch(
-            VideoEvt.VideoDeleted, Cmd.DeleteVideo, error.cmd.model_id
-        )
+    def on_enter_DELETING(self, _):
+        self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
-    def on_enter_COMPLETED(self, _):
+    def on_enter_COMPLETED(self, *_):
         self._complete()
 
     def on_enter_ABORTED(self, _):
         self._abort()
 
     # Conditions
-    def is_complete(self, evt):
-        video_id = evt.args[0]
-        return self._video_repo.exists(video_id)
+    def is_complete(self):
+        return self._video_repo.exists(self._video.id)

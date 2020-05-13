@@ -7,6 +7,7 @@ from OpenCast.app.workflow.player import (
     QueueVideoWorkflow,
     StreamPlaylistWorkflow,
     StreamVideoWorkflow,
+    Video,
 )
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.service.identity import IdentityService
@@ -38,8 +39,11 @@ class PlayerMonitController(Controller):
         source = request.query["url"]
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
-            video_ids = [IdentityService.id_video(source) for source in sources]
             playlist_id = IdentityService.id_playlist(source)
+            videos = [
+                Video(IdentityService.id_video(source), source, playlist_id)
+                for source in sources
+            ]
 
             workflow_id = IdentityService.id_workflow(
                 StreamPlaylistWorkflow, playlist_id
@@ -49,21 +53,22 @@ class PlayerMonitController(Controller):
                 self._cmd_dispatcher,
                 self._evt_dispatcher,
                 self._video_repo,
-                self._source_service,
+                videos,
             )
-            workflow.start(video_ids, sources, playlist_id)
+            workflow.start()
             return
 
         video_id = IdentityService.id_video(source)
+        video = Video(video_id, source, None)
         workflow_id = IdentityService.id_workflow(StreamVideoWorkflow, video_id)
         workflow = StreamVideoWorkflow(
             workflow_id,
             self._cmd_dispatcher,
             self._evt_dispatcher,
             self._video_repo,
-            self._source_service,
+            video,
         )
-        workflow.start(video_id, source=source, playlist_id=None)
+        workflow.start()
 
         return "1"
 
@@ -71,8 +76,11 @@ class PlayerMonitController(Controller):
         source = request.query["url"]
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
-            video_ids = [IdentityService.id_video(source) for source in sources]
             playlist_id = IdentityService.id_playlist(source)
+            videos = [
+                Video(IdentityService.id_video(source), source, playlist_id)
+                for source in sources
+            ]
 
             workflow_id = IdentityService.id_workflow(
                 QueuePlaylistWorkflow, playlist_id
