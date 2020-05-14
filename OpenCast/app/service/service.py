@@ -1,8 +1,8 @@
 import inspect
-import re
 from functools import partial
 
 from OpenCast.infra.data.repo.error import RepoError
+from OpenCast.util.case import to_camelcase
 
 from .error import OperationError
 
@@ -31,7 +31,7 @@ class Service:
 
     def _dispatch_to_handler(self, cmd):
         cmd_name = cmd.__class__.__name__
-        handler_name = re.sub("([A-Z]+)", r"_\1", cmd_name).lower()
+        handler_name = f"_{to_camelcase(cmd_name)}"
         try:
             getattr(self, handler_name)(cmd)
         except Exception as e:

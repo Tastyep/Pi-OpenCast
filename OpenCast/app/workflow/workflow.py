@@ -1,7 +1,6 @@
-import re
-
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.service.identity import IdentityService
+from OpenCast.util.case import to_camelcase
 from transitions import Machine
 
 
@@ -61,7 +60,7 @@ class Workflow(Machine):
         self._evt_dispatcher.observe(cmd_id, evtcls_to_handler, times=1)
 
     def _event_handler(self, evt_cls):
-        handler_name = re.sub("([A-Z]+)", r"_\1", evt_cls.__name__).lower()
+        handler_name = f"_{to_camelcase(evt_cls.__name__)}"
         try:
             return getattr(self.__derived, handler_name)
         except AttributeError:
