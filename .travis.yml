@@ -4,6 +4,12 @@ python: "3.7"
 # Specify the operating systems on which to test for.
 os: linux
 
+# Branch for which a build can be triggered
+branches:
+  only:
+  - master
+  - develop
+
 # command to install dependencies
 install: ./setup.sh
 
