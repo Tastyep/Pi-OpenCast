@@ -138,16 +138,10 @@ class StreamVideoWorkflow(Workflow):
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(StreamVideoWorkflow, self).__init__(
-            logger,
-            self,
-            id,
-            factory,
-            cmd_dispatcher,
-            factory,
-            evt_dispatcher,
-            initial=StreamVideoWorkflow.States.INITIAL,
+            logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
         )
 
+        self._video_repo = video_repo
         self._video = video
 
     # States
