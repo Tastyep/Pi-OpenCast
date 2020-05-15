@@ -33,15 +33,10 @@ class QueueVideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, video: Video):
+    def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(QueueVideoWorkflow, self).__init__(
-            logger,
-            self,
-            id,
-            cmd_dispatcher,
-            evt_dispatcher,
-            initial=QueueVideoWorkflow.States.INITIAL,
+            logger, self, id, app_facade, initial=QueueVideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
         self._video = video
@@ -88,16 +83,11 @@ class QueuePlaylistWorkflow(Workflow):
     # fmt: on
 
     def __init__(
-        self, id, cmd_dispatcher, evt_dispatcher, video_repo, videos: List[Video]
+        self, id, app_facade, video_repo, videos: List[Video],
     ):
         logger = structlog.get_logger(__name__)
         super(QueuePlaylistWorkflow, self).__init__(
-            logger,
-            self,
-            id,
-            cmd_dispatcher,
-            evt_dispatcher,
-            initial=StreamVideoWorkflow.States.INITIAL,
+            logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
         self._videos = videos[::-1]
@@ -145,13 +135,15 @@ class StreamVideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, video: Video):
+    def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(StreamVideoWorkflow, self).__init__(
             logger,
             self,
             id,
+            factory,
             cmd_dispatcher,
+            factory,
             evt_dispatcher,
             initial=StreamVideoWorkflow.States.INITIAL,
         )
@@ -206,16 +198,11 @@ class StreamPlaylistWorkflow(Workflow):
     # fmt: on
 
     def __init__(
-        self, id, cmd_dispatcher, evt_dispatcher, video_repo, videos: List[Video],
+        self, id, app_facade, video_repo, videos: List[Video],
     ):
         logger = structlog.get_logger(__name__)
         super(StreamPlaylistWorkflow, self).__init__(
-            logger,
-            self,
-            id,
-            cmd_dispatcher,
-            evt_dispatcher,
-            initial=StreamVideoWorkflow.States.INITIAL,
+            logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
         )
 
         self._video_repo = video_repo

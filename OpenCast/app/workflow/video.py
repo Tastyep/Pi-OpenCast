@@ -51,15 +51,10 @@ class VideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, cmd_dispatcher, evt_dispatcher, video_repo, video: Video):
+    def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super(VideoWorkflow, self).__init__(
-            logger,
-            self,
-            id,
-            cmd_dispatcher,
-            evt_dispatcher,
-            initial=VideoWorkflow.States.INITIAL,
+            logger, self, id, app_facade, initial=VideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
         self._video = video

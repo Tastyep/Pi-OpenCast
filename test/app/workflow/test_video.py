@@ -19,13 +19,7 @@ class VideoWorkflowTest(WorkflowTestCase):
             "source",
             IdentityService.id_playlist("source"),
         )
-        self.workflow = VideoWorkflow(
-            self.workflow_id,
-            self.cmd_dispatcher,
-            self.evt_dispatcher,
-            self.video_repo,
-            self.video,
-        )
+        self.workflow = self.make_workflow(VideoWorkflow, self.video_repo, self.video)
 
     def test_initial(self):
         self.assertTrue(self.workflow.is_INITIAL())

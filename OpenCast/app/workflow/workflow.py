@@ -1,12 +1,12 @@
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.util.case import to_camelcase
+from OpenCast.util.naming import name_factory_method, name_handler_method
 from transitions import Machine
 
 
 class Workflow(Machine):
     def __init__(
-        self, logger, derived, id, cmd_dispatcher, evt_dispatcher, *args, **kwargs
+        self, logger, derived, id, app_facade, *args, **kwargs,
     ):
         super(Workflow, self).__init__(
             model=self,
@@ -18,8 +18,10 @@ class Workflow(Machine):
         self._logger = logger
 
         self.id = id
-        self._cmd_dispatcher = cmd_dispatcher
-        self._evt_dispatcher = evt_dispatcher
+        self._app_facade = app_facade
+        self._factory = app_facade.workflow_factory()
+        self._cmd_dispatcher = app_facade.cmd_dispatcher()
+        self._evt_dispatcher = app_facade.evt_dispatcher()
         self.__derived = derived
         self._sub_workflows = []
 
@@ -39,11 +41,7 @@ class Workflow(Machine):
 
     def _child_workflow(self, cls, *args, **kwargs):
         workflow = getattr(self._factory, name_factory_method(cls))(
-            self.id,
-            self._cmd_dispatcher,
-            self._evt_dispatcher,
-            *args,
-            **kwargs,
+            self.id, self._app_facade, *args, **kwargs,
         )
         self._sub_workflows.append(workflow)
         return workflow

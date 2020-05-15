@@ -45,30 +45,14 @@ class PlayerMonitController(Controller):
                 for source in sources
             ]
 
-            workflow_id = IdentityService.id_workflow(
-                StreamPlaylistWorkflow, playlist_id
+            self._start_workflow(
+                StreamPlaylistWorkflow, playlist_id, self._video_repo, videos
             )
-            workflow = StreamPlaylistWorkflow(
-                playlist_id,
-                self._cmd_dispatcher,
-                self._evt_dispatcher,
-                self._video_repo,
-                videos,
-            )
-            workflow.start()
             return
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
-        workflow_id = IdentityService.id_workflow(StreamVideoWorkflow, video_id)
-        workflow = StreamVideoWorkflow(
-            workflow_id,
-            self._cmd_dispatcher,
-            self._evt_dispatcher,
-            self._video_repo,
-            video,
-        )
-        workflow.start()
+        self._start_workflow(StreamVideoWorkflow, video_id, self._video_repo, video)
 
         return "1"
 
@@ -82,30 +66,14 @@ class PlayerMonitController(Controller):
                 for source in sources
             ]
 
-            workflow_id = IdentityService.id_workflow(
-                QueuePlaylistWorkflow, playlist_id
+            self._start_workflow(
+                QueuePlaylistWorkflow, playlist_id, self._video_repo, videos
             )
-            workflow = QueuePlaylistWorkflow(
-                workflow_id,
-                self._cmd_dispatcher,
-                self._evt_dispatcher,
-                self._video_repo,
-                videos,
-            )
-            workflow.start()
             return
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
-        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video_id)
-        workflow = QueueVideoWorkflow(
-            workflow_id,
-            self._cmd_dispatcher,
-            self._evt_dispatcher,
-            self._video_repo,
-            video,
-        )
-        workflow.start()
+        self._start_workflow(QueueVideoWorkflow, video_id, self._video_repo, video)
 
     def _video(self):
         control = request.query["control"]
