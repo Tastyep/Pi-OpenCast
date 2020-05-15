@@ -2,7 +2,7 @@ import inspect
 from functools import partial
 
 from OpenCast.infra.data.repo.error import RepoError
-from OpenCast.util.case import to_camelcase
+from OpenCast.util.naming import name_handler_method
 
 from .error import OperationError
 
@@ -30,8 +30,7 @@ class Service:
         self._evt_dispatcher.observe(evt_id, {cls: self._dispatch_to_handler})
 
     def _dispatch_to_handler(self, cmd):
-        cmd_name = cmd.__class__.__name__
-        handler_name = f"_{to_camelcase(cmd_name)}"
+        handler_name = name_handler_method(cmd.__class__)
         try:
             getattr(self, handler_name)(cmd)
         except Exception as e:

@@ -23,6 +23,8 @@ class WorkflowTestCase(TestCase):
         self.raise_event(workflow, OperationError, cmd, "")
 
     def raise_event(self, workflow, evt_cls, *args, **kwargs):
-        handler_name = re.sub("([A-Z]+)", r"_\1", evt_cls.__name__).lower()
         event = evt_cls(*args, **kwargs)
-        getattr(workflow, handler_name)(event)
+        getattr(workflow, name_handler_method(evt_cls))(event)
+
+    def expect_workflow_creation(self, wf_cls):
+        getattr(self.factory, name_factory_method(wf_cls)).assert_called_once()

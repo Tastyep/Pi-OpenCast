@@ -38,8 +38,12 @@ class Workflow(Machine):
         self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
 
     def _child_workflow(self, cls, *args, **kwargs):
-        workflow = cls(
-            self.id, self._cmd_dispatcher, self._evt_dispatcher, *args, **kwargs,
+        workflow = getattr(self._factory, name_factory_method(cls))(
+            self.id,
+            self._cmd_dispatcher,
+            self._evt_dispatcher,
+            *args,
+            **kwargs,
         )
         self._sub_workflows.append(workflow)
         return workflow
@@ -60,7 +64,7 @@ class Workflow(Machine):
         self._evt_dispatcher.observe(cmd_id, evtcls_to_handler, times=1)
 
     def _event_handler(self, evt_cls):
-        handler_name = f"_{to_camelcase(evt_cls.__name__)}"
+        handler_name = name_handler_method(evt_cls)
         try:
             return getattr(self.__derived, handler_name)
         except AttributeError:
