@@ -8,6 +8,12 @@ class Entity:
         self._version = 0
         self._events = OrderedDict()
 
+    def __eq__(self, other):
+        return isinstance(other, type(self)) and self.id == other.id
+
+    def __repr__(self):
+        return f"id: {self.id}, version: {self.version}"
+
     @property
     def id(self):
         return self._id

@@ -17,7 +17,8 @@ class Video(Entity):
         self._record(Evt.VideoCreated, self._source, self._playlist_id)
 
     def __repr__(self):
-        return f"{Video.__name__}(title='{self._title}', playlist={self._playlist_id})"
+        base_repr = super(Video, self).__repr__()
+        return f"{Video.__name__}({base_repr}, title='{self._title}', playlist={self._playlist_id})"
 
     @property
     def source(self):

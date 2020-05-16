@@ -17,8 +17,9 @@ class Player(Entity):
         self._sub_delay = 0
         self._volume = 100
 
-    def __repr(self):
-        return f"{Player.__name__}(id={self.id}, state={self._state}, video_idx={self._index / len(self._queue)})"
+    def __repr__(self):
+        base_repr = super(Player, self).__repr__()
+        return f"{Player.__name__}({base_repr}, state={self._state}, video_idx={self._index} / {len(self._queue)})"
 
     def play(self, video: Video):
         if video not in self._queue:
