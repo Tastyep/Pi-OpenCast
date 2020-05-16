@@ -10,25 +10,27 @@ class MemoryRepo:
 
     def create(self, model):
         if self.get(model.id) is not None:
-            raise RepoError("cannot create: model '{}' already exists".format(model.id))
+            raise RepoError(f"cannot create: '{model}' already exists")
         self._table.append(deepcopy(model))
 
     def update(self, model):
         e = self.get(model.id)
         if e is None:
-            raise RepoError("cannot update: model '{}' doesn't exists".format(model.id))
-        if e.version > model.version:
-            raise RepoError("cannot update: model '{}' is outdated".format(model.id))
-        self._table = [model if e.id == model.id else e for e in self._table]
+            raise RepoError(f"cannot update: '{model}' doesn't exist")
+        if model.version < e.version:
+            raise RepoError(f"cannot update: '{model}' is outdated")
+
+        model.update_version()
+        self._table = [model if e == model else e for e in self._table]
 
     def delete(self, model):
         prev_size = len(self._table)
-        self._table = [e for e in self._table if e.id != model.id]
+        self._table = [e for e in self._table if e != model]
         if len(self._table) == prev_size:
-            raise RepoError("cannot delete: model '{}' doesn't exist".format(model.id))
+            raise RepoError(f"cannot delete: '{model}' doesn't exist")
 
     def list(self):
-        return self._table
+        return deepcopy(self._table)
 
     def get(self, id_):
         model = next((e for e in self._table if e.id == id_), None)
