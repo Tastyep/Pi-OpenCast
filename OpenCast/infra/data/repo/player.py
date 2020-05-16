@@ -1,9 +1,9 @@
 from copy import deepcopy
 
-from .memory import MemoryRepository
+from .memory import MemoryRepo
 
 
-class PlayerRepo(MemoryRepository):
+class PlayerRepo(MemoryRepo):
     def __init__(self):
         super(PlayerRepo, self).__init__()
 
