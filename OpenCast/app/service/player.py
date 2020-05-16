@@ -1,6 +1,6 @@
-import structlog
 from functools import partial
 
+import structlog
 from OpenCast.app.command import player as player_cmds
 from OpenCast.app.error import CommandFailure
 from OpenCast.domain.event import player as player_events
@@ -91,7 +91,6 @@ class PlayerService(Service):
         model = self._player_model()
         if model.state != PlayerState.STOPPED:
             callback = partial(play_video, video)
-            # TODO: Should be model events
             self._evt_dispatcher.once(player_events.PlayerStopped, callback)
             self._player.stop(cmd.id)
         else:

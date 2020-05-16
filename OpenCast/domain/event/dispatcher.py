@@ -21,9 +21,8 @@ class EventDispatcher:
 
             return self._count == 0
 
-    def __init__(self, executor):
+    def __init__(self):
         self._logger = structlog.get_logger(__name__)
-        self._executor = executor
         self._handler_map = {}
         self._evt_to_handler_ids = {}
         self._lock = Lock()
@@ -37,36 +36,31 @@ class EventDispatcher:
         )
 
     def dispatch(self, evt):
-        def impl(evt):
-            self._logger.debug(type(evt).__name__, evt=evt)
+        def remove_handler_links(evt_id, handler):
+            handler_id = id(handler)
+            for evt_cls in handler.handled_evts():
+                evt_hash = hash((evt_id, evt_cls))
+                self._evt_to_handler_ids[evt_hash].remove(handler_id)
+            self._handler_map.pop(handler_id)
 
-            def remove_handler_links(evt_id, handler):
-                handler_id = id(handler)
-                for evt_cls in handler.handled_evts():
-                    evt_hash = hash((evt_id, evt_cls))
-                    self._evt_to_handler_ids[evt_hash].remove(handler_id)
-                self._handler_map.pop(handler_id)
+        self._logger.debug(type(evt).__name__, evt=evt)
 
-            handlers = []
-            with self._lock:
-                for evt_id in set([None, evt.id]):
-                    evt_hash = hash((evt_id, type(evt)))
-                    if evt_hash not in self._evt_to_handler_ids:
-                        continue
+        handlers = []
+        with self._lock:
+            for evt_id in set([None, evt.id]):
+                evt_hash = hash((evt_id, type(evt)))
+                if evt_hash not in self._evt_to_handler_ids:
+                    continue
 
-                    handler_ids = self._evt_to_handler_ids[evt_hash]
-                    for handler_id in handler_ids:
-                        handler = self._handler_map[handler_id]
-                        handlers.append(handler)
-                        if handler.update_expires():
-                            remove_handler_links(evt_id, handler)
+                handler_ids = self._evt_to_handler_ids[evt_hash]
+                for handler_id in handler_ids:
+                    handler = self._handler_map[handler_id]
+                    handlers.append(handler)
+                    if handler.update_expires():
+                        remove_handler_links(evt_id, handler)
 
-            if not handlers:
-                return
-            for handler in handlers:
-                handler(evt)
-
-        self._executor.submit(impl, evt)
+        for handler in handlers:
+            handler(evt)
 
     def _observe(self, evt_id, evt_clss: list, handler):
         with self._lock:

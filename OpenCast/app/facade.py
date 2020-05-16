@@ -10,7 +10,7 @@ class AppFacade:
     def __init__(self):
         self._executor = ThreadPoolExecutor(max_workers=1)  # TODO: make configurable
         self._cmd_dispatcher = CommandDispatcher(self._executor)
-        self._evt_dispatcher = EventDispatcher(self._executor)
+        self._evt_dispatcher = EventDispatcher()
         self._workflow_factory = WorkflowFactory()
 
     def cmd_dispatcher(self):
