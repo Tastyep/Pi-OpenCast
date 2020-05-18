@@ -7,8 +7,8 @@ class CommandDispatcher:
         self._executor = executor
         self._handlers_map = {}
 
-    def observe(self, cmd, handler):
-        cmd_id = id(cmd)
+    def observe(self, cmd_cls, handler):
+        cmd_id = id(cmd_cls)
         if cmd_id not in self._handlers_map:
             self._handlers_map[cmd_id] = list()
         self._handlers_map[cmd_id].append(handler)
