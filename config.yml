@@ -19,6 +19,8 @@ player:
 downloader:
   # The directory used to store downloaded videos.
   output_directory: /tmp
+  # The maximum number of parallel downloads.
+  max_concurrency: 3
 
 subtitle:
   # The default language for subtitles.

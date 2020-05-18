@@ -163,7 +163,8 @@ config = Config({
         "history_size": 15
     },
     "downloader": {
-        "output_directory": "/tmp"
+        "output_directory": "/tmp",
+        "max_concurrency": 3
     },
     "subtitle": {
         "language": "eng"
