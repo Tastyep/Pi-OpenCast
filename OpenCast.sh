@@ -6,6 +6,7 @@ PROJECT_API_PORT="2020"
 PROJECT_WEBAPP_PORT="8081"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
+TEST_DIR="test"
 
 function is_port_bound() {
   lsof -t -i ":$1"
@@ -76,7 +77,11 @@ function logs() {
 
 function test() {
   cd "$PROJECT_DIR" || exit 1
-  run_in_env python -m unittest discover -v
+  if [ -z "$1" ]; then
+    run_in_env python -m unittest discover -v
+  else
+    run_in_env python -m unittest "$TEST_DIR.$1"
+  fi
 }
 
 function run_in_env() {
