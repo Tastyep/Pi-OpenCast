@@ -41,14 +41,14 @@ def main(argv=None):
     io_factory = IoFactory()
     io_facade = IoFacade(io_factory)
 
-    media_factory = MediaFactory(app_facade.evt_dispatcher())
+    media_factory = MediaFactory(app_facade.evt_dispatcher)
     media_facade = MediaFacade(media_factory)
 
     ControllerModule(app_facade, data_facade, io_facade, service_factory)
     ServiceModule(app_facade, data_facade, io_facade, media_facade, service_factory)
 
     try:
-        server = io_facade.server()
+        server = io_facade.server
         server.run(config["server.host"], config["server.port"])
     except Exception as e:
         logger.error(f"{__name__} stopped", error=e)

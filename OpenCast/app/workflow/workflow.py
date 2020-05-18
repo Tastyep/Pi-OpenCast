@@ -6,7 +6,7 @@ from transitions import Machine
 
 class Workflow(Machine):
     def __init__(
-        self, logger, derived, id, app_facade, *args, **kwargs,
+        self, logger, derived, id_, app_facade, *args, **kwargs,
     ):
         super(Workflow, self).__init__(
             model=self,
@@ -17,11 +17,11 @@ class Workflow(Machine):
         )
         self._logger = logger
 
-        self.id = id
+        self.id = id_
         self._app_facade = app_facade
-        self._factory = app_facade.workflow_factory()
-        self._cmd_dispatcher = app_facade.cmd_dispatcher()
-        self._evt_dispatcher = app_facade.evt_dispatcher()
+        self._factory = app_facade.workflow_factory
+        self._cmd_dispatcher = app_facade.cmd_dispatcher
+        self._evt_dispatcher = app_facade.evt_dispatcher
         self.__derived = derived
         self._sub_workflows = []
 

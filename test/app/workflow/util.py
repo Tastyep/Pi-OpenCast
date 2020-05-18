@@ -1,6 +1,6 @@
 import uuid
 from test.util import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, PropertyMock
 
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.service.identity import IdentityService
@@ -13,9 +13,15 @@ class WorkflowTestCase(TestCase):
         self.factory = Mock()
         self.cmd_dispatcher = Mock()
         self.evt_dispatcher = Mock()
-        self.app_facade.workflow_factory.return_value = self.factory
-        self.app_facade.cmd_dispatcher.return_value = self.cmd_dispatcher
-        self.app_facade.vt_dispatcher.return_value = self.evt_dispatcher
+        type(self.app_facade).workflow_factory = PropertyMock(  #
+            return_value=self.factory
+        )
+        type(self.app_facade).cmd_dispatcher = PropertyMock(
+            return_value=self.cmd_dispatcher
+        )
+        type(self.app_facade).evt_dispatcher = PropertyMock(
+            return_value=self.evt_dispatcher
+        )
 
     def make_workflow(self, workflow_cls, *args, **kwargs):
         return workflow_cls(uuid.uuid4(), self.app_facade, *args, **kwargs)

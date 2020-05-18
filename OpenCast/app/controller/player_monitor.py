@@ -20,14 +20,14 @@ class PlayerMonitController(Controller):
         super(PlayerMonitController, self).__init__(app_facade)
 
         self._source_service = service_factory.make_source_service(
-            io_facade.video_downloader()
+            io_facade.video_downloader
         )
-        self._player_repo = data_facade.player_repo()
-        self._video_repo = data_facade.video_repo()
+        self._player_repo = data_facade.player_repo
+        self._video_repo = data_facade.video_repo
         self._player_repo.create(Player(uuid.uuid4()))
 
         # TODO add video monit controller
-        server = io_facade.server()
+        server = io_facade.server
         server.route("/stream", callback=self._stream)
         server.route("/queue", callback=self._queue)
         server.route("/video", callback=self._video)

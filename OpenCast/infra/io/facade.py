@@ -4,11 +4,14 @@ class IoFacade:
         self._server = io_factory.make_server()
         self._video_downloader = io_factory.make_video_downloader()
 
+    @property
     def ffmpeg_wrapper(self):
         return self._ffmpeg_wrapper
 
+    @property
     def server(self):
         return self._server
 
+    @property
     def video_downloader(self):
         return self._video_downloader

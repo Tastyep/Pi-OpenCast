@@ -17,9 +17,9 @@ class PlayerService(Service):
             app_facade, logger, self, player_cmds, infra_events
         )
 
-        self._player_repo = data_facade.player_repo()
-        self._video_repo = data_facade.video_repo()
-        self._player = media_facade.player()
+        self._player_repo = data_facade.player_repo
+        self._video_repo = data_facade.video_repo
+        self._player = media_facade.player
 
     # Infra event handler interface implementation
 

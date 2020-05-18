@@ -13,11 +13,14 @@ class AppFacade:
         self._evt_dispatcher = EventDispatcher()
         self._workflow_factory = WorkflowFactory()
 
+    @property
     def cmd_dispatcher(self):
         return self._cmd_dispatcher
 
+    @property
     def evt_dispatcher(self):
         return self._evt_dispatcher
 
+    @property
     def workflow_factory(self):
         return self._workflow_factory
