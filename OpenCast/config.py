@@ -3,6 +3,7 @@
 A config object is exposed with the default values already set.
 Use one of the different methods to update/retrieve its content.
 """
+import collections.abc
 from os import environ
 
 import yaml
@@ -75,6 +76,9 @@ class Config:
             return Config(content, check_env=False)
         return content
 
+    def __eq__(self, other):
+        return self._content == other._content
+
     def load_from_file(self, path: str):
         """ Loads the configuration from a YAML file.
 
@@ -112,7 +116,15 @@ class Config:
         if errors:
             raise ConfigContentError(errors)
 
-        self._content.update(content)
+        self._update_content(self._content, content)
+
+    def _update_content(self, content, updates):
+        for k, v in updates.items():
+            if isinstance(v, collections.abc.Mapping):
+                content[k] = self._update_content(content[k], v)
+            else:
+                content[k] = v
+        return content
 
     def _validate_input(self, source, dest, path):
         errors = {}

@@ -29,6 +29,12 @@ class ConfigTest(TestCase):
         config.load_from_dict({"a": 2})
         self.assertEqual(2, config["a"])
 
+    def test_load_from_dict_nested_override(self):
+        config = Config({"a": {"b": 1, "c": 2}})
+        config.load_from_dict({"a": {"b": 3}})
+        expected = Config({"a": {"b": 3, "c": 2}})
+        self.assertEqual(expected, config)
+
     def test_load_from_dict_single_invalid_key(self):
         config = Config({"a": 1})
         with self.assertRaises(ConfigContentError) as ctx:
