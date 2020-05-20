@@ -31,34 +31,31 @@ class Service:
 
     def _dispatch_to_handler(self, cmd):
         handler_name = name_handler_method(cmd.__class__)
-        try:
-            getattr(self, handler_name)(cmd)
-        except Exception as e:
-            self._abort_operation(cmd, str(e))
+        retry_count = 5
+        while retry_count > 0:
+            try:
+                getattr(self, handler_name)(cmd)
+                return
+            except RepoError as e:
+                self._logger.error("Repo error", error=e)
+                retry_count -= 1
+            except Exception as e:
+                self._abort_operation(cmd, str(e))
+                return
 
     def _abort_operation(self, cmd, error: str):
         self._evt_dispatcher.dispatch(OperationError(cmd, error))
 
     def _start_transaction(self, repo, cmd_id, impl, *args):
-        retry_count = 5
-        while retry_count > 0:
-            context = repo.make_context()
-            try:
-                impl(context, *args)
-                models = context.entities()
-                models_events = []
-                for model in models:
-                    events = model.release_events()
-                    models_events.append(
-                        [evtcls(cmd_id, *events[evtcls]) for evtcls in events]
-                    )
+        context = repo.make_context()
+        impl(context, *args)
+        models = context.entities()
+        models_events = []
+        for model in models:
+            events = model.release_events()
+            models_events.append([evtcls(cmd_id, *events[evtcls]) for evtcls in events])
 
-                context.commit()
-                retry_count = 0
-                for model_events in models_events:
-                    for event in model_events:
-                        self._evt_dispatcher.dispatch(event)
-            except RepoError as e:
-                self._logger.error("Repo error", error=e)
-                retry_count -= 1
-                # TODO: differenciate fatal from non fatal errors
+        context.commit()
+        for model_events in models_events:
+            for event in model_events:
+                self._evt_dispatcher.dispatch(event)
