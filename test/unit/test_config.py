@@ -1,8 +1,7 @@
 from os import environ
+from test.util import TestCase
 
 from OpenCast.config import Config, ConfigContentError, ConfigError
-
-from .util import TestCase
 
 
 class ConfigTest(TestCase):
