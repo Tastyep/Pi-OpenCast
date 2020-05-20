@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
 
 from OpenCast.domain.event.dispatcher import EventDispatcher
 
@@ -7,9 +7,11 @@ from .workflow.factory import WorkflowFactory
 
 
 class AppFacade:
-    def __init__(self):
-        self._executor = ThreadPoolExecutor(max_workers=1)  # TODO: make configurable
-        self._cmd_dispatcher = CommandDispatcher(self._executor)
+    def __init__(self, app_executor):
+        loop = asyncio.get_event_loop()
+        loop.set_default_executor(app_executor)
+
+        self._cmd_dispatcher = CommandDispatcher(loop)
         self._evt_dispatcher = EventDispatcher()
         self._workflow_factory = WorkflowFactory()
 

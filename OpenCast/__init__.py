@@ -32,7 +32,9 @@ def main(argv=None):
     logging.getLogger(__name__).setLevel(config["log.level"])
     logger = structlog.get_logger(__name__)
 
-    app_facade = AppFacade()
+    # TODO: make worker count configurable
+    app_executor = ThreadPoolExecutor(max_workers=1)
+    app_facade = AppFacade(app_executor)
 
     service_factory = ServiceFactory()
 

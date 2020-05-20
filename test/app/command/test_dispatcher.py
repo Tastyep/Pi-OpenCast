@@ -6,13 +6,13 @@ from OpenCast.app.command.dispatcher import CommandDispatcher
 
 class CommandDispatcherTest(TestCase):
     def setUp(self):
-        def execute_handler(handler, *args, **kwargs):
-            handler(*args, **kwargs)
+        def execute_handler(executor, handler, *args):
+            handler(*args)
 
-        self.executor = Mock()
-        self.executor.submit = Mock(side_effect=execute_handler)
+        self.evt_loop = Mock()
+        self.evt_loop.run_in_executor = Mock(side_effect=execute_handler)
 
-        self.dispatcher = CommandDispatcher(self.executor)
+        self.dispatcher = CommandDispatcher(self.evt_loop)
         self.cmd = Mock()
         self.handler = Mock()
 
