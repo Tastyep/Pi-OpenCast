@@ -51,9 +51,9 @@ class ToggleSubtitle(Command):
 
 @dataclass
 class IncreaseSubtitleDelay(Command):
-    pass
+    amount: int
 
 
 @dataclass
 class DecreaseSubtitleDelay(Command):
-    pass
+    amount: int

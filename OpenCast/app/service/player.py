@@ -23,57 +23,21 @@ class PlayerService(Service):
 
     # Infra event handler interface implementation
 
-    def _player_started(self, evt):
-        def impl(model):
-            model.play(evt.video)
-
-        self._update(evt.id, impl)
-
     def _player_stopped(self, evt):
         def stop_player(model):
             model.stop()
+
+        def play_next(model):
+            video = model.next_video()
+            if video is not None:
+                self._player.play(video, model.volume)
+                model.play(video)
 
         self._update(evt.id, stop_player)
         if evt.id is not None:
             return
 
-        model = self._player_model()
-        video = model.next_video()
-        if video is not None:
-            self._player.play(evt.id, video, model.volume)
-
-    def _player_paused(self, evt):
-        def impl(model):
-            model.pause()
-
-        self._update(evt.id, impl)
-
-    def _player_unpaused(self, evt):
-        def impl(model):
-            model.unpause()
-
-        self._update(evt.id, impl)
-
-    def _video_seeked(self, evt):
-        pass
-
-    def _subtitle_delay_updated(self, evt):
-        def impl(model):
-            model.subtitle_delay = model.subtitle_delay + evt.amount
-
-        self._update(evt.id, impl)
-
-    def _volume_updated(self, evt):
-        def impl(model):
-            model.volume = evt.volume
-
-        self._update(evt.id, impl)
-
-    def _subtitle_state_changed(self, evt):
-        def impl(model):
-            model.subtitle_state = evt.state
-
-        self._update(evt.id, impl)
+        self._update(evt.id, play_next)
 
     # Command handler interface implementation
 
@@ -83,18 +47,7 @@ class PlayerService(Service):
 
         video = self._video_repo.get(cmd.video_id)
         self._update(cmd.id, queue_video, video)
-
-        def play_video(video, *_):
-            model = self._player_model()
-            self._player.play(cmd.id, video, model.volume)
-
-        model = self._player_model()
-        if model.state != PlayerState.STOPPED:
-            callback = partial(play_video, video)
-            self._evt_dispatcher.once(player_events.PlayerStopped, callback)
-            self._player.stop(cmd.id)
-        else:
-            play_video(video)
+        self._play_video_impl(cmd.id, video)
 
     def _queue_video(self, cmd):
         def queue_video(model):
@@ -105,67 +58,88 @@ class PlayerService(Service):
 
     def _stop_video(self, cmd):
         self._player.stop(cmd.id)
+        # Model updates are done from the infra event handler
 
     def _toggle_video_state(self, cmd):
-        player_model = self._player_model()
-        if player_model.state is PlayerState.PLAYING:
-            self._player.pause(cmd.id)
-        else:
-            self._player.unpause(cmd.id)
+        def pause(model):
+            self._player.pause()
+            model.pause()
+
+        def unpause(model):
+            self._player.unpause()
+            model.unpause()
+
+        model = self._player_model()
+        action = pause if model.state is PlayerState.PLAYING else unpause
+        self._update(cmd.id, action)
 
     def _seek_video(self, cmd):
-        self._player.seek(cmd.id, cmd.duration)
+        self._player.seek(cmd.duration)
+        # TODO reflect change in model
 
     def _change_volume(self, cmd):
-        model = self._player_model()
-        model.volume = model.volume + cmd.amount
-        self._player.set_volume(cmd.id, model.volume)
+        def impl(model):
+            model.volume = model.volume + cmd.amount
+            self._player.set_volume(model.volume)
+
+        self._update(cmd.id, impl)
 
     def _next_video(self, cmd):
         model = self._player_model()
-        video = model.next_video()
-        if video is None:
+        next_video = model.next_video()
+        if next_video is None:
             raise CommandFailure("no next video")
 
-        def play_next(video, *_):
-            model = self._player_model()
-            self._player.play(cmd.id, video, model.volume)
-
-        if model.state != PlayerState.STOPPED:
-            callback = partial(play_next, video)
-            self._evt_dispatcher.once(player_events.PlayerStopped, callback)
-            self._player.stop(cmd.id)
-        else:
-            play_next(video)
+        self._play_video_impl(cmd.id, next_video)
 
     def _prev_video(self, cmd):
         model = self._player_model()
-        video = model.prev_video()
-        if video is None:
+        prev_video = model.prev_video()
+        if prev_video is None:
             raise CommandFailure("no previous video")
 
-        def play_prev(video, *_):
-            model = self._player_model()
-            self._player.play(cmd.id, video, model.volume)
-
-        if model.state is not PlayerState.STOPPED:
-            callback = partial(play_prev, video)
-            self._evt_dispatcher.once(player_events.PlayerStopped, callback)
-            self._player.stop(cmd.id)
-        else:
-            play_prev(video)
+        self._play_video_impl(cmd.id, prev_video)
 
     def _toggle_subtitle(self, cmd):
-        state = not self._player_model().subtitle_state
-        self._player.update_subtitle_state(cmd.id, state)
+        def impl(model, state):
+            model.subtitle_state = state
+
+        model = self._player_model()
+        state = not model.subtitle_state
+        self._player.update_subtitle_state(state)
+        self._update(cmd.id, impl, state)
 
     def _increase_subtitle_delay(self, cmd):
-        self._player.increase_subtitle_delay(cmd.id)
+        def impl(model):
+            model.subtitle_delay = model.subtitle_delay + cmd.amount
+
+        self._player.increase_subtitle_delay()
+        self._update(cmd.id, impl)
 
     def _decrease_subtitle_delay(self, cmd):
-        self._player.increase_subtitle_delay(cmd.id)
+        def impl(model):
+            model.subtitle_delay = model.subtitle_delay - cmd.amount
+
+        self._player.increase_subtitle_delay()
+        self._update(cmd.id, impl)
 
     # Private
+
+    def _play_video_impl(self, cmd_id, video):
+        def play_video(model, video, *_):
+            def impl(model):
+                model.play(video)
+
+            self._player.play(video, model.volume)
+            self._update(cmd_id, impl)
+
+        model = self._player_model()
+        if model.state is not PlayerState.STOPPED:
+            callback = partial(play_video, model, video)
+            self._evt_dispatcher.once(player_events.PlayerStopped, callback)
+            self._player.stop(cmd_id)
+        else:
+            play_video(model, video)
 
     def _player_model(self):
         return self._player_repo.get_player()

@@ -100,9 +100,9 @@ class PlayerMonitController(Controller):
 
     def _sound(self):
         if request.query["vol"] == "more":
-            self._dispatcher(Cmd.ChangeVolume, 10)
+            self._dispatcher(Cmd.ChangeVolume, Player.VOLUME_STEP)
         else:
-            self._dispatcher(Cmd.ChangeVolume, -10)
+            self._dispatcher(Cmd.ChangeVolume, -Player.VOLUME_STEP)
         return "1"
 
     def _subtitle(self):
@@ -111,9 +111,9 @@ class PlayerMonitController(Controller):
         if action == "toggle":
             self._dispatch(Cmd.ToggleSubtitle)
         elif action == "increase":
-            self._dispatch(Cmd.IncreaseSubtitleDelay)
+            self._dispatch(Cmd.IncreaseSubtitleDelay, Player.SUBTITLE_DELAY_STEP)
         elif action == "decrease":
-            self._dispatch(Cmd.DecreaseSubtitleDelay)
+            self._dispatch(Cmd.DecreaseSubtitleDelay, -Player.SUBTITLE_DELAY_STEP)
 
     def _running(self):
         return 1

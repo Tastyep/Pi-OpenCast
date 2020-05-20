@@ -20,7 +20,7 @@ class PlayerWrapper:
         self._player_lock = Lock()
         self._stop_operation_id = None
 
-    def play(self, cmd_id, video, volume):
+    def play(self, video, volume):
         command = ["--vol", self._downscale(volume)]
         if config["player.hide_background"] is True:
             command += ["--blank"]
@@ -57,31 +57,27 @@ class PlayerWrapper:
         if not player_started:
             raise PlayerError("error starting the player")
 
-        self._dispatch(e.PlayerStarted(cmd_id, video))
-
-    def stop(self, cmd_id):
+    def stop(self, op_id):
         def impl():
-            self._stop_operation_id = cmd_id
+            self._stop_operation_id = op_id
             self._player.stop()
             # Event is dispatched from _on_exit
 
         self._exec_command(impl)
 
-    def pause(self, cmd_id):
+    def pause(self):
         def impl():
             self._player.play_pause()
 
         self._exec_command(impl)
-        self._dispatch(e.PlayerPaused(cmd_id))
 
-    def unpause(self, cmd_id):
+    def unpause(self):
         def impl():
             self._player.play_pause()
 
         self._exec_command(impl)
-        self._dispatch(e.PlayerUnpaused(cmd_id))
 
-    def update_subtitle_state(self, cmd_id, state):
+    def update_subtitle_state(self, state):
         def impl():
             if state is True:
                 self._player.show_subtitles()
@@ -89,35 +85,30 @@ class PlayerWrapper:
                 self._player.hide_subtitles()
 
         self._exec_command(impl)
-        self._dispatch(e.SubtitleStateChanged(cmd_id, state))
 
-    def increase_subtitle_delay(self, cmd_id):
+    def increase_subtitle_delay(self):
         def impl():
             self._player.action(keys.INCREASE_SUBTITLE_DELAY)
 
         self._exec_command(impl)
-        self._dispatch(e.SubtitleDelayUpdated(cmd_id, 250))
 
-    def decrease_subtitle_delay(self, cmd_id):
+    def decrease_subtitle_delay(self):
         def impl():
             self._player.action(keys.DECREASE_SUBTITLE_DELAY)
 
         self._exec_command(impl)
-        self._dispatch(e.SubtitleDelayUpdated(cmd_id, -250))
 
-    def set_volume(self, cmd_id, volume):
+    def set_volume(self, volume):
         def impl():
             self._player.set_volume(self._downscale(volume))
 
         self._exec_command(impl)
-        self._dispatch(e.VolumeUpdated(cmd_id, volume))
 
-    def seek(self, cmd_id, duration):
+    def seek(self, duration):
         def impl():
             self._player.seek(duration)
 
         self._exec_command(impl)
-        self._dispatch(e.VideoSeeked(cmd_id))
 
     def _downscale(self, volume):
         return volume / 100
