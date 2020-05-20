@@ -4,6 +4,9 @@ from .video_downloader import VideoDownloader
 
 
 class IoFactory:
+    def __init__(self, downloader_executor):
+        self._downloader_executor = downloader_executor
+
     def make_ffmpeg_wrapper(self, *args):
         return FFmpegWrapper(*args)
 
@@ -11,4 +14,4 @@ class IoFactory:
         return Server(*args)
 
     def make_video_downloader(self, *args):
-        return VideoDownloader(*args)
+        return VideoDownloader(self._downloader_executor, *args)

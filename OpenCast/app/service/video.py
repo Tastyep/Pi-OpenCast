@@ -1,4 +1,3 @@
-from functools import partial
 from pathlib import Path
 
 import structlog
@@ -11,14 +10,14 @@ from .service import Service
 
 
 class VideoService(Service):
-    def __init__(self, app_facade, data_facade, io_facade, service_factory):
+    def __init__(self, app_facade, service_factory, data_facade, io_factory):
         logger = structlog.get_logger(__name__)
         super(VideoService, self).__init__(app_facade, logger, self, video_cmds)
         self._video_repo = data_facade.video_repo
-        self._downloader = io_facade.video_downloader
+        self._downloader = io_factory.make_video_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(self._downloader)
         self._subtitle_service = service_factory.make_subtitle_service(
-            io_facade.ffmpeg_wrapper
+            io_factory.make_ffmpeg_wrapper()
         )
 
     # Command handler interface implementation

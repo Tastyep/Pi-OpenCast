@@ -12,4 +12,4 @@ class MediaFactory:
             player.exitEvent += exit_callback
             return player
 
-        return PlayerWrapper(*args, player_factory)
+        return PlayerWrapper(player_factory, *args)

@@ -11,7 +11,7 @@ from .service import Service
 
 
 class PlayerService(Service):
-    def __init__(self, app_facade, data_facade, media_facade):
+    def __init__(self, app_facade, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
         super(PlayerService, self).__init__(
             app_facade, logger, self, player_cmds, infra_events
@@ -19,7 +19,7 @@ class PlayerService(Service):
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
-        self._player = media_facade.player
+        self._player = media_factory.make_player(app_facade.evt_dispatcher)
 
     # Infra event handler interface implementation
 

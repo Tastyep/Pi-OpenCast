@@ -7,9 +7,9 @@ from .download_logger import DownloadLogger
 
 
 class VideoDownloader:
-    def __init__(self, evt_dispatcher, executor):
-        self._evt_dispatcher = evt_dispatcher
+    def __init__(self, executor, evt_dispatcher):
         self._executor = executor
+        self._evt_dispatcher = evt_dispatcher
         self._logger = structlog.get_logger(__name__)
         self._dl_logger = DownloadLogger(self._logger)
         self._log_debug = False  # self._dl_logger.is_enabled_for(logging.DEBUG)

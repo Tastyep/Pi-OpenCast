@@ -2,9 +2,9 @@ from .controller import Controller
 
 
 class FileController(Controller):
-    def __init__(self, app_facade, io_facade):
+    def __init__(self, app_facade, server):
         super(FileController, self).__init__(app_facade)
-        self._server = io_facade.server
+        self._server = server
         # Todo hardcoded port
         self._index_html = """
                                 {{ project_name }} API.

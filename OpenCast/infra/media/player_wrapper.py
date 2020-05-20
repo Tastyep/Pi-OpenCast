@@ -12,10 +12,10 @@ from .error import PlayerError
 
 # OmxPlayer documentation: https://elinux.org/Omxplayer
 class PlayerWrapper:
-    def __init__(self, evt_dispatcher, player_factory):
+    def __init__(self, player_factory, evt_dispatcher):
         self._logger = structlog.get_logger(__name__)
-        self._evt_dispatcher = evt_dispatcher
         self._player_factory = player_factory
+        self._evt_dispatcher = evt_dispatcher
         self._player = None
         self._player_lock = Lock()
         self._stop_operation_id = None
