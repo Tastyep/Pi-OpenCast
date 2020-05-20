@@ -1,5 +1,6 @@
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 import structlog
 
@@ -39,10 +40,11 @@ def main(argv=None):
     data_facade = DataFacade(repo_factory)
 
     io_factory = IoFactory()
-    io_facade = IoFacade(io_factory)
+    downloader_executor = ThreadPoolExecutor(config["downloader.max_concurrency"])
+    io_facade = IoFacade(app_facade.evt_dispatcher, io_factory, downloader_executor)
 
-    media_factory = MediaFactory(app_facade.evt_dispatcher)
-    media_facade = MediaFacade(media_factory)
+    media_factory = MediaFactory()
+    media_facade = MediaFacade(app_facade.evt_dispatcher, media_factory)
 
     ControllerModule(app_facade, data_facade, io_facade, service_factory)
     ServiceModule(app_facade, data_facade, io_facade, media_facade, service_factory)

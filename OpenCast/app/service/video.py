@@ -5,6 +5,7 @@ import structlog
 from OpenCast.app.command import video as video_cmds
 from OpenCast.config import config
 from OpenCast.domain.model.video import Video
+from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
 from .service import Service
 
@@ -59,17 +60,23 @@ class VideoService(Service):
             self._start_transaction(self._video_repo, cmd.id, impl, video)
             return
 
-        def video_downloaded(ctx, data):
-            video = self._video_repo.get(data.id)
-            video.path = data.path
-            ctx.update(video)
+        def video_downloaded(_):
+            def impl(ctx):
+                ctx.update(video)
+
+            self._start_transaction(self._video_repo, cmd.id, impl)
+
+        def abort_operation(evt):
+            self._abort_operation(cmd, evt.error)
 
         output_dir = config["downloader.output_directory"]
         video.path = Path(f"{output_dir}/{video.title}.mp4")
-        callback = partial(
-            self._start_transaction, self._video_repo, cmd.id, video_downloaded
+        self._evt_dispatcher.observe(
+            cmd.id,
+            {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
+            times=1,
         )
-        self._downloader.queue(video, callback, priority=cmd.priority)
+        self._downloader.download(cmd.id, video)
 
     def _fetch_video_subtitle(self, cmd):
         def impl(ctx):
