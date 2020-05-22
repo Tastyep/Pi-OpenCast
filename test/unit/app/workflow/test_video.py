@@ -26,13 +26,13 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_init_to_completed(self):
         self.video_repo.exists.return_value = True
-        self.workflow.start(with_priority=False)
+        self.workflow.start()
         self.video_repo.exists.assert_called_once_with(self.video.id)
         self.assertTrue(self.workflow.is_COMPLETED())
 
     def test_init_to_creating(self):
         self.video_repo.exists.return_value = False
-        self.workflow.start(with_priority=False)
+        self.workflow.start()
         self.video_repo.exists.assert_called_once_with(self.video.id)
         self.assertTrue(self.workflow.is_CREATING())
 
@@ -69,16 +69,16 @@ class VideoWorkflowTest(WorkflowTestCase):
     def test_retrieving_to_deleting(self):
         event = Evt.VideoIdentified(None, self.video.id, "")
         self.workflow.to_RETRIEVING(event)
-        cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, False)
+        cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
         self.raise_error(self.workflow, cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
     def test_retrieving_to_finalising(self):
         event = Evt.VideoIdentified(None, self.video.id, "")
         self.workflow.to_RETRIEVING(event)
-        cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, False)
+        cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
         self.raise_event(
-            self.workflow, Evt.VideoRetrieved, cmd.id, self.video.id, "/tmp",
+            self.workflow, Evt.VideoRetrieved, cmd.id, self.video.id, "/tmp/video.mp4",
         )
         self.assertTrue(self.workflow.is_FINALISING())
 

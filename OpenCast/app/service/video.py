@@ -2,7 +2,6 @@ from pathlib import Path
 
 import structlog
 from OpenCast.app.command import video as video_cmds
-from OpenCast.config import config
 from OpenCast.domain.model.video import Video
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
@@ -68,8 +67,7 @@ class VideoService(Service):
         def abort_operation(evt):
             self._abort_operation(cmd, evt.error)
 
-        output_dir = config["downloader.output_directory"]
-        video.path = Path(f"{output_dir}/{video.title}.mp4")
+        video.path = Path(cmd.output_directory) / f"{video.title}.mp4"
         self._evt_dispatcher.observe(
             cmd.id,
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},

@@ -58,10 +58,8 @@ class VideoWorkflow(Workflow):
         )
         self._video_repo = video_repo
         self._video = video
-        self._with_priority = False
 
-    def start(self, with_priority):
-        self._with_priority = with_priority
+    def start(self):
         self._create()
 
     # States
@@ -80,7 +78,7 @@ class VideoWorkflow(Workflow):
             VideoEvt.VideoRetrieved,
             Cmd.RetrieveVideo,
             self._video.id,
-            self._with_priority,
+            config["downloader.output_directory"],
         )
 
     def on_enter_FINALISING(self, _):

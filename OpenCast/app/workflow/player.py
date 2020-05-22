@@ -44,7 +44,7 @@ class QueueVideoWorkflow(Workflow):
     # States
     def on_enter_COLLECTING(self):
         workflow = self._child_workflow(VideoWorkflow, self._video_repo, self._video)
-        self._observe_start(workflow, with_priority=False)
+        self._observe_start(workflow)
 
     def on_enter_QUEUEING(self, evt):
         self._observe_dispatch(
@@ -147,7 +147,7 @@ class StreamVideoWorkflow(Workflow):
     # States
     def on_enter_COLLECTING(self):
         workflow = self._child_workflow(VideoWorkflow, self._video_repo, self._video)
-        self._observe_start(workflow, with_priority=True)
+        self._observe_start(workflow)
 
     def on_enter_STARTING(self, evt):
         self._observe_dispatch(
