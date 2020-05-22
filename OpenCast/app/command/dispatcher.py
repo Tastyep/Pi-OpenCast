@@ -2,9 +2,9 @@ import structlog
 
 
 class CommandDispatcher:
-    def __init__(self, evt_loop):
+    def __init__(self, app_executor):
         self._logger = structlog.get_logger(__name__)
-        self._evt_loop = evt_loop
+        self._executor = app_executor
         self._handlers_map = {}
 
     def observe(self, cmd_cls, handler):
@@ -22,4 +22,4 @@ class CommandDispatcher:
                 for handler in handlers:
                     handler(cmd)
 
-        self._evt_loop.run_in_executor(None, impl)
+        self._executor.submit(impl)
