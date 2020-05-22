@@ -34,10 +34,11 @@ class SubtitleService:
                 and stream["tags"]["language"] == language
             ):
                 self._logger.debug(f"Match: {subtitle}")
-                return self._ffmpeg_wrapper.extract_stream(
+                if self._ffmpeg_wrapper.extract_stream(
                     src=video.path,
                     dest=subtitle,
                     stream_idx=stream["index"],
                     override=False,
-                )
+                ):
+                    return subtitle
         return None

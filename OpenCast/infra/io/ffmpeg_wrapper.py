@@ -25,6 +25,6 @@ class FFmpegWrapper:
             return dest
         except ffmpeg.Error as e:
             if e is None and override is True:  # The file probably exists
-                return dest
+                return True
             self._logger.error("Extraction error", error=e.stderr)
-            return None
+            return False
