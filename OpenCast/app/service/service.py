@@ -37,14 +37,15 @@ class Service:
                 getattr(self, handler_name)(cmd)
                 return
             except RepoError as e:
-                self._logger.error("Repo error", error=e)
+                self._logger.error("Repo error", cmd=cmd, error=e)
                 retry_count -= 1
             except Exception as e:
+                self._logger.error("Operation error", cmd=cmd, error=e)
                 self._abort_operation(cmd, str(e))
                 return
 
     def _abort_operation(self, cmd, error: str):
-        self._evt_dispatcher.dispatch(OperationError(cmd, error))
+        self._evt_dispatcher.dispatch(OperationError(cmd.id, error))
 
     def _start_transaction(self, repo, cmd_id, impl, *args):
         context = repo.make_context()
