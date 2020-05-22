@@ -1,30 +1,29 @@
-from dataclasses import dataclass
 from uuid import UUID
 
-from .command import Command
+from .command import Command, command
 
 
-@dataclass
+@command
 class CreateVideo(Command):
     source: str
     playlist_id: UUID
 
 
-@dataclass
+@command
 class DeleteVideo(Command):
     pass
 
 
-@dataclass
+@command
 class IdentifyVideo(Command):
     pass
 
 
-@dataclass
+@command
 class RetrieveVideo(Command):
-    priority: bool
+    output_directory: str
 
 
-@dataclass
+@command
 class FetchVideoSubtitle(Command):
     language: str
