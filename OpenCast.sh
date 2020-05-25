@@ -2,15 +2,18 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="OpenCast"
+PROJECT_API_PORT="2020"
+PROJECT_WEBAPP_PORT="8081"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
+TEST_DIR="test"
 
-function is_server_running() {
-  lsof -t -i :2020
+function is_port_bound() {
+  lsof -t -i ":$1"
 }
 
 function wait_for_server() {
-  while [ ! "$(is_server_running)" ]; do
+  while [ ! "$(is_port_bound $1)" ]; do
     sleep 1
   done
 }
@@ -23,7 +26,7 @@ function element_in() {
 }
 
 function start() {
-  if [ "$(is_server_running)" ]; then
+  if [ "$(is_port_bound $PROJECT_API_PORT)" ]; then
     echo "$PROJECT_NAME server is already running."
     return
   fi
@@ -36,28 +39,31 @@ function start() {
   mkdir -p "$LOG_DIR"
 
   echo "Starting $PROJECT_NAME server."
-  pipenv run python -m "$PROJECT_NAME" &
+  (cd ./webapp && npm install && npm start &)
+  wait_for_server "$PROJECT_WEBAPP_PORT"
 
-  wait_for_server
+  run_in_env poetry run python -m "$PROJECT_NAME" &
   pid="$(pgrep -f "python -m $PROJECT_NAME")"
   echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
 
 function stop() {
   echo "Killing $PROJECT_NAME..."
+  # Todo hardcoded port
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
+  lsof -t -i :8081 | xargs kill >/dev/null 2>&1
   sudo killall omxplayer.bin >/dev/null 2>&1
   echo "Done."
 }
 
 function restart() {
-  stop && start
+  stop && start ""
 }
 
 function update() {
   echo "Checking for updates."
 
-  (cd "$PROJECT_DIR" && git pull && pipenv update)
+  (cd "$PROJECT_DIR" && poetry update)
 }
 
 function status() {
@@ -69,15 +75,29 @@ function logs() {
   tail -n 50 -f "$PROJECT_DIR/$LOG_DIR/$LOG_FILE"
 }
 
-function tests() {
+function test() {
   cd "$PROJECT_DIR" || exit 1
-  pipenv run python -m unittest discover -v -p "*_test.py"
+  if [ -z "$1" ]; then
+    run_in_env python -m unittest discover -v
+  else
+    run_in_env python -m unittest "$TEST_DIR.$1"
+  fi
 }
 
-COMMANDS=("start" "stop" "restart" "update" "status" "logs" "tests")
+function run_in_env() {
+  poetry install
+  poetry run "$@"
+}
+
+# Source profile file as poetry use it to modify the PATH
+# This is likely to be done by the display manager, but not always (lightdm).
+source ~/.profile
+
+COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test")
 if element_in "$1" "${COMMANDS[@]}"; then
   COMMAND="$1"
   shift
+
   "$COMMAND" "$@"
 else
   echo "Usage: $0 {$(

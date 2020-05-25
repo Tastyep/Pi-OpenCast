@@ -27,7 +27,7 @@ function error() {
 # Check if the script is executed from the project or standalone.
 # Clone the project and update PROJECT_DIR accordingly is executed in standalone mode.
 function setup_environment() {
-  if ! git ls-files --error-unmatch "$0" >/dev/null 2>&1; then
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     local homedir
 
     homedir="$(getent passwd "$USER" | cut -d: -f6)"
@@ -37,6 +37,22 @@ function setup_environment() {
     info "Cloning $PROJECT into $PROJECT_DIR"
     git clone "https://github.com/Tastyep/$PROJECT" "$PROJECT_DIR"
   fi
+}
+
+# Install system dependencies.
+function install_system_deps() {
+  info "Installing system dependencies..."
+
+  sudo apt-get update
+  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip libdbus-glib-1-dev libdbus-1-dev ||
+    error "failed to install dependencies"
+  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+}
+
+# Install project dependencies.
+function install_project_deps() {
+  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+  "$PROJECT_DIR/$INTERNAL_NAME.sh" update
 }
 
 # Format and install the systemd config file.
@@ -51,28 +67,11 @@ function start_at_boot() {
   sudo systemctl enable "$SERVICE_NAME"
 }
 
-# Install dependencies.
-function install_deps() {
-  info "Installing dependencies..."
-
-  sudo apt-get update
-  sudo apt-get install -y lsof python-pip ||
-    error "failed to install dependencies"
-  sudo -H pip install -U pipenv ||
-    error "failed to install pipenv"
-}
-
-# Start the server as daemon.
-function launch() {
-  info "Starting $PROJECT"
-
-  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
-  sudo systemctl start "$SERVICE_NAME"
-}
-
+install_system_deps
 setup_environment
-install_deps
+install_project_deps
 start_at_boot
-launch
+
+info "Installation successful, reboot to finish."
 
 exit 0

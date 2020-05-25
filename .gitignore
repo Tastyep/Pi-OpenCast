@@ -2,4 +2,17 @@
 *.pyc
 *~
 *.xpi
-Pipfile.lock
+
+
+# node modules
+webapp/node_modules
+
+# logging directory
+/log/
+
+# Generated directories
+build
+
+#  Generated files
+OpenCast.pid
+__pycache__

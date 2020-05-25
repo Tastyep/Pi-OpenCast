@@ -1,22 +1,17 @@
 language: python
-python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev"  # 3.5 development branch
-  - "3.6"
-  - "3.6-dev"  # 3.6 development branch
-  - "3.7-dev"  # 3.7 development branch
+python: "3.7"
 
 # Specify the operating systems on which to test for.
-os:
-  - linux
+os: linux
+
+# Branch for which a build can be triggered
+branches:
+  only:
+  - master
+  - develop
 
 # command to install dependencies
-install:
-  - pip install --user pipenv
-  - pipenv install
+install: ./setup.sh
 
 # command to run tests
-script:
-  - ./OpenCast.sh test
+script: ./OpenCast.sh test

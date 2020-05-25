@@ -26,7 +26,7 @@ Other features:
 - History and browsing support.
 - Subtitle loading for local files (when name matches).
   - example: Tv Show S01E01.mp4, Tv Show S01E01.srt
-- Dependency management using [Pipenv](https://github.com/pypa/pipenv)
+- Dependency management using [Poetry](https://python-poetry.org/)
 - User friendly configuration file.
 
 ### How to
