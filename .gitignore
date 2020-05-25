@@ -15,3 +15,4 @@ build
 
 #  Generated files
 OpenCast.pid
+__pycache__

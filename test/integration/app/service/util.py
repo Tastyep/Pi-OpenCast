@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 from test.integration.app.event_expecter import EventExpecter
 from test.shared.infra.data.producer import DataProducer
 from test.shared.infra.facade_mock import InfraFacadeMock
@@ -29,4 +28,4 @@ class ServiceTestCase(TestCase):
         self.evt_expecter = EventExpecter(
             self.app_facade.cmd_dispatcher, self.app_facade.evt_dispatcher
         )
-        self.data_producer = DataProducer()
+        self.data_producer = DataProducer.make()
