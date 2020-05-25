@@ -3,6 +3,8 @@
 </div>
 <h1 align="center" style="font-size: 50px; color:#000; font-weight: 600">OpenCast</h1>
 
+[![Build Status](https://travis-ci.org/Tastyep/Pi-OpenCast.svg?branch=master)](https://travis-ci.org/Tastyep/Pi-OpenCast)
+
 OpenCast is a client-server media player that transforms your Raspberry Pi into an awesome streaming device.
 All you need to make it work is a Raspberry Pi, an internet connection and a screen of your choice.
 
@@ -27,7 +29,7 @@ Other features:
 - Subtitle loading for local files (when name matches).
   - example: Tv Show S01E01.mp4, Tv Show S01E01.srt
 - Dependency management using [Poetry](https://python-poetry.org/)
-- User friendly configuration file.
+- User friendly logging and configuration files.
 
 ### How to
 #### Install
@@ -38,7 +40,7 @@ Other features:
 First of all, note the <address> of your Raspberry-Pi by executing `sudo ifconfig`.
 
 ###### Computer
-Open your favorite browser and go on `<address>:2020`
+Open your favorite browser and go on `<address>:8081`
 
 
 ### License
