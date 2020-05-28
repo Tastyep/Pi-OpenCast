@@ -12,10 +12,10 @@ OpenCast.infra.io.download\_logger module
    :undoc-members:
    :show-inheritance:
 
-OpenCast.infra.io.facade module
--------------------------------
+OpenCast.infra.io.error module
+------------------------------
 
-.. automodule:: OpenCast.infra.io.facade
+.. automodule:: OpenCast.infra.io.error
    :members:
    :undoc-members:
    :show-inheritance:

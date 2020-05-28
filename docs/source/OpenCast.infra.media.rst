@@ -12,14 +12,6 @@ OpenCast.infra.media.error module
    :undoc-members:
    :show-inheritance:
 
-OpenCast.infra.media.facade module
-----------------------------------
-
-.. automodule:: OpenCast.infra.media.facade
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 OpenCast.infra.media.factory module
 -----------------------------------
 

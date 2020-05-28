@@ -4,6 +4,14 @@ OpenCast.app.workflow package
 Submodules
 ----------
 
+OpenCast.app.workflow.factory module
+------------------------------------
+
+.. automodule:: OpenCast.app.workflow.factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 OpenCast.app.workflow.player module
 -----------------------------------
 

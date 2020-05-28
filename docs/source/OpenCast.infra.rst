@@ -13,6 +13,18 @@ Subpackages
    OpenCast.infra.log
    OpenCast.infra.media
 
+Submodules
+----------
+
+OpenCast.infra.facade module
+----------------------------
+
+.. automodule:: OpenCast.infra.facade
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Module contents
 ---------------
 

@@ -4,6 +4,14 @@ OpenCast.app.service package
 Submodules
 ----------
 
+OpenCast.app.service.error module
+---------------------------------
+
+.. automodule:: OpenCast.app.service.error
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 OpenCast.app.service.module module
 ----------------------------------
 

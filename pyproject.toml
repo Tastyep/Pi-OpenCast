@@ -26,6 +26,7 @@ transitions = "^0.8.1"
 structlog = "^20.1.0"
 colorama = "^0.4.3"
 sphinx = "^3.0.3"
+sphinx_rtd_theme = "^0.4.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
