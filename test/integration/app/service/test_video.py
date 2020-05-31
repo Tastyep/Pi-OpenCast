@@ -20,7 +20,7 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader = Mock()
         self.ffmpeg_wrapper = Mock()
         self.io_factory = self.infra_facade.io_factory
-        self.io_factory.make_video_downloader.return_value = self.downloader
+        self.io_factory.make_downloader.return_value = self.downloader
         self.io_factory.make_ffmpeg_wrapper.return_value = self.ffmpeg_wrapper
 
         self.service = VideoService(
@@ -56,7 +56,7 @@ class VideoServiceTest(ServiceTestCase):
         self.data_producer.video("source", None).populate(self.data_facade)
 
         title = "video_title"
-        self.downloader.fetch_metadata.return_value = {"title": title}
+        self.downloader.pick_stream_metadata.return_value = {"title": title}
 
         video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(Evt.VideoIdentified, title).from_(
@@ -73,7 +73,7 @@ class VideoServiceTest(ServiceTestCase):
         def dispatch_downloaded(op_id, *args):
             self.app_facade.evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
-        self.downloader.download.side_effect = dispatch_downloaded
+        self.downloader.download_video.side_effect = dispatch_downloaded
         output_dir = config["downloader.output_directory"]
         path = Path(output_dir) / f"{video_title}.mp4"
         self.evt_expecter.expect(Evt.VideoRetrieved, path).from_(
@@ -92,7 +92,7 @@ class VideoServiceTest(ServiceTestCase):
                 DownloadError(op_id, "Download error")
             )
 
-        self.downloader.download.side_effect = dispatch_error
+        self.downloader.download_video.side_effect = dispatch_error
         output_dir = config["downloader.output_directory"]
         self.evt_expecter.expect(OperationError, "Download error").from_(
             Cmd.RetrieveVideo, video_id, output_dir

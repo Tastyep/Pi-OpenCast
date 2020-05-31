@@ -13,7 +13,7 @@ class VideoService(Service):
         logger = structlog.get_logger(__name__)
         super(VideoService, self).__init__(app_facade, logger, self, video_cmds)
         self._video_repo = data_facade.video_repo
-        self._downloader = io_factory.make_video_downloader(app_facade.evt_dispatcher)
+        self._downloader = io_factory.make_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(self._downloader)
         self._subtitle_service = service_factory.make_subtitle_service(
             io_factory.make_ffmpeg_wrapper()
@@ -41,7 +41,7 @@ class VideoService(Service):
             ctx.update(video)
 
         video = self._video_repo.get(cmd.model_id)
-        metadata = self._source_service.fetch_metadata(video)
+        metadata = self._source_service.pick_stream_metadata(video)
         if metadata is None:
             self._abort_operation(cmd, "can't fetch metadata")
             return
@@ -73,7 +73,7 @@ class VideoService(Service):
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
             times=1,
         )
-        self._downloader.download(cmd.id, video)
+        self._downloader.download_video(cmd.id, video)
 
     def _fetch_video_subtitle(self, cmd):
         def impl(ctx):

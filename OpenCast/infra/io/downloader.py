@@ -6,7 +6,7 @@ from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 from .download_logger import DownloadLogger
 
 
-class VideoDownloader:
+class Downloader:
     def __init__(self, executor, evt_dispatcher):
         self._executor = executor
         self._evt_dispatcher = evt_dispatcher
@@ -14,7 +14,7 @@ class VideoDownloader:
         self._dl_logger = DownloadLogger(self._logger)
         self._log_debug = False  # self._dl_logger.is_enabled_for(logging.DEBUG)
 
-    def download(self, op_id, video):
+    def download_video(self, op_id, video):
         def impl():
             self._logger.debug("Downloading", video=video)
             options = {
@@ -42,11 +42,11 @@ class VideoDownloader:
         self._logger.debug("Queing", video=video)
         self._executor.submit(impl)
 
-    def fetch_metadata(self, url, fields):
+    def pick_stream_metadata(self, url, fields):
         options = {
             "noplaylist": True,
         }
-        data = self._fetch_metadata(url, options)
+        data = self._download_stream_metadata(url, options)
         if data is None:
             return None
         return {k: data[k] for k in fields}
@@ -56,7 +56,7 @@ class VideoDownloader:
             "extract_flat": "in_playlist",
         }
         # Download the playlist data without downloading the videos.
-        data = self._fetch_metadata(url, options)
+        data = self._download_stream_metadata(url, options)
         if data is None:
             return []
 
@@ -65,7 +65,7 @@ class VideoDownloader:
         urls = [base_url + "/watch?v=" + entry["id"] for entry in data["entries"]]
         return urls
 
-    def _fetch_metadata(self, url, options):
+    def _download_stream_metadata(self, url, options):
         self._logger.debug("Fetching metadata", url=url)
         options.update(
             {
