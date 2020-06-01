@@ -1,3 +1,5 @@
+from typing import List
+
 import youtube_dl
 
 import structlog
@@ -14,33 +16,59 @@ class Downloader:
         self._dl_logger = DownloadLogger(self._logger)
         self._log_debug = False  # self._dl_logger.is_enabled_for(logging.DEBUG)
 
-    def download_video(self, op_id, video):
+    def download_video(self, op_id, source: str, dest: str):
         def impl():
-            self._logger.debug("Downloading", video=video)
+            self._logger.debug("Downloading", video=dest)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
                 "bestvideo+bestaudio/best",
                 "debug_printtraffic": self._log_debug,
                 "noplaylist": True,
                 "merge_output_format": "mp4",
-                "outtmpl": str(video.path),
+                "outtmpl": dest,
                 "quiet": True,
-                "progress_hooks": [self._dl_logger.log_progress],
+                "progress_hooks": [self._dl_logger.log_download_progress],
             }
             ydl = youtube_dl.YoutubeDL(options)
             with ydl:  # Download the video
                 try:
-                    ydl.download([video.source])
+                    ydl.download([source])
                 except Exception as e:
-                    self._logger.error("Download error", video=video, error=e)
+                    self._logger.error(
+                        "Download error", video=dest, source=source, error=e
+                    )
                     self._evt_dispatcher.dispatch(DownloadError(op_id, str(e)))
                     return
 
-            self._logger.debug("Download success", video=video)
+            self._logger.debug("Download success", video=dest)
             self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
-        self._logger.debug("Queing", video=video)
+        self._logger.debug("Queing", video=dest)
         self._executor.submit(impl)
+
+    def download_subtitle(self, url: str, dest: str, lang: str, exts: List[str]):
+        self._logger.debug("Downloading subtitle", subtitle=dest, lang=lang)
+
+        for ext in exts:
+            options = {
+                "skip_download": True,
+                "subtitleslangs": [lang],
+                "subtitlesformat": ext,
+                "writeautomaticsub": True,
+                "outtmpl": dest,
+                "progress_hooks": [self._dl_logger.log_download_progress],
+                "quiet": True,
+            }
+            ydl = youtube_dl.YoutubeDL(options)
+            with ydl:
+                try:
+                    ydl.download([url])
+                    return f"{dest}.{lang}.{ext}"
+                except Exception as e:
+                    self._logger.error(
+                        "Subtitle download error", subtitle=dest, ext=ext, error=e
+                    )
+        return None
 
     def pick_stream_metadata(self, url, fields):
         options = {
@@ -72,7 +100,7 @@ class Downloader:
                 "ignoreerrors": True,  # Causes ydl to return None on error
                 "debug_printtraffic": self._log_debug,
                 "quiet": True,
-                "progress_hooks": [self._dl_logger.log_progress],
+                "progress_hooks": [self._dl_logger.log_download_progress],
             }
         )
         ydl = youtube_dl.YoutubeDL(options)
