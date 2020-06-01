@@ -22,7 +22,8 @@ class ServiceTestCase(TestCase):
         repo_factory = RepoFactory()
         self.data_facade = DataFacade(repo_factory)
 
-        self.service_factory = ServiceFactory()
+        infraServiceFactory = Mock()
+        self.service_factory = ServiceFactory(infraServiceFactory)
 
         self.infra_facade = InfraFacadeMock()
         self.evt_expecter = EventExpecter(

@@ -20,7 +20,7 @@ class PlayerMonitController(Controller):
         super(PlayerMonitController, self).__init__(app_facade)
 
         self._source_service = service_factory.make_source_service(
-            infra_facade.io_factory.make_video_downloader(app_facade.evt_dispatcher)
+            infra_facade.io_factory.make_downloader(app_facade.evt_dispatcher)
         )
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo

@@ -9,7 +9,7 @@ class DownloadLogger:
         return False
         # return self._logger.isEnabledFor(level)
 
-    def log_progress(self, d):
+    def log_download_progress(self, d):
         status = d.get("status", "N/A")
         if status not in ["downloading", "error", "finished"]:
             return
