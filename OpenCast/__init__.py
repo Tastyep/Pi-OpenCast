@@ -15,6 +15,7 @@ from .infra.facade import InfraFacade
 from .infra.io.factory import IoFactory
 from .infra.log.module import init as init_logging
 from .infra.media.factory import MediaFactory
+from .infra.service.factory import ServiceFactory as InfraServiceFactory
 
 
 def main(argv=None):
@@ -35,7 +36,8 @@ def main(argv=None):
     app_executor = ThreadPoolExecutor(max_workers=1)
     app_facade = AppFacade(app_executor)
 
-    service_factory = ServiceFactory()
+    infra_service_factory = InfraServiceFactory()
+    service_factory = ServiceFactory(infra_service_factory)
 
     repo_factory = RepoFactory()
     data_facade = DataFacade(repo_factory)
