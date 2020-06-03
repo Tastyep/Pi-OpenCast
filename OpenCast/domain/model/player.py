@@ -68,13 +68,15 @@ class Player(Entity):
 
     def next_video(self):
         if self._index + 1 >= len(self._queue):
-            if config["player.loop_last"] is True:
+            if self._queue and config["player.loop_last"] is True:
                 return self._queue[self._index]
             return None
 
         return self._queue[self._index + 1]
 
     def prev_video(self):
+        if not self._queue:
+            return None
         if self._index == 0:
             return self._queue[0]
         return self._queue[self._index - 1]
