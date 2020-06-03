@@ -16,17 +16,16 @@ keywords = ['raspberry', 'opencast', 'chromecast']
 python = "^3.7"
 toml = "^0.9"
 bottle = "^0.12.18"
-omxplayer-wrapper = "^0.3.3"
 youtube-dl = ">= 2020.3.24"
 pyyaml = "^5.3.1"
 "hurry.filesize" = "^0.9"
-psutil = "^5.7.0"
 ffmpeg-python = "^0.2.0"
 transitions = "^0.8.1"
 structlog = "^20.1.0"
 colorama = "^0.4.3"
 sphinx = "^3.0.3"
 sphinx_rtd_theme = "^0.4.3"
+python-vlc = "^3.0.9113"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

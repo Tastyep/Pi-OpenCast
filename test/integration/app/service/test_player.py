@@ -1,4 +1,3 @@
-from test.shared.infra.media.player_mock import make_player_mock
 from unittest.mock import Mock
 
 from OpenCast.app.command import player as Cmd
@@ -14,7 +13,7 @@ class PlayerServiceTest(ServiceTestCase):
     def setUp(self):
         super(PlayerServiceTest, self).setUp()
 
-        self.player = make_player_mock(self.app_facade.evt_dispatcher)
+        self.player = Mock()
         media_factory = self.infra_facade.media_factory
         media_factory.make_player = Mock(return_value=self.player)
 
@@ -82,9 +81,9 @@ class PlayerServiceTest(ServiceTestCase):
         ).populate(self.data_facade)
 
         next_video_id = IdentityService.id_video("source2")
-        self.evt_expecter.expect(Evt.PlayerStopped).expect(
-            Evt.PlayerStarted, next_video_id
-        ).from_(Cmd.NextVideo, self.player_id)
+        self.evt_expecter.expect(Evt.PlayerStarted, next_video_id).from_(
+            Cmd.NextVideo, self.player_id
+        )
 
     def test_prev_video(self):
         self.data_producer.player().video("source", None).video(
@@ -92,9 +91,9 @@ class PlayerServiceTest(ServiceTestCase):
         ).play().populate(self.data_facade)
 
         prev_video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.PlayerStopped).expect(
-            Evt.PlayerStarted, prev_video_id
-        ).from_(Cmd.PrevVideo, self.player_id)
+        self.evt_expecter.expect(Evt.PlayerStarted, prev_video_id).from_(
+            Cmd.PrevVideo, self.player_id
+        )
 
     def test_toggle_subtitle(self):
         self.data_producer.player().populate(self.data_facade)

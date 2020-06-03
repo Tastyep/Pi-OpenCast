@@ -1,130 +1,64 @@
 from threading import Lock
-
-import psutil
+from uuid import UUID
 
 import OpenCast.infra.event.player as e
 import structlog
-from omxplayer import keys
-from OpenCast.config import config
-
-from .error import PlayerError
+import vlc
 
 
-# OmxPlayer documentation: https://elinux.org/Omxplayer
 class PlayerWrapper:
-    def __init__(self, player_factory, evt_dispatcher):
+    def __init__(self, evt_dispatcher):
         self._logger = structlog.get_logger(__name__)
-        self._player_factory = player_factory
         self._evt_dispatcher = evt_dispatcher
-        self._player = None
-        self._player_lock = Lock()
+
+        self._instance = vlc.Instance()
+        self._player = self._instance.media_player_new()
+        # self._list_player = self._instance.media_list_player_new()
+        # self._list_player.set_media_player(self._player)
+        # self._playlist = self._instance.media_list_new()
+        # self._list_player.set_media_list(self._playlist)
+        self._id_to_media = {}
+
+        self._lock = Lock()
         self._stop_operation_id = None
 
-    def play(self, video, volume):
-        command = ["--vol", self._downscale(volume)]
-        if config["player.hide_background"] is True:
-            command += ["--blank"]
+        player_events = self._player.event_manager()
+        player_events.event_attach(
+            vlc.EventType.MediaPlayerEndReached, self._on_media_end
+        )
 
-        if video.subtitle is not None:
-            command += ["--subtitles", video.subtitle]
+    def play(self, video_id: UUID, video_path: str):
+        media = self._id_to_media.get(video_id, None)
+        if media is None:
+            media = self._instance.media_new(video_path)
+            self._id_to_media[video_id] = media
+        print(f"Play video {video_id}")
+        self._player.set_media(media)
+        self._player.play()
 
-        def start_player():
-            self._logger.debug("Opening video", video=video, opt=command)
-            try:
-                self._player = self._player_factory(
-                    video.path,
-                    command,
-                    "org.mpris.MediaPlayer2.omxplayer1",
-                    self._on_exit,
-                )
-                return True
-            except SystemError:
-                self._logger.error("Dbus error", error="Couldn't connect")
-                # Kill instance if it is a dbus problem
-                for proc in psutil.process_iter():
-                    if "omxplayer" in proc.name():
-                        self._logger.debug(f"Killing process", process=proc.name())
-                        proc.kill()
-                return False
-
-        player_started = False
-        with self._player_lock:
-            for _ in range(5):
-                player_started = start_player()
-                if player_started:
-                    break
-
-        if not player_started:
-            raise PlayerError("error starting the player")
-
-    def stop(self, op_id):
-        def impl():
-            self._stop_operation_id = op_id
-            self._player.stop()
-            # Event is dispatched from _on_exit
-
-        self._exec_command(impl)
+    def stop(self):
+        self._player.stop()
 
     def pause(self):
-        def impl():
-            self._player.play_pause()
-
-        self._exec_command(impl)
+        self._player.pause()
 
     def unpause(self):
-        def impl():
-            self._player.play_pause()
+        self._player.pause()
 
-        self._exec_command(impl)
+    def toggle_subtitle(self):
+        self._player.toggle_teletext()
 
-    def update_subtitle_state(self, state):
-        def impl():
-            if state is True:
-                self._player.show_subtitles()
-            else:
-                self._player.hide_subtitles()
-
-        self._exec_command(impl)
-
-    def increase_subtitle_delay(self):
-        def impl():
-            self._player.action(keys.INCREASE_SUBTITLE_DELAY)
-
-        self._exec_command(impl)
-
-    def decrease_subtitle_delay(self):
-        def impl():
-            self._player.action(keys.DECREASE_SUBTITLE_DELAY)
-
-        self._exec_command(impl)
+    def set_subtitle_delay(self, delay: int):
+        self._player.video_set_spu_delay(delay)
 
     def set_volume(self, volume):
-        def impl():
-            self._player.set_volume(self._downscale(volume))
-
-        self._exec_command(impl)
+        self._player.audio_set_volume(volume)
 
     def seek(self, duration):
-        def impl():
-            self._player.seek(duration)
+        current_time = self._player.get_time()
+        if current_time != -1:
+            self._player.set_time(current_time + duration)
 
-        self._exec_command(impl)
-
-    def _downscale(self, volume):
-        return volume / 100
-
-    def _exec_command(self, command):
-        with self._player_lock:
-            if self._player is None:
-                raise PlayerError("the player is not started")
-            command()
-
-    def _dispatch(self, event):
-        self._evt_dispatcher.dispatch(event)
-
-    def _on_exit(self, player, code):
-        with self._player_lock:
-            evt = e.PlayerStopped(self._stop_operation_id)
-            self._stop_operation_id = None
-            self._player = None
-        self._dispatch(evt)
+    def _on_media_end(self, event):
+        evt = e.MediaEndReached(None)
+        self._evt_dispatcher.dispatch(evt)
