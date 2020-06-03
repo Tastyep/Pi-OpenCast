@@ -22,7 +22,7 @@ class PlayerController(Controller):
         model = self._player_repo.get_player()
         video = model.next_video()
         if video is None:
-            self._dispatch(Cmd.StopVideo)
+            self._dispatch(Cmd.StopPlayer)
         else:
             self._dispatch(Cmd.PlayVideo, video.id)
 

@@ -41,12 +41,14 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.QueueVideo, self.player_id, video_id
         )
 
-    def test_stop_video(self):
+    def test_stop_player(self):
         self.data_producer.player().video("source", None).play().populate(
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.PlayerStopped).from_(Cmd.StopVideo, self.player_id)
+        self.evt_expecter.expect(Evt.PlayerStopped).from_(
+            Cmd.StopPlayer, self.player_id
+        )
 
     def test_pause_video(self):
         self.data_producer.player().video("source", None).play().populate(

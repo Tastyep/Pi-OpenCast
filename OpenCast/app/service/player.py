@@ -29,7 +29,7 @@ class PlayerService(Service):
         video = self._video_repo.get(cmd.video_id)
         self._queue_video_impl(cmd.id, video)
 
-    def _stop_video(self, cmd):
+    def _stop_player(self, cmd):
         def stop_video(model):
             model.stop()
             self._player.stop()

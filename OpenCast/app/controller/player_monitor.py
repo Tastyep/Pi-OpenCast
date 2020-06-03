@@ -80,7 +80,7 @@ class PlayerMonitController(Controller):
         if control == "pause":
             self._dispatch(Cmd.ToggleVideoState)
         elif control == "stop":
-            self._dispatch(Cmd.StopVideo)
+            self._dispatch(Cmd.StopPlayer)
         elif control == "right":
             self._dispatch(Cmd.SeekVideo, Player.SHORT_TIME_STEP)
         elif control == "left":
