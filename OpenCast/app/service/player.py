@@ -15,24 +15,6 @@ class PlayerService(Service):
         self._video_repo = data_facade.video_repo
         self._player = media_factory.make_player(app_facade.evt_dispatcher)
 
-    # Infra event handler interface implementation
-
-    def _player_stopped(self, evt):
-        def stop_player(model):
-            model.stop()
-
-        def play_next(model):
-            video = model.next_video()
-            if video is not None:
-                self._player.play(video, model.volume)
-                model.play(video)
-
-        self._update(evt.id, stop_player)
-        if evt.id is not None:
-            return
-
-        self._update(evt.id, play_next)
-
     # Command handler interface implementation
 
     def _play_video(self, cmd):
