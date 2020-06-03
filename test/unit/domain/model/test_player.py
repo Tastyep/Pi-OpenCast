@@ -20,7 +20,7 @@ class PlayerTest(ModelTestCase):
         return Video(IdentityService.id_video(source), source, None)
 
     def test_construction(self):
-        self.assertEqual(100, self.player.volume)
+        self.assertEqual(70, self.player.volume)
         self.assertFalse(self.player.subtitle_state)
         self.assertEqual(0, self.player.subtitle_delay)
         self.assertEqual(PlayerState.STOPPED, self.player.state)

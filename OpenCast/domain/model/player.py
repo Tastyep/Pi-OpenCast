@@ -20,7 +20,7 @@ class Player(Entity):
         self._index = 0
         self._sub_state = False
         self._sub_delay = 0
-        self._volume = 100
+        self._volume = 70
 
     def __repr__(self):
         base_repr = super(Player, self).__repr__()
@@ -115,4 +115,4 @@ class Player(Entity):
     @volume.setter
     def volume(self, v):
         self._volume = max(min(200, v), 0)
-        self._record(Evt.VolumeUpdated)
+        self._record(Evt.VolumeUpdated, self._volume)

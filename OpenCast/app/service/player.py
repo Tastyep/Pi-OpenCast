@@ -15,6 +15,9 @@ class PlayerService(Service):
         self._video_repo = data_facade.video_repo
         self._player = media_factory.make_player(app_facade.evt_dispatcher)
 
+        model = self._player_model()
+        self._player.set_volume(model.volume)
+
     # Command handler interface implementation
 
     def _play_video(self, cmd):

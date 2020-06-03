@@ -17,13 +17,13 @@ class PlayerServiceTest(ServiceTestCase):
         media_factory = self.infra_facade.media_factory
         media_factory.make_player = Mock(return_value=self.player)
 
+        self.data_producer.player().populate(self.data_facade)
         self.service = PlayerService(self.app_facade, self.data_facade, media_factory)
 
         self.player_repo = self.data_facade.player_repo
         self.video_repo = self.data_facade.video_repo
 
         self.player_id = IdentityService.id_player()
-        self.data_producer.player().populate(self.data_facade)
 
     def test_play_video(self):
         self.data_producer.video("source", None).populate(self.data_facade)
@@ -71,9 +71,10 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.VolumeUpdated).from_(
-            Cmd.ChangeVolume, self.player_id, Player.VOLUME_STEP
-        )
+        player = self.player_repo.get_player()
+        self.evt_expecter.expect(
+            Evt.VolumeUpdated, player.volume + Player.VOLUME_STEP
+        ).from_(Cmd.ChangeVolume, self.player_id, Player.VOLUME_STEP)
 
     def test_next_video(self):
         self.data_producer.player().video("source", None).play().video(
@@ -96,21 +97,21 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
     def test_toggle_subtitle(self):
-        self.data_producer.player().populate(self.data_facade)
+        self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleStateUpdated).from_(
             Cmd.ToggleSubtitle, self.player_id
         )
 
     def test_increase_subtitle_delay(self):
-        self.data_producer.player().populate(self.data_facade)
+        self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleDelayUpdated).from_(
             Cmd.IncreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
         )
 
     def test_decrease_subtitle_delay(self):
-        self.data_producer.player().populate(self.data_facade)
+        self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleDelayUpdated).from_(
             Cmd.DecreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
