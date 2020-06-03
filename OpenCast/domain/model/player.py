@@ -10,6 +10,8 @@ from .video import Video
 class Player(Entity):
     VOLUME_STEP = 10
     SUBTITLE_DELAY_STEP = 100
+    SHORT_TIME_STEP = 1000
+    LONG_TIME_STEP = 30000
 
     def __init__(self, id_):
         super(Player, self).__init__(id_)

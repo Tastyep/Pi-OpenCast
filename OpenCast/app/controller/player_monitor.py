@@ -82,13 +82,13 @@ class PlayerMonitController(Controller):
         elif control == "stop":
             self._dispatch(Cmd.StopVideo)
         elif control == "right":
-            self._dispatch(Cmd.SeekVideo, 30)
+            self._dispatch(Cmd.SeekVideo, Player.SHORT_TIME_STEP)
         elif control == "left":
-            self._dispatch(Cmd.SeekVideo, -30)
+            self._dispatch(Cmd.SeekVideo, -Player.SHORT_TIME_STEP)
         elif control == "longright":
-            self._dispatch(Cmd.SeekVideo, 300)
+            self._dispatch(Cmd.SeekVideo, Player.LONG_TIME_STEP)
         elif control == "longleft":
-            self._dispatch(Cmd.SeekVideo, -300)
+            self._dispatch(Cmd.SeekVideo, -Player.LONG_TIME_STEP)
         elif control == "prev":
             self._dispatch(Cmd.PrevVideo)
         elif control == "next":
@@ -100,9 +100,9 @@ class PlayerMonitController(Controller):
 
     def _sound(self):
         if request.query["vol"] == "more":
-            self._dispatcher(Cmd.ChangeVolume, Player.VOLUME_STEP)
+            self._dispatch(Cmd.ChangeVolume, Player.VOLUME_STEP)
         else:
-            self._dispatcher(Cmd.ChangeVolume, -Player.VOLUME_STEP)
+            self._dispatch(Cmd.ChangeVolume, -Player.VOLUME_STEP)
         return "1"
 
     def _subtitle(self):
