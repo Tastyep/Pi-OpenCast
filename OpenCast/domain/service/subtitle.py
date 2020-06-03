@@ -4,9 +4,8 @@ import structlog
 
 
 class SubtitleService:
-    def __init__(self, subtitle_converter, ffmpeg_wrapper, downloader):
+    def __init__(self, ffmpeg_wrapper, downloader):
         self._logger = structlog.get_logger(__name__)
-        self._subtitle_converter = subtitle_converter
         self._ffmpeg_wrapper = ffmpeg_wrapper
         self._downloader = downloader
 
@@ -52,13 +51,7 @@ class SubtitleService:
                 and stream["tags"]["language"] == language
             ):
                 self._logger.debug(f"Match: {subtitle}")
-                if self._ffmpeg_wrapper.extract_stream(
-                    src=video_path,
-                    dest=subtitle,
-                    stream_idx=stream["index"],
-                    override=False,
-                ):
-                    return subtitle
+                return subtitle
         return None
 
     def _download_from_source(
@@ -68,7 +61,4 @@ class SubtitleService:
         subtitle = self._downloader.download_subtitle(
             video_source, dest, language, ["vtt"]
         )
-        if subtitle is None or Path(subtitle).suffix == "srt":
-            return subtitle
-
-        return self._subtitle_converter.vtt_to_srt(Path(subtitle))
+        return subtitle
