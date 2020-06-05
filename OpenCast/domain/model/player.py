@@ -18,7 +18,7 @@ class Player(Entity):
         self._state = PlayerState.STOPPED
         self._queue = []
         self._index = 0
-        self._sub_state = False
+        self._sub_state = True
         self._sub_delay = 0
         self._volume = 70
 

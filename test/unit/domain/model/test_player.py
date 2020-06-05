@@ -21,7 +21,7 @@ class PlayerTest(ModelTestCase):
 
     def test_construction(self):
         self.assertEqual(70, self.player.volume)
-        self.assertFalse(self.player.subtitle_state)
+        self.assertTrue(self.player.subtitle_state)
         self.assertEqual(0, self.player.subtitle_delay)
         self.assertEqual(PlayerState.STOPPED, self.player.state)
 

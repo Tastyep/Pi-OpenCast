@@ -179,7 +179,7 @@ config = Config({
         "max_concurrency": 3
     },
     "subtitle": {
-        "language": "en"
+        "language": "eng"
     }
 }, check_env=True)
 # fmt: on
