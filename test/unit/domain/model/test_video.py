@@ -11,6 +11,7 @@ class VideoTest(ModelTestCase):
         self.assertEqual("source", video.source)
         self.assertEqual(None, video.title)
         self.assertEqual(None, video.path)
+        self.assertEqual(None, video.streams)
         self.assertEqual(None, video.subtitle)
         self.expect_events(video, Evt.VideoCreated)
 
@@ -29,6 +30,11 @@ class VideoTest(ModelTestCase):
         video = self.make_video()
         video.path = "/tmp"
         self.expect_events(video, Evt.VideoRetrieved)
+
+    def test_parse(self):
+        video = self.make_video()
+        video.streams = {}
+        self.expect_events(video, Evt.VideoParsed)
 
     def test_set_subtitles(self):
         video = self.make_video()

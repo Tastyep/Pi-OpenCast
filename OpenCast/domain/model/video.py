@@ -1,8 +1,17 @@
+from dataclasses import dataclass
 from pathlib import Path
+from typing import List
 
 from OpenCast.domain.event import video as Evt
 
 from .entity import Entity
+
+
+@dataclass
+class Stream:
+    index: int
+    type: str
+    language: str
 
 
 class Video(Entity):
@@ -12,6 +21,7 @@ class Video(Entity):
         self._playlist_id = playlist_id
         self._title = None
         self._path = None
+        self._streams = None
         self._subtitle = None
 
         self._record(Evt.VideoCreated, self._source, self._playlist_id)
@@ -37,6 +47,10 @@ class Video(Entity):
         return self._playlist_id
 
     @property
+    def streams(self):
+        return self._streams
+
+    @property
     def subtitle(self):
         return self._subtitle
 
@@ -54,6 +68,11 @@ class Video(Entity):
         self._path = path
         self._record(Evt.VideoRetrieved, self._path)
 
+    @streams.setter
+    def streams(self, streams: List[Stream]):
+        self._streams = streams
+        self._record(Evt.VideoParsed, self._streams)
+
     @subtitle.setter
     def subtitle(self, subtitle: str):
         self._subtitle = subtitle
@@ -61,6 +80,16 @@ class Video(Entity):
 
     def from_disk(self):
         return Path(self._source).is_file()
+
+    def stream(self, type: str, language: str):
+        return next(
+            (
+                stream
+                for stream in self._streams
+                if stream.type == type and stream.language == language
+            ),
+            None,
+        )
 
     def delete(self):
         self._record(Evt.VideoDeleted)
