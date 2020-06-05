@@ -21,7 +21,7 @@ class Video(Entity):
         self._playlist_id = playlist_id
         self._title = None
         self._path = None
-        self._streams = None
+        self._streams = []
         self._subtitle = None
 
         self._record(Evt.VideoCreated, self._source, self._playlist_id)

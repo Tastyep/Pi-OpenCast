@@ -11,7 +11,7 @@ class VideoTest(ModelTestCase):
         self.assertEqual("source", video.source)
         self.assertEqual(None, video.title)
         self.assertEqual(None, video.path)
-        self.assertEqual(None, video.streams)
+        self.assertEqual([], video.streams)
         self.assertEqual(None, video.subtitle)
         self.expect_events(video, Evt.VideoCreated)
 
