@@ -1,6 +1,7 @@
 from typing import List
 
-import youtube_dl
+from youtube_dl import YoutubeDL
+from youtube_dl.utils import ISO639Utils
 
 import structlog
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
@@ -29,7 +30,7 @@ class Downloader:
                 "quiet": True,
                 "progress_hooks": [self._dl_logger.log_download_progress],
             }
-            ydl = youtube_dl.YoutubeDL(options)
+            ydl = YoutubeDL(options)
             with ydl:  # Download the video
                 try:
                     ydl.download([source])
@@ -49,6 +50,7 @@ class Downloader:
     def download_subtitle(self, url: str, dest: str, lang: str, exts: List[str]):
         self._logger.debug("Downloading subtitle", subtitle=dest, lang=lang)
 
+        lang = ISO639Utils.long2short(lang)
         for ext in exts:
             options = {
                 "skip_download": True,
@@ -59,7 +61,7 @@ class Downloader:
                 "progress_hooks": [self._dl_logger.log_download_progress],
                 "quiet": True,
             }
-            ydl = youtube_dl.YoutubeDL(options)
+            ydl = YoutubeDL(options)
             with ydl:
                 try:
                     ydl.download([url])
@@ -103,7 +105,7 @@ class Downloader:
                 "progress_hooks": [self._dl_logger.log_download_progress],
             }
         )
-        ydl = youtube_dl.YoutubeDL(options)
+        ydl = YoutubeDL(options)
         with ydl:
             try:
                 return ydl.extract_info(url, download=False)
