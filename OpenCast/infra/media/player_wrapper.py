@@ -7,32 +7,26 @@ import vlc
 
 
 class PlayerWrapper:
-    def __init__(self, evt_dispatcher):
+    def __init__(self, vlc_instance, evt_dispatcher):
         self._logger = structlog.get_logger(__name__)
+
+        self._instance = vlc_instance
         self._evt_dispatcher = evt_dispatcher
 
-        self._instance = vlc.Instance()
         self._player = self._instance.media_player_new()
-        # self._list_player = self._instance.media_list_player_new()
-        # self._list_player.set_media_player(self._player)
-        # self._playlist = self._instance.media_list_new()
-        # self._list_player.set_media_list(self._playlist)
         self._id_to_media = {}
 
         self._lock = Lock()
         self._stop_operation_id = None
 
         player_events = self._player.event_manager()
-        player_events.event_attach(
-            vlc.EventType.MediaPlayerEndReached, self._on_media_end
-        )
+        player_events.event_attach(EventType.MediaPlayerEndReached, self._on_media_end)
 
     def play(self, video_id: UUID, video_path: str):
         media = self._id_to_media.get(video_id, None)
         if media is None:
             media = self._instance.media_new(video_path)
             self._id_to_media[video_id] = media
-        print(f"Play video {video_id}")
         self._player.set_media(media)
         self._player.play()
 
