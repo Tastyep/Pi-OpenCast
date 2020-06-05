@@ -1,4 +1,3 @@
-from test.shared.infra.media.player_mock import make_player_mock
 from unittest.mock import Mock
 
 from OpenCast.app.command import player as Cmd
@@ -14,17 +13,17 @@ class PlayerServiceTest(ServiceTestCase):
     def setUp(self):
         super(PlayerServiceTest, self).setUp()
 
-        self.player = make_player_mock(self.app_facade.evt_dispatcher)
+        self.player = Mock()
         media_factory = self.infra_facade.media_factory
         media_factory.make_player = Mock(return_value=self.player)
 
+        self.data_producer.player().populate(self.data_facade)
         self.service = PlayerService(self.app_facade, self.data_facade, media_factory)
 
         self.player_repo = self.data_facade.player_repo
         self.video_repo = self.data_facade.video_repo
 
         self.player_id = IdentityService.id_player()
-        self.data_producer.player().populate(self.data_facade)
 
     def test_play_video(self):
         self.data_producer.video("source", None).populate(self.data_facade)
@@ -42,12 +41,14 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.QueueVideo, self.player_id, video_id
         )
 
-    def test_stop_video(self):
+    def test_stop_player(self):
         self.data_producer.player().video("source", None).play().populate(
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.PlayerStopped).from_(Cmd.StopVideo, self.player_id)
+        self.evt_expecter.expect(Evt.PlayerStopped).from_(
+            Cmd.StopPlayer, self.player_id
+        )
 
     def test_pause_video(self):
         self.data_producer.player().video("source", None).play().populate(
@@ -72,9 +73,10 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.VolumeUpdated).from_(
-            Cmd.ChangeVolume, self.player_id, Player.VOLUME_STEP
-        )
+        player = self.player_repo.get_player()
+        self.evt_expecter.expect(
+            Evt.VolumeUpdated, player.volume + Player.VOLUME_STEP
+        ).from_(Cmd.ChangeVolume, self.player_id, Player.VOLUME_STEP)
 
     def test_next_video(self):
         self.data_producer.player().video("source", None).play().video(
@@ -82,9 +84,9 @@ class PlayerServiceTest(ServiceTestCase):
         ).populate(self.data_facade)
 
         next_video_id = IdentityService.id_video("source2")
-        self.evt_expecter.expect(Evt.PlayerStopped).expect(
-            Evt.PlayerStarted, next_video_id
-        ).from_(Cmd.NextVideo, self.player_id)
+        self.evt_expecter.expect(Evt.PlayerStarted, next_video_id).from_(
+            Cmd.NextVideo, self.player_id
+        )
 
     def test_prev_video(self):
         self.data_producer.player().video("source", None).video(
@@ -92,26 +94,26 @@ class PlayerServiceTest(ServiceTestCase):
         ).play().populate(self.data_facade)
 
         prev_video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.PlayerStopped).expect(
-            Evt.PlayerStarted, prev_video_id
-        ).from_(Cmd.PrevVideo, self.player_id)
+        self.evt_expecter.expect(Evt.PlayerStarted, prev_video_id).from_(
+            Cmd.PrevVideo, self.player_id
+        )
 
     def test_toggle_subtitle(self):
-        self.data_producer.player().populate(self.data_facade)
+        self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleStateUpdated).from_(
             Cmd.ToggleSubtitle, self.player_id
         )
 
     def test_increase_subtitle_delay(self):
-        self.data_producer.player().populate(self.data_facade)
+        self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleDelayUpdated).from_(
             Cmd.IncreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
         )
 
     def test_decrease_subtitle_delay(self):
-        self.data_producer.player().populate(self.data_facade)
+        self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleDelayUpdated).from_(
             Cmd.DecreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP

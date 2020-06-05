@@ -1,4 +1,7 @@
+import inspect
+
 from OpenCast.domain.service.identity import IdentityService
+from OpenCast.util.naming import name_handler_method
 
 
 class Controller:
@@ -10,6 +13,13 @@ class Controller:
     def _dispatch(self, cmd_cls, component_id, *args, **kwargs):
         cmd_id = IdentityService.id_command(cmd_cls, component_id)
         self._cmd_dispatcher.dispatch(cmd_cls(cmd_id, component_id, *args, **kwargs))
+
+    def _observe(self, module):
+        classes = inspect.getmembers(module, inspect.isclass)
+        for _, cls in classes:
+            if cls.__module__ == module.__name__:
+                handler_name = name_handler_method(cls)
+                self._evt_dispatcher.observe(None, {cls: getattr(self, handler_name)})
 
     def _start_workflow(self, workflow_cls, resource_id, *args, **kwargs):
         workflow_id = IdentityService.id_workflow(workflow_cls, resource_id)

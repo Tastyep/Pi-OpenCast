@@ -1,4 +1,5 @@
 import inspect
+import traceback
 from functools import partial
 
 from OpenCast.infra.data.repo.error import RepoError
@@ -40,7 +41,12 @@ class Service:
                 self._logger.error("Repo error", cmd=cmd, error=e)
                 retry_count -= 1
             except Exception as e:
-                self._logger.error("Operation error", cmd=cmd, error=e)
+                self._logger.error(
+                    "Operation error",
+                    cmd=cmd,
+                    error=e,
+                    traceback=traceback.format_exc(),
+                )
                 self._abort_operation(cmd, str(e))
                 return
 

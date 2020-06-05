@@ -25,5 +25,10 @@ class RetrieveVideo(Command):
 
 
 @command
+class ParseVideo(Command):
+    pass
+
+
+@command
 class FetchVideoSubtitle(Command):
     language: str

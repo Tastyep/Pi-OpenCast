@@ -3,6 +3,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 import structlog
+from vlc import Instance as VlcInstance
 
 from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
@@ -15,6 +16,7 @@ from .infra.facade import InfraFacade
 from .infra.io.factory import IoFactory
 from .infra.log.module import init as init_logging
 from .infra.media.factory import MediaFactory
+from .infra.service.factory import ServiceFactory as InfraServiceFactory
 
 
 def main(argv=None):
@@ -35,14 +37,16 @@ def main(argv=None):
     app_executor = ThreadPoolExecutor(max_workers=1)
     app_facade = AppFacade(app_executor)
 
-    service_factory = ServiceFactory()
+    infra_service_factory = InfraServiceFactory()
+    service_factory = ServiceFactory(infra_service_factory)
 
     repo_factory = RepoFactory()
     data_facade = DataFacade(repo_factory)
 
-    downloader_executor = ThreadPoolExecutor(config["downloader.max_concurrency"])
-    io_factory = IoFactory(downloader_executor)
-    media_factory = MediaFactory()
+    io_factory = IoFactory()
+    media_factory = MediaFactory(
+        VlcInstance(), ThreadPoolExecutor(config["downloader.max_concurrency"])
+    )
     infra_facade = InfraFacade(io_factory, media_factory)
 
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)

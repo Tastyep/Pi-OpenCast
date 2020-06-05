@@ -5,6 +5,7 @@ PROJECT_NAME="OpenCast"
 PROJECT_API_PORT="2020"
 PROJECT_WEBAPP_PORT="8081"
 LOG_DIR="log"
+DOC_DIR="docs"
 LOG_FILE="$PROJECT_NAME.log"
 TEST_DIR="test"
 
@@ -52,7 +53,6 @@ function stop() {
   # Todo hardcoded port
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
   lsof -t -i :8081 | xargs kill >/dev/null 2>&1
-  sudo killall omxplayer.bin >/dev/null 2>&1
   echo "Done."
 }
 
@@ -80,8 +80,20 @@ function test() {
   if [ -z "$1" ]; then
     run_in_env python -m unittest discover -v
   else
-    run_in_env python -m unittest "$TEST_DIR.$1"
+    local selector="$1"
+
+    if [[ "$selector" != "$TEST_DIR"* ]]; then
+      selector="$TEST_DIR.$selector"
+    fi
+    run_in_env python -m unittest "$selector"
   fi
+}
+
+function gendoc() {
+  cd "$DOC_DIR" || exit 1
+
+  run_in_env make html
+  xdg-open "build/html/index.html"
 }
 
 function run_in_env() {
@@ -93,7 +105,7 @@ function run_in_env() {
 # This is likely to be done by the display manager, but not always (lightdm).
 source ~/.profile
 
-COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test")
+COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test" "gendoc")
 if element_in "$1" "${COMMANDS[@]}"; then
   COMMAND="$1"
   shift

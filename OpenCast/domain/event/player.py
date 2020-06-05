@@ -36,7 +36,7 @@ class VideoSeeked(Event):
 
 @dataclass
 class VolumeUpdated(Event):
-    pass
+    volume: int
 
 
 @dataclass

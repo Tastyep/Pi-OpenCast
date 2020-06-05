@@ -14,7 +14,7 @@ class QueueVideo(Command):
 
 
 @command
-class StopVideo(Command):
+class StopPlayer(Command):
     pass
 
 

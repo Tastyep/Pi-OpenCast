@@ -8,5 +8,5 @@ class ServiceModule:
             app_facade, data_facade, infra_facade.media_factory
         )
         self._video_service = VideoService(
-            app_facade, service_factory, data_facade, infra_facade.io_factory
+            app_facade, service_factory, data_facade, infra_facade.media_factory
         )

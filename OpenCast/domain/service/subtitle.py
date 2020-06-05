@@ -4,41 +4,40 @@ import structlog
 
 
 class SubtitleService:
-    def __init__(self, ffmpeg_wrapper):
+    def __init__(self, downloader):
         self._logger = structlog.get_logger(__name__)
-        self._ffmpeg_wrapper = ffmpeg_wrapper
+        self._downloader = downloader
 
-    def load_from_disk(self, video, language):
-        video_name = video.path.name.rsplit(".", 1)[0]
-        parent_path = video.path.parents[0]
-        subtitle = f"{parent_path}/{video_name}.srt"
+    def fetch_subtitle(self, video, language: str, search_online=True) -> Path:
+        subtitle = self.load_from_disk(video.path, language)
+        if subtitle is not None:
+            return subtitle
 
+        if not video.from_disk():
+            subtitle = self.download_from_source(video.source, video.path, language)
+            if subtitle is not None:
+                return subtitle
+
+        if search_online:
+            pass  # TODO
+
+        return None
+
+    def load_from_disk(self, video_path: Path, language: str) -> Path:
+        parent_path = video_path.parents[0]
+        subtitle = str(video_path.with_suffix(".srt"))
         # Find the matching subtitle from a .srt file
-        srtFiles = list(parent_path.glob("*.srt"))
+        srtFiles = parent_path.glob("*.srt")
         if Path(subtitle) in srtFiles:
             self._logger.debug("Found srt file", subtitle=subtitle)
             return subtitle
-
-        # Extract file metadata
-        # Find subtitle with matching language
-        self._logger.debug("Searching softcoded subtitles", video=video)
-        metadata = self._ffmpeg_wrapper.probe(video.path)
-        for stream in metadata["streams"]:
-            self._logger.debug(
-                f"Channel #{stream['index']}",
-                type=stream["codec_type"],
-                name=stream["codec_long_name"],
-            )
-            if (
-                stream["codec_type"] == "subtitle"
-                and stream["tags"]["language"] == language
-            ):
-                self._logger.debug(f"Match: {subtitle}")
-                if self._ffmpeg_wrapper.extract_stream(
-                    src=video.path,
-                    dest=subtitle,
-                    stream_idx=stream["index"],
-                    override=False,
-                ):
-                    return subtitle
         return None
+
+    def download_from_source(
+        self, video_source: str, video_path: Path, language: str
+    ) -> Path:
+        dest = str(video_path.with_suffix(""))
+        subtitle = self._downloader.download_subtitle(
+            video_source, dest, language, ["vtt"]
+        )
+        return Path(subtitle)

@@ -4,6 +4,14 @@ OpenCast.infra.event package
 Submodules
 ----------
 
+OpenCast.infra.event.downloader module
+--------------------------------------
+
+.. automodule:: OpenCast.infra.event.downloader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 OpenCast.infra.event.event module
 ---------------------------------
 
