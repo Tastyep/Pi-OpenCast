@@ -53,7 +53,6 @@ function stop() {
   # Todo hardcoded port
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
   lsof -t -i :8081 | xargs kill >/dev/null 2>&1
-  sudo killall omxplayer.bin >/dev/null 2>&1
   echo "Done."
 }
 
@@ -81,7 +80,12 @@ function test() {
   if [ -z "$1" ]; then
     run_in_env python -m unittest discover -v
   else
-    run_in_env python -m unittest "$TEST_DIR.$1"
+    local selector="$1"
+
+    if [[ "$selector" != "$TEST_DIR"* ]]; then
+      selector="$TEST_DIR.$selector"
+    fi
+    run_in_env python -m unittest "$selector"
   fi
 }
 

@@ -44,7 +44,7 @@ function install_system_deps() {
   info "Installing system dependencies..."
 
   sudo apt-get update
-  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip libdbus-glib-1-dev libdbus-1-dev ||
+  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip ||
     error "failed to install dependencies"
   curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
 }

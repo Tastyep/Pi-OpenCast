@@ -20,8 +20,8 @@ class PlayerTest(ModelTestCase):
         return Video(IdentityService.id_video(source), source, None)
 
     def test_construction(self):
-        self.assertEqual(100, self.player.volume)
-        self.assertFalse(self.player.subtitle_state)
+        self.assertEqual(70, self.player.volume)
+        self.assertTrue(self.player.subtitle_state)
         self.assertEqual(0, self.player.subtitle_delay)
         self.assertEqual(PlayerState.STOPPED, self.player.state)
 
@@ -60,6 +60,10 @@ class PlayerTest(ModelTestCase):
         self.player.play(self.player.next_video())
         self.assertEqual(None, self.player.next_video())
 
+    def test_next_no_video(self):
+        config.load_from_dict({"player": {"loop_last": True}})
+        self.assertEqual(None, self.player.next_video())
+
     def test_prev(self):
         videos = self.make_videos(video_count=2)
         for video in videos:
@@ -67,6 +71,9 @@ class PlayerTest(ModelTestCase):
         self.assertEqual(videos[0], self.player.prev_video())
         self.player.play(self.player.next_video())
         self.assertEqual(videos[0], self.player.prev_video())
+
+    def test_prev_no_video(self):
+        self.assertEqual(None, self.player.prev_video())
 
     def test_play(self):
         video = self.make_video()

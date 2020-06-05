@@ -19,8 +19,10 @@ class PlayerMonitController(Controller):
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
         super(PlayerMonitController, self).__init__(app_facade)
 
+        media_factory = infra_facade.media_factory
         self._source_service = service_factory.make_source_service(
-            infra_facade.io_factory.make_downloader(app_facade.evt_dispatcher)
+            media_factory.make_downloader(app_facade.evt_dispatcher),
+            media_factory.make_video_parser(),
         )
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
@@ -80,15 +82,15 @@ class PlayerMonitController(Controller):
         if control == "pause":
             self._dispatch(Cmd.ToggleVideoState)
         elif control == "stop":
-            self._dispatch(Cmd.StopVideo)
+            self._dispatch(Cmd.StopPlayer)
         elif control == "right":
-            self._dispatch(Cmd.SeekVideo, 30)
+            self._dispatch(Cmd.SeekVideo, Player.SHORT_TIME_STEP)
         elif control == "left":
-            self._dispatch(Cmd.SeekVideo, -30)
+            self._dispatch(Cmd.SeekVideo, -Player.SHORT_TIME_STEP)
         elif control == "longright":
-            self._dispatch(Cmd.SeekVideo, 300)
+            self._dispatch(Cmd.SeekVideo, Player.LONG_TIME_STEP)
         elif control == "longleft":
-            self._dispatch(Cmd.SeekVideo, -300)
+            self._dispatch(Cmd.SeekVideo, -Player.LONG_TIME_STEP)
         elif control == "prev":
             self._dispatch(Cmd.PrevVideo)
         elif control == "next":
@@ -100,9 +102,9 @@ class PlayerMonitController(Controller):
 
     def _sound(self):
         if request.query["vol"] == "more":
-            self._dispatcher(Cmd.ChangeVolume, Player.VOLUME_STEP)
+            self._dispatch(Cmd.ChangeVolume, Player.VOLUME_STEP)
         else:
-            self._dispatcher(Cmd.ChangeVolume, -Player.VOLUME_STEP)
+            self._dispatch(Cmd.ChangeVolume, -Player.VOLUME_STEP)
         return "1"
 
     def _subtitle(self):

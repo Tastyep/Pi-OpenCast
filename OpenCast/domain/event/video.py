@@ -27,5 +27,10 @@ class VideoRetrieved(Event):
 
 
 @dataclass
+class VideoParsed(Event):
+    streams: list
+
+
+@dataclass
 class VideoSubtitleFetched(Event):
     subtitle: Path

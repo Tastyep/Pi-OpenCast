@@ -10,15 +10,17 @@ from .video import Video
 class Player(Entity):
     VOLUME_STEP = 10
     SUBTITLE_DELAY_STEP = 100
+    SHORT_TIME_STEP = 1000
+    LONG_TIME_STEP = 30000
 
     def __init__(self, id_):
         super(Player, self).__init__(id_)
         self._state = PlayerState.STOPPED
         self._queue = []
         self._index = 0
-        self._sub_state = False
+        self._sub_state = True
         self._sub_delay = 0
-        self._volume = 100
+        self._volume = 70
 
     def __repr__(self):
         base_repr = super(Player, self).__repr__()
@@ -66,13 +68,15 @@ class Player(Entity):
 
     def next_video(self):
         if self._index + 1 >= len(self._queue):
-            if config["player.loop_last"] is True:
+            if self._queue and config["player.loop_last"] is True:
                 return self._queue[self._index]
             return None
 
         return self._queue[self._index + 1]
 
     def prev_video(self):
+        if not self._queue:
+            return None
         if self._index == 0:
             return self._queue[0]
         return self._queue[self._index - 1]
@@ -113,4 +117,4 @@ class Player(Entity):
     @volume.setter
     def volume(self, v):
         self._volume = max(min(200, v), 0)
-        self._record(Evt.VolumeUpdated)
+        self._record(Evt.VolumeUpdated, self._volume)

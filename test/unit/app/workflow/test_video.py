@@ -73,17 +73,33 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.raise_error(self.workflow, cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_retrieving_to_finalising(self):
+    def test_retrieving_to_parsing(self):
         event = Evt.VideoIdentified(None, self.video.id, "")
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
         self.raise_event(
             self.workflow, Evt.VideoRetrieved, cmd.id, self.video.id, "/tmp/video.mp4",
         )
+        self.assertTrue(self.workflow.is_PARSING())
+
+    def test_parsing_to_deleting(self):
+        event = Evt.VideoRetrieved(None, self.video.id, "/tmp")
+        self.workflow.to_PARSING(event)
+        cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
+        self.raise_error(self.workflow, cmd)
+        self.assertTrue(self.workflow.is_DELETING())
+
+    def test_parsing_to_finalising(self):
+        event = Evt.VideoRetrieved(None, self.video.id, "/tmp")
+        self.workflow.to_PARSING(event)
+        cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
+        self.raise_event(
+            self.workflow, Evt.VideoParsed, cmd.id, self.video.id, {},
+        )
         self.assertTrue(self.workflow.is_FINALISING())
 
     def test_finalising_to_deleting(self):
-        event = Evt.VideoRetrieved(None, self.video.id, "/tmp")
+        event = Evt.VideoParsed(None, self.video.id, {})
         self.workflow.to_FINALISING(event)
         cmd = self.expect_dispatch(
             Cmd.FetchVideoSubtitle, self.video.id, config["subtitle.language"]
@@ -92,7 +108,7 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.assertTrue(self.workflow.is_DELETING())
 
     def test_finalising_to_completed(self):
-        event = Evt.VideoRetrieved(None, self.video.id, "/tmp")
+        event = Evt.VideoParsed(None, self.video.id, {})
         self.workflow.to_FINALISING(event)
         cmd = self.expect_dispatch(
             Cmd.FetchVideoSubtitle, self.video.id, config["subtitle.language"]

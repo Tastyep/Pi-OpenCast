@@ -4,5 +4,5 @@ from OpenCast.infra.event.event import Event
 
 
 @dataclass
-class PlayerStopped(Event):
+class MediaEndReached(Event):
     pass

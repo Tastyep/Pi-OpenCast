@@ -31,6 +31,7 @@ class VideoWorkflow(Workflow):
         CREATING = auto()
         IDENTIFYING = auto()
         RETRIEVING = auto()
+        PARSING = auto()
         FINALISING = auto()
         COMPLETED = auto()
         DELETING = auto()
@@ -42,7 +43,8 @@ class VideoWorkflow(Workflow):
         ["_create",                 States.INITIAL,     States.CREATING],
         ["_video_created",          States.CREATING,    States.IDENTIFYING],
         ["_video_identified",       States.IDENTIFYING, States.RETRIEVING],
-        ["_video_retrieved",        States.RETRIEVING,  States.FINALISING],
+        ["_video_retrieved",        States.RETRIEVING,  States.PARSING],
+        ["_video_parsed",           States.PARSING,     States.FINALISING],
         ["_video_subtitle_fetched", States.FINALISING,  States.COMPLETED],
 
         ["_operation_error",        States.CREATING,    States.ABORTED],
@@ -79,6 +81,11 @@ class VideoWorkflow(Workflow):
             Cmd.RetrieveVideo,
             self._video.id,
             config["downloader.output_directory"],
+        )
+
+    def on_enter_PARSING(self, _):
+        self._observe_dispatch(
+            VideoEvt.VideoParsed, Cmd.ParseVideo, self._video.id,
         )
 
     def on_enter_FINALISING(self, _):
