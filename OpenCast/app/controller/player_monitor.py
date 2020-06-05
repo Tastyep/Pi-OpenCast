@@ -19,8 +19,10 @@ class PlayerMonitController(Controller):
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
         super(PlayerMonitController, self).__init__(app_facade)
 
+        media_factory = infra_facade.media_factory
         self._source_service = service_factory.make_source_service(
-            infra_facade.io_factory.make_downloader(app_facade.evt_dispatcher)
+            media_factory.make_downloader(app_facade.evt_dispatcher),
+            media_factory.make_video_parser(),
         )
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo

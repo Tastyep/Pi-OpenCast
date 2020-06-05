@@ -1,5 +1,5 @@
-from pathlib import Path
-
+from .downloader import Downloader
+from .parser import VideoParser
 from .player_wrapper import PlayerWrapper
 
 
@@ -10,3 +10,9 @@ class MediaFactory:
 
     def make_player(self, *args):
         return PlayerWrapper(self._vlc, *args)
+
+    def make_downloader(self, *args):
+        return Downloader(self._downloader_executor, *args)
+
+    def make_video_parser(self, *args):
+        return VideoParser(self._vlc, *args)

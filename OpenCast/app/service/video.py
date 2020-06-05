@@ -9,15 +9,15 @@ from .service import Service
 
 
 class VideoService(Service):
-    def __init__(self, app_facade, service_factory, data_facade, io_factory):
+    def __init__(self, app_facade, service_factory, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
         super(VideoService, self).__init__(app_facade, logger, self, video_cmds)
         self._video_repo = data_facade.video_repo
-        self._downloader = io_factory.make_downloader(app_facade.evt_dispatcher)
-        self._source_service = service_factory.make_source_service(self._downloader)
-        self._subtitle_service = service_factory.make_subtitle_service(
-            io_factory.make_ffmpeg_wrapper(), self._downloader
+        self._downloader = media_factory.make_downloader(app_facade.evt_dispatcher)
+        self._source_service = service_factory.make_source_service(
+            self._downloader, media_factory.make_video_parser()
         )
+        self._subtitle_service = service_factory.make_subtitle_service(self._downloader)
 
     # Command handler interface implementation
     def _create_video(self, cmd):
