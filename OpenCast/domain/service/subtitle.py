@@ -4,14 +4,11 @@ import structlog
 
 
 class SubtitleService:
-    def __init__(self, ffmpeg_wrapper, downloader):
+    def __init__(self, downloader):
         self._logger = structlog.get_logger(__name__)
-        self._ffmpeg_wrapper = ffmpeg_wrapper
         self._downloader = downloader
 
-    def fetch_subtitle(
-        self, video, language: str, search_source=True, search_online=True
-    ) -> Path:
+    def fetch_subtitle(self, video, language: str, search_online=True) -> Path:
         subtitle = self._load_from_disk(video.path, language)
         if subtitle is not None:
             return subtitle
@@ -35,23 +32,6 @@ class SubtitleService:
         if Path(subtitle) in srtFiles:
             self._logger.debug("Found srt file", subtitle=subtitle)
             return subtitle
-
-        # Extract file metadata
-        # Find subtitle with matching language
-        self._logger.debug("Searching softcoded subtitles", subtitle=subtitle)
-        metadata = self._ffmpeg_wrapper.probe(video_path)
-        for stream in metadata["streams"]:
-            self._logger.debug(
-                f"Channel #{stream['index']}",
-                type=stream["codec_type"],
-                name=stream["codec_long_name"],
-            )
-            if (
-                stream["codec_type"] == "subtitle"
-                and stream["tags"]["language"] == language
-            ):
-                self._logger.debug(f"Match: {subtitle}")
-                return subtitle
         return None
 
     def _download_from_source(
