@@ -1,6 +1,7 @@
 import structlog
 from OpenCast.app.command import player as player_cmds
 from OpenCast.app.error import CommandFailure
+from OpenCast.config import config
 from OpenCast.domain.model.player_state import PlayerState
 
 from .service import Service
@@ -104,6 +105,11 @@ class PlayerService(Service):
             model.play(video)
 
         self._player.play(video.id, str(video.path))
+        player = self._player_model()
+        if player.subtitle_state is True:
+            sub_stream = video.stream("subtitle", config["subtitle.language"])
+            if sub_stream is not None:
+                self._player.select_subtitle_stream(sub_stream.index)
         self._update(cmd_id, play_video)
 
     def _queue_video_impl(self, cmd_id, video):

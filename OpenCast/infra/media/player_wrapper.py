@@ -1,9 +1,11 @@
-from threading import Lock
+from threading import Condition
 from uuid import UUID
 
 import OpenCast.infra.event.player as e
 import structlog
-import vlc
+from vlc import EventType
+
+from .error import PlayerError
 
 
 class PlayerWrapper:
@@ -15,9 +17,6 @@ class PlayerWrapper:
 
         self._player = self._instance.media_player_new()
         self._id_to_media = {}
-
-        self._lock = Lock()
-        self._stop_operation_id = None
 
         player_events = self._player.event_manager()
         player_events.event_attach(EventType.MediaPlayerEndReached, self._on_media_end)
@@ -38,6 +37,23 @@ class PlayerWrapper:
 
     def unpause(self):
         self._player.pause()
+
+    def select_subtitle_stream(self, index: int):
+        media = self._player.get_media()
+        if media is None:
+            raise PlayerError("the player is not started")
+
+        def is_playing(_, cv):
+            with cv:
+                cv.notify()
+
+        cv = Condition()
+        self._player.event_manager().event_attach(
+            EventType.MediaPlayerPlaying, is_playing, cv
+        )
+        with cv:
+            cv.wait_for(self._player.is_playing)
+        self._player.video_set_spu(index)
 
     def toggle_subtitle(self):
         self._player.toggle_teletext()
