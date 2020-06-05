@@ -12,6 +12,6 @@ class SourceService:
         return self._downloader.unfold_playlist(source)
 
     def pick_stream_metadata(self, video):
-        if video.is_file():
+        if video.from_disk():
             return {"title": str(Path(video.source).name)}
         return self._downloader.pick_stream_metadata(video.source, ["title"])

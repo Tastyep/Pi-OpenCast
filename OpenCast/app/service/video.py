@@ -54,7 +54,7 @@ class VideoService(Service):
             ctx.update(video)
 
         video = self._video_repo.get(cmd.model_id)
-        if video.is_file():
+        if video.from_disk():
             self._start_transaction(self._video_repo, cmd.id, impl, video)
             return
 

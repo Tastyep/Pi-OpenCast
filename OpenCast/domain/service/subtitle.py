@@ -16,7 +16,7 @@ class SubtitleService:
         if subtitle is not None:
             return subtitle
 
-        if search_source:
+        if not video.from_disk():
             subtitle = self._download_from_source(video.source, video.path, language)
             if subtitle is not None:
                 return subtitle
