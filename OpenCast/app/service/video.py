@@ -75,6 +75,15 @@ class VideoService(Service):
         )
         self._downloader.download_video(cmd.id, video.source, str(video.path))
 
+    def _parse_video(self, cmd):
+        def impl(ctx):
+            video = self._video_repo.get(cmd.model_id)
+            streams = self._source_service.list_streams(video)
+            video.streams = streams
+            ctx.update(video)
+
+        self._start_transaction(self._video_repo, cmd.id, impl)
+
     def _fetch_video_subtitle(self, cmd):
         def impl(ctx):
             video = self._video_repo.get(cmd.model_id)

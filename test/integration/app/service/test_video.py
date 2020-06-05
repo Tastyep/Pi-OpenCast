@@ -1,12 +1,12 @@
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.service.video import VideoService
 from OpenCast.config import config
 from OpenCast.domain.event import video as Evt
-from OpenCast.domain.model.video import Video
+from OpenCast.domain.model.video import Stream, Video
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
@@ -18,13 +18,13 @@ class VideoServiceTest(ServiceTestCase):
         super(VideoServiceTest, self).setUp()
 
         self.downloader = Mock()
-        self.ffmpeg_wrapper = Mock()
-        self.io_factory = self.infra_facade.io_factory
-        self.io_factory.make_downloader.return_value = self.downloader
-        self.io_factory.make_ffmpeg_wrapper.return_value = self.ffmpeg_wrapper
+        self.video_parser = Mock()
+        self.media_factory = self.infra_facade.media_factory
+        self.media_factory.make_downloader.return_value = self.downloader
+        self.media_factory.make_video_parser.return_value = self.video_parser
 
         self.service = VideoService(
-            self.app_facade, self.service_factory, self.data_facade, self.io_factory
+            self.app_facade, self.service_factory, self.data_facade, self.media_factory
         )
 
         self.video_repo = self.data_facade.video_repo
@@ -98,26 +98,43 @@ class VideoServiceTest(ServiceTestCase):
             Cmd.RetrieveVideo, video_id, output_dir
         )
 
-    def test_fetch_video_subtitle(self):
+    def test_parse_video(self):
         self.data_producer.video("source", None, path=Path("/tmp/source.mp4")).populate(
             self.data_facade
         )
 
-        subtitle = "/tmp/source.srt"
-        subtitle_language = config["subtitle.language"]
-        self.ffmpeg_wrapper.probe.return_value = {
-            "streams": [
-                {
-                    "index": 1,
-                    "codec_type": "subtitle",
-                    "codec_long_name": "subtitle",
-                    "tags": {"language": subtitle_language},
-                }
-            ]
-        }
-        self.ffmpeg_wrapper.extract_stream.return_value = subtitle
+        streams = [
+            (0, "video", None),
+            (1, "audio", None),
+            (2, "subtitle", "subtitle_lang"),
+        ]
+        self.video_parser.parse_streams.return_value = streams
+
+        expected = [Stream(*stream) for stream in streams]
+        video_id = IdentityService.id_video("source")
+        self.evt_expecter.expect(Evt.VideoParsed, expected).from_(
+            Cmd.ParseVideo, video_id
+        )
+
+    def test_fetch_video_subtitle(self):
+        path_mock = MagicMock()
+        self.data_producer.video("source", None, path=path_mock).populate(
+            self.data_facade
+        )
+
+        # Load from disk
+        disk_subtitle = "/tmp/source.srt"
+        path_mock.with_suffix.return_value = disk_subtitle
+        parent_mock = Mock()
+        path_mock.parents.__getitem__.return_value = parent_mock
+        parent_mock.glob.return_value = []
+
+        # Download from source
+        source_subtitle = "/tmp/source.vtt"
+        self.downloader.download_subtitle.return_value = source_subtitle
 
         video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.VideoSubtitleFetched, subtitle).from_(
+        subtitle_language = config["subtitle.language"]
+        self.evt_expecter.expect(Evt.VideoSubtitleFetched, Path(source_subtitle)).from_(
             Cmd.FetchVideoSubtitle, video_id, subtitle_language
         )
