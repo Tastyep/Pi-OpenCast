@@ -49,7 +49,7 @@ class PlayerWrapper:
         self._player.toggle_teletext()
 
     def set_subtitle_delay(self, delay: int):
-        self._player.video_set_spu_delay(delay)
+        self._player.video_set_spu_delay(delay * 1000)
 
     def set_volume(self, volume):
         self._player.audio_set_volume(volume)
