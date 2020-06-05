@@ -80,7 +80,12 @@ function test() {
   if [ -z "$1" ]; then
     run_in_env python -m unittest discover -v
   else
-    run_in_env python -m unittest "$TEST_DIR.$1"
+    local selector="$1"
+
+    if [[ "$selector" != "$TEST_DIR"* ]]; then
+      selector="$TEST_DIR.$selector"
+    fi
+    run_in_env python -m unittest "$selector"
   fi
 }
 
