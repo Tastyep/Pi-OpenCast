@@ -9,12 +9,12 @@ class SubtitleService:
         self._downloader = downloader
 
     def fetch_subtitle(self, video, language: str, search_online=True) -> Path:
-        subtitle = self._load_from_disk(video.path, language)
+        subtitle = self.load_from_disk(video.path, language)
         if subtitle is not None:
             return subtitle
 
         if not video.from_disk():
-            subtitle = self._download_from_source(video.source, video.path, language)
+            subtitle = self.download_from_source(video.source, video.path, language)
             if subtitle is not None:
                 return subtitle
 
@@ -23,22 +23,21 @@ class SubtitleService:
 
         return None
 
-    def _load_from_disk(self, video_path: Path, language: str) -> str:
+    def load_from_disk(self, video_path: Path, language: str) -> Path:
         parent_path = video_path.parents[0]
         subtitle = str(video_path.with_suffix(".srt"))
-
         # Find the matching subtitle from a .srt file
-        srtFiles = list(parent_path.glob("*.srt"))
+        srtFiles = parent_path.glob("*.srt")
         if Path(subtitle) in srtFiles:
             self._logger.debug("Found srt file", subtitle=subtitle)
             return subtitle
         return None
 
-    def _download_from_source(
+    def download_from_source(
         self, video_source: str, video_path: Path, language: str
-    ) -> str:
+    ) -> Path:
         dest = str(video_path.with_suffix(""))
         subtitle = self._downloader.download_subtitle(
             video_source, dest, language, ["vtt"]
         )
-        return subtitle
+        return Path(subtitle)

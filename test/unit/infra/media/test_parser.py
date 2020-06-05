@@ -3,7 +3,7 @@ from test.util import TestCase
 from unittest.mock import Mock
 
 from OpenCast.infra.media.parser import VideoParser, VideoParsingError
-from vlc import MediaParsedStatus
+from vlc import MediaParsedStatus, TrackType
 
 Stream = namedtuple("Stream", ["id", "type", "language"])
 
@@ -21,9 +21,16 @@ class VideoParserTest(TestCase):
         media.get_parsed_status.return_value = MediaParsedStatus.done
         media.is_parsed.return_value = 1
 
-        streams = [(f"id_{i}", f"type_{i}", f"language_{i}") for i in range(3)]
+        input_languages = [b"eng", None, b"\xE2\x82\xAC"]
+        output_languages = ["eng", None, "€"]
+        input_types = [TrackType.audio, TrackType.video, TrackType.ext]
+        output_types = ["audio", "video", "subtitle"]
+
+        streams = [(i, input_types[i], input_languages[i]) for i in range(3)]
+        expected = [(i, output_types[i], output_languages[i]) for i in range(3)]
+
         media.tracks_get.return_value = [Stream(*stream) for stream in streams]
-        self.assertEqual(streams, self.parser.parse_streams(video_path))
+        self.assertEqual(expected, self.parser.parse_streams(video_path))
 
     def test_parse_streams_failed(self):
         video_path = "/tmp/source.mp4"
