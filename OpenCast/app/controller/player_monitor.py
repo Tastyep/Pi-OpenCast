@@ -30,12 +30,16 @@ class PlayerMonitController(Controller):
 
         # TODO add video monit controller
         server = infra_facade.server
-        server.route("/stream", callback=self._stream)
-        server.route("/queue", callback=self._queue)
-        server.route("/video", callback=self._video)
-        server.route("/subtitle", callback=self._subtitle)
-        server.route("/sound", callback=self._sound)
-        server.route("/running", callback=self._running)
+
+        def route(url, callback):
+            server.route(f"/api/player/{url}", callback=callback)
+
+        route("stream", self._stream)
+        route("queue", self._queue)
+        route("video", self._video)
+        route("subtitle", self._subtitle)
+        route("sound", self._sound)
+        route("running", self._running)
 
     def _stream(self):
         source = request.query["url"]
