@@ -40,7 +40,7 @@ class PrevVideo(Command):
 
 @command
 class ChangeVolume(Command):
-    amount: int
+    volume: int
 
 
 @command
