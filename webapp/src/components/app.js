@@ -1,31 +1,36 @@
 import React, { Component } from "react";
 
+import { Grid, Paper } from "@material-ui/core";
+
 import Header from "./header";
 import StreamInput from "./stream_input";
 import PlayerControls from "./player_controls";
 import VolumeControl from "./volume_control";
-import { Grid } from "@material-ui/core";
 
 class App extends Component {
   render() {
     return (
       <Grid container>
-        <Grid item xs={false} sm={2} md={3} />
-        <Grid item container direction="column" xs={12} sm={8} md={6}>
-          <Grid item>
+        <Grid item sm={1} md={2} />
+        <Grid item container xs={12} sm={10} md={8}>
+          <Grid item container>
             <Header />
-          </Grid>
-          <Grid item>
-            <StreamInput />
-          </Grid>
-          <Grid item>
-            <VolumeControl />
-          </Grid>
-          <Grid item>
-            <PlayerControls />
+            <Paper elevation={3} style={{ flex: 1, padding: 24 }}>
+              <Grid item container direction="column" spacing={4}>
+                <Grid item>
+                  <StreamInput />
+                </Grid>
+                <Grid item>
+                  <PlayerControls />
+                </Grid>
+                <Grid item>
+                  <VolumeControl />
+                </Grid>
+              </Grid>
+            </Paper>
           </Grid>
         </Grid>
-        <Grid item xs={false} sm={2} md={3} />
+        <Grid item sm={1} md={2} />
       </Grid>
     );
   }
