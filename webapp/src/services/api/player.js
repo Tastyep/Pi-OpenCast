@@ -24,12 +24,24 @@ async function pauseMedia() {
   return await API.get("player/pause");
 }
 
-async function seekMedia(duration) {
-  return await API.get("player/seek", { params: { duration: duration } });
+async function seekMedia(forward, long) {
+  return await API.get("player/seek", {
+    params: { forward: forward, long: long },
+  });
 }
 
 async function updateVolume(value) {
   return await API.get("player/volume", { params: { value: value } });
+}
+
+async function toggleSubtitle() {
+  return await API.get("player/subtitle/toggle");
+}
+
+async function seekSubtitle(forward) {
+  return await API.get("player/subtitle/seek", {
+    params: { forward: forward },
+  });
 }
 
 export default {
@@ -41,4 +53,6 @@ export default {
   pauseMedia,
   seekMedia,
   updateVolume,
+  toggleSubtitle,
+  seekSubtitle,
 };

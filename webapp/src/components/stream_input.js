@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 
 import player from "services/api/player";
 
@@ -9,22 +8,38 @@ import "./stream_input.css";
 
 function StreamInput() {
   const [url, setUrl] = React.useState("");
-  const [action, setAction] = React.useState(undefined);
+  const [action, setAction] = React.useState(() => player.streamMedia);
+  const [castVariant, setCastVariant] = React.useState("contained");
+  const [queueVariant, setQueueVariant] = React.useState("outlined");
 
   const handleSubmit = (event) => {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
     if (url === "") {
       return;
     }
     action(url);
     setUrl("");
-    setAction(undefined);
+  };
+
+  const handleActionChange = (cast) => {
+    if (cast === true) {
+      setCastVariant("contained");
+      setQueueVariant("outlined");
+      setAction(() => player.streamMedia);
+    } else {
+      setCastVariant("outlined");
+      setQueueVariant("contained");
+      setAction(() => player.queueMedia);
+    }
+    handleSubmit(undefined);
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate autoComplete="off">
+    <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">
       <Grid container spacing={1}>
-        <Grid item xs={9}>
+        <Grid item xs={6} sm={7} md={8}>
           <TextField
             fullWidth
             id="outlined-basic"
@@ -34,23 +49,21 @@ function StreamInput() {
             onChange={(e) => setUrl(e.target.value)}
           />
         </Grid>
-        <Grid item xs={1} />
-        <Grid item xs={2} className="StreamButtons">
+        <Grid item xs={6} sm={5} md={4} className="StreamButtons">
           <ButtonGroup
-            orientation="vertical"
+            size="medium"
             color="primary"
             aria-label="vertical contained primary button group"
-            variant="text"
           >
             <Button
-              type="submit"
-              onClick={() => setAction(() => player.streamMedia)}
+              variant={castVariant}
+              onClick={() => handleActionChange(true)}
             >
               Cast
             </Button>
             <Button
-              type="submit"
-              onClick={() => setAction(() => player.queueMedia)}
+              variant={queueVariant}
+              onClick={() => handleActionChange(false)}
             >
               Queue
             </Button>
