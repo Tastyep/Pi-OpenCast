@@ -52,6 +52,8 @@ install_system_deps() {
 
 # Install project dependencies.
 function install_project_deps() {
+  info "Installing project dependencies..."
+
   "$PROJECT_DIR/$INTERNAL_NAME.sh" update
   (cd "$PROJECT_DIR/webapp" && npm install)
 }
