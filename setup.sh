@@ -52,10 +52,15 @@ function install_system_deps() {
 
 # Install project dependencies.
 function install_project_deps() {
-  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
   "$PROJECT_DIR/$INTERNAL_NAME.sh" update
   (cd "$PROJECT_DIR/webapp" && npm install)
+}
 
+# Build the web application.
+function build_project() {
+  info "Building $INTERNAL_NAME web application"
+
+  (cd "$PROJECT_DIR/webapp" && npm run build)
 }
 
 # Format and install the systemd config file.
@@ -70,9 +75,12 @@ function start_at_boot() {
   sudo systemctl enable "$SERVICE_NAME"
 }
 
+chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+
 install_system_deps
 setup_environment
 install_project_deps
+build_project
 start_at_boot
 
 info "Installation successful, reboot to finish."
