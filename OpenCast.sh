@@ -2,12 +2,16 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="OpenCast"
-PROJECT_API_PORT="2020"
-PROJECT_WEBAPP_PORT="8081"
+
+API_PORT="2020"
+WEBAPP_PORT="8081"
+
 LOG_DIR="log"
 DOC_DIR="docs"
-LOG_FILE="$PROJECT_NAME.log"
 TEST_DIR="test"
+WEBAPP_DIR="webapp"
+
+LOG_FILE="$PROJECT_NAME.log"
 
 function is_port_bound() {
   lsof -t -i ":$1"
@@ -27,7 +31,7 @@ function element_in() {
 }
 
 function start() {
-  if [ "$(is_port_bound $PROJECT_API_PORT)" ]; then
+  if [ "$(is_port_bound $API_PORT)" ]; then
     echo "$PROJECT_NAME server is already running."
     return
   fi
@@ -44,15 +48,13 @@ function start() {
   wait_for_server "$PROJECT_WEBAPP_PORT"
 
   run_in_env poetry run python -m "$PROJECT_NAME" &
-  pid="$(pgrep -f "python -m $PROJECT_NAME")"
-  echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
 
 function stop() {
   echo "Killing $PROJECT_NAME..."
   # Todo hardcoded port
-  lsof -t -i :2020 | xargs kill >/dev/null 2>&1
-  lsof -t -i :8081 | xargs kill >/dev/null 2>&1
+  lsof -t -i ":$API_PORT" | xargs kill >/dev/null 2>&1
+  (cd "$PROJECT_DIR/$WEBAPP_DIR" && npm stop)
   echo "Done."
 }
 
@@ -68,7 +70,7 @@ function update() {
 
 function status() {
   echo -n "$PROJECT_NAME is ... "
-  [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
+  [ "$(lsof -t -i :"$API_PORT")" ] && echo "UP" || echo "DOWN"
 }
 
 function logs() {
