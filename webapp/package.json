@@ -16,6 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "stop": "lsof -t -a -i :$(grep 'PORT' .env | cut -f 2 -d'=') -c node | xargs kill >/dev/null 2>&1 || echo 'Not started'",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
