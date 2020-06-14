@@ -17,12 +17,6 @@ function is_port_bound() {
   lsof -t -i ":$1"
 }
 
-function wait_for_server() {
-  while [ ! "$(is_port_bound $1)" ]; do
-    sleep 1
-  done
-}
-
 function element_in() {
   local e match="$1"
   shift
@@ -44,9 +38,7 @@ function start() {
   mkdir -p "$LOG_DIR"
 
   echo "Starting $PROJECT_NAME server."
-  (cd ./webapp && npm install && npm start &)
-  wait_for_server "$PROJECT_WEBAPP_PORT"
-
+  (cd "$WEBAPP_DIR" && WEBAPP_PORT=$WEBAPP_PORT npm run serve &)
   run_in_env poetry run python -m "$PROJECT_NAME" &
 }
 
