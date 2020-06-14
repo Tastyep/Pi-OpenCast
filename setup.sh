@@ -44,15 +44,25 @@ function install_system_deps() {
   info "Installing system dependencies..."
 
   sudo apt-get update
-  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip ||
+  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip \
+    nodejs npm ||
     error "failed to install dependencies"
   curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
 }
 
 # Install project dependencies.
 function install_project_deps() {
-  chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+  info "Installing project dependencies..."
+
   "$PROJECT_DIR/$INTERNAL_NAME.sh" update
+  (cd "$PROJECT_DIR/webapp" && npm install)
+}
+
+# Build the web application.
+function build_project() {
+  info "Building $INTERNAL_NAME web application"
+
+  (cd "$PROJECT_DIR/webapp" && npm run build)
 }
 
 # Format and install the systemd config file.
@@ -67,9 +77,12 @@ function start_at_boot() {
   sudo systemctl enable "$SERVICE_NAME"
 }
 
+chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+
 install_system_deps
 setup_environment
 install_project_deps
+build_project
 start_at_boot
 
 info "Installation successful, reboot to finish."

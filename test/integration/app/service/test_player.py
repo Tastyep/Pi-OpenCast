@@ -73,10 +73,9 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
-        player = self.player_repo.get_player()
-        self.evt_expecter.expect(
-            Evt.VolumeUpdated, player.volume + Player.VOLUME_STEP
-        ).from_(Cmd.ChangeVolume, self.player_id, Player.VOLUME_STEP)
+        self.evt_expecter.expect(Evt.VolumeUpdated, 80).from_(
+            Cmd.ChangeVolume, self.player_id, 80
+        )
 
     def test_next_video(self):
         self.data_producer.player().video("source", None).play().video(

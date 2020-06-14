@@ -1,0 +1,9 @@
+.SeekButtons {
+  display: inline-flex;
+  flex-direction: row-reverse;
+}
+
+.SubtitleButtons {
+  display: inline-flex;
+  flex-direction: row-reverse;
+}

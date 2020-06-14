@@ -56,7 +56,7 @@ class PlayerService(Service):
 
     def _change_volume(self, cmd):
         def impl(model):
-            model.volume = model.volume + cmd.amount
+            model.volume = cmd.volume
             self._player.set_volume(model.volume)
 
         self._update(cmd.id, impl)

@@ -16,7 +16,7 @@ class EnableCors:
 
             if request.method != "OPTIONS":
                 # actual request; reply with the actual response
-                return fn(*args, **kwargs)
+                return fn(request, *args, **kwargs)
 
         return _enable_cors
 
