@@ -12,10 +12,12 @@
     "prettier": "^2.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.1"
+    "react-scripts": "^3.4.1",
+    "serve": "^11.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
+    "serve": "serve -s build -l $WEBAPP_PORT --no-clipboard",
     "stop": "lsof -t -a -i :$(grep 'PORT' .env | cut -f 2 -d'=') -c node | xargs kill >/dev/null 2>&1 || echo 'Not started'",
     "build": "react-scripts build",
     "test": "react-scripts test",
