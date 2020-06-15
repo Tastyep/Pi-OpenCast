@@ -10,7 +10,7 @@ from .service import Service
 class PlayerService(Service):
     def __init__(self, app_facade, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
-        super(PlayerService, self).__init__(app_facade, logger, self, player_cmds)
+        super().__init__(app_facade, logger, self, player_cmds)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo

@@ -55,7 +55,7 @@ class VideoWorkflow(Workflow):
 
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
-        super(VideoWorkflow, self).__init__(
+        super().__init__(
             logger, self, id, app_facade, initial=VideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo

@@ -8,7 +8,7 @@ class Workflow(Machine):
     def __init__(
         self, logger, derived, id_, app_facade, *args, **kwargs,
     ):
-        super(Workflow, self).__init__(
+        super().__init__(
             model=self,
             states=derived.States,
             transitions=derived.transitions,

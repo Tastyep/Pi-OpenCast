@@ -35,7 +35,7 @@ class QueueVideoWorkflow(Workflow):
 
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
-        super(QueueVideoWorkflow, self).__init__(
+        super().__init__(
             logger, self, id, app_facade, initial=QueueVideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
@@ -86,7 +86,7 @@ class QueuePlaylistWorkflow(Workflow):
         self, id, app_facade, video_repo, videos: List[Video],
     ):
         logger = structlog.get_logger(__name__)
-        super(QueuePlaylistWorkflow, self).__init__(
+        super().__init__(
             logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
@@ -137,7 +137,7 @@ class StreamVideoWorkflow(Workflow):
 
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
-        super(StreamVideoWorkflow, self).__init__(
+        super().__init__(
             logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
         )
 
@@ -195,7 +195,7 @@ class StreamPlaylistWorkflow(Workflow):
         self, id, app_facade, video_repo, videos: List[Video],
     ):
         logger = structlog.get_logger(__name__)
-        super(StreamPlaylistWorkflow, self).__init__(
+        super().__init__(
             logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
         )
 
