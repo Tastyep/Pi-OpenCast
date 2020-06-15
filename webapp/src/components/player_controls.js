@@ -1,8 +1,8 @@
 import React from "react";
 import { IconButton, ButtonGroup, Grid } from "@material-ui/core";
 
-import PauseOutlinedIcon from "@material-ui/icons/PauseOutlined";
-import StopOutlinedIcon from "@material-ui/icons/StopOutlined";
+import PauseIcon from "@material-ui/icons/Pause";
+import StopIcon from "@material-ui/icons/Stop";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
 import ClosedCaptionIcon from "@material-ui/icons/ClosedCaption";
@@ -27,10 +27,10 @@ function PlayerControls() {
             <SkipPreviousIcon />
           </IconButton>
           <IconButton onClick={() => player.pauseMedia()}>
-            <PauseOutlinedIcon />
+            <PauseIcon />
           </IconButton>
           <IconButton onClick={() => player.stopMedia()}>
-            <StopOutlinedIcon />
+            <StopIcon />
           </IconButton>
           <IconButton onClick={() => player.nextMedia()}>
             <SkipNextIcon />
