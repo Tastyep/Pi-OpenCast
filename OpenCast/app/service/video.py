@@ -11,7 +11,7 @@ from .service import Service
 class VideoService(Service):
     def __init__(self, app_facade, service_factory, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
-        super(VideoService, self).__init__(app_facade, logger, self, video_cmds)
+        super().__init__(app_facade, logger, self, video_cmds)
         self._video_repo = data_facade.video_repo
         self._downloader = media_factory.make_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(

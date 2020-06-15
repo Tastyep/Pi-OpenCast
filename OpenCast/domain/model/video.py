@@ -16,7 +16,7 @@ class Stream:
 
 class Video(Entity):
     def __init__(self, id_, source, playlist_id):
-        super(Video, self).__init__(id_)
+        super().__init__(id_)
         self._source = source
         self._playlist_id = playlist_id
         self._title = None
@@ -27,7 +27,7 @@ class Video(Entity):
         self._record(Evt.VideoCreated, self._source, self._playlist_id)
 
     def __repr__(self):
-        base_repr = super(Video, self).__repr__()
+        base_repr = super().__repr__()
         return f"{Video.__name__}({base_repr}, title='{self._title}', playlist={self._playlist_id})"
 
     @property

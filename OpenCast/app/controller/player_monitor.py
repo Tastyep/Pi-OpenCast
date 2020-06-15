@@ -17,7 +17,7 @@ from .monitor import MonitorController
 
 class PlayerMonitController(MonitorController):
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
-        super(PlayerMonitController, self).__init__(app_facade, infra_facade)
+        super().__init__(app_facade, infra_facade)
 
         media_factory = infra_facade.media_factory
         self._source_service = service_factory.make_source_service(
@@ -112,6 +112,4 @@ class PlayerMonitController(MonitorController):
 
     def _dispatch(self, cmd_cls, *args, **kwargs):
         player_id = IdentityService.id_player()
-        return super(PlayerMonitController, self)._dispatch(
-            cmd_cls, player_id, *args, **kwargs
-        )
+        return super()._dispatch(cmd_cls, player_id, *args, **kwargs)

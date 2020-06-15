@@ -14,7 +14,7 @@ class Player(Entity):
     LONG_TIME_STEP = 30000
 
     def __init__(self, id_):
-        super(Player, self).__init__(id_)
+        super().__init__(id_)
         self._state = PlayerState.STOPPED
         self._queue = []
         self._index = 0
@@ -23,7 +23,7 @@ class Player(Entity):
         self._volume = 70
 
     def __repr__(self):
-        base_repr = super(Player, self).__repr__()
+        base_repr = super().__repr__()
         return f"{Player.__name__}({base_repr}, state={self._state}, video_idx={self._index} / {len(self._queue)})"
 
     def play(self, video: Video):

@@ -3,7 +3,7 @@ from .controller import Controller
 
 class FileController(Controller):
     def __init__(self, app_facade, server):
-        super(FileController, self).__init__(app_facade)
+        super().__init__(app_facade)
         self._server = server
         # Todo hardcoded port
         self._index_html = """
