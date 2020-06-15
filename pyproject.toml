@@ -22,13 +22,14 @@ pyyaml = "^5.3.1"
 transitions = "^0.8.1"
 structlog = "^20.1.0"
 colorama = "^0.4.3"
-sphinx = "^3.0.3"
-sphinx_rtd_theme = "^0.4.3"
 python-vlc = "^3.0.9113"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 pytest-cov = "^2.4"
+sphinx_rtd_theme = "^0.4.3"
+sphinx = "^3.1.1"
+mypy = "^0.780"
 
 [tool.poetry.scripts]
 my-script = 'OpenCast:main'
