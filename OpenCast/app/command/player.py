@@ -29,13 +29,8 @@ class SeekVideo(Command):
 
 
 @command
-class NextVideo(Command):
-    pass
-
-
-@command
-class PrevVideo(Command):
-    pass
+class PickVideo(Command):
+    video_id: UUID
 
 
 @command

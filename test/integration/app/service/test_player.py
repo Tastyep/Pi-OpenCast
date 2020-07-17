@@ -77,24 +77,14 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.ChangeVolume, self.player_id, 80
         )
 
-    def test_next_video(self):
+    def test_pick_video(self):
         self.data_producer.player().video("source", None).play().video(
             "source2", None
         ).populate(self.data_facade)
 
-        next_video_id = IdentityService.id_video("source2")
-        self.evt_expecter.expect(Evt.PlayerStarted, next_video_id).from_(
-            Cmd.NextVideo, self.player_id
-        )
-
-    def test_prev_video(self):
-        self.data_producer.player().video("source", None).video(
-            "source2", None
-        ).play().populate(self.data_facade)
-
-        prev_video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.PlayerStarted, prev_video_id).from_(
-            Cmd.PrevVideo, self.player_id
+        video_id = IdentityService.id_video("source2")
+        self.evt_expecter.expect(Evt.PlayerStarted, video_id).from_(
+            Cmd.PickVideo, self.player_id, video_id
         )
 
     def test_toggle_subtitle(self):

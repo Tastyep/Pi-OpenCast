@@ -64,16 +64,24 @@ class PlayerTest(ModelTestCase):
         config.load_from_dict({"player": {"loop_last": True}})
         self.assertEqual(None, self.player.next_video())
 
-    def test_prev(self):
+    def test_pick(self):
         videos = self.make_videos(video_count=2)
         for video in videos:
             self.player.queue(video)
-        self.assertEqual(videos[0], self.player.prev_video())
-        self.player.play(self.player.next_video())
-        self.assertEqual(videos[0], self.player.prev_video())
+        self.assertEqual(videos[0], self.player.pick(videos[0].id))
+        self.assertEqual(videos[1], self.player.pick(videos[1].id))
 
-    def test_prev_no_video(self):
-        self.assertEqual(None, self.player.prev_video())
+    def test_pick_no_video(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.player.pick(None)
+        self.assertEqual("queue is empty", str(ctx.exception))
+
+    def test_pick_missing_video(self):
+        video = self.make_video()
+        self.player.queue(video)
+        with self.assertRaises(DomainError) as ctx:
+            self.player.pick(None)
+        self.assertEqual("video not found", str(ctx.exception))
 
     def test_play(self):
         video = self.make_video()
