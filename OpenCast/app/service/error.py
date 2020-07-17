@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from uuid import UUID
+
+from OpenCast.infra import Id
 
 
 @dataclass
 class OperationError:
-    id: UUID
+    id: Id
     error: str

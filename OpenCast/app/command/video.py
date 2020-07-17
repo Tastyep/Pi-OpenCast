@@ -1,12 +1,10 @@
-from uuid import UUID
-
-from .command import Command, command
+from .command import Command, ModelId, command
 
 
 @command
 class CreateVideo(Command):
     source: str
-    playlist_id: UUID
+    playlist_id: ModelId
 
 
 @command

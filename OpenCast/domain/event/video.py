@@ -1,14 +1,13 @@
 from dataclasses import dataclass
 from pathlib import Path
-from uuid import UUID
 
-from .event import Event
+from .event import Event, ModelId
 
 
 @dataclass
 class VideoCreated(Event):
     source: str
-    playlist_id: UUID
+    playlist_id: ModelId
 
 
 @dataclass

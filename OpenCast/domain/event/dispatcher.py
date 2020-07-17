@@ -1,6 +1,7 @@
 from threading import Lock
 
 import structlog
+from OpenCast.infra import Id
 
 
 class EventDispatcher:
@@ -30,7 +31,7 @@ class EventDispatcher:
     def once(self, evt_cls, handler):
         self.observe(None, {evt_cls: handler}, 1)
 
-    def observe(self, evt_id, evtcls_to_handler: dict, times=-1):
+    def observe(self, evt_id: Id, evtcls_to_handler: dict, times=-1):
         self._observe(
             evt_id, evtcls_to_handler.keys(), self._Handler(evtcls_to_handler, times)
         )
@@ -62,7 +63,7 @@ class EventDispatcher:
         for handler in handlers:
             handler(evt)
 
-    def _observe(self, evt_id, evt_clss: list, handler):
+    def _observe(self, evt_id: Id, evt_clss: list, handler):
         with self._lock:
             handler_id = id(handler)
             self._handler_map[handler_id] = handler

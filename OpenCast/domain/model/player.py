@@ -13,7 +13,7 @@ class Player(Entity):
     SHORT_TIME_STEP = 1000
     LONG_TIME_STEP = 30000
 
-    def __init__(self, id_):
+    def __init__(self, id_: Id):
         super().__init__(id_)
         self._state = PlayerState.STOPPED
         self._queue = []
@@ -74,7 +74,7 @@ class Player(Entity):
 
         return self._queue[self._index + 1]
 
-    def pick(self, video_id):
+    def pick(self, video_id: Id):
         if not self._queue:
             raise DomainError(f"queue is empty")
         video = next((video for video in self._queue if video.id == video_id), None)
