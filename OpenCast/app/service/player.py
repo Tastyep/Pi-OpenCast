@@ -61,21 +61,10 @@ class PlayerService(Service):
 
         self._update(cmd.id, impl)
 
-    def _next_video(self, cmd):
+    def _pick_video(self, cmd):
         model = self._player_model()
-        next_video = model.next_video()
-        if next_video is None:
-            raise CommandFailure("no next video")
-
-        self._play_video_impl(cmd.id, next_video)
-
-    def _prev_video(self, cmd):
-        model = self._player_model()
-        prev_video = model.prev_video()
-        if prev_video is None:
-            raise CommandFailure("no previous video")
-
-        self._play_video_impl(cmd.id, prev_video)
+        video = model.pick(cmd.video_id)
+        self._play_video_impl(cmd.id, video)
 
     def _toggle_subtitle(self, cmd):
         def impl(model):
