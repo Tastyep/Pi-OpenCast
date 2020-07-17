@@ -1,16 +1,14 @@
-from uuid import UUID
-
-from .command import Command, command
+from .command import Command, ModelId, command
 
 
 @command
 class PlayVideo(Command):
-    video_id: UUID
+    video_id: ModelId
 
 
 @command
 class QueueVideo(Command):
-    video_id: UUID
+    video_id: ModelId
 
 
 @command
@@ -30,7 +28,7 @@ class SeekVideo(Command):
 
 @command
 class PickVideo(Command):
-    video_id: UUID
+    video_id: ModelId
 
 
 @command

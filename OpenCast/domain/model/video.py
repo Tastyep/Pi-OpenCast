@@ -4,7 +4,7 @@ from typing import List
 
 from OpenCast.domain.event import video as Evt
 
-from .entity import Entity
+from .entity import Entity, Id
 
 
 @dataclass
@@ -15,7 +15,7 @@ class Stream:
 
 
 class Video(Entity):
-    def __init__(self, id_, source, playlist_id):
+    def __init__(self, id_: Id, source, playlist_id: Id):
         super().__init__(id_)
         self._source = source
         self._playlist_id = playlist_id

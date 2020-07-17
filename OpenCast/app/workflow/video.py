@@ -1,21 +1,21 @@
 from collections import namedtuple
 from dataclasses import astuple, dataclass
 from enum import Enum, auto
-from uuid import UUID
 
 import structlog
 from OpenCast.app.command import video as Cmd
 from OpenCast.config import config
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model import Id
 
 from .workflow import Workflow
 
 
 @dataclass
 class Video:
-    id: UUID
+    id: Id
     source: str
-    playlist_id: UUID
+    playlist_id: Id
 
     def to_tuple(self):
         return astuple(self)

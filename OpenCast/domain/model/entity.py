@@ -1,9 +1,11 @@
 from collections import OrderedDict
 from copy import deepcopy
 
+from . import Id
+
 
 class Entity:
-    def __init__(self, id_):
+    def __init__(self, id_: Id):
         self._id = id_
         self._version = 0
         self._events = OrderedDict()
