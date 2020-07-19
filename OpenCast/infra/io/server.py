@@ -44,7 +44,7 @@ class Server:
         return template(*args, **kwargs)
 
     def make_response(self, status, body):
-        return HTTPResponse(body, status)
+        return HTTPResponse(body=body, status=status)
 
     def _enable_cors(self):
         def options_handler(path=None):
