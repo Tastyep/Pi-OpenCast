@@ -1,3 +1,1 @@
-from uuid import UUID
-
-Id = UUID
+from OpenCast.infra import Id

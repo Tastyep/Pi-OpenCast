@@ -1,8 +1,7 @@
 import structlog
 from OpenCast.app.command import player as player_cmds
-from OpenCast.app.error import CommandFailure
 from OpenCast.config import config
-from OpenCast.domain.model.player_state import PlayerState
+from OpenCast.domain.model.player import State as PlayerState
 
 from .service import Service
 

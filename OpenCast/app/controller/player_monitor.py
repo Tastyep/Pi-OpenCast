@@ -41,7 +41,7 @@ class PlayerMonitController(MonitorController):
 
     def _get(self, _):
         player = self._player_repo.get_player()
-        return self._make_response(200, player.to_json())
+        return self._make_response(200, player)
 
     def _stream(self, req):
         source = req.query["url"]
