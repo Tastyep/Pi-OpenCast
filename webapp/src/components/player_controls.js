@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton, ButtonGroup, Grid } from "@material-ui/core";
 
 import PauseIcon from "@material-ui/icons/Pause";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
@@ -18,21 +19,40 @@ import player from "services/api/player";
 import "./player_control.css";
 
 function PlayerControls() {
+  const [pauseStatus, setPauseStatus] = useState(true);
+
+  const updatePlayerState = (player) => {
+    if (player.status === "PAUSED") {
+      setPauseStatus(false);
+    } else {
+      setPauseStatus(true);
+    }
+  };
+
+  useEffect(() => {
+    player
+      .get()
+      .then((response) => {
+        updatePlayerState(response.data);
+      })
+      .catch((error) => console.log(error));
+  });
+
   // Highlight subtitle button when on
   return (
     <Grid container spacing={1}>
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => player.prevMedia()}>
+          <IconButton onClick={() => player.pickMedia(undefined)}>
             <SkipPreviousIcon />
           </IconButton>
           <IconButton onClick={() => player.pauseMedia()}>
-            <PauseIcon />
+            {pauseStatus ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
           <IconButton onClick={() => player.stopMedia()}>
             <StopIcon />
           </IconButton>
-          <IconButton onClick={() => player.nextMedia()}>
+          <IconButton onClick={() => player.pickMedia(undefined)}>
             <SkipNextIcon />
           </IconButton>
         </ButtonGroup>
