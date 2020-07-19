@@ -2,7 +2,7 @@ import OpenCast.domain.event.player as Evt
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
 from OpenCast.domain.model.player import Player
-from OpenCast.domain.model.player_state import PlayerState
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 

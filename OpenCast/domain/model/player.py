@@ -1,10 +1,17 @@
+from enum import Enum
+
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
 from OpenCast.domain.event import player as Evt
 
-from .entity import Entity
-from .player_state import PlayerState
+from .entity import Entity, Id
 from .video import Video
+
+
+class State(Enum):
+    PLAYING = 1
+    PAUSED = 2
+    STOPPED = 3
 
 
 class Player(Entity):
@@ -15,7 +22,7 @@ class Player(Entity):
 
     def __init__(self, id_: Id):
         super().__init__(id_)
-        self._state = PlayerState.STOPPED
+        self._state = State.STOPPED
         self._queue = []
         self._index = 0
         self._sub_state = True
@@ -25,65 +32,6 @@ class Player(Entity):
     def __repr__(self):
         base_repr = super().__repr__()
         return f"{Player.__name__}({base_repr}, state={self._state}, video_idx={self._index} / {len(self._queue)})"
-
-    def play(self, video: Video):
-        if video not in self._queue:
-            raise DomainError(f"unknown video: {video}")
-
-        self._index = self._queue.index(video)
-        self._state = PlayerState.PLAYING
-        self._record(Evt.PlayerStarted, video.id)
-
-    def stop(self):
-        if self._state is PlayerState.STOPPED:
-            raise DomainError("the player is already stopped")
-        self._state = PlayerState.STOPPED
-        self._sub_delay = 0
-        self._record(Evt.PlayerStopped)
-
-    def queue(self, video: Video, with_priority=False):
-        idx = len(self._queue)
-
-        # Try to order videos from the same playlist together
-        next_videos = self._queue[self._index :]
-        for i, q_video in enumerate(reversed(next_videos)):
-            if q_video.playlist_id == video.playlist_id:
-                idx = self._index + len(next_videos) - i
-                break
-
-        self._queue.insert(idx, video)
-        self._record(Evt.VideoQueued, video.id)
-
-    def pause(self):
-        if self._state is not PlayerState.PLAYING:
-            raise DomainError(f"the player is not started")
-        self._state = PlayerState.PAUSED
-        self._record(Evt.PlayerPaused)
-
-    def unpause(self):
-        if self._state is not PlayerState.PAUSED:
-            raise DomainError(f"the player is not paused")
-        self._state = PlayerState.PLAYING
-        self._record(Evt.PlayerUnpaused)
-
-    def next_video(self):
-        if self._index + 1 >= len(self._queue):
-            if self._queue and config["player.loop_last"] is True:
-                return self._queue[self._index]
-            return None
-
-        return self._queue[self._index + 1]
-
-    def pick(self, video_id: Id):
-        if not self._queue:
-            raise DomainError(f"queue is empty")
-        video = next((video for video in self._queue if video.id == video_id), None)
-        if video is None:
-            raise DomainError(f"video not found")
-        return video
-
-    def seek_video(self):
-        self._record(Evt.VideoSeeked)
 
     @property
     def state(self):
@@ -119,3 +67,62 @@ class Player(Entity):
     def volume(self, v):
         self._volume = max(min(200, v), 0)
         self._record(Evt.VolumeUpdated, self._volume)
+
+    def play(self, video: Video):
+        if video not in self._queue:
+            raise DomainError(f"unknown video: {video}")
+
+        self._index = self._queue.index(video)
+        self._state = State.PLAYING
+        self._record(Evt.PlayerStarted, video.id)
+
+    def stop(self):
+        if self._state is State.STOPPED:
+            raise DomainError("the player is already stopped")
+        self._state = State.STOPPED
+        self._sub_delay = 0
+        self._record(Evt.PlayerStopped)
+
+    def queue(self, video: Video, with_priority=False):
+        idx = len(self._queue)
+
+        # Try to order videos from the same playlist together
+        next_videos = self._queue[self._index :]
+        for i, q_video in enumerate(reversed(next_videos)):
+            if q_video.playlist_id == video.playlist_id:
+                idx = self._index + len(next_videos) - i
+                break
+
+        self._queue.insert(idx, video)
+        self._record(Evt.VideoQueued, video.id)
+
+    def pause(self):
+        if self._state is not State.PLAYING:
+            raise DomainError(f"the player is not started")
+        self._state = State.PAUSED
+        self._record(Evt.PlayerPaused)
+
+    def unpause(self):
+        if self._state is not State.PAUSED:
+            raise DomainError(f"the player is not paused")
+        self._state = State.PLAYING
+        self._record(Evt.PlayerUnpaused)
+
+    def next_video(self):
+        if self._index + 1 >= len(self._queue):
+            if self._queue and config["player.loop_last"] is True:
+                return self._queue[self._index]
+            return None
+
+        return self._queue[self._index + 1]
+
+    def pick(self, video_id: Id):
+        if not self._queue:
+            raise DomainError(f"queue is empty")
+        video = next((video for video in self._queue if video.id == video_id), None)
+        if video is None:
+            raise DomainError(f"video not found")
+        return video
+
+    def seek_video(self):
+        self._record(Evt.VideoSeeked)

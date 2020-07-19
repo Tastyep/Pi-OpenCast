@@ -32,5 +32,10 @@ class Entity:
         self._events.clear()
         return events
 
+    def to_dict(self):
+        data = self.__dict__
+        data.pop("_events")
+        return data
+
     def _record(self, evtcls, *args):
         self._events[evtcls] = (self.id,) + args

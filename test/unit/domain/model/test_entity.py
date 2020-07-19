@@ -4,9 +4,14 @@ from OpenCast.domain.model.entity import Entity
 
 
 class EntityTest(TestCase):
+    def setUp(self):
+        self.entity = Entity(None)
+
     def test_construction(self):
-        entity_id = None
-        entity = Entity(entity_id)
-        self.assertEqual(entity_id, entity.id)
-        self.assertEqual(0, entity.version)
-        self.assertEmpty(entity.release_events())
+        self.assertEqual(None, self.entity.id)
+        self.assertEqual(0, self.entity.version)
+        self.assertEmpty(self.entity.release_events())
+
+    def test_json(self):
+        json = self.entity.to_dict()
+        self.assertEqual({"_id": None, "_version": 0}, json)
