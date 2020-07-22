@@ -1,6 +1,7 @@
 import uuid
 
 from OpenCast.app.command import player as Cmd
+from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
@@ -8,6 +9,7 @@ from OpenCast.app.workflow.player import (
     StreamVideoWorkflow,
     Video,
 )
+from OpenCast.domain.event import player as Evt
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.util.conversion import str_to_bool
@@ -20,6 +22,7 @@ class PlayerMonitController(MonitorController):
         super().__init__(app_facade, infra_facade, "/player")
 
         media_factory = infra_facade.media_factory
+        self._io_factory = infra_facade.io_factory
         self._source_service = service_factory.make_source_service(
             media_factory.make_downloader(app_facade.evt_dispatcher),
             media_factory.make_video_parser(),
@@ -86,34 +89,68 @@ class PlayerMonitController(MonitorController):
         return self._ok()
 
     async def _pick_video(self, req):
-        video_id = uuid.UUID(req.query["video_id"])
-        self._dispatch(Cmd.PickVideo, video_id)
+        video_id = uuid.UUID(req.query["id"])
+        handlers, channel = self._make_default_handlers(Evt.VideoPicked)
+        self._observe_dispatch(handlers, Cmd.PickVideo, video_id)
+
+        return await channel.receive()
 
     async def _stop(self, _):
-        self._dispatch(Cmd.StopPlayer)
+        handlers, channel = self._make_default_handlers(Evt.PlayerStopped)
+        self._observe_dispatch(handlers, Cmd.StopPlayer)
+
+        return await channel.receive()
 
     async def _pause(self, _):
-        self._dispatch(Cmd.ToggleVideoState)
+        handlers, channel = self._make_default_handlers(Evt.PlayerStateToggled)
+        self._observe_dispatch(handlers, Cmd.TogglePlayerState)
+
+        return await channel.receive()
 
     async def _seek(self, req):
         forward = str_to_bool(req.query["forward"])
         long = str_to_bool(req.query["long"])
         side = 1 if forward is True else -1
         step = Player.LONG_TIME_STEP if long is True else Player.SHORT_TIME_STEP
-        self._dispatch(Cmd.SeekVideo, side * step)
+        handlers, channel = self._make_default_handlers(Evt.VideoSeeked)
+        self._observe_dispatch(handlers, Cmd.SeekVideo, side * step)
+
+        return await channel.receive()
 
     async def _volume(self, req):
         volume = int(req.query["value"])
-        self._dispatch(Cmd.ChangeVolume, volume)
+        handlers, channel = self._make_default_handlers(Evt.VolumeUpdated)
+        self._observe_dispatch(handlers, Cmd.ChangeVolume, volume)
+
+        return await channel.receive()
 
     async def _subtitle_toggle(self, _):
-        self._dispatch(Cmd.ToggleSubtitle)
+        handlers, channel = self._make_default_handlers(Evt.SubtitleStateUpdated)
+        self._observe_dispatch(handlers, Cmd.ToggleSubtitle)
+
+        return await channel.receive()
 
     async def _subtitle_seek(self, req):
         forward = str_to_bool(req.query["forward"])
         step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
-        self._dispatch(Cmd.IncreaseSubtitleDelay, step)
+        handlers, channel = self._make_default_handlers(Evt.SubtitleDelayUpdated)
+        self._observe_dispatch(handlers, Cmd.IncreaseSubtitleDelay, step)
 
-    def _dispatch(self, cmd_cls, *args, **kwargs):
+        return await channel.receive()
+
+    def _make_default_handlers(self, evt_cls):
+        channel = self._io_factory.make_janus_channel()
+
+        def on_success(evt):
+            player = self._player_repo.get_player()
+            channel.send(self._ok(player))
+
+        def on_error(error):
+            channel.send(self._bad_request())
+
+        evtcls_handler = {evt_cls: on_success, OperationError: on_error}
+        return evtcls_handler, channel
+
+    def _observe_dispatch(self, evtcls_handler, cmd_cls, *args, **kwargs):
         player_id = IdentityService.id_player()
-        return super()._dispatch(cmd_cls, player_id, *args, **kwargs)
+        super()._observe_dispatch(evtcls_handler, cmd_cls, player_id, *args, **kwargs)
