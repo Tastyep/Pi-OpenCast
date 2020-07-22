@@ -50,22 +50,13 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.StopPlayer, self.player_id
         )
 
-    def test_pause_video(self):
+    def test_toggle_player_state(self):
         self.data_producer.player().video("source", None).play().populate(
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.PlayerPaused).from_(
-            Cmd.ToggleVideoState, self.player_id
-        )
-
-    def test_unpause_video(self):
-        self.data_producer.player().video("source", None).play().pause().populate(
-            self.data_facade
-        )
-
-        self.evt_expecter.expect(Evt.PlayerUnpaused).from_(
-            Cmd.ToggleVideoState, self.player_id
+        self.evt_expecter.expect(Evt.PlayerStateToggled).from_(
+            Cmd.TogglePlayerState, self.player_id
         )
 
     def test_change_video_volume(self):

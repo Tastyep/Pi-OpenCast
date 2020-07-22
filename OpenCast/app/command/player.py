@@ -17,7 +17,7 @@ class StopPlayer(Command):
 
 
 @command
-class ToggleVideoState(Command):
+class TogglePlayerState(Command):
     pass
 
 

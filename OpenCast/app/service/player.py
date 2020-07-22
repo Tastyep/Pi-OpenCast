@@ -36,18 +36,15 @@ class PlayerService(Service):
 
         self._update(cmd.id, stop_video)
 
-    def _toggle_video_state(self, cmd):
-        def pause(model):
-            self._player.pause()
-            model.pause()
+    def _toggle_player_state(self, cmd):
+        def toggle_state(model):
+            model.toggle_pause()
+            if model.state is PlayerState.PAUSED:
+                self._player.pause()
+            else:
+                self._player.unpause()
 
-        def unpause(model):
-            self._player.unpause()
-            model.unpause()
-
-        model = self._player_model()
-        action = pause if model.state is PlayerState.PLAYING else unpause
-        self._update(cmd.id, action)
+        self._update(cmd.id, toggle_state)
 
     def _seek_video(self, cmd):
         self._player.seek(cmd.duration)
