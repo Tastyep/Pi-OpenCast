@@ -96,17 +96,14 @@ class Player(Entity):
         self._queue.insert(idx, video)
         self._record(Evt.VideoQueued, video.id)
 
-    def pause(self):
-        if self._state is not State.PLAYING:
+    def toggle_pause(self):
+        if self._state is State.PLAYING:
+            self._state = State.PAUSED
+        elif self._state is State.PAUSED:
+            self._state = State.PLAYING
+        else:
             raise DomainError(f"the player is not started")
-        self._state = State.PAUSED
-        self._record(Evt.PlayerPaused)
-
-    def unpause(self):
-        if self._state is not State.PAUSED:
-            raise DomainError(f"the player is not paused")
-        self._state = State.PLAYING
-        self._record(Evt.PlayerUnpaused)
+        self._record(Evt.PlayerStateToggled)
 
     def next_video(self):
         if self._index + 1 >= len(self._queue):

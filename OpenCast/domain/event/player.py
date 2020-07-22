@@ -19,12 +19,7 @@ class PlayerStopped(Event):
 
 
 @dataclass
-class PlayerPaused(Event):
-    pass
-
-
-@dataclass
-class PlayerUnpaused(Event):
+class PlayerStateToggled(Event):
     pass
 
 
