@@ -89,7 +89,7 @@ class PlayerMonitController(MonitorController):
 
     async def _pick_video(self, req):
         video_id = uuid.UUID(req.query["id"])
-        handlers, channel = self._make_default_handlers(Evt.VideoPicked)
+        handlers, channel = self._make_default_handlers(Evt.PlayerStarted)
         self._observe_dispatch(handlers, Cmd.PickVideo, video_id)
 
         return await channel.receive()
