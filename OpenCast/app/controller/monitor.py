@@ -1,8 +1,8 @@
 import functools
 import json
 
+from OpenCast.app.command import make_cmd
 from OpenCast.app.tool.json_encoder import ModelEncoder
-from OpenCast.domain.service.identity import IdentityService
 
 from .controller import Controller
 
@@ -17,9 +17,9 @@ class MonitorController(Controller):
     def _observe_dispatch(
         self, evtcls_handler: dict, cmd_cls, component_id, *args, **kwargs
     ):
-        cmd_id = IdentityService.id_command(cmd_cls, component_id)
-        self._evt_dispatcher.observe(cmd_id, evtcls_handler, 1)
-        self._cmd_dispatcher.dispatch(cmd_cls(cmd_id, component_id, *args, **kwargs))
+        cmd = make_cmd(cmd_cls, component_id, *args, **kwargs)
+        self._evt_dispatcher.observe(cmd.id, evtcls_handler, 1)
+        self._cmd_dispatcher.dispatch(cmd)
 
     def _route(self, method, route, handle):
         self._server.route(method, f"{self._base_route}{route}", handle)
