@@ -29,7 +29,6 @@ class PlayerMonitController(MonitorController):
         )
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
-        self._player_repo.create(Player(uuid.uuid4()))
 
         self._route("GET", "/", self._get)
         self._route("POST", "/stream", self._stream)
