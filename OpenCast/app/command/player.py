@@ -32,7 +32,7 @@ class PickVideo(Command):
 
 
 @command
-class ChangeVolume(Command):
+class UpdateVolume(Command):
     volume: int
 
 
@@ -42,7 +42,7 @@ class ToggleSubtitle(Command):
 
 
 @command
-class IncreaseSubtitleDelay(Command):
+class AdjustSubtitleDelay(Command):
     amount: int
 
 
