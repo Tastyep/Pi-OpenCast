@@ -1,5 +1,5 @@
+from OpenCast.app.command import make_cmd
 from OpenCast.app.service.error import OperationError
-from OpenCast.domain.service.identity import IdentityService
 from OpenCast.util.naming import name_factory_method, name_handler_method
 from transitions import Machine
 
@@ -51,9 +51,9 @@ class Workflow(Machine):
         workflow.start(*args, **kwargs)
 
     def _observe_dispatch(self, evt_cls, cmd_cls, model_id, *args, **kwargs):
-        cmd_id = IdentityService.id_command(cmd_cls, model_id)
-        self._observe(cmd_id, [evt_cls, OperationError])
-        self._cmd_dispatcher.dispatch(cmd_cls(cmd_id, model_id, *args, **kwargs))
+        cmd = make_cmd(cmd_cls, model_id, *args, **kwargs)
+        self._observe(cmd.id, [evt_cls, OperationError])
+        self._cmd_dispatcher.dispatch(cmd)
 
     def _observe(self, cmd_id, evt_clss: list):
         evtcls_to_handler = {

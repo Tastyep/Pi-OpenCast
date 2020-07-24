@@ -1,5 +1,6 @@
 import inspect
 
+from OpenCast.app.command import make_cmd
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.util.naming import name_handler_method
 
@@ -11,8 +12,8 @@ class Controller:
         self._evt_dispatcher = app_facade.evt_dispatcher
 
     def _dispatch(self, cmd_cls, component_id, *args, **kwargs):
-        cmd_id = IdentityService.id_command(cmd_cls, component_id)
-        self._cmd_dispatcher.dispatch(cmd_cls(cmd_id, component_id, *args, **kwargs))
+        cmd = make_cmd(cmd_cls, component_id, *args, **kwargs)
+        self._cmd_dispatcher.dispatch(cmd)
 
     def _observe(self, module):
         classes = inspect.getmembers(module, inspect.isclass)
