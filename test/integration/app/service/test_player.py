@@ -65,7 +65,7 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
         self.evt_expecter.expect(Evt.VolumeUpdated, 80).from_(
-            Cmd.ChangeVolume, self.player_id, 80
+            Cmd.UpdateVolume, self.player_id, 80
         )
 
     def test_pick_video(self):
@@ -89,7 +89,7 @@ class PlayerServiceTest(ServiceTestCase):
         self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleDelayUpdated).from_(
-            Cmd.IncreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
+            Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
         )
 
     def test_decrease_subtitle_delay(self):

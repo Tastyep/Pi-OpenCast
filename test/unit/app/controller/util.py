@@ -61,7 +61,7 @@ class MonitorControllerTestCase(IsolatedAsyncioTestCase):
                     url = f"{url}?{k}={v}"
                     first = False
                 else:
-                    url = f"{url},{k}={v}"
+                    url = f"{url}&{k}={v}"
 
         return make_mocked_request(method, url)
 

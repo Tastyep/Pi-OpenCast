@@ -50,7 +50,7 @@ class PlayerService(Service):
         self._player.seek(cmd.duration)
         # TODO reflect change in model
 
-    def _change_volume(self, cmd):
+    def _update_volume(self, cmd):
         def impl(model):
             model.volume = cmd.volume
             self._player.set_volume(model.volume)
@@ -69,7 +69,7 @@ class PlayerService(Service):
         self._player.toggle_subtitle()
         self._update(cmd.id, impl)
 
-    def _increase_subtitle_delay(self, cmd):
+    def _adjust_subtitle_delay(self, cmd):
         def impl(model):
             model.subtitle_delay = model.subtitle_delay + cmd.amount
             self._player.set_subtitle_delay(model.subtitle_delay)

@@ -119,7 +119,7 @@ class PlayerMonitController(MonitorController):
     async def _volume(self, req):
         volume = int(req.query["value"])
         handlers, channel = self._make_default_handlers(Evt.VolumeUpdated)
-        self._observe_dispatch(handlers, Cmd.ChangeVolume, volume)
+        self._observe_dispatch(handlers, Cmd.UpdateVolume, volume)
 
         return await channel.receive()
 
@@ -133,7 +133,7 @@ class PlayerMonitController(MonitorController):
         forward = str_to_bool(req.query["forward"])
         step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
         handlers, channel = self._make_default_handlers(Evt.SubtitleDelayUpdated)
-        self._observe_dispatch(handlers, Cmd.IncreaseSubtitleDelay, step)
+        self._observe_dispatch(handlers, Cmd.AdjustSubtitleDelay, step)
 
         return await channel.receive()
 
