@@ -1,8 +1,7 @@
 import structlog
 from OpenCast.app.command import player as player_cmds
-from OpenCast.app.error import CommandFailure
 from OpenCast.config import config
-from OpenCast.domain.model.player_state import PlayerState
+from OpenCast.domain.model.player import State as PlayerState
 
 from .service import Service
 
@@ -37,45 +36,31 @@ class PlayerService(Service):
 
         self._update(cmd.id, stop_video)
 
-    def _toggle_video_state(self, cmd):
-        def pause(model):
-            self._player.pause()
-            model.pause()
+    def _toggle_player_state(self, cmd):
+        def toggle_state(model):
+            model.toggle_pause()
+            if model.state is PlayerState.PAUSED:
+                self._player.pause()
+            else:
+                self._player.unpause()
 
-        def unpause(model):
-            self._player.unpause()
-            model.unpause()
-
-        model = self._player_model()
-        action = pause if model.state is PlayerState.PLAYING else unpause
-        self._update(cmd.id, action)
+        self._update(cmd.id, toggle_state)
 
     def _seek_video(self, cmd):
         self._player.seek(cmd.duration)
         # TODO reflect change in model
 
-    def _change_volume(self, cmd):
+    def _update_volume(self, cmd):
         def impl(model):
             model.volume = cmd.volume
             self._player.set_volume(model.volume)
 
         self._update(cmd.id, impl)
 
-    def _next_video(self, cmd):
+    def _pick_video(self, cmd):
         model = self._player_model()
-        next_video = model.next_video()
-        if next_video is None:
-            raise CommandFailure("no next video")
-
-        self._play_video_impl(cmd.id, next_video)
-
-    def _prev_video(self, cmd):
-        model = self._player_model()
-        prev_video = model.prev_video()
-        if prev_video is None:
-            raise CommandFailure("no previous video")
-
-        self._play_video_impl(cmd.id, prev_video)
+        video = model.pick(cmd.video_id)
+        self._play_video_impl(cmd.id, video)
 
     def _toggle_subtitle(self, cmd):
         def impl(model):
@@ -84,7 +69,7 @@ class PlayerService(Service):
         self._player.toggle_subtitle()
         self._update(cmd.id, impl)
 
-    def _increase_subtitle_delay(self, cmd):
+    def _adjust_subtitle_delay(self, cmd):
         def impl(model):
             model.subtitle_delay = model.subtitle_delay + cmd.amount
             self._player.set_subtitle_delay(model.subtitle_delay)

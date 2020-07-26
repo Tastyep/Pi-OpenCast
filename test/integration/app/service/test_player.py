@@ -50,22 +50,13 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.StopPlayer, self.player_id
         )
 
-    def test_pause_video(self):
+    def test_toggle_player_state(self):
         self.data_producer.player().video("source", None).play().populate(
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.PlayerPaused).from_(
-            Cmd.ToggleVideoState, self.player_id
-        )
-
-    def test_unpause_video(self):
-        self.data_producer.player().video("source", None).play().pause().populate(
-            self.data_facade
-        )
-
-        self.evt_expecter.expect(Evt.PlayerUnpaused).from_(
-            Cmd.ToggleVideoState, self.player_id
+        self.evt_expecter.expect(Evt.PlayerStateToggled).from_(
+            Cmd.TogglePlayerState, self.player_id
         )
 
     def test_change_video_volume(self):
@@ -74,27 +65,17 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
         self.evt_expecter.expect(Evt.VolumeUpdated, 80).from_(
-            Cmd.ChangeVolume, self.player_id, 80
+            Cmd.UpdateVolume, self.player_id, 80
         )
 
-    def test_next_video(self):
+    def test_pick_video(self):
         self.data_producer.player().video("source", None).play().video(
             "source2", None
         ).populate(self.data_facade)
 
-        next_video_id = IdentityService.id_video("source2")
-        self.evt_expecter.expect(Evt.PlayerStarted, next_video_id).from_(
-            Cmd.NextVideo, self.player_id
-        )
-
-    def test_prev_video(self):
-        self.data_producer.player().video("source", None).video(
-            "source2", None
-        ).play().populate(self.data_facade)
-
-        prev_video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.PlayerStarted, prev_video_id).from_(
-            Cmd.PrevVideo, self.player_id
+        video_id = IdentityService.id_video("source2")
+        self.evt_expecter.expect(Evt.PlayerStarted, video_id).from_(
+            Cmd.PickVideo, self.player_id, video_id
         )
 
     def test_toggle_subtitle(self):
@@ -108,7 +89,7 @@ class PlayerServiceTest(ServiceTestCase):
         self.data_producer.populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.SubtitleDelayUpdated).from_(
-            Cmd.IncreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
+            Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
         )
 
     def test_decrease_subtitle_delay(self):

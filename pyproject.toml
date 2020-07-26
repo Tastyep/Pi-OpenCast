@@ -15,20 +15,23 @@ keywords = ['raspberry', 'opencast', 'chromecast']
 [tool.poetry.dependencies]
 python = "^3.7"
 toml = "^0.9"
-bottle = "^0.12.18"
 youtube-dl = ">= 2020.3.24"
 pyyaml = "^5.3.1"
 "hurry.filesize" = "^0.9"
 transitions = "^0.8.1"
 structlog = "^20.1.0"
 colorama = "^0.4.3"
-sphinx = "^3.0.3"
-sphinx_rtd_theme = "^0.4.3"
 python-vlc = "^3.0.9113"
+aiohttp = "^3.6.2"
+aiohttp_cors = "^0.7.0"
+janus = "^0.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 pytest-cov = "^2.4"
+sphinx_rtd_theme = "^0.4.3"
+sphinx = "^3.1.1"
+mypy = "^0.780"
 
 [tool.poetry.scripts]
 my-script = 'OpenCast:main'

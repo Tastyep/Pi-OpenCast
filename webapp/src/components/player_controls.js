@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton, ButtonGroup, Grid } from "@material-ui/core";
 
 import PauseIcon from "@material-ui/icons/Pause";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
 import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
@@ -18,50 +19,81 @@ import player from "services/api/player";
 import "./player_control.css";
 
 function PlayerControls() {
+  const [pauseStatus, setPauseStatus] = useState(true);
+
+  const updatePlayerState = (player) => {
+    console.log("player: ", player);
+    if (player.state === "PAUSED") {
+      setPauseStatus(false);
+    } else {
+      setPauseStatus(true);
+    }
+  };
+
+  const updatePlayer = (update, ...args) => {
+    update(...args)
+      .then((response) => {
+        updatePlayerState(response.data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  useEffect(() => {
+    updatePlayer(player.get);
+  });
+
   // Highlight subtitle button when on
   return (
     <Grid container spacing={1}>
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => player.prevMedia()}>
+          <IconButton onClick={() => updatePlayer(player.pickMedia, undefined)}>
             <SkipPreviousIcon />
           </IconButton>
-          <IconButton onClick={() => player.pauseMedia()}>
-            <PauseIcon />
+          <IconButton onClick={() => updatePlayer(player.pauseMedia)}>
+            {pauseStatus ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
-          <IconButton onClick={() => player.stopMedia()}>
+          <IconButton onClick={() => updatePlayer(player.stopMedia)}>
             <StopIcon />
           </IconButton>
-          <IconButton onClick={() => player.nextMedia()}>
+          <IconButton onClick={() => updatePlayer(player.pickMedia, undefined)}>
             <SkipNextIcon />
           </IconButton>
         </ButtonGroup>
       </Grid>
       <Grid item xs={6} md={4} className="SeekButtons">
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => player.seekMedia(false, true)}>
+          <IconButton
+            onClick={() => updatePlayer(player.seekMedia, false, true)}
+          >
             <FastRewindIcon />
           </IconButton>
-          <IconButton onClick={() => player.seekMedia(false, false)}>
+          <IconButton
+            onClick={() => updatePlayer(player.seekMedia, false, false)}
+          >
             <ArrowLeftIcon />
           </IconButton>
-          <IconButton onClick={() => player.seekMedia(true, false)}>
+          <IconButton
+            onClick={() => updatePlayer(player.seekMedia, true, false)}
+          >
             <ArrowRightIcon />
           </IconButton>
-          <IconButton onClick={() => player.seekMedia(true, true)}>
+          <IconButton
+            onClick={() => updatePlayer(player.seekMedia, true, true)}
+          >
             <FastForwardIcon />
           </IconButton>
         </ButtonGroup>
       </Grid>
       <Grid item xs={12} md={4} className="SubtitleButtons">
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => player.seekSubtitle(false)}>
+          <IconButton onClick={() => updatePlayer(player.seekSubtitle, false)}>
             <RemoveCircleOutlineIcon />
           </IconButton>
-          <IconButton onClick={() => player.toggleSubtitle()}>
+          <IconButton onClick={() => updatePlayer(player.toggleSubtitle)}>
             <ClosedCaptionIcon />
           </IconButton>
-          <IconButton onClick={() => player.seekSubtitle(true)}>
+          <IconButton onClick={() => updatePlayer(player.seekSubtitle, true)}>
             <AddCircleOutlineIcon />
           </IconButton>
         </ButtonGroup>

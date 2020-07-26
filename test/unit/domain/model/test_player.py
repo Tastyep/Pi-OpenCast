@@ -2,7 +2,7 @@ import OpenCast.domain.event.player as Evt
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
 from OpenCast.domain.model.player import Player
-from OpenCast.domain.model.player_state import PlayerState
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 
@@ -64,16 +64,24 @@ class PlayerTest(ModelTestCase):
         config.load_from_dict({"player": {"loop_last": True}})
         self.assertEqual(None, self.player.next_video())
 
-    def test_prev(self):
+    def test_pick(self):
         videos = self.make_videos(video_count=2)
         for video in videos:
             self.player.queue(video)
-        self.assertEqual(videos[0], self.player.prev_video())
-        self.player.play(self.player.next_video())
-        self.assertEqual(videos[0], self.player.prev_video())
+        self.assertEqual(videos[0], self.player.pick(videos[0].id))
+        self.assertEqual(videos[1], self.player.pick(videos[1].id))
 
-    def test_prev_no_video(self):
-        self.assertEqual(None, self.player.prev_video())
+    def test_pick_no_video(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.player.pick(None)
+        self.assertEqual("queue is empty", str(ctx.exception))
+
+    def test_pick_missing_video(self):
+        video = self.make_video()
+        self.player.queue(video)
+        with self.assertRaises(DomainError) as ctx:
+            self.player.pick(None)
+        self.assertEqual("video not found", str(ctx.exception))
 
     def test_play(self):
         video = self.make_video()
@@ -103,40 +111,35 @@ class PlayerTest(ModelTestCase):
             self.player.stop()
         self.assertEqual("the player is already stopped", str(ctx.exception))
 
-    def test_pause(self):
+    def test_toggle_pause(self):
         video = self.make_video()
         self.player.queue(video)
         self.player.play(video)
-        self.player.pause()
+        self.player.toggle_pause()
         self.assertEqual(PlayerState.PAUSED, self.player.state)
         self.expect_events(
-            self.player, Evt.VideoQueued, Evt.PlayerStarted, Evt.PlayerPaused
+            self.player, Evt.VideoQueued, Evt.PlayerStarted, Evt.PlayerStateToggled
         )
 
-    def test_pause_not_started(self):
+    def test_toggle_pause_not_started(self):
         with self.assertRaises(DomainError) as ctx:
-            self.player.pause()
+            self.player.toggle_pause()
         self.assertEqual("the player is not started", str(ctx.exception))
 
-    def test_unpause(self):
+    def test_toggle_pause_twice(self):
         video = self.make_video()
         self.player.queue(video)
         self.player.play(video)
-        self.player.pause()
-        self.player.unpause()
+        self.player.toggle_pause()
+        self.player.toggle_pause()
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.expect_events(
             self.player,
             Evt.VideoQueued,
             Evt.PlayerStarted,
-            Evt.PlayerPaused,
-            Evt.PlayerUnpaused,
+            Evt.PlayerStateToggled,
+            Evt.PlayerStateToggled,
         )
-
-    def test_unpause_not_paused(self):
-        with self.assertRaises(DomainError) as ctx:
-            self.player.unpause()
-        self.assertEqual("the player is not paused", str(ctx.exception))
 
     def test_volume(self):
         self.player.volume = -10
@@ -147,4 +150,6 @@ class PlayerTest(ModelTestCase):
 
         self.player.volume = 50
         self.assertEqual(50, self.player.volume)
-        self.expect_events(self.player, Evt.VolumeUpdated)
+        self.expect_events(
+            self.player, Evt.VolumeUpdated, Evt.VolumeUpdated, Evt.VolumeUpdated
+        )

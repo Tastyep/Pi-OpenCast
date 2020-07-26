@@ -1,8 +1,8 @@
 from threading import Condition
-from uuid import UUID
 
 import OpenCast.infra.event.player as e
 import structlog
+from OpenCast.infra import Id
 from vlc import EventType
 
 from .error import PlayerError
@@ -21,7 +21,7 @@ class PlayerWrapper:
         player_events = self._player.event_manager()
         player_events.event_attach(EventType.MediaPlayerEndReached, self._on_media_end)
 
-    def play(self, video_id: UUID, video_path: str):
+    def play(self, video_id: Id, video_path: str):
         media = self._id_to_media.get(video_id, None)
         if media is None:
             media = self._instance.media_new(video_path)

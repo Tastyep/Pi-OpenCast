@@ -60,7 +60,9 @@ class Service:
         models_events = []
         for model in models:
             events = model.release_events()
-            models_events.append([evtcls(cmd_id, *events[evtcls]) for evtcls in events])
+            models_events.append(
+                [evtcls(cmd_id, *event[evtcls]) for event in events for evtcls in event]
+            )
 
         context.commit()
         for model_events in models_events:

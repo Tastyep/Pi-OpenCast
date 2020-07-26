@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
@@ -7,10 +7,10 @@ import player from "services/api/player";
 import "./stream_input.css";
 
 function StreamInput() {
-  const [url, setUrl] = React.useState("");
-  const [action, setAction] = React.useState(() => player.streamMedia);
-  const [castVariant, setCastVariant] = React.useState("contained");
-  const [queueVariant, setQueueVariant] = React.useState("outlined");
+  const [url, setUrl] = useState("");
+  const [action, setAction] = useState(() => player.streamMedia);
+  const [castVariant, setCastVariant] = useState("contained");
+  const [queueVariant, setQueueVariant] = useState("outlined");
 
   const handleSubmit = (event) => {
     if (event) {

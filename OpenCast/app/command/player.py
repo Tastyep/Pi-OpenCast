@@ -1,16 +1,14 @@
-from uuid import UUID
-
-from .command import Command, command
+from .command import Command, ModelId, command
 
 
 @command
 class PlayVideo(Command):
-    video_id: UUID
+    video_id: ModelId
 
 
 @command
 class QueueVideo(Command):
-    video_id: UUID
+    video_id: ModelId
 
 
 @command
@@ -19,7 +17,7 @@ class StopPlayer(Command):
 
 
 @command
-class ToggleVideoState(Command):
+class TogglePlayerState(Command):
     pass
 
 
@@ -29,17 +27,12 @@ class SeekVideo(Command):
 
 
 @command
-class NextVideo(Command):
-    pass
+class PickVideo(Command):
+    video_id: ModelId
 
 
 @command
-class PrevVideo(Command):
-    pass
-
-
-@command
-class ChangeVolume(Command):
+class UpdateVolume(Command):
     volume: int
 
 
@@ -49,7 +42,7 @@ class ToggleSubtitle(Command):
 
 
 @command
-class IncreaseSubtitleDelay(Command):
+class AdjustSubtitleDelay(Command):
     amount: int
 
 

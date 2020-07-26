@@ -1,17 +1,16 @@
 from dataclasses import dataclass
-from uuid import UUID
 
-from .event import Event
+from .event import Event, ModelId
 
 
 @dataclass
 class PlayerStarted(Event):
-    video_id: UUID
+    video_id: ModelId
 
 
 @dataclass
 class VideoQueued(Event):
-    video_id: UUID
+    video_id: ModelId
 
 
 @dataclass
@@ -20,12 +19,7 @@ class PlayerStopped(Event):
 
 
 @dataclass
-class PlayerPaused(Event):
-    pass
-
-
-@dataclass
-class PlayerUnpaused(Event):
+class PlayerStateToggled(Event):
     pass
 
 
