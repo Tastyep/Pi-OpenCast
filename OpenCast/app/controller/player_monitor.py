@@ -1,5 +1,3 @@
-import uuid
-
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
@@ -10,6 +8,7 @@ from OpenCast.app.workflow.player import (
     Video,
 )
 from OpenCast.domain.event import player as Evt
+from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.util.conversion import str_to_bool
@@ -22,7 +21,6 @@ class PlayerMonitController(MonitorController):
         super().__init__(app_facade, infra_facade, "/player")
 
         media_factory = infra_facade.media_factory
-        self._io_factory = infra_facade.io_factory
         self._source_service = service_factory.make_source_service(
             media_factory.make_downloader(app_facade.evt_dispatcher),
             media_factory.make_video_parser(),
@@ -88,7 +86,7 @@ class PlayerMonitController(MonitorController):
         return self._ok()
 
     async def _pick_video(self, req):
-        video_id = uuid.UUID(req.query["id"])
+        video_id = Id(req.query["id"])
         handlers, channel = self._make_default_handlers(Evt.PlayerStarted)
         self._observe_dispatch(handlers, Cmd.PickVideo, video_id)
 

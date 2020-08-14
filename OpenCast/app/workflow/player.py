@@ -171,23 +171,23 @@ class StreamPlaylistWorkflow(Workflow):
     # fmt: off
     class States(Enum):
         INITIAL = auto()
-        PLAYING = auto()
+        STARTING = auto()
         QUEUEING = auto()
         COMPLETED = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["_play_video",                      States.INITIAL,  States.PLAYING],
-        ["_stream_video_workflow_completed", States.PLAYING,  States.COMPLETED, "_is_last_video"],   # noqa: E501
-        ["_stream_video_workflow_completed", States.PLAYING,  States.QUEUEING],
-        ["_stream_video_workflow_aborted",   States.PLAYING,  States.COMPLETED, "_is_last_video"],   # noqa: E501
-        ["_stream_video_workflow_aborted",   States.PLAYING,  "="],
+        ["_play_video",                      States.INITIAL,  States.STARTING],
+        ["_stream_video_workflow_completed", States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
+        ["_stream_video_workflow_completed", States.STARTING, States.QUEUEING],
+        ["_stream_video_workflow_aborted",   States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
+        ["_stream_video_workflow_aborted",   States.STARTING, "="],
 
-        ["_queue_video_workflow_completed",  States.QUEUEING,  States.COMPLETED, "_is_last_video"],  # noqa: E501
-        ["_queue_video_workflow_completed",  States.QUEUEING,  "="],
-        ["_queue_video_workflow_aborted",    States.QUEUEING,  States.COMPLETED, "_is_last_video"],  # noqa: E501
-        ["_queue_video_workflow_aborted",    States.QUEUEING,  "="],
+        ["_queue_video_workflow_completed",  States.QUEUEING, States.COMPLETED, "_is_last_video"],  # noqa: E501
+        ["_queue_video_workflow_completed",  States.QUEUEING, "="],
+        ["_queue_video_workflow_aborted",    States.QUEUEING, States.COMPLETED, "_is_last_video"],  # noqa: E501
+        ["_queue_video_workflow_aborted",    States.QUEUEING, "="],
     ]
     # fmt: on
 
@@ -206,7 +206,7 @@ class StreamPlaylistWorkflow(Workflow):
         self._play_video(None)
 
     # States
-    def on_enter_PLAYING(self, _):
+    def on_enter_STARTING(self, _):
         workflow = self._child_workflow(
             StreamVideoWorkflow, self._video_repo, self._videos.pop()
         )

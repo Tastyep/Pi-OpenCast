@@ -21,11 +21,11 @@ class MemoryRepo:
             raise RepoError(f"cannot update: '{model}' is outdated")
 
         model.update_version()
-        self._table = [model if e == model else e for e in self._table]
+        self._table = [model if m == model else m for m in self._table]
 
     def delete(self, model):
         prev_size = len(self._table)
-        self._table = [e for e in self._table if e != model]
+        self._table = [m for m in self._table if m != model]
         if len(self._table) == prev_size:
             raise RepoError(f"cannot delete: '{model}' doesn't exist")
 
@@ -33,13 +33,13 @@ class MemoryRepo:
         return deepcopy(self._table)
 
     def get(self, id_):
-        model = next((e for e in self._table if e.id == id_), None)
+        model = next((m for m in self._table if m.id == id_), None)
         if model is None:
             return None
         return deepcopy(model)
 
     def exists(self, id_):
-        return next((e for e in self._table if e.id == id_), None) is not None
+        return next((m for m in self._table if m.id == id_), None) is not None
 
     def make_context(self):
         return Context(self)

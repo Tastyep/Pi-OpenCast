@@ -44,6 +44,7 @@ def main(argv=None):
 
     repo_factory = RepoFactory()
     data_facade = DataFacade(repo_factory)
+    data_facade.player_repo.create(Player(IdentityService.id_player()))
 
     io_factory = IoFactory()
     media_factory = MediaFactory(
@@ -53,8 +54,6 @@ def main(argv=None):
 
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)
     ServiceModule(app_facade, infra_facade, data_facade, service_factory)
-
-    data_facade.player_repo.create(Player(IdentityService.id_player()))
 
     try:
         server = infra_facade.server
