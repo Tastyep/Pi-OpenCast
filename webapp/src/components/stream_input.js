@@ -19,7 +19,7 @@ function StreamInput() {
     if (url === "") {
       return;
     }
-    action(url);
+    action(url).catch((error) => console.log(error));
     setUrl("");
   };
 
