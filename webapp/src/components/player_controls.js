@@ -14,7 +14,7 @@ import FastForwardIcon from "@material-ui/icons/FastForward";
 import ArrowLeftIcon from "@material-ui/icons/ArrowLeft";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 
-import player from "services/api/player";
+import playerAPI from "services/api/player";
 
 import "./player_control.css";
 
@@ -39,7 +39,7 @@ function PlayerControls() {
   };
 
   useEffect(() => {
-    updatePlayer(player.get);
+    updatePlayer(playerAPI.get);
   });
 
   // Highlight subtitle button when on
@@ -47,16 +47,20 @@ function PlayerControls() {
     <Grid container spacing={1}>
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => updatePlayer(player.pickMedia, undefined)}>
+          <IconButton
+            onClick={() => updatePlayer(playerAPI.pickMedia, undefined)}
+          >
             <SkipPreviousIcon />
           </IconButton>
-          <IconButton onClick={() => updatePlayer(player.pauseMedia)}>
+          <IconButton onClick={() => updatePlayer(playerAPI.pauseMedia)}>
             {pauseStatus ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
-          <IconButton onClick={() => updatePlayer(player.stopMedia)}>
+          <IconButton onClick={() => updatePlayer(playerAPI.stopMedia)}>
             <StopIcon />
           </IconButton>
-          <IconButton onClick={() => updatePlayer(player.pickMedia, undefined)}>
+          <IconButton
+            onClick={() => updatePlayer(playerAPI.pickMedia, undefined)}
+          >
             <SkipNextIcon />
           </IconButton>
         </ButtonGroup>
@@ -64,22 +68,22 @@ function PlayerControls() {
       <Grid item xs={6} md={4} className="SeekButtons">
         <ButtonGroup size="small" variant="text">
           <IconButton
-            onClick={() => updatePlayer(player.seekMedia, false, true)}
+            onClick={() => updatePlayer(playerAPI.seekMedia, false, true)}
           >
             <FastRewindIcon />
           </IconButton>
           <IconButton
-            onClick={() => updatePlayer(player.seekMedia, false, false)}
+            onClick={() => updatePlayer(playerAPI.seekMedia, false, false)}
           >
             <ArrowLeftIcon />
           </IconButton>
           <IconButton
-            onClick={() => updatePlayer(player.seekMedia, true, false)}
+            onClick={() => updatePlayer(playerAPI.seekMedia, true, false)}
           >
             <ArrowRightIcon />
           </IconButton>
           <IconButton
-            onClick={() => updatePlayer(player.seekMedia, true, true)}
+            onClick={() => updatePlayer(playerAPI.seekMedia, true, true)}
           >
             <FastForwardIcon />
           </IconButton>
@@ -87,13 +91,17 @@ function PlayerControls() {
       </Grid>
       <Grid item xs={12} md={4} className="SubtitleButtons">
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => updatePlayer(player.seekSubtitle, false)}>
+          <IconButton
+            onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}
+          >
             <RemoveCircleOutlineIcon />
           </IconButton>
-          <IconButton onClick={() => updatePlayer(player.toggleSubtitle)}>
+          <IconButton onClick={() => updatePlayer(playerAPI.toggleSubtitle)}>
             <ClosedCaptionIcon />
           </IconButton>
-          <IconButton onClick={() => updatePlayer(player.seekSubtitle, true)}>
+          <IconButton
+            onClick={() => updatePlayer(playerAPI.seekSubtitle, true)}
+          >
             <AddCircleOutlineIcon />
           </IconButton>
         </ButtonGroup>
