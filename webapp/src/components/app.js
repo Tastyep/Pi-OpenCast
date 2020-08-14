@@ -4,6 +4,7 @@ import { Grid, Paper } from "@material-ui/core";
 
 import Header from "./header";
 import StreamInput from "./stream_input";
+import VideoList from "./video_list";
 import PlayerControls from "./player_controls";
 import VolumeControl from "./volume_control";
 
@@ -19,6 +20,9 @@ class App extends Component {
               <Grid item container direction="column" spacing={4}>
                 <Grid item>
                   <StreamInput />
+                </Grid>
+                <Grid item>
+                  <VideoList />
                 </Grid>
                 <Grid item>
                   <PlayerControls />
