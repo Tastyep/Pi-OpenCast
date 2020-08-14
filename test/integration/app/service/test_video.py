@@ -55,20 +55,20 @@ class VideoServiceTest(ServiceTestCase):
     def test_identify_video(self):
         self.data_producer.video("source", None).populate(self.data_facade)
 
-        title = "video_title"
-        self.downloader.pick_stream_metadata.return_value = {"title": title}
+        metadata = {"title": "title", "thumbnail": "thumbnail_url"}
+        self.downloader.pick_stream_metadata.return_value = metadata
 
         video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.VideoIdentified, title).from_(
+        self.evt_expecter.expect(Evt.VideoIdentified, metadata).from_(
             Cmd.IdentifyVideo, video_id
         )
 
     def test_retrieve_video_success(self):
         video_id = IdentityService.id_video("source")
         video_title = "video_title"
-        self.data_producer.video("source", None, title=video_title).populate(
-            self.data_facade
-        )
+        self.data_producer.video(
+            "source", None, metadata={"title": video_title}
+        ).populate(self.data_facade)
 
         def dispatch_downloaded(op_id, *args):
             self.app_facade.evt_dispatcher.dispatch(DownloadSuccess(op_id))
@@ -83,9 +83,9 @@ class VideoServiceTest(ServiceTestCase):
     def test_retrieve_video_error(self):
         video_id = IdentityService.id_video("source")
         video_title = "video_title"
-        self.data_producer.video("source", None, title=video_title).populate(
-            self.data_facade
-        )
+        self.data_producer.video(
+            "source", None, metadata={"title": video_title}
+        ).populate(self.data_facade)
 
         def dispatch_error(op_id, *args):
             self.app_facade.evt_dispatcher.dispatch(

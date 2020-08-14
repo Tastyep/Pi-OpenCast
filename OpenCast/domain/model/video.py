@@ -15,10 +15,13 @@ class Stream:
 
 
 class Video(Entity):
+    METADATA_FIELDS = ["title", "thumbnail"]
+
     def __init__(self, id_: Id, source, playlist_id: Id):
         super().__init__(id_)
         self._source = source
         self._playlist_id = playlist_id
+        self._thumbnail = None
         self._title = None
         self._path = None
         self._streams = []
@@ -28,7 +31,7 @@ class Video(Entity):
 
     def __repr__(self):
         base_repr = super().__repr__()
-        return f"{Video.__name__}({base_repr}, title='{self._title}', playlist={self._playlist_id})"
+        return f"{Video.__name__}({base_repr}, title='{self.title}', playlist={self._playlist_id})"
 
     @property
     def source(self):
@@ -54,14 +57,12 @@ class Video(Entity):
     def subtitle(self):
         return self._subtitle
 
-    @title.setter
-    def title(self, title):
-        self._title = str(title.encode("ascii", "ignore"))
+    def metadata(self, metadata: dict):
+        self._title = metadata.get("title", None)
+        self._thumbnail = metadata.get("thumbnail", None)
+        self._record(Evt.VideoIdentified, metadata)
 
-    @title.setter
-    def title(self, title: str):
-        self._title = title
-        self._record(Evt.VideoIdentified, self._title)
+    metadata = property(None, metadata)
 
     @path.setter
     def path(self, path: Path):

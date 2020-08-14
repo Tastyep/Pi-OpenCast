@@ -23,7 +23,7 @@ class VideoTest(ModelTestCase):
 
     def test_identify(self):
         video = self.make_video()
-        video.title = "name"
+        video.metadata = {"title": "name", "thumbnail": "thumbnail_url"}
         self.expect_events(video, Evt.VideoIdentified)
 
     def test_retrieve(self):
