@@ -87,6 +87,9 @@ class PlayerMonitController(MonitorController):
 
     async def _pick_video(self, req):
         video_id = Id(req.query["id"])
+        if not self._video_repo.exists(video_id):
+            return self._not_found()
+
         handlers, channel = self._make_default_handlers(Evt.PlayerStarted)
         self._observe_dispatch(handlers, Cmd.PickVideo, video_id)
 
