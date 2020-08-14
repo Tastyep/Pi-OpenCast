@@ -32,14 +32,14 @@ class Service:
 
     def _dispatch_to_handler(self, cmd):
         handler_name = name_handler_method(cmd.__class__)
-        retry_count = 5
-        while retry_count > 0:
+        try_count = 1
+        while try_count > 0:
             try:
                 getattr(self, handler_name)(cmd)
                 return
             except RepoError as e:
                 self._logger.error("Repo error", cmd=cmd, error=e)
-                retry_count -= 1
+                try_count -= 1
             except Exception as e:
                 self._logger.error(
                     "Operation error",
