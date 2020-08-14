@@ -17,7 +17,7 @@ class VideoDeleted(Event):
 
 @dataclass
 class VideoIdentified(Event):
-    title: str
+    metadata: dict
 
 
 @dataclass
