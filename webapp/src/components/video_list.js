@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
-import GridList from "@material-ui/core/GridList";
-import GridListTile from "@material-ui/core/GridListTile";
-import GridListTileBar from "@material-ui/core/GridListTileBar";
-import IconButton from "@material-ui/core/IconButton";
+import {
+  GridList,
+  GridListTile,
+  GridListTileBar,
+  IconButton,
+  Paper,
+} from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 import videoAPI from "services/api/video";
@@ -42,6 +45,7 @@ function VideoList() {
   const classes = useStyles();
   const [videos, setVideos] = useState([]);
   const [timer, setTimer] = useState(0);
+  const [videoId, setVideoId] = useState(null);
 
   const deleteVideo = (video) => {
     videoAPI
@@ -56,7 +60,7 @@ function VideoList() {
     playerAPI
       .pickMedia(video.id)
       .then((response) => {
-        console.log("TODO: fetch re ordered list");
+        setVideoId(video.id);
       })
       .catch((error) => console.log(error));
   };
@@ -81,7 +85,7 @@ function VideoList() {
 
   return (
     <div className={classes.root}>
-      <GridList className={classes.gridList} cols={4} spacing={10}>
+      <GridList className={classes.gridList} cols={4} spacing={2}>
         {videos.map((tile) => (
           <GridListTile key={tile.thumbnail}>
             <img
@@ -104,6 +108,7 @@ function VideoList() {
                 </IconButton>
               }
             />
+            )}
           </GridListTile>
         ))}
       </GridList>
