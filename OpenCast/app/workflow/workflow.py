@@ -1,12 +1,14 @@
 from OpenCast.app.command import make_cmd
 from OpenCast.app.service.error import OperationError
-from OpenCast.util.naming import name_factory_method, name_handler_method
+from OpenCast.util.naming import name_handler_method
 from transitions import Machine
+
+from . import Id
 
 
 class Workflow(Machine):
     def __init__(
-        self, logger, derived, id_, app_facade, *args, **kwargs,
+        self, logger, derived, id_: Id, app_facade, *args, **kwargs,
     ):
         super().__init__(
             model=self,
@@ -39,23 +41,17 @@ class Workflow(Machine):
     def _abort(self, *args):
         self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
 
-    def _child_workflow(self, cls, *args, **kwargs):
-        workflow = getattr(self._factory, name_factory_method(cls))(
-            self.id, self._app_facade, *args, **kwargs,
-        )
-        self._sub_workflows.append(workflow)
-        return workflow
-
     def _observe_start(self, workflow, *args, **kwargs):
-        self._observe(self.id, [workflow.Completed, workflow.Aborted])
-        workflow.start(*args, **kwargs)
+        self._observe(workflow.id, [workflow.Completed, workflow.Aborted])
+        if self._app_facade.workflow_manager.start(workflow, *args, **kwargs):
+            self._sub_workflows.append(workflow)
 
-    def _observe_dispatch(self, evt_cls, cmd_cls, model_id, *args, **kwargs):
+    def _observe_dispatch(self, evt_cls, cmd_cls, model_id: Id, *args, **kwargs):
         cmd = make_cmd(cmd_cls, model_id, *args, **kwargs)
         self._observe(cmd.id, [evt_cls, OperationError])
         self._cmd_dispatcher.dispatch(cmd)
 
-    def _observe(self, cmd_id, evt_clss: list):
+    def _observe(self, cmd_id: Id, evt_clss: list):
         evtcls_to_handler = {
             evt_cls: self._event_handler(evt_cls) for evt_cls in evt_clss
         }
