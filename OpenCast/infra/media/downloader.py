@@ -56,7 +56,7 @@ class Downloader:
                 "skip_download": True,
                 "subtitleslangs": [lang],
                 "subtitlesformat": ext,
-                "writeautomaticsub": True,
+                "writeautomaticsub": False,
                 "outtmpl": dest,
                 "progress_hooks": [self._dl_logger.log_download_progress],
                 "quiet": True,
