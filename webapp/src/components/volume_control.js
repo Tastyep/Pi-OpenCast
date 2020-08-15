@@ -28,7 +28,7 @@ function VolumeControl() {
         setPlayerVolume(response.data);
       })
       .catch((error) => console.log(error));
-  });
+  }, []);
 
   return (
     <div>

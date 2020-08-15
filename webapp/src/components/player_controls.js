@@ -40,7 +40,7 @@ function PlayerControls() {
 
   useEffect(() => {
     updatePlayer(playerAPI.get);
-  });
+  }, []);
 
   // Highlight subtitle button when on
   return (
