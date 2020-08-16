@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Grid, Typography, Slider } from "@material-ui/core";
 
 import VolumeDown from "@material-ui/icons/VolumeDown";
 import VolumeUp from "@material-ui/icons/VolumeUp";
 
-import player from "services/api/player";
+import playerAPI from "services/api/player";
 
 function VolumeControl() {
   const [value, setValue] = React.useState(30);
@@ -13,9 +13,22 @@ function VolumeControl() {
     setValue(newValue);
   };
 
-  const handleCommit = (event, newValue) => {
-    player.updateVolume(newValue);
+  const setPlayerVolume = (player) => {
+    setValue(player.volume);
   };
+
+  const handleCommit = (event, newValue) => {
+    playerAPI.updateVolume(newValue);
+  };
+
+  useEffect(() => {
+    playerAPI
+      .get()
+      .then((response) => {
+        setPlayerVolume(response.data);
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   return (
     <div>

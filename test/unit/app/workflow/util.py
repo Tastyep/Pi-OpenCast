@@ -12,6 +12,12 @@ class WorkflowTestCase(TestCase):
     def setUp(self):
         self.app_facade = AppFacadeMock()
 
+        def start_workflow(workflow):
+            workflow.start()
+            return True
+
+        self.app_facade.workflow_manager.start.side_effect = start_workflow
+
     def make_workflow(self, workflow_cls, *args, **kwargs):
         return workflow_cls(uuid.uuid4(), self.app_facade, *args, **kwargs)
 

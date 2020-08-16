@@ -10,6 +10,7 @@ class Controller:
         self._app_facade = app_facade
         self._cmd_dispatcher = app_facade.cmd_dispatcher
         self._evt_dispatcher = app_facade.evt_dispatcher
+        self._workflow_manager = app_facade.workflow_manager
 
     def _dispatch(self, cmd_cls, component_id, *args, **kwargs):
         cmd = make_cmd(cmd_cls, component_id, *args, **kwargs)
@@ -25,5 +26,4 @@ class Controller:
     def _start_workflow(self, workflow_cls, resource_id, *args, **kwargs):
         workflow_id = IdentityService.id_workflow(workflow_cls, resource_id)
         workflow = workflow_cls(workflow_id, self._app_facade, *args, **kwargs)
-        workflow.start()
-        return workflow
+        return self._workflow_manager.start(workflow)

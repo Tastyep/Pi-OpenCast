@@ -2,13 +2,13 @@ import React, { useState } from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
-import player from "services/api/player";
+import playerAPI from "services/api/player";
 
 import "./stream_input.css";
 
 function StreamInput() {
   const [url, setUrl] = useState("");
-  const [action, setAction] = useState(() => player.streamMedia);
+  const [action, setAction] = useState(() => playerAPI.streamMedia);
   const [castVariant, setCastVariant] = useState("contained");
   const [queueVariant, setQueueVariant] = useState("outlined");
 
@@ -19,7 +19,7 @@ function StreamInput() {
     if (url === "") {
       return;
     }
-    action(url);
+    action(url).catch((error) => console.log(error));
     setUrl("");
   };
 
@@ -27,11 +27,11 @@ function StreamInput() {
     if (cast === true) {
       setCastVariant("contained");
       setQueueVariant("outlined");
-      setAction(() => player.streamMedia);
+      setAction(() => playerAPI.streamMedia);
     } else {
       setCastVariant("outlined");
       setQueueVariant("contained");
-      setAction(() => player.queueMedia);
+      setAction(() => playerAPI.queueMedia);
     }
     handleSubmit(undefined);
   };

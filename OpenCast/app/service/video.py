@@ -37,7 +37,7 @@ class VideoService(Service):
 
     def _identify_video(self, cmd):
         def impl(ctx, video, metadata):
-            video.title = metadata["title"]
+            video.metadata = metadata
             ctx.update(video)
 
         video = self._video_repo.get(cmd.model_id)

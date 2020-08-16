@@ -53,7 +53,9 @@ class MonitorControllerTestCase(IsolatedAsyncioTestCase):
             body,
         )
 
-    def make_request(self, method: str, url: str, query: dict = None):
+    def make_request(
+        self, method: str, url: str, match_info: dict = {}, query: dict = None
+    ):
         if query is not None:
             first = True
             for k, v in query.items():
@@ -63,7 +65,7 @@ class MonitorControllerTestCase(IsolatedAsyncioTestCase):
                 else:
                     url = f"{url}&{k}={v}"
 
-        return make_mocked_request(method, url)
+        return make_mocked_request(method, url, match_info=match_info)
 
     def set_cmd_response(self, cmd, evt_cls, *args):
         def respond_to_cmd(command):

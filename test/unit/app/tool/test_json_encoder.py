@@ -16,7 +16,7 @@ class JsonEncoderTest(TestCase):
     def test_encode_video(self):
         video_id = IdentityService.id_video("source")
         video = Video(video_id, "source", None)
-        video.title = "title"
+        video.metadata = {"title": "title", "thumbnail": "thumbnail_url"}
         video.path = Path("/tmp/video.mp4")
         video.streams = [Stream(0, "audio", "en")]
         video.subtitle = Path("/tmp/video.srt")

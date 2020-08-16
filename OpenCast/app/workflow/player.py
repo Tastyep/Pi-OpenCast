@@ -43,7 +43,10 @@ class QueueVideoWorkflow(Workflow):
 
     # States
     def on_enter_COLLECTING(self):
-        workflow = self._child_workflow(VideoWorkflow, self._video_repo, self._video)
+        workflow_id = IdentityService.id_workflow(VideoWorkflow, self._video.id)
+        workflow = self._factory.make_video_workflow(
+            workflow_id, self._app_facade, self._video_repo, self._video
+        )
         self._observe_start(workflow)
 
     def on_enter_QUEUEING(self, evt):
@@ -97,8 +100,10 @@ class QueuePlaylistWorkflow(Workflow):
 
     # States
     def on_enter_QUEUEING(self, _):
-        workflow = self._child_workflow(
-            QueueVideoWorkflow, self._video_repo, self._videos.pop()
+        video = self._videos.pop()
+        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
+        workflow = self._factory.make_queue_video_workflow(
+            workflow_id, self._app_facade, self._video_repo, video
         )
         self._observe_start(workflow)
 
@@ -146,7 +151,10 @@ class StreamVideoWorkflow(Workflow):
 
     # States
     def on_enter_COLLECTING(self):
-        workflow = self._child_workflow(VideoWorkflow, self._video_repo, self._video)
+        workflow_id = IdentityService.id_workflow(VideoWorkflow, self._video.id)
+        workflow = self._factory.make_video_workflow(
+            workflow_id, self._app_facade, self._video_repo, self._video
+        )
         self._observe_start(workflow)
 
     def on_enter_STARTING(self, evt):
@@ -171,23 +179,23 @@ class StreamPlaylistWorkflow(Workflow):
     # fmt: off
     class States(Enum):
         INITIAL = auto()
-        PLAYING = auto()
+        STARTING = auto()
         QUEUEING = auto()
         COMPLETED = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["_play_video",                      States.INITIAL,  States.PLAYING],
-        ["_stream_video_workflow_completed", States.PLAYING,  States.COMPLETED, "_is_last_video"],   # noqa: E501
-        ["_stream_video_workflow_completed", States.PLAYING,  States.QUEUEING],
-        ["_stream_video_workflow_aborted",   States.PLAYING,  States.COMPLETED, "_is_last_video"],   # noqa: E501
-        ["_stream_video_workflow_aborted",   States.PLAYING,  "="],
+        ["_play_video",                      States.INITIAL,  States.STARTING],
+        ["_stream_video_workflow_completed", States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
+        ["_stream_video_workflow_completed", States.STARTING, States.QUEUEING],
+        ["_stream_video_workflow_aborted",   States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
+        ["_stream_video_workflow_aborted",   States.STARTING, "="],
 
-        ["_queue_video_workflow_completed",  States.QUEUEING,  States.COMPLETED, "_is_last_video"],  # noqa: E501
-        ["_queue_video_workflow_completed",  States.QUEUEING,  "="],
-        ["_queue_video_workflow_aborted",    States.QUEUEING,  States.COMPLETED, "_is_last_video"],  # noqa: E501
-        ["_queue_video_workflow_aborted",    States.QUEUEING,  "="],
+        ["_queue_video_workflow_completed",  States.QUEUEING, States.COMPLETED, "_is_last_video"],  # noqa: E501
+        ["_queue_video_workflow_completed",  States.QUEUEING, "="],
+        ["_queue_video_workflow_aborted",    States.QUEUEING, States.COMPLETED, "_is_last_video"],  # noqa: E501
+        ["_queue_video_workflow_aborted",    States.QUEUEING, "="],
     ]
     # fmt: on
 
@@ -206,15 +214,19 @@ class StreamPlaylistWorkflow(Workflow):
         self._play_video(None)
 
     # States
-    def on_enter_PLAYING(self, _):
-        workflow = self._child_workflow(
-            StreamVideoWorkflow, self._video_repo, self._videos.pop()
+    def on_enter_STARTING(self, _):
+        video = self._videos.pop()
+        workflow_id = IdentityService.id_workflow(StreamVideoWorkflow, video.id)
+        workflow = self._factory.make_stream_video_workflow(
+            workflow_id, self._app_facade, self._video_repo, video
         )
         self._observe_start(workflow,)
 
     def on_enter_QUEUEING(self, _):
-        workflow = self._child_workflow(
-            QueueVideoWorkflow, self._video_repo, self._videos.pop()
+        video = self._videos.pop()
+        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
+        workflow = self._factory.make_queue_video_workflow(
+            workflow_id, self._app_facade, self._video_repo, video
         )
         self._observe_start(workflow,)
 

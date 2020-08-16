@@ -45,7 +45,7 @@ function start() {
 function stop() {
   echo "Killing $PROJECT_NAME..."
   # Todo hardcoded port
-  lsof -t -i ":$API_PORT" | xargs kill >/dev/null 2>&1
+  lsof -t -a -i ":$API_PORT" -c python | xargs kill >/dev/null 2>&1
   (cd "$PROJECT_DIR/$WEBAPP_DIR" && npm stop)
   echo "Done."
 }
