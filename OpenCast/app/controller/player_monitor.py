@@ -28,22 +28,22 @@ class PlayerMonitController(MonitorController):
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
 
-        self._route("GET", "/", self._get)
-        self._route("POST", "/stream", self._stream)
-        self._route("POST", "/queue", self._queue)
-        self._route("POST", "/video", self._pick_video)
-        self._route("POST", "/stop", self._stop)
-        self._route("POST", "/pause", self._pause)
-        self._route("POST", "/seek", self._seek)
-        self._route("POST", "/volume", self._volume)
-        self._route("POST", "/subtitle/toggle", self._subtitle_toggle)
-        self._route("POST", "/subtitle/seek", self._subtitle_seek)
+        self._route("GET", "/", self.get)
+        self._route("POST", "/stream", self.stream)
+        self._route("POST", "/queue", self.queue)
+        self._route("POST", "/video", self.pick_video)
+        self._route("POST", "/stop", self.stop)
+        self._route("POST", "/pause", self.pause)
+        self._route("POST", "/seek", self.seek)
+        self._route("POST", "/volume", self.volume)
+        self._route("POST", "/subtitle/toggle", self.subtitle_toggle)
+        self._route("POST", "/subtitle/seek", self.subtitle_seek)
 
-    async def _get(self, _):
+    async def get(self, _):
         player = self._player_repo.get_player()
         return self._ok(player)
 
-    async def _stream(self, req):
+    async def stream(self, req):
         source = req.query["url"]
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
@@ -64,7 +64,7 @@ class PlayerMonitController(MonitorController):
 
         return self._ok()
 
-    async def _queue(self, req):
+    async def queue(self, req):
         source = req.query["url"]
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
@@ -85,7 +85,7 @@ class PlayerMonitController(MonitorController):
 
         return self._ok()
 
-    async def _pick_video(self, req):
+    async def pick_video(self, req):
         video_id = Id(req.query["id"])
         if not self._video_repo.exists(video_id):
             return self._not_found()
@@ -95,19 +95,19 @@ class PlayerMonitController(MonitorController):
 
         return await channel.receive()
 
-    async def _stop(self, _):
+    async def stop(self, _):
         handlers, channel = self._make_default_handlers(Evt.PlayerStopped)
         self._observe_dispatch(handlers, Cmd.StopPlayer)
 
         return await channel.receive()
 
-    async def _pause(self, _):
+    async def pause(self, _):
         handlers, channel = self._make_default_handlers(Evt.PlayerStateToggled)
         self._observe_dispatch(handlers, Cmd.TogglePlayerState)
 
         return await channel.receive()
 
-    async def _seek(self, req):
+    async def seek(self, req):
         forward = str_to_bool(req.query["forward"])
         long = str_to_bool(req.query["long"])
         side = 1 if forward is True else -1
@@ -117,20 +117,20 @@ class PlayerMonitController(MonitorController):
 
         return await channel.receive()
 
-    async def _volume(self, req):
+    async def volume(self, req):
         volume = int(req.query["value"])
         handlers, channel = self._make_default_handlers(Evt.VolumeUpdated)
         self._observe_dispatch(handlers, Cmd.UpdateVolume, volume)
 
         return await channel.receive()
 
-    async def _subtitle_toggle(self, _):
+    async def subtitle_toggle(self, _):
         handlers, channel = self._make_default_handlers(Evt.SubtitleStateUpdated)
         self._observe_dispatch(handlers, Cmd.ToggleSubtitle)
 
         return await channel.receive()
 
-    async def _subtitle_seek(self, req):
+    async def subtitle_seek(self, req):
         forward = str_to_bool(req.query["forward"])
         step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
         handlers, channel = self._make_default_handlers(Evt.SubtitleDelayUpdated)
