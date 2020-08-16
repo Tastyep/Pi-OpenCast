@@ -26,7 +26,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     async def test_get(self):
         req = self.make_request("GET", "/")
-        resp = await self.route(self.controller._get, req)
+        resp = await self.route(self.controller.get, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_pick_video(self):
@@ -39,14 +39,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             video_id,
         )
 
-        resp = await self.route(self.controller._pick_video, req)
+        resp = await self.route(self.controller.pick_video, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_pick_video_not_found(self):
         video_id = IdentityService.id_video("source")
         req = self.make_request("POST", "/video", query={"id": str(video_id)})
 
-        resp = await self.route(self.controller._pick_video, req)
+        resp = await self.route(self.controller.pick_video, req)
         self.assertEqual(resp, (404, None))
 
     async def test_pick_video_error(self):
@@ -55,7 +55,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         req = self.make_request("POST", "/video", query={"id": str(video_id)})
         self.set_cmd_error(make_cmd(Cmd.PickVideo, self.player_id, video_id))
 
-        resp = await self.route(self.controller._pick_video, req)
+        resp = await self.route(self.controller.pick_video, req)
         self.assertEqual(resp, (400, None))
 
     async def test_stop(self):
@@ -64,14 +64,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_cmd(Cmd.StopPlayer, self.player_id), Evt.PlayerStopped
         )
 
-        resp = await self.route(self.controller._stop, req)
+        resp = await self.route(self.controller.stop, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_stop_error(self):
         req = self.make_request("POST", "/stop")
         self.set_cmd_error(make_cmd(Cmd.StopPlayer, self.player_id))
 
-        resp = await self.route(self.controller._stop, req)
+        resp = await self.route(self.controller.stop, req)
         self.assertEqual(resp, (400, None))
 
     async def test_pause(self):
@@ -80,14 +80,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_cmd(Cmd.TogglePlayerState, self.player_id), Evt.PlayerStateToggled
         )
 
-        resp = await self.route(self.controller._pause, req)
+        resp = await self.route(self.controller.pause, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_pause_error(self):
         req = self.make_request("POST", "/pause")
         self.set_cmd_error(make_cmd(Cmd.TogglePlayerState, self.player_id))
 
-        resp = await self.route(self.controller._pause, req)
+        resp = await self.route(self.controller.pause, req)
         self.assertEqual(resp, (400, None))
 
     async def test_seek_forward_short(self):
@@ -99,7 +99,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             Evt.VideoSeeked,
         )
 
-        resp = await self.route(self.controller._seek, req)
+        resp = await self.route(self.controller.seek, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_seek_forward_long(self):
@@ -111,7 +111,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             Evt.VideoSeeked,
         )
 
-        resp = await self.route(self.controller._seek, req)
+        resp = await self.route(self.controller.seek, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_seek_backward_short(self):
@@ -123,7 +123,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             Evt.VideoSeeked,
         )
 
-        resp = await self.route(self.controller._seek, req)
+        resp = await self.route(self.controller.seek, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_seek_backward_long(self):
@@ -135,7 +135,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             Evt.VideoSeeked,
         )
 
-        resp = await self.route(self.controller._seek, req)
+        resp = await self.route(self.controller.seek, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_seek_error(self):
@@ -146,7 +146,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_cmd(Cmd.SeekVideo, self.player_id, Player.LONG_TIME_STEP)
         )
 
-        resp = await self.route(self.controller._seek, req)
+        resp = await self.route(self.controller.seek, req)
         self.assertEqual(resp, (400, None))
 
     async def test_volume(self):
@@ -155,14 +155,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_cmd(Cmd.UpdateVolume, self.player_id, 80), Evt.VolumeUpdated, 80,
         )
 
-        resp = await self.route(self.controller._volume, req)
+        resp = await self.route(self.controller.volume, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_volume_error(self):
         req = self.make_request("POST", "/volume", query={"value": 80})
         self.set_cmd_error(make_cmd(Cmd.UpdateVolume, self.player_id, 80))
 
-        resp = await self.route(self.controller._volume, req)
+        resp = await self.route(self.controller.volume, req)
         self.assertEqual(resp, (400, None))
 
     async def test_subtitle_toggle(self):
@@ -171,14 +171,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_cmd(Cmd.ToggleSubtitle, self.player_id), Evt.SubtitleStateUpdated,
         )
 
-        resp = await self.route(self.controller._subtitle_toggle, req)
+        resp = await self.route(self.controller.subtitle_toggle, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_subtitle_toggle_error(self):
         req = self.make_request("POST", "/subtitle_toggle")
         self.set_cmd_error(make_cmd(Cmd.ToggleSubtitle, self.player_id))
 
-        resp = await self.route(self.controller._subtitle_toggle, req)
+        resp = await self.route(self.controller.subtitle_toggle, req)
         self.assertEqual(resp, (400, None))
 
     async def test_subtitle_seek_forward(self):
@@ -190,7 +190,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             Evt.SubtitleDelayUpdated,
         )
 
-        resp = await self.route(self.controller._subtitle_seek, req)
+        resp = await self.route(self.controller.subtitle_seek, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_subtitle_seek_backward(self):
@@ -202,7 +202,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             Evt.SubtitleDelayUpdated,
         )
 
-        resp = await self.route(self.controller._subtitle_seek, req)
+        resp = await self.route(self.controller.subtitle_seek, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
     async def test_subtitle_seek_error(self):
@@ -213,5 +213,5 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             )
         )
 
-        resp = await self.route(self.controller._subtitle_seek, req)
+        resp = await self.route(self.controller.subtitle_seek, req)
         self.assertEqual(resp, (400, None))

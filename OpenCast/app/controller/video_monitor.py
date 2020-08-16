@@ -10,22 +10,22 @@ class VideoMonitController(MonitorController):
         super().__init__(app_facade, infra_facade, "/video")
         self._video_repo = data_facade.video_repo
 
-        self._route("GET", "/", handle=self._list)
-        self._route("GET", "/{id}", handle=self._get)
-        self._route("DELETE", "/{id}", handle=self._delete)
+        self._route("GET", "/", handle=self.list)
+        self._route("GET", "/{id}", handle=self.get)
+        self._route("DELETE", "/{id}", handle=self.delete)
 
-    async def _list(self, req):
+    async def list(self, req):
         videos = self._video_repo.list()
         return self._ok(videos)
 
-    async def _get(self, req):
+    async def get(self, req):
         id = Id(req.match_info["id"])
         video = self._video_repo.get(id)
         if video is None:
             return self._not_found()
         return self._ok(video)
 
-    async def _delete(self, req):
+    async def delete(self, req):
         id = Id(req.match_info["id"])
         if not self._video_repo.exists(id):
             return self._not_found()
