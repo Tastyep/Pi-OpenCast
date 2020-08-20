@@ -13,8 +13,8 @@ WEBAPP_DIR="webapp"
 
 LOG_FILE="$PROJECT_NAME.log"
 
-is_port_bound() {
-  lsof -t -i ":$1"
+function is_port_bound() {
+  lsof -t -a -i ":$1" -c python
 }
 
 function element_in() {
@@ -62,7 +62,7 @@ update() {
 
 status() {
   echo -n "$PROJECT_NAME is ... "
-  [ "$(lsof -t -i :"$API_PORT")" ] && echo "UP" || echo "DOWN"
+  [ "$(lsof -t -a -i ":$API_PORT" -c python)" ] && echo "UP" || echo "DOWN"
 }
 
 logs() {
