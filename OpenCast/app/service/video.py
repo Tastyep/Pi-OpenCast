@@ -1,3 +1,5 @@
+""" Handlers for video commands """
+
 from pathlib import Path
 
 import structlog

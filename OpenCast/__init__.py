@@ -1,3 +1,5 @@
+""" OpenCast application's backend """
+
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor

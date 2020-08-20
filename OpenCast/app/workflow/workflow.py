@@ -1,3 +1,5 @@
+""" Workflow abstraction using finite-state machines """
+
 from OpenCast.app.command import make_cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.util.naming import name_handler_method
@@ -7,6 +9,18 @@ from . import Id
 
 
 class Workflow(Machine):
+    """Workflow base class
+
+    Args:
+        logger: The workflow's logger.
+        derived: The instance of the derived class.
+        id: The workflow's ID.
+        app_facade: The application facade.
+
+    Attributes:
+        id: The workflow's ID.
+    """
+
     def __init__(
         self, logger, derived, id_: Id, app_facade, *args, **kwargs,
     ):
@@ -28,11 +42,13 @@ class Workflow(Machine):
         self._sub_workflows = []
 
     def reset(self):
+        """ Reset the workflow and its sub-workflows to their initial state"""
         self.set_state(self._initial)
         for workflow in self._sub_workflows:
             workflow.reset()
 
     def cancel(self, *args):
+        """ Cancel the workflow and dispatch the related event"""
         self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
 
     def complete(self, *args):

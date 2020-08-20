@@ -1,3 +1,5 @@
+""" Entrypoint of the module """
+
 #!/usr/bin/env python
 import sys
 

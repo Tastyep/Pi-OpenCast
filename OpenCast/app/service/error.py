@@ -1,3 +1,5 @@
+""" Set of exceptions related to operation errors """
+
 from dataclasses import dataclass
 
 from OpenCast.infra import Id

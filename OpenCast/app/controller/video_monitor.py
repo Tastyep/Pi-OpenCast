@@ -1,3 +1,5 @@
+""" Video capabilities monitoring routes """
+
 from OpenCast.app.command import video as Cmd
 from OpenCast.domain.event import video as Evt
 from OpenCast.domain.model import Id

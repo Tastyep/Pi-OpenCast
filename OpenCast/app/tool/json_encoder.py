@@ -1,3 +1,5 @@
+""" Custom JSON encoder definitions """
+
 import dataclasses
 from enum import Enum
 from json import JSONEncoder

@@ -1,3 +1,5 @@
+""" Manager and coordinator of workflows """
+
 from threading import RLock
 
 from . import Id
