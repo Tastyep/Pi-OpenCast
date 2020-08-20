@@ -1,3 +1,6 @@
+""" Database context in charge of recording and applying transactions on repositories """
+
+
 class Context:
     def __init__(self, repo):
         self._repo = repo

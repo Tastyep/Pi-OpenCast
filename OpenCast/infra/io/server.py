@@ -1,3 +1,5 @@
+""" High level HTTP server """
+
 import aiohttp_cors as cors
 import structlog
 from aiohttp import web

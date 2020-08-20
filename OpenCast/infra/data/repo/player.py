@@ -1,3 +1,5 @@
+""" Player repository """
+
 from copy import deepcopy
 
 from .memory import MemoryRepo

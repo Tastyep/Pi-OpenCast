@@ -1,4 +1,4 @@
-"""Utilities related to type convertions"""
+""" Utilities related to type convertions """
 
 
 def str_to_bool(string):

@@ -1,4 +1,4 @@
-"""Utilities related to the project's naming conventions"""
+""" Utilities related to the project's naming conventions """
 
 
 def to_camelcase(name):

@@ -1,3 +1,5 @@
+""" Media player abstraction """
+
 from threading import Condition
 
 import OpenCast.infra.event.player as e

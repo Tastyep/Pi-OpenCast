@@ -1,3 +1,5 @@
+""" Channels represent a pipe in which data can be transfered """
+
 from asyncio import sleep
 from queue import SimpleQueue
 
