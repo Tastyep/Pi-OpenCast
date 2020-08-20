@@ -1,3 +1,6 @@
+""" The facade exposing persistence capabilities """
+
+
 class DataFacade:
     def __init__(self, repo_factory):
         self._player_repo = repo_factory.make_player_repo()

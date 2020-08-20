@@ -1,3 +1,5 @@
+""" Factory for creating media processing objects """
+
 from .downloader import Downloader
 from .parser import VideoParser
 from .player_wrapper import PlayerWrapper

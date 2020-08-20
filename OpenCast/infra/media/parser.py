@@ -1,3 +1,5 @@
+""" Parser of disk available medias """
+
 from threading import Condition
 
 import structlog

@@ -1,3 +1,6 @@
+""" Parse, download and extract a media with its metadata """
+
+
 from typing import List
 
 from youtube_dl import YoutubeDL

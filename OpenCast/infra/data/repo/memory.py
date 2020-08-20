@@ -1,3 +1,5 @@
+""" Abstraction of an in-memory repository """
+
 from copy import deepcopy
 
 from .context import Context

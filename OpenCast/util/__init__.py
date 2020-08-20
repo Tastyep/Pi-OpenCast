@@ -1,1 +1,1 @@
-"""Various utilities used in the project"""
+""" Various utilities used in the project """

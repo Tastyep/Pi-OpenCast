@@ -1,3 +1,5 @@
+""" Abstract Event definition """
+
 from dataclasses import dataclass
 
 from OpenCast.infra import Id

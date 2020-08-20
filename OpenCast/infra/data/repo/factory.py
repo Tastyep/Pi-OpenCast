@@ -1,3 +1,6 @@
+""" Factory in charge of creating repository objects """
+
+
 from .player import PlayerRepo
 from .video import VideoRepo
 

@@ -1,3 +1,5 @@
+""" Logger displaying download progress """
+
 from hurry.filesize import alternative, size
 
 
