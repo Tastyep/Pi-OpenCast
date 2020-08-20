@@ -1,3 +1,6 @@
+""" Handlers for player commands """
+
+
 import structlog
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import config

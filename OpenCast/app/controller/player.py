@@ -1,3 +1,5 @@
+""" Player behaviour changes resulting from events """
+
 import structlog
 from OpenCast.app.command import player as Cmd
 from OpenCast.domain.service.identity import IdentityService

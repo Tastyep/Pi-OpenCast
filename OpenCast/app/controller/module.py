@@ -1,3 +1,5 @@
+""" Module in charge of registering application controllers """
+
 from .player import PlayerController
 from .player_monitor import PlayerMonitController
 from .video_monitor import VideoMonitController

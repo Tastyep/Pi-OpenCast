@@ -1,3 +1,5 @@
+""" Abstraction of an applicative controller """
+
 import inspect
 
 from OpenCast.app.command import make_cmd

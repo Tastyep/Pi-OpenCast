@@ -1,3 +1,5 @@
+""" Player capabilities monitoring routes """
+
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
@@ -17,6 +19,8 @@ from .monitor import MonitorController
 
 
 class PlayerMonitController(MonitorController):
+    """ The controller in charge of player related requests """
+
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
         super().__init__(app_facade, infra_facade, "/player")
 

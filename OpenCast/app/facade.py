@@ -1,3 +1,5 @@
+""" Common applicative objects """
+
 from OpenCast.domain.event.dispatcher import EventDispatcher
 
 from .command.dispatcher import CommandDispatcher

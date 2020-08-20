@@ -1,3 +1,5 @@
+""" Abstraction of a monitoring controller """
+
 import functools
 import json
 
