@@ -1,3 +1,5 @@
+""" Abstract representation of a domain event """
+
 from dataclasses import dataclass
 
 from OpenCast.domain.model import Id as ModelId

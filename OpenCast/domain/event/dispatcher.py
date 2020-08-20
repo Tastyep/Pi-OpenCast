@@ -1,3 +1,5 @@
+""" Dispatch events to handlers """
+
 from threading import Lock
 
 import structlog

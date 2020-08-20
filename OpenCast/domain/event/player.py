@@ -1,3 +1,5 @@
+""" Events emitted by the player model """
+
 from dataclasses import dataclass
 
 from .event import Event, ModelId

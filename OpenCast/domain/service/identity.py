@@ -1,3 +1,5 @@
+""" Entity identification operations """
+
 from uuid import uuid3, uuid4
 
 
