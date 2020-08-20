@@ -1,3 +1,5 @@
+""" Subtitle operations """
+
 from pathlib import Path
 
 import structlog

@@ -1,3 +1,6 @@
+""" Events emitted by the video model """
+
+
 from dataclasses import dataclass
 from pathlib import Path
 

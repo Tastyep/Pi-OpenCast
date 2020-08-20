@@ -1,3 +1,6 @@
+""" Conceptual representation of the media player (VLC) """
+
+
 from enum import Enum
 
 from OpenCast.config import config

@@ -1,3 +1,6 @@
+""" Abstract representation of a versionable entity """
+
+
 from copy import deepcopy
 
 from . import Id
