@@ -6,7 +6,6 @@ import {
   GridListTile,
   GridListTileBar,
   IconButton,
-  Paper,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 
@@ -56,9 +55,9 @@ function VideoList() {
       .catch((error) => console.log(error));
   };
 
-  const pickMedia = (video) => {
+  const playMedia = (video) => {
     playerAPI
-      .pickMedia(video.id)
+      .playMedia(video.id)
       .then((response) => {
         setVideoId(video.id);
       })
@@ -91,7 +90,7 @@ function VideoList() {
             <img
               src={tile.thumbnail === null ? noPreview : tile.thumbnail}
               alt={tile.title}
-              onClick={() => pickMedia(tile)}
+              onClick={() => playMedia(tile)}
             />
             <GridListTileBar
               title={tile.title}
