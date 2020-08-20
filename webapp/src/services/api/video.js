@@ -5,11 +5,11 @@ async function list() {
 }
 
 async function get(id) {
-  return await API.get("/video/" + id, null, { params: { id: id } });
+  return await API.get("/video/" + id);
 }
 
 async function delete_(id) {
-  return await API.delete("/video/" + id, null, { params: { id: id } });
+  return await API.delete("/video/" + id);
 }
 
 export default {
