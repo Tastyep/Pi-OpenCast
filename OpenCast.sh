@@ -86,7 +86,7 @@ function test() {
 function gendoc() {
   cd "$DOC_DIR" || exit 1
 
-  run_in_env make html
+  run_in_env make html -b coverage
   xdg-open "build/html/index.html"
 }
 
