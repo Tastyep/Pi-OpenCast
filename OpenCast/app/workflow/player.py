@@ -58,10 +58,10 @@ class QueueVideoWorkflow(Workflow):
         )
 
     def on_enter_COMPLETED(self, _):
-        self._complete()
+        self.complete()
 
     def on_enter_ABORTED(self, _):
-        self._abort()
+        self.cancel()
 
 
 class QueuePlaylistWorkflow(Workflow):
@@ -108,10 +108,10 @@ class QueuePlaylistWorkflow(Workflow):
         self._observe_start(workflow)
 
     def on_enter_COMPLETED(self, _):
-        self._complete()
+        self.complete()
 
     def on_enter_ABORTED(self, _):
-        self._abort()
+        self.cancel()
 
     # Conditions
     def _is_last_video(self, evt):
@@ -125,18 +125,18 @@ class StreamVideoWorkflow(Workflow):
     # fmt: off
     class States(Enum):
         INITIAL = auto()
-        COLLECTING = auto()
+        QUEUEING = auto()
         STARTING = auto()
         COMPLETED = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["start",                     States.INITIAL,    States.COLLECTING],
-        ["_video_workflow_completed", States.COLLECTING, States.STARTING],
-        ["_video_workflow_aborted",   States.COLLECTING, States.ABORTED],
-        ["_player_started",           States.STARTING,   States.COMPLETED],
-        ["_operation_error",          States.STARTING,   States.ABORTED],
+        ["start",                           States.INITIAL,    States.QUEUEING],
+        ["_queue_video_workflow_completed", States.QUEUEING,   States.STARTING],
+        ["_queue_video_workflow_aborted",   States.QUEUEING,   States.ABORTED],
+        ["_player_started",                 States.STARTING,   States.COMPLETED],
+        ["_operation_error",                States.STARTING,   States.ABORTED],
     ]
     # fmt: on
 
@@ -150,9 +150,9 @@ class StreamVideoWorkflow(Workflow):
         self._video = video
 
     # States
-    def on_enter_COLLECTING(self):
-        workflow_id = IdentityService.id_workflow(VideoWorkflow, self._video.id)
-        workflow = self._factory.make_video_workflow(
+    def on_enter_QUEUEING(self):
+        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, self._video.id)
+        workflow = self._factory.make_queue_video_workflow(
             workflow_id, self._app_facade, self._video_repo, self._video
         )
         self._observe_start(workflow)
@@ -166,10 +166,10 @@ class StreamVideoWorkflow(Workflow):
         )
 
     def on_enter_COMPLETED(self, _):
-        self._complete()
+        self.complete()
 
     def on_enter_ABORTED(self, _):
-        self._abort()
+        self.cancel()
 
 
 class StreamPlaylistWorkflow(Workflow):
@@ -231,10 +231,10 @@ class StreamPlaylistWorkflow(Workflow):
         self._observe_start(workflow,)
 
     def on_enter_COMPLETED(self, _):
-        self._complete()
+        self.complete()
 
     def on_enter_ABORTED(self, _):
-        self._abort()
+        self.cancel()
 
     # Conditions
     def _is_last_video(self, _):

@@ -113,13 +113,5 @@ class Player(Entity):
 
         return self._queue[self._index + 1]
 
-    def pick(self, video_id: Id):
-        if not self._queue:
-            raise DomainError(f"queue is empty")
-        video = next((video for video in self._queue if video.id == video_id), None)
-        if video is None:
-            raise DomainError(f"video not found")
-        return video
-
     def seek_video(self):
         self._record(Evt.VideoSeeked)

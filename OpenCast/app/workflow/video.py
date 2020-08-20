@@ -100,10 +100,10 @@ class VideoWorkflow(Workflow):
         self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
     def on_enter_COMPLETED(self, *_):
-        self._complete()
+        self.complete()
 
     def on_enter_ABORTED(self, _):
-        self._abort()
+        self.cancel()
 
     # Conditions
     def is_complete(self):

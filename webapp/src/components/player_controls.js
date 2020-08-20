@@ -48,7 +48,7 @@ function PlayerControls() {
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
           <IconButton
-            onClick={() => updatePlayer(playerAPI.pickMedia, undefined)}
+            onClick={() => updatePlayer(playerAPI.playMedia, undefined)}
           >
             <SkipPreviousIcon />
           </IconButton>
@@ -59,7 +59,7 @@ function PlayerControls() {
             <StopIcon />
           </IconButton>
           <IconButton
-            onClick={() => updatePlayer(playerAPI.pickMedia, undefined)}
+            onClick={() => updatePlayer(playerAPI.playMedia, undefined)}
           >
             <SkipNextIcon />
           </IconButton>

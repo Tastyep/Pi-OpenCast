@@ -12,8 +12,8 @@ async function queueMedia(url) {
   return await API.post("/player/queue", null, { params: { url: url } });
 }
 
-async function pickMedia(id) {
-  return await API.post("/player/video", null, { params: { id: id } });
+async function playMedia(id) {
+  return await API.post("/player/play", null, { params: { id: id } });
 }
 
 async function stopMedia() {
@@ -48,7 +48,7 @@ export default {
   get,
   streamMedia,
   queueMedia,
-  pickMedia,
+  playMedia,
   stopMedia,
   pauseMedia,
   seekMedia,
