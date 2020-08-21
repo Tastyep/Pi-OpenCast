@@ -35,6 +35,7 @@ extensions = [
     "sphinx.ext.napoleon",  # Adapts google style docstrings
     "sphinx.ext.autosummary",  # Create neat summary tables for modules/classes/methods etc
     "sphinx_autodoc_typehints",  # Automatically document param types (less noise in class signature)
+    "sphinxcontrib.openapi",  # Generate APIs docs from OpenAPI (fka Swagger) spec
     "sphinx.ext.coverage",
 ]
 
