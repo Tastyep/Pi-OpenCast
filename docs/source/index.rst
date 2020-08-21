@@ -49,5 +49,5 @@ Table Of Contents
   :name: mastertoc
   :maxdepth: 2
 
-  api
+  api/root
   module
