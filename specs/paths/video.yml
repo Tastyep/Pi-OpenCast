@@ -4,7 +4,7 @@ root:
       - video
     summary: List videos
     description: |
-      Retrieves a list of all videos on file in the host.
+      Retrieve a list of all videos on file in the host
     operationId: listVideos
     responses:
       "200":
@@ -22,7 +22,7 @@ id:
       - video
     summary: Find video by ID
     description: |
-      Queries and returns a video with a given ID
+      Querie and return a video with a given ID
     operationId: getVideoById
     parameters:
       - in: path

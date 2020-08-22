@@ -1,0 +1,179 @@
+root:
+  get:
+    tags:
+      - player
+    summary: Find the player
+    description: |
+      Querie and return the player
+    operationId: getPlayer
+    responses:
+      "200":
+        description: successful operation
+        content:
+          application/json:
+            schema:
+              $ref: "../definitions/player.yml#/Player"
+
+stream:
+  post:
+    tags:
+      - player
+    summary: Download and play media(s)
+    description: |
+      Download the media(s) corresponding to the given URL and play it
+    operationId: streamMedia
+    parameters:
+      - in: query
+        name: url
+        schema:
+          type: string
+        description: The url of the media to play
+    responses:
+      "200":
+        description: successful operation
+
+queue:
+  post:
+    tags:
+      - player
+    summary: Download and queue media(s)
+    description: |
+      Download the media(s) corresponding to the given URL and queue it
+    operationId: queueMedia
+    parameters:
+      - in: query
+        name: url
+        schema:
+          type: string
+        description: The url of the media to play
+    responses:
+      "200":
+        description: successful operation
+
+play:
+  post:
+    tags:
+      - player
+    summary: Select a media for playing
+    description: |
+      Play the media selected by ID
+    operationId: playMedia
+    parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: The ID of the media
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
+
+stop:
+  post:
+    tags:
+      - player
+    summary: Stop the player
+    description: |
+      Stop the player
+    operationId: stopPlayer
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
+
+pause:
+  post:
+    tags:
+      - player
+    summary: Toggle player pause
+    description: |
+      Toggle the pause status of the player
+    operationId: pausePlayer
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
+
+seek:
+  post:
+    tags:
+      - player
+    summary: Seek active media
+    description: |
+      Seek the active media with a given step
+    operationId: seekMedia
+    parameters:
+      - in: query
+        name: forward
+        schema:
+          type: boolean
+        description: True to advance in the media, False otherwise
+      - in: query
+        name: long
+        schema:
+          type: boolean
+        description: True to use the highest seeking step, False otherwise
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
+
+volume:
+  post:
+    tags:
+      - player
+    summary: Update player volume
+    description: |
+      Update the volume of the player
+    operationId: updateVolume
+    parameters:
+      - in: query
+        name: value
+        schema:
+          type: integer
+          format: int32
+        description: The value for the player's volume [0-100]
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
+
+subtitle_toggle:
+  post:
+    tags:
+      - player
+    summary: Toggle active media subtitle
+    description: |
+      Toggle the active media subtitle state
+    operationId: toggleMediaSubtitle
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
+
+subtitle_seek:
+  post:
+    tags:
+      - player
+    summary: Seek active media subtitle
+    description: |
+      Seek the active media subtitle with a given step
+    operationId: seekMediaSubtitle
+    parameters:
+      - in: query
+        name: forward
+        schema:
+          type: boolean
+        description: True to advance the media subtitle, False otherwise
+    responses:
+      "200":
+        description: successful operation
+      "400":
+        description: operation failure
