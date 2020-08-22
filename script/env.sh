@@ -12,5 +12,6 @@ function penv() {
 }
 
 function jenv() {
+  (cd "$ROOT/webapp/" && npm install --only=dev)
   PATH="$ROOT/webapp/node_modules:$PATH" eval "$@"
 }
