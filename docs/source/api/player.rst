@@ -1,6 +1,6 @@
-Video
-=====
+Player
+======
 
 .. openapi:: ../../../specs/openapi.yml
   :include:
-    /videos.*
+    /player.*

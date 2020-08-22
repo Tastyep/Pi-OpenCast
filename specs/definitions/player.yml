@@ -1,0 +1,31 @@
+Player:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: Unique ID for a video
+    state:
+      type: string
+      description: Operating state of the player
+    queue:
+      type: array
+      items:
+        type: integer
+        format: int64
+      description: List of video IDs
+    index:
+      type: integer
+      format: int32
+      description: Index of the current media
+    sub_state:
+      type: boolean
+      description: True if subtitles are on, False otherwise
+    sub_delay:
+      type: integer
+      format: int32
+      description: Subtitle delay value
+    volume:
+      type: integer
+      format: int32
+      description: Volume value [0-100]
