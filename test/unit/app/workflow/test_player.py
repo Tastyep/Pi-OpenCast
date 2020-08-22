@@ -143,34 +143,34 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
     def test_initial(self):
         self.assertTrue(self.workflow.is_INITIAL())
 
-    def test_init_to_collecting(self):
-        self.expect_workflow_creation(VideoWorkflow)
+    def test_init_to_queueing(self):
+        self.expect_workflow_creation(QueueVideoWorkflow)
         self.workflow.start()
-        self.assertTrue(self.workflow.is_COLLECTING())
+        self.assertTrue(self.workflow.is_QUEUEING())
 
-    def test_collecting_to_aborted(self):
-        video_workflow = self.expect_workflow_creation(VideoWorkflow)
-        self.workflow.to_COLLECTING()
-        video_workflow.start.assert_called_once()
-        self.raise_event(self.workflow, video_workflow.Aborted, video_workflow.id)
+    def test_queueing_to_aborted(self):
+        queue_workflow = self.expect_workflow_creation(QueueVideoWorkflow)
+        self.workflow.to_QUEUEING()
+        queue_workflow.start.assert_called_once()
+        self.raise_event(self.workflow, queue_workflow.Aborted, queue_workflow.id)
         self.assertTrue(self.workflow.is_ABORTED())
 
-    def test_collecting_to_starting(self):
-        video_workflow = self.expect_workflow_creation(VideoWorkflow)
-        self.workflow.to_COLLECTING()
-        video_workflow.start.assert_called_once()
-        self.raise_event(self.workflow, video_workflow.Completed, video_workflow.id)
+    def test_queueing_to_starting(self):
+        queue_workflow = self.expect_workflow_creation(QueueVideoWorkflow)
+        self.workflow.to_QUEUEING()
+        queue_workflow.start.assert_called_once()
+        self.raise_event(self.workflow, queue_workflow.Completed, queue_workflow.id)
         self.assertTrue(self.workflow.is_STARTING())
 
     def test_starting_to_aborted(self):
-        event = VideoWorkflow.Completed(self.workflow.id)
+        event = QueueVideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_STARTING(event)
         cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
         self.raise_error(self.workflow, cmd)
         self.assertTrue(self.workflow.is_ABORTED())
 
     def test_queueing_to_completed(self):
-        event = VideoWorkflow.Completed(self.workflow.id)
+        event = QueueVideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_STARTING(event)
         cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
         self.raise_event(

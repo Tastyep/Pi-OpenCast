@@ -27,11 +27,6 @@ class SeekVideo(Command):
 
 
 @command
-class PickVideo(Command):
-    video_id: ModelId
-
-
-@command
 class UpdateVolume(Command):
     volume: int
 

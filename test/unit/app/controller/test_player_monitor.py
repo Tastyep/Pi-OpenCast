@@ -29,33 +29,33 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         resp = await self.route(self.controller.get, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
-    async def test_pick_video(self):
+    async def test_play_video(self):
         self.data_producer.video("source", None).populate(self.data_facade)
         video_id = IdentityService.id_video("source")
-        req = self.make_request("POST", "/video", query={"id": str(video_id)})
+        req = self.make_request("POST", "/play", query={"id": str(video_id)})
         self.set_cmd_response(
-            make_cmd(Cmd.PickVideo, self.player_id, video_id),
+            make_cmd(Cmd.PlayVideo, self.player_id, video_id),
             Evt.PlayerStarted,
             video_id,
         )
 
-        resp = await self.route(self.controller.pick_video, req)
+        resp = await self.route(self.controller.play_video, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
-    async def test_pick_video_not_found(self):
+    async def test_play_video_not_found(self):
         video_id = IdentityService.id_video("source")
-        req = self.make_request("POST", "/video", query={"id": str(video_id)})
+        req = self.make_request("POST", "/play", query={"id": str(video_id)})
 
-        resp = await self.route(self.controller.pick_video, req)
+        resp = await self.route(self.controller.play_video, req)
         self.assertEqual(resp, (404, None))
 
-    async def test_pick_video_error(self):
+    async def test_play_video_error(self):
         self.data_producer.video("source", None).populate(self.data_facade)
         video_id = IdentityService.id_video("source")
-        req = self.make_request("POST", "/video", query={"id": str(video_id)})
-        self.set_cmd_error(make_cmd(Cmd.PickVideo, self.player_id, video_id))
+        req = self.make_request("POST", "/play", query={"id": str(video_id)})
+        self.set_cmd_error(make_cmd(Cmd.PlayVideo, self.player_id, video_id))
 
-        resp = await self.route(self.controller.pick_video, req)
+        resp = await self.route(self.controller.play_video, req)
         self.assertEqual(resp, (400, None))
 
     async def test_stop(self):

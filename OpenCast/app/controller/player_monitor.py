@@ -31,7 +31,7 @@ class PlayerMonitController(MonitorController):
         self._route("GET", "/", self.get)
         self._route("POST", "/stream", self.stream)
         self._route("POST", "/queue", self.queue)
-        self._route("POST", "/video", self.pick_video)
+        self._route("POST", "/play", self.play_video)
         self._route("POST", "/stop", self.stop)
         self._route("POST", "/pause", self.pause)
         self._route("POST", "/seek", self.seek)
@@ -56,7 +56,7 @@ class PlayerMonitController(MonitorController):
             self._start_workflow(
                 StreamPlaylistWorkflow, playlist_id, self._video_repo, videos
             )
-            return
+            return self._ok()
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
@@ -77,7 +77,7 @@ class PlayerMonitController(MonitorController):
             self._start_workflow(
                 QueuePlaylistWorkflow, playlist_id, self._video_repo, videos
             )
-            return
+            return self._ok()
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
@@ -85,13 +85,13 @@ class PlayerMonitController(MonitorController):
 
         return self._ok()
 
-    async def pick_video(self, req):
+    async def play_video(self, req):
         video_id = Id(req.query["id"])
         if not self._video_repo.exists(video_id):
             return self._not_found()
 
         handlers, channel = self._make_default_handlers(Evt.PlayerStarted)
-        self._observe_dispatch(handlers, Cmd.PickVideo, video_id)
+        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id)
 
         return await channel.receive()
 

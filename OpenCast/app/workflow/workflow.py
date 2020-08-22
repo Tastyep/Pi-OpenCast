@@ -35,11 +35,8 @@ class Workflow(Machine):
     def cancel(self, *args):
         self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
 
-    def _complete(self, *args):
+    def complete(self, *args):
         self._evt_dispatcher.dispatch(self.__derived.Completed(self.id, *args))
-
-    def _abort(self, *args):
-        self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
 
     def _observe_start(self, workflow, *args, **kwargs):
         self._observe(workflow.id, [workflow.Completed, workflow.Aborted])

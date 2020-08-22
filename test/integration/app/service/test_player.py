@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 from OpenCast.app.command import player as Cmd
+from OpenCast.app.service.error import OperationError
 from OpenCast.app.service.player import PlayerService
 from OpenCast.domain.event import player as Evt
 from OpenCast.domain.model.player import Player
@@ -26,12 +27,25 @@ class PlayerServiceTest(ServiceTestCase):
         self.player_id = IdentityService.id_player()
 
     def test_play_video(self):
-        self.data_producer.video("source", None).populate(self.data_facade)
+        self.data_producer.player().video("source", None).video(
+            "source2", None
+        ).populate(self.data_facade)
+
+        video_id = IdentityService.id_video("source2")
+        self.evt_expecter.expect(Evt.PlayerStarted, video_id).from_(
+            Cmd.PlayVideo, self.player_id, video_id
+        )
+
+    def test_play_video_not_queued(self):
+        self.data_producer.video("source", None).player().video(
+            "source2", None
+        ).populate(self.data_facade)
 
         video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.VideoQueued, video_id).expect(
-            Evt.PlayerStarted, video_id
-        ).from_(Cmd.PlayVideo, self.player_id, video_id)
+        video = self.video_repo.get(video_id)
+        self.evt_expecter.expect(OperationError, f"unknown video: {video}").from_(
+            Cmd.PlayVideo, self.player_id, video_id
+        )
 
     def test_queue_video(self):
         self.data_producer.video("source", None).populate(self.data_facade)
@@ -66,16 +80,6 @@ class PlayerServiceTest(ServiceTestCase):
 
         self.evt_expecter.expect(Evt.VolumeUpdated, 80).from_(
             Cmd.UpdateVolume, self.player_id, 80
-        )
-
-    def test_pick_video(self):
-        self.data_producer.player().video("source", None).play().video(
-            "source2", None
-        ).populate(self.data_facade)
-
-        video_id = IdentityService.id_video("source2")
-        self.evt_expecter.expect(Evt.PlayerStarted, video_id).from_(
-            Cmd.PickVideo, self.player_id, video_id
         )
 
     def test_toggle_subtitle(self):

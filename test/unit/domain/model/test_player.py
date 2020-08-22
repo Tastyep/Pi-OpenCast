@@ -25,6 +25,34 @@ class PlayerTest(ModelTestCase):
         self.assertEqual(0, self.player.subtitle_delay)
         self.assertEqual(PlayerState.STOPPED, self.player.state)
 
+    def test_play(self):
+        video = self.make_video()
+        self.player.queue(video)
+        self.player.play(video)
+        self.assertEqual(PlayerState.PLAYING, self.player.state)
+        self.expect_events(self.player, Evt.VideoQueued, Evt.PlayerStarted)
+
+    def test_play_unknown(self):
+        video = self.make_video()
+        with self.assertRaises(DomainError) as ctx:
+            self.player.play(video)
+        self.assertEqual(f"unknown video: {video}", str(ctx.exception))
+
+    def test_stop(self):
+        video = self.make_video()
+        self.player.queue(video)
+        self.player.play(video)
+        self.player.stop()
+        self.assertEqual(PlayerState.STOPPED, self.player.state)
+        self.expect_events(
+            self.player, Evt.VideoQueued, Evt.PlayerStarted, Evt.PlayerStopped
+        )
+
+    def test_stop_not_started(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.player.stop()
+        self.assertEqual("the player is already stopped", str(ctx.exception))
+
     def test_queue(self):
         video = self.make_video()
         self.player.queue(video)
@@ -63,53 +91,6 @@ class PlayerTest(ModelTestCase):
     def test_next_no_video(self):
         config.load_from_dict({"player": {"loop_last": True}})
         self.assertEqual(None, self.player.next_video())
-
-    def test_pick(self):
-        videos = self.make_videos(video_count=2)
-        for video in videos:
-            self.player.queue(video)
-        self.assertEqual(videos[0], self.player.pick(videos[0].id))
-        self.assertEqual(videos[1], self.player.pick(videos[1].id))
-
-    def test_pick_no_video(self):
-        with self.assertRaises(DomainError) as ctx:
-            self.player.pick(None)
-        self.assertEqual("queue is empty", str(ctx.exception))
-
-    def test_pick_missing_video(self):
-        video = self.make_video()
-        self.player.queue(video)
-        with self.assertRaises(DomainError) as ctx:
-            self.player.pick(None)
-        self.assertEqual("video not found", str(ctx.exception))
-
-    def test_play(self):
-        video = self.make_video()
-        self.player.queue(video)
-        self.player.play(video)
-        self.assertEqual(PlayerState.PLAYING, self.player.state)
-        self.expect_events(self.player, Evt.VideoQueued, Evt.PlayerStarted)
-
-    def test_play_unknown(self):
-        video = self.make_video()
-        with self.assertRaises(DomainError) as ctx:
-            self.player.play(video)
-        self.assertEqual(f"unknown video: {video}", str(ctx.exception))
-
-    def test_stop(self):
-        video = self.make_video()
-        self.player.queue(video)
-        self.player.play(video)
-        self.player.stop()
-        self.assertEqual(PlayerState.STOPPED, self.player.state)
-        self.expect_events(
-            self.player, Evt.VideoQueued, Evt.PlayerStarted, Evt.PlayerStopped
-        )
-
-    def test_stop_not_started(self):
-        with self.assertRaises(DomainError) as ctx:
-            self.player.stop()
-        self.assertEqual("the player is already stopped", str(ctx.exception))
 
     def test_toggle_pause(self):
         video = self.make_video()
