@@ -96,13 +96,13 @@ source ~/.profile
 
 declare -A COMMANDS
 COMMANDS=(
-  [start]="Start $PROJECT_NAME."
-  [stop]="Stop $PROJECT_NAME."
-  [restart]="Restart $PROJECT_NAME."
-  [update]="Update $PROJECT_NAME."
-  [status]="Print the operational status of $PROJECT_NAME."
-  [logs]="Tail the log file."
-  [test]="Run the test suite."
   [gendoc]="Generate local documentation."
+  [logs]="Tail the log file."
+  [restart]="Restart $PROJECT_NAME."
+  [start]="Start $PROJECT_NAME."
+  [status]="Print the operational status of $PROJECT_NAME."
+  [stop]="Stop $PROJECT_NAME."
+  [test]="Run the test suite."
+  [update]="Update $PROJECT_NAME."
 )
-make_basic_cli COMMANDS "$@"
+make_basic_cli default_help_display COMMANDS "$@"

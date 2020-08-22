@@ -6,10 +6,12 @@ ROOT="$(cd "$HERE/.." && pwd)"
 source "$HERE/array.sh"
 
 function make_basic_cli() {
+  local display_help
   local -n commands
 
-  commands="$1"
-  shift
+  display_help="$1"
+  commands="$2"
+  shift 2
   local args="$@"
 
   if element_in "$1" "${!commands[@]}"; then
@@ -18,28 +20,28 @@ function make_basic_cli() {
 
     "$cmd" "$@"
   else
-    display_help $commands
+    "$display_help" commands
   fi
 }
 
-function display_help() {
-  printf "Usage: $0:\n\n"
+function default_help_display() {
+  printf "Usage: $0 command\n\n"
   printf "Available commands:\n"
 
-  # Append a default the help command entry
-  commands[help]="Display this help message."
-
+  local -n command_ref
   local longest=0
-  for cmd in "${!commands[@]}"; do
+
+  command_ref="$1"
+  for cmd in "${!command_ref[@]}"; do
     local len="${#cmd}"
 
     [[ "$len" > "$longest" ]] && longest="$len"
   done
 
   local sorted_cmds=$(
-    for cmd in "${!commands[@]}"; do
-      printf "${commands[$cmd]}:::$cmd\n"
-    done | sort | awk -F::: '{print $2}'
+    for cmd in "${!command_ref[@]}"; do
+      printf "$cmd\n"
+    done | sort
   )
 
   for cmd in ${sorted_cmds[@]}; do
@@ -48,6 +50,6 @@ function display_help() {
     if [[ "$size_diff" > 0 ]]; then
       spaces="$(printf ' %.0s' $(seq 1 "$size_diff"))"
     fi
-    printf " - $cmd:$spaces ${commands["$cmd"]}\n"
+    printf " - $cmd:$spaces ${command_ref["$cmd"]}\n"
   done
 }
