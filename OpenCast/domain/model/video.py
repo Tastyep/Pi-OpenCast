@@ -33,7 +33,8 @@ class Video(Entity):
 
     def __repr__(self):
         base_repr = super().__repr__()
-        return f"{Video.__name__}({base_repr}, title='{self.title}', playlist={self._playlist_id})"
+        return f"{Video.__name__}({base_repr}, title='{self.title}',\
+                playlist={self._playlist_id})"
 
     @property
     def source(self):

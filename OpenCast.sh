@@ -15,9 +15,7 @@ LOG_FILE="$PROJECT_NAME.log"
 
 source "$PROJECT_DIR/script/gen_cli.sh"
 
-function is_port_bound() {
-  lsof -t -a -i ":$1" -c python
-}
+#### CLI handlers
 
 function start() {
   if [ "$(is_port_bound $API_PORT)" ]; then
@@ -85,6 +83,16 @@ function gendoc() {
   xdg-open "build/html/index.html"
 }
 
+function lint() {
+  "$PROJECT_DIR/tool/lint.sh" "$@"
+}
+
+#### Internal functions
+
+function is_port_bound() {
+  lsof -t -a -i ":$1" -c python
+}
+
 function run_in_env() {
   poetry install
   poetry run "$@"
@@ -97,6 +105,7 @@ source ~/.profile
 declare -A COMMANDS
 COMMANDS=(
   [gendoc]="Generate local documentation."
+  [lint]="Run linters on given targets."
   [logs]="Tail the log file."
   [restart]="Restart $PROJECT_NAME."
   [start]="Start $PROJECT_NAME."
