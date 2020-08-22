@@ -1,4 +1,6 @@
-""" Database context in charge of recording and applying transactions on repositories """
+"""
+Database context in charge of recording and applying transactions on repositories
+"""
 
 
 class Context:
