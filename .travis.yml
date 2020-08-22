@@ -14,4 +14,4 @@ branches:
 install: ./setup.sh
 
 # command to run tests
-script: ./OpenCast.sh test
+script: ./OpenCast.sh test && ./OpenCast.sh lint all
