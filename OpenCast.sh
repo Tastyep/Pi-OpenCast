@@ -14,6 +14,7 @@ WEBAPP_DIR="webapp"
 LOG_FILE="$PROJECT_NAME.log"
 
 source "$PROJECT_DIR/script/gen_cli.sh"
+source "$PROJECT_DIR/script/env.sh"
 
 #### CLI handlers
 
@@ -32,7 +33,7 @@ function start() {
 
   echo "Starting $PROJECT_NAME server."
   (cd "$WEBAPP_DIR" && WEBAPP_PORT=$WEBAPP_PORT npm run serve &)
-  run_in_env poetry run python -m "$PROJECT_NAME" &
+  run_in_env python -m "$PROJECT_NAME" &
 }
 
 function stop() {
@@ -65,21 +66,21 @@ function logs() {
 function test() {
   cd "$PROJECT_DIR" || exit 1
   if [ -z "$1" ]; then
-    run_in_env python -m unittest discover -v
+    penv python -m unittest discover -v
   else
     local selector="$1"
 
     if [[ "$selector" != "$TEST_DIR"* ]]; then
       selector="$TEST_DIR.$selector"
     fi
-    run_in_env python -m unittest "$selector"
+    penv python -m unittest "$selector"
   fi
 }
 
 function gendoc() {
   cd "$DOC_DIR" || exit 1
 
-  run_in_env make html -b coverage
+  penv make html -b coverage
   xdg-open "build/html/index.html"
 }
 
@@ -92,15 +93,6 @@ function lint() {
 function is_port_bound() {
   lsof -t -a -i ":$1" -c python
 }
-
-function run_in_env() {
-  poetry install
-  poetry run "$@"
-}
-
-# Source profile file as poetry use it to modify the PATH
-# This is likely to be done by the display manager, but not always (lightdm).
-source ~/.profile
 
 declare -A COMMANDS
 COMMANDS=(
