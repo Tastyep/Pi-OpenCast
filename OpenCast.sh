@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="OpenCast"
@@ -13,15 +13,10 @@ WEBAPP_DIR="webapp"
 
 LOG_FILE="$PROJECT_NAME.log"
 
+source "$PROJECT_DIR/script/gen_cli.sh"
+
 function is_port_bound() {
   lsof -t -a -i ":$1" -c python
-}
-
-function element_in() {
-  local e match="$1"
-  shift
-  for e; do [[ "$e" == "$match" ]] && return 0; done
-  return 1
 }
 
 function start() {
@@ -99,15 +94,15 @@ run_in_env() {
 # This is likely to be done by the display manager, but not always (lightdm).
 source ~/.profile
 
-COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test" "gendoc")
-if element_in "$1" "${COMMANDS[@]}"; then
-  COMMAND="$1"
-  shift
-
-  "$COMMAND" "$@"
-else
-  echo "Usage: $0 {$(
-    IFS='|'
-    echo "${COMMANDS[*]}"
-  )}"
-fi
+declare -A COMMANDS
+COMMANDS=(
+  [start]="Start $PROJECT_NAME."
+  [stop]="Stop $PROJECT_NAME."
+  [restart]="Restart $PROJECT_NAME."
+  [update]="Update $PROJECT_NAME."
+  [status]="Print the operational status of $PROJECT_NAME."
+  [logs]="Tail the log file."
+  [test]="Run the test suite."
+  [gendoc]="Generate local documentation."
+)
+make_basic_cli COMMANDS "$@"
