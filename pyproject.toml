@@ -34,6 +34,8 @@ sphinx = "^3.1.1"
 mypy = "^0.780"
 sphinx-autodoc-typehints = "^1.11.0"
 sphinxcontrib-openapi = "^0.7.0"
+black = "^19.10b0"
+flake8 = "^3.8.3"
 
 [tool.poetry.scripts]
 my-script = 'OpenCast:main'
