@@ -1,3 +1,5 @@
+""" Video capabilities monitoring routes """
+
 from OpenCast.app.command import video as Cmd
 from OpenCast.domain.event import video as Evt
 from OpenCast.domain.model import Id
@@ -7,7 +9,7 @@ from .monitor import MonitorController
 
 class VideoMonitController(MonitorController):
     def __init__(self, app_facade, infra_facade, data_facade):
-        super().__init__(app_facade, infra_facade, "/video")
+        super().__init__(app_facade, infra_facade, "/videos")
         self._video_repo = data_facade.video_repo
 
         self._route("GET", "/", handle=self.list)

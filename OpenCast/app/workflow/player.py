@@ -1,3 +1,5 @@
+""" Workflows running player related operations """
+
 from collections import namedtuple
 from enum import Enum, auto
 from typing import List

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_NAME="OpenCast"
@@ -13,16 +13,10 @@ WEBAPP_DIR="webapp"
 
 LOG_FILE="$PROJECT_NAME.log"
 
-function is_port_bound() {
-  lsof -t -a -i ":$1" -c python
-}
+source "$PROJECT_DIR/script/gen_cli.sh"
+source "$PROJECT_DIR/script/env.sh"
 
-function element_in() {
-  local e match="$1"
-  shift
-  for e; do [[ "$e" == "$match" ]] && return 0; done
-  return 1
-}
+#### CLI handlers
 
 function start() {
   if [ "$(is_port_bound $API_PORT)" ]; then
@@ -39,7 +33,7 @@ function start() {
 
   echo "Starting $PROJECT_NAME server."
   (cd "$WEBAPP_DIR" && WEBAPP_PORT=$WEBAPP_PORT npm run serve &)
-  run_in_env poetry run python -m "$PROJECT_NAME" &
+  run_in_env python -m "$PROJECT_NAME" &
 }
 
 function stop() {
@@ -72,42 +66,44 @@ function logs() {
 function test() {
   cd "$PROJECT_DIR" || exit 1
   if [ -z "$1" ]; then
-    run_in_env python -m unittest discover -v
+    penv python -m unittest discover -v
   else
     local selector="$1"
 
     if [[ "$selector" != "$TEST_DIR"* ]]; then
       selector="$TEST_DIR.$selector"
     fi
-    run_in_env python -m unittest "$selector"
+    penv python -m unittest "$selector"
   fi
 }
 
 function gendoc() {
   cd "$DOC_DIR" || exit 1
 
-  run_in_env make html
+  penv make html -b coverage
   xdg-open "build/html/index.html"
 }
 
-function run_in_env() {
-  poetry install
-  poetry run "$@"
+function lint() {
+  "$PROJECT_DIR/tool/lint.sh" "$@"
 }
 
-# Source profile file as poetry use it to modify the PATH
-# This is likely to be done by the display manager, but not always (lightdm).
-source ~/.profile
+#### Internal functions
 
-COMMANDS=("start" "stop" "restart" "update" "status" "logs" "test" "gendoc")
-if element_in "$1" "${COMMANDS[@]}"; then
-  COMMAND="$1"
-  shift
+function is_port_bound() {
+  lsof -t -a -i ":$1" -c python
+}
 
-  "$COMMAND" "$@"
-else
-  echo "Usage: $0 {$(
-    IFS='|'
-    echo "${COMMANDS[*]}"
-  )}"
-fi
+declare -A COMMANDS
+COMMANDS=(
+  [gendoc]="Generate local documentation."
+  [lint]="Run linters on given targets."
+  [logs]="Tail the log file."
+  [restart]="Restart $PROJECT_NAME."
+  [start]="Start $PROJECT_NAME."
+  [status]="Print the operational status of $PROJECT_NAME."
+  [stop]="Stop $PROJECT_NAME."
+  [test]="Run the test suite."
+  [update]="Update $PROJECT_NAME."
+)
+make_basic_cli default_help_display COMMANDS "$@"

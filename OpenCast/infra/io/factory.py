@@ -1,3 +1,5 @@
+""" Factory for creating IO objects """
+
 from .channel import JanusChannel, PollingChannel
 from .server import Server
 

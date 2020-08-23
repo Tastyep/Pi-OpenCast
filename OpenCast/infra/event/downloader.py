@@ -1,3 +1,5 @@
+""" Events emitted by the media downloader """
+
 from dataclasses import dataclass
 
 from OpenCast.infra.event.event import Event

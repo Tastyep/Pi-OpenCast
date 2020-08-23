@@ -1,3 +1,5 @@
+""" Player commands """
+
 from .command import Command, ModelId, command
 
 

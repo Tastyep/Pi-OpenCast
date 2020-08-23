@@ -1,3 +1,5 @@
+""" Abstraction of an applicative service """
+
 import inspect
 import traceback
 from functools import partial

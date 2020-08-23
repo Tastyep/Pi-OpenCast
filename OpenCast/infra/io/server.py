@@ -1,3 +1,5 @@
+""" High level HTTP server """
+
 import aiohttp_cors as cors
 import structlog
 from aiohttp import web
@@ -21,7 +23,7 @@ class Server:
         self._cors.add(route)
 
     def run(self, host, port):
-        self._logger.info(f"Started", host=host, port=port)
+        self._logger.info("Started", host=host, port=port)
 
         web.run_app(self._app, host=host, port=port)
 

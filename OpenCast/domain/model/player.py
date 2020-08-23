@@ -1,3 +1,6 @@
+""" Conceptual representation of the media player (VLC) """
+
+
 from enum import Enum
 
 from OpenCast.config import config
@@ -31,7 +34,10 @@ class Player(Entity):
 
     def __repr__(self):
         base_repr = super().__repr__()
-        return f"{Player.__name__}({base_repr}, state={self._state}, video_idx={self._index} / {len(self._queue)})"
+        return (
+            f"{Player.__name__}({base_repr}, state={self._state},"
+            f"video_idx={self._index} / {len(self._queue)})"
+        )
 
     @property
     def state(self):
@@ -102,7 +108,7 @@ class Player(Entity):
         elif self._state is State.PAUSED:
             self._state = State.PLAYING
         else:
-            raise DomainError(f"the player is not started")
+            raise DomainError("the player is not started")
         self._record(Evt.PlayerStateToggled)
 
     def next_video(self):

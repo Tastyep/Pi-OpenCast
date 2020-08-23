@@ -1,3 +1,5 @@
+""" Conceptual representation of a media """
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
@@ -31,7 +33,10 @@ class Video(Entity):
 
     def __repr__(self):
         base_repr = super().__repr__()
-        return f"{Video.__name__}({base_repr}, title='{self.title}', playlist={self._playlist_id})"
+        return (
+            f"{Video.__name__}({base_repr}, title='{self.title}',"
+            f"playlist={self._playlist_id})"
+        )
 
     @property
     def source(self):

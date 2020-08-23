@@ -1,1 +1,3 @@
-from OpenCast.infra import Id
+""" Definitions of high level multi-sequencial operations """
+
+from OpenCast.infra import Id  # noqa: F401

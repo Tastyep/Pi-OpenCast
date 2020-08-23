@@ -1,3 +1,5 @@
+""" Module in charge of registering application services """
+
 from .player import PlayerService
 from .video import VideoService
 

@@ -1,3 +1,6 @@
+""" Abstract representation of a command """
+
+
 from dataclasses import dataclass
 
 from OpenCast.domain.model import Id as ModelId
