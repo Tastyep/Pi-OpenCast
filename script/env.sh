@@ -12,6 +12,12 @@ function penv() {
 }
 
 function jenv() {
-  (cd "$ROOT/webapp/" && npm install --only=dev)
-  PATH="$ROOT/webapp/node_modules:$PATH" eval "$@"
+  local node_modules_path
+
+  node_modules_path="$ROOT/webapp/node_modules/.bin"
+  if [[ "$PATH" != *"$node_modules_path"* ]]; then
+    export PATH="$PATH:$node_modules_path"
+    (cd "$ROOT/webapp/" && npm install --only=dev)
+  fi
+  eval "$@"
 }
