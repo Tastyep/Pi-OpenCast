@@ -84,6 +84,10 @@ function gendoc() {
   xdg-open "build/html/index.html"
 }
 
+function gen() {
+  "$PROJECT_DIR/tool/generate.sh" "$@"
+}
+
 function lint() {
   "$PROJECT_DIR/tool/lint.sh" "$@"
 }
@@ -96,7 +100,7 @@ function is_port_bound() {
 
 declare -A COMMANDS
 COMMANDS=(
-  [gendoc]="Generate local documentation."
+  [gen]="Generate content."
   [lint]="Run linters on given targets."
   [logs]="Tail the log file."
   [restart]="Restart $PROJECT_NAME."
