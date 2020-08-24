@@ -9,7 +9,7 @@ source "$ROOT/script/env.sh"
 #### CLI handlers
 
 function doc() {
-  (cd "$ROOT/docs" && penv make html -b coverage)
+  (cd "$ROOT/docs" && penv make clean && penv make html -b coverage)
 }
 
 #### Internal functions
