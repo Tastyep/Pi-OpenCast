@@ -5,6 +5,7 @@ from dataclasses import astuple, dataclass
 from enum import Enum, auto
 
 import structlog
+
 from OpenCast.app.command import video as Cmd
 from OpenCast.config import config
 from OpenCast.domain.event import video as VideoEvt

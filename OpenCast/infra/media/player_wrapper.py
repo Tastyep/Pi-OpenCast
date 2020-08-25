@@ -2,10 +2,11 @@
 
 from threading import Condition
 
-import OpenCast.infra.event.player as e
 import structlog
-from OpenCast.infra import Id
 from vlc import EventType
+
+import OpenCast.infra.event.player as e
+from OpenCast.infra import Id
 
 from .error import PlayerError
 

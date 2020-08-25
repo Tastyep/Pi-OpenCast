@@ -5,6 +5,7 @@ from enum import Enum, auto
 from typing import List
 
 import structlog
+
 from OpenCast.app.command import player as PlayerCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.service.identity import IdentityService
