@@ -1,4 +1,4 @@
-name: Test
+name: Sanitize
 
 on:
   push:
@@ -27,5 +27,8 @@ jobs:
       - name: Install dependencies
         run: ./setup.sh
       #
-      - name: Test
-        run: ./OpenCast.sh test
+      - name: Lint
+        run: ./OpenCast.sh lint all
+      #
+      - name: Format
+        run: ./OpenCast.sh format all
