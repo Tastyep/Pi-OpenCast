@@ -13,7 +13,7 @@ WEBAPP_DIR="webapp"
 
 LOG_FILE="$PROJECT_NAME.log"
 
-source "$PROJECT_DIR/script/gen_cli.sh"
+source "$PROJECT_DIR/script/cli_builder.sh"
 source "$PROJECT_DIR/script/env.sh"
 
 #### CLI handlers
@@ -84,6 +84,10 @@ gendoc() {
   xdg-open "build/html/index.html"
 }
 
+function format() {
+  "$PROJECT_DIR/tool/format.sh" "$@"
+}
+
 function gen() {
   "$PROJECT_DIR/tool/generate.sh" "$@"
 }
@@ -98,8 +102,11 @@ function is_port_bound() {
   lsof -t -a -i ":$1" -c python
 }
 
+#### CLI definition
+
 declare -A COMMANDS
 COMMANDS=(
+  [format]="Format source code."
   [gen]="Generate content."
   [lint]="Run linters on given targets."
   [logs]="Tail the log file."
@@ -110,4 +117,4 @@ COMMANDS=(
   [test]="Run the test suite."
   [update]="Update $PROJECT_NAME."
 )
-make_basic_cli default_help_display COMMANDS "$@"
+make_cli default_help_display COMMANDS "$@"

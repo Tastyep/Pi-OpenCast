@@ -5,7 +5,7 @@ ROOT="$(cd "$HERE/.." && pwd)"
 
 source "$HERE/array.sh"
 
-function make_basic_cli() {
+function make_cli() {
   local display_help
   local -n commands
 
@@ -51,5 +51,31 @@ function default_help_display() {
       spaces="$(printf ' %.0s' $(seq 1 "$size_diff"))"
     fi
     printf " - $cmd:$spaces ${command_ref["$cmd"]}\n"
+  done
+}
+
+function expect_params() {
+  local -n params_ref
+  local command
+  local args
+  local count
+
+  params_ref="$1"
+  command="$2"
+  args=("$@")
+  count="${#args[@]}"
+  for ((i = 2; i < count; i++)); do
+    local param
+
+    param="${args[$i]}"
+    if ! element_in "$param" "${params_ref[@]}"; then
+      printf "$0 $command: invalid argument $param\n"
+      printf "usage: $command "
+      for param in "$params_ref"; do
+        printf "[$param]"
+      done
+      printf "\n"
+      exit 1
+    fi
   done
 }
