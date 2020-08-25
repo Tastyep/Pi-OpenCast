@@ -24,7 +24,7 @@ structlog = "^20.1.0"
 colorama = "^0.4.3"
 sphinx = "^3.0.3"
 sphinx_rtd_theme = "^0.4.3"
-python-vlc = "^3.0.9113"
+python-vlc = "^3.0.11115"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

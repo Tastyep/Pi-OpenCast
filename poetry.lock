@@ -254,7 +254,7 @@ description = "VLC bindings for python."
 name = "python-vlc"
 optional = false
 python-versions = "*"
-version = "3.0.9113"
+version = "3.0.11115"
 
 [[package]]
 category = "main"
@@ -495,7 +495,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "f2286064f6040a5efa9b8c07f86f9a9ffdfed0f0fcc8fa655109c7b60c869f61"
+content-hash = "b6ff18a648be6de477dc591aee234bbab112f5bc69468f8137e6dc151bf14d59"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -655,8 +655,8 @@ pytest-cov = [
     {file = "pytest_cov-2.9.0-py2.py3-none-any.whl", hash = "sha256:c87dfd8465d865655a8213859f1b4749b43448b5fae465cb981e16d52a811424"},
 ]
 python-vlc = [
-    {file = "python-vlc-3.0.9113.tar.gz", hash = "sha256:5422b79d347b6419008ee91cfd9663edc37eaf2a0bd8fb9017d4cc2e5f249dda"},
-    {file = "python_vlc-3.0.9113-py3-none-any.whl", hash = "sha256:6e6799cae79a1cda737144f6ac72d72d449752c5384fb2b5cb326600626e3bef"},
+    {file = "python-vlc-3.0.11115.tar.gz", hash = "sha256:a4d3bdddfce84a8fb1b2d5447193a0239c55c16ca246e5194d48efd59c4e236b"},
+    {file = "python_vlc-3.0.11115-py3-none-any.whl", hash = "sha256:508bc5b4b4fd72b4e23c926795bdcd38c7c1c08a4dd6b8cc87b0abd1d7118aa1"},
 ]
 pytz = [
     {file = "pytz-2020.1-py2.py3-none-any.whl", hash = "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"},
@@ -676,6 +676,7 @@ pyyaml = [
     {file = "PyYAML-5.3.1.tar.gz", hash = "sha256:b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"},
 ]
 requests = [
+    {file = "requests-2.23.0-py2.7.egg", hash = "sha256:5d2d0ffbb515f39417009a46c14256291061ac01ba8f875b90cad137de83beb4"},
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
 ]
