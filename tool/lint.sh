@@ -3,8 +3,9 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 
-source "$ROOT/script/gen_cli.sh"
+source "$ROOT/script/cli_builder.sh"
 source "$ROOT/script/env.sh"
+source "$ROOT/script/logging.sh"
 
 #### CLI handlers
 
@@ -15,7 +16,7 @@ function all() {
 
 function python() {
   penv flake8 "$ROOT/OpenCast" --statistics
-  display_linter_status "flake8" "$?"
+  log_status "flake8" "$?"
 }
 
 function spec() {
@@ -26,21 +27,10 @@ function spec() {
   output=$(jenv "$cmd" | tee >(cat - >&5))
 
   echo "$output" | grep -q "problem" && status=1 || status=0
-  display_linter_status "spectral" "$status"
+  log_status "spectral" "$status"
 }
 
-#### Internal functions
-
-function display_linter_status() {
-  local name status marker
-
-  name="$1"
-  status="$2"
-  [[ "$status" == "1" ]] && marker="✗" || marker="✓"
-
-  printf "$marker $name\n"
-  return "$status"
-}
+#### CLI definition
 
 declare -A COMMANDS
 COMMANDS=(
@@ -48,4 +38,4 @@ COMMANDS=(
   [python]="Run the linter on the python code."
   [spec]="Run the linter on the API spec."
 )
-make_basic_cli default_help_display COMMANDS "$@"
+make_cli default_help_display COMMANDS "$@"
