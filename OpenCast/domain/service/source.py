@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List
 
 import structlog
+
 from OpenCast.domain.model.video import Stream
 
 

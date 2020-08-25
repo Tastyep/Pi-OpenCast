@@ -12,6 +12,7 @@ webapp/node_modules
 
 # Generated directories
 build
+docs/source/_autosummary
 
 #  Generated files
 OpenCast.pid
