@@ -3,10 +3,10 @@
 
 from typing import List
 
+import structlog
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import ISO639Utils
 
-import structlog
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
 from .download_logger import DownloadLogger

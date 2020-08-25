@@ -23,5 +23,8 @@ jobs:
       - name: Lint
         run: ./OpenCast.sh lint all
       #
+      - name: Format
+        run: ./OpenCast.sh format all
+      #
       - name: Test
         run: ./OpenCast.sh test
