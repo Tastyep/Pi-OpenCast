@@ -33,8 +33,13 @@ function restart() {
 }
 
 function status() {
-  "$SERVICE_BACK" "status" "$@"
-  "$SERVICE_FRONT" "status" "$@"
+  "$SERVICE_BACK" "status"
+  "$SERVICE_FRONT" "status"
+}
+
+function test() {
+  "$SERVICE_BACK" "test" &&
+    "$SERVICE_FRONT" "test"
 }
 
 #### CLI definition
@@ -47,5 +52,6 @@ COMMANDS=(
   [stop]="Stop all services."
   [restart]="Restart all services."
   [status]="Display the status of all service."
+  [test]="Run tests for all services."
 )
 make_cli default_help_display COMMANDS "$@"
