@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
-ROOT="$(cd "$HERE/.." && pwd)"
 
 source "$HERE/array.sh"
 
