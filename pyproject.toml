@@ -27,7 +27,7 @@ sphinx_rtd_theme = "^0.4.3"
 python-vlc = "^3.0.9113"
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.0"
+pytest = "^6.0"
 pytest-cov = "^2.4"
 
 [tool.poetry.scripts]
