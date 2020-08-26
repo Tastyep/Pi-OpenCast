@@ -28,4 +28,4 @@ jobs:
         run: ./setup.sh
       #
       - name: Test
-        run: ./OpenCast.sh test
+        run: ./OpenCast.sh test all
