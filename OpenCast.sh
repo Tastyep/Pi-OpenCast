@@ -18,52 +18,7 @@ source "$PROJECT_DIR/script/env.sh"
 
 #### CLI handlers
 
-function start() {
-  if [ "$(is_port_bound $API_PORT)" ]; then
-    echo "$PROJECT_NAME server is already running."
-    return
-  fi
-
-  if [[ "$1" == "-u" ]]; then
-    update
-  fi
-
-  cd "$PROJECT_DIR" || exit 1
-  mkdir -p "$LOG_DIR"
-
-  echo "Starting $PROJECT_NAME server."
-  (cd "$WEBAPP_DIR" && WEBAPP_PORT=$WEBAPP_PORT npm run serve &)
-  run_in_env python -m "$PROJECT_NAME" &
-}
-
-stop() {
-  echo "Killing $PROJECT_NAME..."
-  # Todo hardcoded port
-  lsof -t -a -i ":$API_PORT" -c python | xargs kill >/dev/null 2>&1
-  (cd "$PROJECT_DIR/$WEBAPP_DIR" && npm stop)
-  echo "Done."
-}
-
-restart() {
-  stop && start ""
-}
-
-update() {
-  echo "Checking for updates."
-
-  (cd "$PROJECT_DIR" && poetry update)
-}
-
-status() {
-  echo -n "$PROJECT_NAME is ... "
-  [ "$(lsof -t -a -i ":$API_PORT" -c python)" ] && echo "UP" || echo "DOWN"
-}
-
-logs() {
-  tail -n 50 -f "$PROJECT_DIR/$LOG_DIR/$LOG_FILE"
-}
-
-test() {
+function test() {
   cd "$PROJECT_DIR" || exit 1
   if [ -z "$1" ]; then
     penv python -m unittest discover -v
@@ -77,13 +32,6 @@ test() {
   fi
 }
 
-gendoc() {
-  cd "$DOC_DIR" || exit 1
-
-  penv make html -b coverage
-  xdg-open "build/html/index.html"
-}
-
 function format() {
   "$PROJECT_DIR/tool/format.sh" "$@"
 }
@@ -94,6 +42,10 @@ function gen() {
 
 function lint() {
   "$PROJECT_DIR/tool/lint.sh" "$@"
+}
+
+function service() {
+  "$PROJECT_DIR/tool/service.sh" "$@"
 }
 
 #### Internal functions
@@ -109,12 +61,7 @@ COMMANDS=(
   [format]="Format source code."
   [gen]="Generate content."
   [lint]="Run linters on given targets."
-  [logs]="Tail the log file."
-  [restart]="Restart $PROJECT_NAME."
-  [start]="Start $PROJECT_NAME."
-  [status]="Print the operational status of $PROJECT_NAME."
-  [stop]="Stop $PROJECT_NAME."
+  [service]="Operate services."
   [test]="Run the test suite."
-  [update]="Update $PROJECT_NAME."
 )
 make_cli default_help_display COMMANDS "$@"

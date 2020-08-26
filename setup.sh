@@ -54,7 +54,7 @@ install_system_deps() {
 function install_project_deps() {
   info "Installing project dependencies..."
 
-  "$PROJECT_DIR/$INTERNAL_NAME.sh" update
+  "$PROJECT_DIR/$INTERNAL_NAME.sh" service back update
   (cd "$PROJECT_DIR/webapp" && npm install)
 }
 
@@ -64,7 +64,7 @@ start_at_boot() {
 
   local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"
   sed -i "s/{ USER }/$USER/g" "$config"
-  sed -i "s#{ START_COMMAND }#$PROJECT_DIR/$INTERNAL_NAME.sh start -u#g" "$config"
+  sed -i "s#{ START_COMMAND }#$PROJECT_DIR/$INTERNAL_NAME.sh service start#g" "$config"
   sudo cp "$config" "$SYSTEMD_CONFIG_DIR"
   sudo systemctl daemon-reload
   sudo systemctl enable "$SERVICE_NAME"
