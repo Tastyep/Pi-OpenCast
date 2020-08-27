@@ -19,11 +19,11 @@ System Dependencies
 ===================
 
  - Python 3.7+
+ - nodejs
+ - npm
  - curl
  - lsof
  - pip3
- - nodejs
- - npm
 
 Project Installation
 ====================
