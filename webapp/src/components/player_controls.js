@@ -4,8 +4,6 @@ import { IconButton, ButtonGroup, Grid } from "@material-ui/core";
 import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
-import SkipNextIcon from "@material-ui/icons/SkipNext";
-import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
 import ClosedCaptionIcon from "@material-ui/icons/ClosedCaption";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
@@ -47,21 +45,11 @@ function PlayerControls() {
     <Grid container spacing={1}>
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
-          <IconButton
-            onClick={() => updatePlayer(playerAPI.playMedia, undefined)}
-          >
-            <SkipPreviousIcon />
-          </IconButton>
           <IconButton onClick={() => updatePlayer(playerAPI.pauseMedia)}>
             {pauseStatus ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
           <IconButton onClick={() => updatePlayer(playerAPI.stopMedia)}>
             <StopIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => updatePlayer(playerAPI.playMedia, undefined)}
-          >
-            <SkipNextIcon />
           </IconButton>
         </ButtonGroup>
       </Grid>
