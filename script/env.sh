@@ -8,7 +8,11 @@ ROOT="$(cd "$HERE/.." && pwd)"
 source ~/.profile
 
 function penv() {
-  poetry run "$@"
+  if [[ "$(pwd)" == "$ROOT"* ]]; then
+    poetry run "$@"
+  else
+    (cd "$ROOT" && poetry run "$@")
+  fi
 }
 
 function jenv() {
