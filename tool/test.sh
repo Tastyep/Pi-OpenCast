@@ -10,8 +10,8 @@ source "$ROOT/script/logging.sh"
 #### CLI handlers
 
 function all() {
-  back
-  front
+  back "$@"
+  front "$@"
 }
 
 function back() {
@@ -28,6 +28,8 @@ function back() {
 
   penv "$command -m unittest $selector -v"
   log_status "Python" "$?"
+
+  [[ ! -z "${parsed["--coverage"]}" ]] && penv coverage xml
 }
 
 function front() {

@@ -74,7 +74,6 @@ function expect_params() {
 
     arg="${args[$i]}"
     found=0
-    echo "Arg: $arg"
     for j in "${!params_ref[@]}"; do
       if element_in "$j" "${matched_params[@]}"; then
         continue
