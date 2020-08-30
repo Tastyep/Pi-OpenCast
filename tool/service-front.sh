@@ -14,12 +14,13 @@ source "$ROOT/script/logging.sh"
 
 function start() {
   local -a params
+  local -A parsed
   params=("--dev")
-  expect_params params "start" "$@"
+  expect_params params parsed "start" "$@"
 
   local npm_cmd
   npm_cmd="WEBAPP_PORT=$WEBAPP_PORT npm run serve &"
-  [[ "$1" == "--dev" ]] && npm_cmd="npm start"
+  [[ ! -z "${parsed["--dev"]}" ]] && npm_cmd="npm start"
 
   (cd "$WEBAPP_DIR" && eval "$npm_cmd")
 }

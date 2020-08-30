@@ -15,16 +15,18 @@ function all() {
 }
 
 function back() {
-  if [[ -z "$1" ]]; then
-    penv python -m unittest discover -v
-  else
-    local selector="$1"
+  local -a params
+  local -A parsed
+  params=("--coverage" "[<selector>]")
+  expect_params params parsed "back" "$@"
 
-    if [[ "$selector" != "$TEST_DIR"* ]]; then
-      selector="$TEST_DIR.$selector"
-    fi
-    penv python -m unittest "$selector"
-  fi
+  local command selector
+  command="python"
+  selector="discover"
+  [[ ! -z "${parsed["--coverage"]}" ]] && command="coverage run"
+  [[ "${parsed["[<selector>]"]}" ]] && selector="${parsed["[<selector>]"]}"
+
+  penv "$command -m unittest $selector -v"
   log_status "Python" "$?"
 }
 
