@@ -24,7 +24,7 @@ function back() {
   command="python"
   selector="discover"
   [[ ! -z "${parsed["--coverage"]}" ]] && command="coverage run"
-  [[ "${parsed["[<selector>]"]}" ]] && selector="${parsed["[<selector>]"]}"
+  [[ ! -z "${parsed["selector"]}" ]] && selector="${parsed["selector"]}"
 
   penv "$command -m unittest $selector -v"
   log_status "Python" "$?"

@@ -64,7 +64,7 @@ function expect_params() {
   args=("$@")
   count="${#args[@]}"
 
-  parse_params params_attr
+  identify_params params_attr
 
   local matched_params
   matched_params=()
@@ -74,6 +74,7 @@ function expect_params() {
 
     arg="${args[$i]}"
     found=0
+    echo "Arg: $arg"
     for j in "${!params_ref[@]}"; do
       if element_in "$j" "${matched_params[@]}"; then
         continue
@@ -93,8 +94,11 @@ function expect_params() {
       display_help
     fi
 
+    local decayed_name
+
+    decayed_name="$(decay "${params_ref["$index"]}" "${params_attr["$index"]}")"
     matched_params+=("$index")
-    parsed_ref["${params_ref["$j"]}"]="$arg"
+    parsed_ref["$decayed_name"]="$arg"
   done
   for i in "${!params_ref[@]}"; do
     if [[ "${params_attr["$i"]}" == *"required"* ]] && ! element_in "$i" "${matched_params[@]}"; then
@@ -102,6 +106,22 @@ function expect_params() {
       display_help
     fi
   done
+}
+
+function decay() {
+  local param type
+
+  param="$1"
+  type="$2"
+  IFS='|' read -r -a attrs <<<"$type"
+  for attr in "${attrs[@]}"; do
+    case "$attr" in
+    "optional" | "required" | "argument")
+      param="${param:1:${#param}-2}"
+      ;;
+    esac
+  done
+  echo "$param"
 }
 
 function display_help() {
@@ -113,7 +133,7 @@ function display_help() {
   exit 1
 }
 
-function parse_params() {
+function identify_params() {
   local -n attrs_ref
 
   attrs_ref="$1"
