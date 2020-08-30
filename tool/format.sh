@@ -14,12 +14,13 @@ function all() {
 }
 
 function python() {
-  local black_opts isort_opts=()
   local -a params
-
+  local -A parsed
   params=("--check")
-  expect_params params "python" "$@"
-  if [[ "$1" == "--check" ]]; then
+  expect_params params parsed "python" "$@"
+
+  local black_opts isort_opts=()
+  if [[ ! -z "${parsed["--check"]}" ]]; then
     black_opts+=("--check")
     isort_opts+=("--check-only")
   fi

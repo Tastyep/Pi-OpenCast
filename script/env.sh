@@ -9,9 +9,9 @@ source ~/.profile
 
 function penv() {
   if [[ "$(pwd)" == "$ROOT"* ]]; then
-    poetry run "$@"
+    poetry run $@
   else
-    (cd "$ROOT" && poetry run "$@")
+    (cd "$ROOT" && poetry run $@)
   fi
 }
 
