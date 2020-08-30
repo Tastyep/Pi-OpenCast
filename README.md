@@ -4,6 +4,7 @@
 <h1 align="center" style="font-size: 50px; color:#000; font-weight: 600">OpenCast</h1>
 
 ![Test](https://github.com/Tastyep/Pi-OpenCast/workflows/Test/badge.svg)
+[![codecov](https://codecov.io/gh/Tastyep/Pi-OpenCast/branch/develop/graph/badge.svg)](https://codecov.io/gh/Tastyep/Pi-OpenCast)
 ![Sanitize](https://github.com/Tastyep/Pi-OpenCast/workflows/Sanitize/badge.svg)
 [![Documentation](https://github.com/Tastyep/Pi-OpenCast/workflows/Documentation/badge.svg)](https://tastyep.github.io/Pi-OpenCast/)
 
