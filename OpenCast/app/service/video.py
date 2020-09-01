@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import structlog
-
 from OpenCast.app.command import video as video_cmds
 from OpenCast.domain.model.video import Video
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
@@ -22,7 +21,7 @@ class VideoService(Service):
         )
         self._subtitle_service = service_factory.make_subtitle_service(self._downloader)
 
-    # Command handler interface implementation
+    # Command handler implementation
     def _create_video(self, cmd):
         def impl(ctx):
             video = Video(cmd.model_id, cmd.source, cmd.playlist_id)
@@ -71,7 +70,7 @@ class VideoService(Service):
             self._abort_operation(cmd, evt.error)
 
         video.path = Path(cmd.output_directory) / f"{video.title}.mp4"
-        self._evt_dispatcher.observe(
+        self._evt_dispatcher.observe_result(
             cmd.id,
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
             times=1,

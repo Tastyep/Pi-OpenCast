@@ -31,7 +31,7 @@ class WorkflowManagerTest(TestCase):
             self.assertTrue(evtcls_handler)
             self.workflow.complete = evtcls_handler.get(self.workflow.Completed, None)
 
-        self.evt_dispatcher.observe.side_effect = fake_observe
+        self.evt_dispatcher.observe_result.side_effect = fake_observe
 
         self.assertTrue(self.manager.start(self.workflow))
         self.assertTrue(self.manager.is_running(self.workflow.id))

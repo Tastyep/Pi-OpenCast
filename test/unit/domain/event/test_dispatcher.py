@@ -14,14 +14,14 @@ class EventDispatcherTest(TestCase):
         self.handler = Mock()
 
     def test_observe_event(self):
-        self.dispatcher.observe(None, {type(self.evt): self.handler})
+        self.dispatcher.observe({type(self.evt): self.handler})
         self.dispatcher.dispatch(self.evt)
         self.handler.assert_called_once_with(self.evt)
 
     def test_observe_event_by_id(self):
-        self.dispatcher.observe(self.cmd_id, {type(self.evt): self.handler})
+        self.dispatcher.observe_result(self.cmd_id, {type(self.evt): self.handler})
         # Unrelated event should not call the handler
-        self.dispatcher.observe(uuid4(), {type(self.evt): self.handler})
+        self.dispatcher.observe_result(uuid4(), {type(self.evt): self.handler})
         self.dispatcher.dispatch(self.evt)
         self.handler.assert_called_once_with(self.evt)
 
@@ -36,8 +36,10 @@ class EventDispatcherTest(TestCase):
 
     def test_multiple_observe_event(self):
         id_handler = Mock()
-        self.dispatcher.observe(self.cmd_id, {type(self.evt): id_handler}, times=1)
-        self.dispatcher.observe(None, {type(self.evt): self.handler})
+        self.dispatcher.observe_result(
+            self.cmd_id, {type(self.evt): id_handler}, times=1
+        )
+        self.dispatcher.observe({type(self.evt): self.handler})
         self.dispatcher.dispatch(self.evt)
 
         id_handler.assert_called_once_with(self.evt)

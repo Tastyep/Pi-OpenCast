@@ -1,10 +1,9 @@
 """ Workflow abstraction using finite-state machines """
 
-from transitions import Machine
-
 from OpenCast.app.command import make_cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.util.naming import name_handler_method
+from transitions import Machine
 
 from . import Id
 
@@ -69,7 +68,7 @@ class Workflow(Machine):
         evtcls_to_handler = {
             evt_cls: self._event_handler(evt_cls) for evt_cls in evt_clss
         }
-        self._evt_dispatcher.observe(cmd_id, evtcls_to_handler, times=1)
+        self._evt_dispatcher.observe_result(cmd_id, evtcls_to_handler, times=1)
 
     def _event_handler(self, evt_cls):
         handler_name = name_handler_method(evt_cls)
