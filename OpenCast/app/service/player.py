@@ -21,7 +21,7 @@ class PlayerService(Service):
         model = self._player_model()
         self._player.set_volume(model.volume)
 
-    # Command handler interface implementation
+    # Command handler implementation
 
     def _play_video(self, cmd):
         def impl(player):
@@ -91,6 +91,8 @@ class PlayerService(Service):
             self._player.set_subtitle_delay(model.subtitle_delay)
 
         self._update(cmd.id, impl)
+
+    # Event handler implementation
 
     # Private
     def _player_model(self):

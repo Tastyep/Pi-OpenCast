@@ -18,7 +18,7 @@ class EventExpecter:
         cmd_id = IdentityService.id_command(cmd_cls, model_id)
 
         for evt_cls, handler_data in self.evt_to_handler.items():
-            self.evt_dispatcher.observe(cmd_id, {evt_cls: handler_data.functor})
+            self.evt_dispatcher.observe_result(cmd_id, {evt_cls: handler_data.functor})
 
         cmd = cmd_cls(cmd_id, model_id, *args)
         self.cmd_dispatcher.dispatch(cmd)

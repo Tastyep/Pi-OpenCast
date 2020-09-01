@@ -29,8 +29,8 @@ class Service:
     def _observe_command(self, cls):
         self._cmd_dispatcher.observe(cls, self._dispatch_to_handler)
 
-    def _observe_event(self, evt_id, cls):
-        self._evt_dispatcher.observe(evt_id, {cls: self._dispatch_to_handler})
+    def _observe_event(self, cls):
+        self._evt_dispatcher.observe({cls: self._dispatch_to_handler})
 
     def _dispatch_to_handler(self, cmd):
         handler_name = name_handler_method(cmd.__class__)

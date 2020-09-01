@@ -23,7 +23,7 @@ class Controller:
         for _, cls in classes:
             if cls.__module__ == module.__name__:
                 handler_name = name_handler_method(cls)
-                self._evt_dispatcher.observe(None, {cls: getattr(self, handler_name)})
+                self._evt_dispatcher.observe({cls: getattr(self, handler_name)})
 
     def _start_workflow(self, workflow_cls, resource_id, *args, **kwargs):
         workflow_id = IdentityService.id_workflow(workflow_cls, resource_id)
