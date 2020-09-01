@@ -2,7 +2,6 @@
 
 
 import structlog
-
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import config
 from OpenCast.domain.model.player import State as PlayerState
