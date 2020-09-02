@@ -22,12 +22,8 @@ function python() {
 function spec() {
   local cmd output status
 
-  exec 5>&1
-  cmd="spectral lint "$ROOT/specs/openapi.yml" --verbose --skip-rule info-contact"
-  output=$(jenv "$cmd" | tee >(cat - >&5))
-
-  echo "$output" | grep -q "problem" && status=1 || status=0
-  log_status "spectral" "$status"
+  jenv "speccy --config $ROOT/specs/.speccy.yml lint $ROOT/specs/openapi.yml"
+  log_status "speccy" "$?"
 }
 
 #### CLI definition

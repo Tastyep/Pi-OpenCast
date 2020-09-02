@@ -20,7 +20,7 @@ id:
   get:
     tags:
       - video
-    summary: Find video by ID
+    summary: Find video
     description: |
       Querie and return a video with a given ID
     operationId: getVideoById
@@ -49,7 +49,7 @@ id:
   delete:
     tags:
       - video
-    summary: Remove video by ID
+    summary: Remove video
     description: |
       Remove a video with a given ID
     operationId: deleteVideoById
