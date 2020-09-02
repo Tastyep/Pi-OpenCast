@@ -89,13 +89,13 @@ class PlayerTest(ModelTestCase):
         video = self.make_video()
         with self.assertRaises(DomainError) as ctx:
             self.player.remove(video.id)
-        self.assertEqual("the video is not queued", str(ctx.exception))
+        self.assertEqual(f"unknown video: {video.id}", str(ctx.exception))
 
-    def test_has_media(self):
+    def test_has_video(self):
         video = self.make_video()
-        self.assertFalse(self.player.has_media(video.id))
+        self.assertFalse(self.player.has_video(video.id))
         self.player.queue(video)
-        self.assertTrue(self.player.has_media(video.id))
+        self.assertTrue(self.player.has_video(video.id))
 
     def test_next(self):
         videos = self.make_videos(video_count=2)
