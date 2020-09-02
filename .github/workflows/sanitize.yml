@@ -31,4 +31,4 @@ jobs:
         run: ./OpenCast.sh lint all
       #
       - name: Format
-        run: ./OpenCast.sh format all
+        run: ./OpenCast.sh format all --check
