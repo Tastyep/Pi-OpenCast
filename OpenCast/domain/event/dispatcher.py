@@ -3,6 +3,7 @@
 from threading import Lock
 
 import structlog
+
 from OpenCast.infra import Id
 
 

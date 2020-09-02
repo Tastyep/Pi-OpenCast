@@ -6,6 +6,7 @@ from test.util import TestCase
 from unittest import IsolatedAsyncioTestCase
 
 from aiohttp.test_utils import make_mocked_request
+
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.event.dispatcher import EventDispatcher
 from OpenCast.domain.service.identity import IdentityService
