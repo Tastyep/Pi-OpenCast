@@ -1,10 +1,10 @@
 # Convert JSON Schema-proper to OpenAPI-flavoured Schema Objects
 jsonSchema: true
 # Keep the noise down
-quiet: true
+quiet: false
 # Output a lot of information about what is happening (wont work if you have quiet on)
 # Default stdout = 1
-verbose: 2
+verbose: 1
 # Rules specific to the lint command
 lint:
   # rules files to load
@@ -13,9 +13,6 @@ lint:
   # rules to skip
   skip:
     - info-contact
-# Rules specific to the resolve command
-resolve:
-  output: foo.yaml
 # Rules specific to the serve command
 serve:
   port: 8001
