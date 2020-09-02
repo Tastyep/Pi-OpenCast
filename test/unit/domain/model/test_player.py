@@ -56,14 +56,15 @@ class PlayerTest(ModelTestCase):
     def test_queue(self):
         video = self.make_video()
         self.player.queue(video)
-        self.assertListEqual([video], self.player.video_queue)
+        self.assertListEqual([video.id], self.player.video_queue)
         self.expect_events(self.player, Evt.VideoQueued)
 
     def test_queue_multiple_unrelated(self):
         videos = self.make_videos(video_count=3)
         for video in videos:
             self.player.queue(video)
-        self.assertListEqual(videos, self.player.video_queue)
+        expected = [video.id for video in videos]
+        self.assertListEqual(expected, self.player.video_queue)
 
     def test_queue_multiple_related(self):
         videos = [
@@ -74,18 +75,39 @@ class PlayerTest(ModelTestCase):
         for video in videos:
             self.player.queue(video)
 
-        expected_queue = [videos[0], videos[2], videos[1]]
+        expected_queue = [videos[0].id, videos[2].id, videos[1].id]
         self.assertListEqual(expected_queue, self.player.video_queue)
+
+    def test_remove(self):
+        video = self.make_video()
+        self.player.queue(video)
+        self.player.remove(video.id)
+
+        self.expect_events(self.player, Evt.VideoQueued, Evt.VideoRemoved)
+
+    def test_remove_not_found(self):
+        video = self.make_video()
+        with self.assertRaises(DomainError) as ctx:
+            self.player.remove(video.id)
+        self.assertEqual("the video is not queued", str(ctx.exception))
+
+    def test_has_media(self):
+        video = self.make_video()
+        self.assertFalse(self.player.has_media(video.id))
+        self.player.queue(video)
+        self.assertTrue(self.player.has_media(video.id))
 
     def test_next(self):
         videos = self.make_videos(video_count=2)
         for video in videos:
             self.player.queue(video)
         config.load_from_dict({"player": {"loop_last": False}})
-        self.assertEqual(videos[1], self.player.next_video())
-        self.assertEqual(videos[1], self.player.next_video())
+        self.assertEqual(videos[1].id, self.player.next_video())
+        self.assertEqual(videos[1].id, self.player.next_video())
 
-        self.player.play(self.player.next_video())
+        video_id = self.player.next_video()
+        next_video = next((video for video in videos if video.id == video_id))
+        self.player.play(next_video)
         self.assertEqual(None, self.player.next_video())
 
     def test_next_no_video(self):

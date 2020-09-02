@@ -22,7 +22,7 @@ class VideoService(Service):
         )
         self._subtitle_service = service_factory.make_subtitle_service(self._downloader)
 
-    # Command handler interface implementation
+    # Command handler implementation
     def _create_video(self, cmd):
         def impl(ctx):
             video = Video(cmd.model_id, cmd.source, cmd.playlist_id)
@@ -46,7 +46,7 @@ class VideoService(Service):
         video = self._video_repo.get(cmd.model_id)
         metadata = self._source_service.pick_stream_metadata(video)
         if metadata is None:
-            self._abort_operation(cmd, "can't fetch metadata")
+            self._abort_operation(cmd.id, "can't fetch metadata")
             return
 
         self._start_transaction(self._video_repo, cmd.id, impl, video, metadata)
@@ -68,10 +68,10 @@ class VideoService(Service):
             self._start_transaction(self._video_repo, cmd.id, impl)
 
         def abort_operation(evt):
-            self._abort_operation(cmd, evt.error)
+            self._abort_operation(cmd.id, evt.error)
 
         video.path = Path(cmd.output_directory) / f"{video.title}.mp4"
-        self._evt_dispatcher.observe(
+        self._evt_dispatcher.observe_result(
             cmd.id,
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
             times=1,

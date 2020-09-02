@@ -8,6 +8,8 @@ from OpenCast.infra import Id
 
 
 class EventDispatcher:
+    ANY_EVENT = None
+
     class _Handler:
         def __init__(self, evtcls_handler, count):
             self._evtcls_handler = evtcls_handler
@@ -32,9 +34,12 @@ class EventDispatcher:
         self._lock = Lock()
 
     def once(self, evt_cls, handler):
-        self.observe(None, {evt_cls: handler}, 1)
+        self.observe_result(self.ANY_EVENT, {evt_cls: handler}, 1)
 
-    def observe(self, evt_id: Id, evtcls_handler: dict, times=-1):
+    def observe(self, evtcls_handler: dict, times=-1):
+        self.observe_result(self.ANY_EVENT, evtcls_handler, times)
+
+    def observe_result(self, evt_id: Id, evtcls_handler: dict, times=-1):
         self._observe(
             evt_id, evtcls_handler.keys(), self._Handler(evtcls_handler, times)
         )

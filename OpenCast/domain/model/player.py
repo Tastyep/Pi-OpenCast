@@ -1,14 +1,15 @@
 """ Conceptual representation of the media player (VLC) """
 
 
+from dataclasses import dataclass
 from enum import Enum
 
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
 from OpenCast.domain.event import player as Evt
+from OpenCast.domain.model.video import Video
 
 from .entity import Entity, Id
-from .video import Video
 
 
 class State(Enum):
@@ -22,6 +23,11 @@ class Player(Entity):
     SUBTITLE_DELAY_STEP = 100
     SHORT_TIME_STEP = 1000
     LONG_TIME_STEP = 30000
+
+    @dataclass
+    class _Video:
+        id: Id
+        playlist_id: Id
 
     def __init__(self, id_: Id):
         super().__init__(id_)
@@ -45,7 +51,7 @@ class Player(Entity):
 
     @property
     def video_queue(self):
-        return self._queue
+        return [video.id for video in self._queue]
 
     @property
     def subtitle_state(self):
@@ -74,13 +80,21 @@ class Player(Entity):
         self._volume = max(min(200, v), 0)
         self._record(Evt.VolumeUpdated, self._volume)
 
-    def play(self, video: Video):
-        if video not in self._queue:
-            raise DomainError(f"unknown video: {video}")
+    def has_media(self, video_id: Id):
+        for video in self._queue:
+            if video.id == video_id:
+                return True
+        return False
 
-        self._index = self._queue.index(video)
-        self._state = State.PLAYING
-        self._record(Evt.PlayerStarted, video.id)
+    def play(self, video: Video):
+        for i, q_video in enumerate(self._queue):
+            if q_video.id == video.id:
+                self._index = i
+                self._state = State.PLAYING
+                self._record(Evt.PlayerStarted, video.id)
+                return
+
+        raise DomainError(f"unknown video: {video}")
 
     def stop(self):
         if self._state is State.STOPPED:
@@ -89,7 +103,7 @@ class Player(Entity):
         self._sub_delay = 0
         self._record(Evt.PlayerStopped)
 
-    def queue(self, video: Video, with_priority=False):
+    def queue(self, video: Video):
         idx = len(self._queue)
 
         # Try to order videos from the same playlist together
@@ -99,8 +113,15 @@ class Player(Entity):
                 idx = self._index + len(next_videos) - i
                 break
 
-        self._queue.insert(idx, video)
+        self._queue.insert(idx, self._Video(video.id, video.playlist_id))
         self._record(Evt.VideoQueued, video.id)
+
+    def remove(self, video_id: Id):
+        count = len(self._queue)
+        self._queue = [video for video in self._queue if video.id != video_id]
+        if len(self._queue) == count:
+            raise DomainError("the video is not queued")
+        self._record(Evt.VideoRemoved, video_id)
 
     def toggle_pause(self):
         if self._state is State.PLAYING:
@@ -114,10 +135,10 @@ class Player(Entity):
     def next_video(self):
         if self._index + 1 >= len(self._queue):
             if self._queue and config["player.loop_last"] is True:
-                return self._queue[self._index]
+                return self._queue[self._index].id
             return None
 
-        return self._queue[self._index + 1]
+        return self._queue[self._index + 1].id
 
     def seek_video(self):
         self._record(Evt.VideoSeeked)

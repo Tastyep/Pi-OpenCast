@@ -41,3 +41,7 @@ coverage = "^5.2.1"
 
 [tool.poetry.scripts]
 my-script = 'OpenCast:main'
+
+[tool.isort]
+profile = "black"
+src_paths = ["OpenCast", "test"]

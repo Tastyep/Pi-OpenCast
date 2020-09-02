@@ -21,7 +21,7 @@ class MonitorController(Controller):
         self, evtcls_handler: dict, cmd_cls, component_id, *args, **kwargs
     ):
         cmd = make_cmd(cmd_cls, component_id, *args, **kwargs)
-        self._evt_dispatcher.observe(cmd.id, evtcls_handler, 1)
+        self._evt_dispatcher.observe_result(cmd.id, evtcls_handler, 1)
         self._cmd_dispatcher.dispatch(cmd)
 
     def _route(self, method, route, handle):

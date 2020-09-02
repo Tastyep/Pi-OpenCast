@@ -25,7 +25,7 @@ class WorkflowManager:
                 return False
 
             self._workflow_ids.append(workflow.id)
-            self._evt_dispatcher.observe(
+            self._evt_dispatcher.observe_result(
                 workflow.id,
                 {workflow.Completed: on_completion, workflow.Aborted: on_completion},
                 times=1,

@@ -23,11 +23,11 @@ class PlayerController(Controller):
 
     def _media_end_reached(self, evt):
         model = self._player_repo.get_player()
-        video = model.next_video()
-        if video is None:
+        video_id = model.next_video()
+        if video_id is None:
             self._dispatch(Cmd.StopPlayer)
         else:
-            self._dispatch(Cmd.PlayVideo, video.id)
+            self._dispatch(Cmd.PlayVideo, video_id)
 
     def _dispatch(self, cmd_cls, *args, **kwargs):
         player_id = IdentityService.id_player()
