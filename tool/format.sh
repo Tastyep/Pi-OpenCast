@@ -26,11 +26,15 @@ function python() {
   fi
   # Collect python files
   local py_files
+  local -a py_dirs
 
   py_files=()
-  while IFS= read -r -d $'\0'; do
-    py_files+=("$REPLY")
-  done < <(find "$ROOT/OpenCast" -name "*.py" -print0)
+  py_dirs=("OpenCast" "test")
+  for py_dir in "${py_dirs[@]}"; do
+    while IFS= read -r -d $'\0'; do
+      py_files+=("$REPLY")
+    done < <(find "$ROOT/$py_dir" -name "*.py" -print0)
+  done
 
   penv black "${black_opts[@]}" "${py_files[@]}"
   log_status "black" "$?"
