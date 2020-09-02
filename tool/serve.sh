@@ -8,20 +8,14 @@ source "$ROOT/script/env.sh"
 
 #### CLI handlers
 
-function doc() {
-  (cd "$ROOT/docs" && penv make clean && penv make html -b coverage)
-}
-
 function spec() {
-  mkdir -p "$ROOT/gen"
-  jenv "speccy --config $ROOT/specs/.speccy.yml resolve $ROOT/specs/openapi.yml --output $ROOT/gen/openapi.yml"
+  jenv "speccy --config $ROOT/specs/.speccy.yml serve $ROOT/specs/openapi.yml"
 }
 
 #### CLI definition
 
 declare -A COMMANDS
 COMMANDS=(
-  [doc]="Generate documentation files."
-  [spec]="Generate a merged openapi file."
+  [spec]="View specifications in beautiful human readable documentation."
 )
 make_cli default_help_display COMMANDS "$@"
