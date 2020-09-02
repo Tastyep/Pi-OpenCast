@@ -29,7 +29,36 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         resp = await self.route(self.controller.get, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
-    async def test_play_video(self):
+    async def test_remove(self):
+        self.data_producer.player().video("source", None).populate(self.data_facade)
+        video_id = IdentityService.id_video("source")
+        req = self.make_request("POST", "/remove", query={"id": str(video_id)})
+        self.set_cmd_response(
+            make_cmd(Cmd.RemoveVideo, self.player_id, video_id),
+            Evt.VideoRemoved,
+            video_id,
+        )
+
+        resp = await self.route(self.controller.remove, req)
+        self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
+
+    async def test_remove_not_found(self):
+        video_id = IdentityService.id_video("source")
+        req = self.make_request("POST", "/remove", query={"id": str(video_id)})
+
+        resp = await self.route(self.controller.remove, req)
+        self.assertEqual(resp, (404, None))
+
+    async def test_remove_error(self):
+        self.data_producer.player().video("source", None).populate(self.data_facade)
+        video_id = IdentityService.id_video("source")
+        req = self.make_request("POST", "/remove", query={"id": str(video_id)})
+        self.set_cmd_error(make_cmd(Cmd.RemoveVideo, self.player_id, video_id))
+
+        resp = await self.route(self.controller.remove, req)
+        self.assertEqual(resp, (400, None))
+
+    async def test_play(self):
         self.data_producer.video("source", None).populate(self.data_facade)
         video_id = IdentityService.id_video("source")
         req = self.make_request("POST", "/play", query={"id": str(video_id)})
@@ -39,23 +68,23 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             video_id,
         )
 
-        resp = await self.route(self.controller.play_video, req)
+        resp = await self.route(self.controller.play, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
 
-    async def test_play_video_not_found(self):
+    async def test_play_not_found(self):
         video_id = IdentityService.id_video("source")
         req = self.make_request("POST", "/play", query={"id": str(video_id)})
 
-        resp = await self.route(self.controller.play_video, req)
+        resp = await self.route(self.controller.play, req)
         self.assertEqual(resp, (404, None))
 
-    async def test_play_video_error(self):
+    async def test_play_error(self):
         self.data_producer.video("source", None).populate(self.data_facade)
         video_id = IdentityService.id_video("source")
         req = self.make_request("POST", "/play", query={"id": str(video_id)})
         self.set_cmd_error(make_cmd(Cmd.PlayVideo, self.player_id, video_id))
 
-        resp = await self.route(self.controller.play_video, req)
+        resp = await self.route(self.controller.play, req)
         self.assertEqual(resp, (400, None))
 
     async def test_stop(self):

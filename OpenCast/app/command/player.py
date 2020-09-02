@@ -14,6 +14,11 @@ class QueueVideo(Command):
 
 
 @command
+class RemoveVideo(Command):
+    video_id: ModelId
+
+
+@command
 class StopPlayer(Command):
     pass
 
