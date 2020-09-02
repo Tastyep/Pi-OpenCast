@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 
 from OpenCast.domain.model import Id as ModelId
-from OpenCast.infra import Id as Id
+from OpenCast.infra import Id
 
 
 def command(cls):
