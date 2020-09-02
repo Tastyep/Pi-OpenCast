@@ -78,6 +78,25 @@ class PlayerTest(ModelTestCase):
         expected_queue = [videos[0].id, videos[2].id, videos[1].id]
         self.assertListEqual(expected_queue, self.player.video_queue)
 
+    def test_remove(self):
+        video = self.make_video()
+        self.player.queue(video)
+        self.player.remove(video.id)
+
+        self.expect_events(self.player, Evt.VideoQueued, Evt.VideoRemoved)
+
+    def test_remove_not_found(self):
+        video = self.make_video()
+        with self.assertRaises(DomainError) as ctx:
+            self.player.remove(video.id)
+        self.assertEqual("the video is not queued", str(ctx.exception))
+
+    def test_has_media(self):
+        video = self.make_video()
+        self.assertFalse(self.player.has_media(video.id))
+        self.player.queue(video)
+        self.assertTrue(self.player.has_media(video.id))
+
     def test_next(self):
         videos = self.make_videos(video_count=2)
         for video in videos:
