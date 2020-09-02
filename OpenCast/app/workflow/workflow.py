@@ -1,9 +1,10 @@
 """ Workflow abstraction using finite-state machines """
 
+from transitions import Machine
+
 from OpenCast.app.command import make_cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.util.naming import name_handler_method
-from transitions import Machine
 
 from . import Id
 

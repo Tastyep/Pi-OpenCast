@@ -2,8 +2,9 @@ from collections import namedtuple
 from test.util import TestCase
 from unittest.mock import Mock
 
-from OpenCast.infra.media.parser import VideoParser, VideoParsingError
 from vlc import MediaParsedStatus, TrackType
+
+from OpenCast.infra.media.parser import VideoParser, VideoParsingError
 
 Stream = namedtuple("Stream", ["id", "type", "language"])
 

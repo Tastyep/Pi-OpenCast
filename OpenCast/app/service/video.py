@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import structlog
+
 from OpenCast.app.command import video as video_cmds
 from OpenCast.domain.model.video import Video
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
