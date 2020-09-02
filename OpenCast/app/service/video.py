@@ -45,7 +45,7 @@ class VideoService(Service):
         video = self._video_repo.get(cmd.model_id)
         metadata = self._source_service.pick_stream_metadata(video)
         if metadata is None:
-            self._abort_operation(cmd, "can't fetch metadata")
+            self._abort_operation(cmd.id, "can't fetch metadata")
             return
 
         self._start_transaction(self._video_repo, cmd.id, impl, video, metadata)
@@ -67,7 +67,7 @@ class VideoService(Service):
             self._start_transaction(self._video_repo, cmd.id, impl)
 
         def abort_operation(evt):
-            self._abort_operation(cmd, evt.error)
+            self._abort_operation(cmd.id, evt.error)
 
         video.path = Path(cmd.output_directory) / f"{video.title}.mp4"
         self._evt_dispatcher.observe_result(

@@ -4,6 +4,7 @@
 import structlog
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import config
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import State as PlayerState
 
 from .service import Service
@@ -13,6 +14,8 @@ class PlayerService(Service):
     def __init__(self, app_facade, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, self, player_cmds)
+
+        self._observe_event(VideoEvt.VideoDeleted)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
@@ -93,6 +96,13 @@ class PlayerService(Service):
         self._update(cmd.id, impl)
 
     # Event handler implementation
+
+    def _video_deleted(self, evt):
+        def impl(model):
+            if model.has_media(evt.model_id):
+                model.remove(evt.model_id)
+
+        self._update(evt.id, impl)
 
     # Private
     def _player_model(self):

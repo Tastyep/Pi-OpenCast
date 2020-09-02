@@ -16,6 +16,11 @@ class VideoQueued(Event):
 
 
 @dataclass
+class VideoRemoved(Event):
+    video_id: ModelId
+
+
+@dataclass
 class PlayerStopped(Event):
     pass
 

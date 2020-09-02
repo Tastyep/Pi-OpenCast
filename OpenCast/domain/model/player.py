@@ -80,6 +80,12 @@ class Player(Entity):
         self._volume = max(min(200, v), 0)
         self._record(Evt.VolumeUpdated, self._volume)
 
+    def has_media(self, video_id: Id):
+        for video in self._queue:
+            if video.id == video_id:
+                return True
+        return False
+
     def play(self, video: Video):
         for i, q_video in enumerate(self._queue):
             if q_video.id == video.id:
@@ -109,6 +115,13 @@ class Player(Entity):
 
         self._queue.insert(idx, self._Video(video.id, video.playlist_id))
         self._record(Evt.VideoQueued, video.id)
+
+    def remove(self, video_id: Id):
+        count = len(self._queue)
+        self._queue = [video for video in self._queue if video.id != video_id]
+        if len(self._queue) == count:
+            raise DomainError("the video is not queued")
+        self._record(Evt.VideoRemoved, video_id)
 
     def toggle_pause(self):
         if self._state is State.PLAYING:
