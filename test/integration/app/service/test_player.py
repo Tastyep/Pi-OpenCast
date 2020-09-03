@@ -80,6 +80,22 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.TogglePlayerState, self.player_id
         )
 
+    def test_seek_video(self):
+        self.data_producer.player().video("source", None).play().populate(
+            self.data_facade
+        )
+
+        self.evt_expecter.expect(Evt.VideoSeeked, self.player_id).from_(
+            Cmd.SeekVideo, self.player_id, 1
+        )
+
+    def test_seek_video_not_started(self):
+        self.data_producer.player().video("source", None).populate(self.data_facade)
+
+        self.evt_expecter.expect(OperationError, "the player is not started").from_(
+            Cmd.SeekVideo, self.player_id, 1
+        )
+
     def test_change_video_volume(self):
         self.data_producer.player().video("source", None).play().populate(
             self.data_facade

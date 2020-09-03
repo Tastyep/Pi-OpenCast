@@ -156,3 +156,17 @@ class PlayerTest(ModelTestCase):
         self.expect_events(
             self.player, Evt.VolumeUpdated, Evt.VolumeUpdated, Evt.VolumeUpdated
         )
+
+    def test_seek_video(self):
+        video = self.make_video()
+        self.player.queue(video)
+        self.player.play(video)
+        self.player.seek_video()
+        self.expect_events(
+            self.player, Evt.VideoQueued, Evt.PlayerStarted, Evt.VideoSeeked
+        )
+
+    def test_seek_video_not_started(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.player.seek_video()
+        self.assertEqual("the player is not started", str(ctx.exception))
