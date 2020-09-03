@@ -98,10 +98,10 @@ class PlayerTest(ModelTestCase):
         self.assertTrue(self.player.has_video(video.id))
 
     def test_next(self):
+        config.load_from_dict({"player": {"loop_last": False}})
         videos = self.make_videos(video_count=2)
         for video in videos:
             self.player.queue(video)
-        config.load_from_dict({"player": {"loop_last": False}})
         self.assertEqual(videos[1].id, self.player.next_video())
         self.assertEqual(videos[1].id, self.player.next_video())
 
@@ -111,8 +111,24 @@ class PlayerTest(ModelTestCase):
         self.assertEqual(None, self.player.next_video())
 
     def test_next_no_video(self):
+        config.load_from_dict({"player": {"loop_last": False}})
+        self.assertEqual(None, self.player.next_video())
+
+    def test_next_no_video_loop_last(self):
         config.load_from_dict({"player": {"loop_last": True}})
         self.assertEqual(None, self.player.next_video())
+
+    def test_next_last_video(self):
+        config.load_from_dict({"player": {"loop_last": False}})
+        video = self.make_video()
+        self.player.queue(video)
+        self.assertEqual(None, self.player.next_video())
+
+    def test_next_last_video_loop_last(self):
+        config.load_from_dict({"player": {"loop_last": True}})
+        video = self.make_video()
+        self.player.queue(video)
+        self.assertEqual(video.id, self.player.next_video())
 
     def test_toggle_pause(self):
         video = self.make_video()
