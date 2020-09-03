@@ -123,6 +123,14 @@ class Player(Entity):
             raise DomainError(f"unknown video: {video_id}")
         self._record(Evt.VideoRemoved, video_id)
 
+    def next_video(self):
+        if self._index + 1 >= len(self._queue):
+            if self._queue and config["player.loop_last"] is True:
+                return self._queue[self._index].id
+            return None
+
+        return self._queue[self._index + 1].id
+
     def toggle_pause(self):
         if self._state is State.PLAYING:
             self._state = State.PAUSED
@@ -132,13 +140,7 @@ class Player(Entity):
             raise DomainError("the player is not started")
         self._record(Evt.PlayerStateToggled)
 
-    def next_video(self):
-        if self._index + 1 >= len(self._queue):
-            if self._queue and config["player.loop_last"] is True:
-                return self._queue[self._index].id
-            return None
-
-        return self._queue[self._index + 1].id
-
     def seek_video(self):
+        if self._state is State.STOPPED:
+            raise DomainError("the player is not started")
         self._record(Evt.VideoSeeked)

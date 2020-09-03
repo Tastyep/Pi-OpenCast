@@ -71,8 +71,11 @@ class PlayerService(Service):
         self._update(cmd.id, impl)
 
     def _seek_video(self, cmd):
-        self._player.seek(cmd.duration)
-        # TODO reflect change in model
+        def impl(model):
+            model.seek_video()
+            self._player.seek(cmd.duration)
+
+        self._update(cmd.id, impl)
 
     def _update_volume(self, cmd):
         def impl(model):
