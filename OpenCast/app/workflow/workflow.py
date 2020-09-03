@@ -42,6 +42,9 @@ class Workflow(Machine):
         self.__derived = derived
         self._sub_workflows = []
 
+    def __repr__(self):
+        return f"{type(self).__name__}(id={self.id})"
+
     def reset(self):
         """ Reset the workflow and its sub-workflows to their initial state"""
         self.set_state(self._initial)
