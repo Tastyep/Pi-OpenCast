@@ -76,15 +76,17 @@ class Downloader:
         return None
 
     def pick_stream_metadata(self, url, fields):
+        self._logger.debug("Downloading stream metadata", url=url, fields=fields)
         options = {
             "noplaylist": True,
         }
         data = self._download_stream_metadata(url, options)
         if data is None:
             return None
-        return {k: data[k] for k in fields}
+        return {k: data.get(k, None) for k in fields}
 
     def unfold_playlist(self, url):
+        self._logger.debug("Unfolding playlist", url=url)
         options = {
             "extract_flat": "in_playlist",
         }
