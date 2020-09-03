@@ -2,7 +2,7 @@ root:
   get:
     tags:
       - player
-    summary: Find the player
+    summary: Find player
     description: |
       Querie and return the player
     operationId: getPlayer
@@ -18,7 +18,7 @@ stream:
   post:
     tags:
       - player
-    summary: Download and play media(s)
+    summary: Stream media(s)
     description: |
       Download the media(s) corresponding to the given URL and play it
     operationId: streamMedia
@@ -36,7 +36,7 @@ queue:
   post:
     tags:
       - player
-    summary: Download and queue media(s)
+    summary: Queue media(s)
     description: |
       Download the media(s) corresponding to the given URL and queue it
     operationId: queueMedia
@@ -50,11 +50,33 @@ queue:
       "200":
         description: successful operation
 
+remove:
+  post:
+    tags:
+      - player
+    summary: Remove media
+    description: |
+      Remove the media with the given ID from the queue
+    operationId: removeMedia
+    parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: The ID of the media
+    responses:
+      "200":
+        description: successful operation
+      "404":
+        description: not found
+      "400":
+        description: operation failure
+
 play:
   post:
     tags:
       - player
-    summary: Select a media for playing
+    summary: Play media
     description: |
       Play the media selected by ID
     operationId: playMedia
@@ -67,6 +89,8 @@ play:
     responses:
       "200":
         description: successful operation
+      "404":
+        description: not found
       "400":
         description: operation failure
 
@@ -74,7 +98,7 @@ stop:
   post:
     tags:
       - player
-    summary: Stop the player
+    summary: Stop
     description: |
       Stop the player
     operationId: stopPlayer
@@ -88,7 +112,7 @@ pause:
   post:
     tags:
       - player
-    summary: Toggle player pause
+    summary: Pause/Unpause
     description: |
       Toggle the pause status of the player
     operationId: pausePlayer
@@ -102,7 +126,7 @@ seek:
   post:
     tags:
       - player
-    summary: Seek active media
+    summary: Seek
     description: |
       Seek the active media with a given step
     operationId: seekMedia
@@ -127,7 +151,7 @@ volume:
   post:
     tags:
       - player
-    summary: Update player volume
+    summary: Update volume
     description: |
       Update the volume of the player
     operationId: updateVolume
@@ -148,7 +172,7 @@ subtitle_toggle:
   post:
     tags:
       - player
-    summary: Toggle active media subtitle
+    summary: Toggle subtitle
     description: |
       Toggle the active media subtitle state
     operationId: toggleMediaSubtitle
@@ -162,7 +186,7 @@ subtitle_seek:
   post:
     tags:
       - player
-    summary: Seek active media subtitle
+    summary: Seek subtitle
     description: |
       Seek the active media subtitle with a given step
     operationId: seekMediaSubtitle

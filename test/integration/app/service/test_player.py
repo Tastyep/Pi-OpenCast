@@ -25,7 +25,7 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.PlayVideo, self.player_id, video_id
         )
 
-    def test_play_video_not_queued(self):
+    def test_play_video_not_found(self):
         self.data_producer.video("source", None).player().video(
             "source2", None
         ).populate(self.data_facade)
@@ -42,6 +42,24 @@ class PlayerServiceTest(ServiceTestCase):
         video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(Evt.VideoQueued, self.player_id, video_id).from_(
             Cmd.QueueVideo, self.player_id, video_id
+        )
+
+    def test_remove_video(self):
+        self.data_producer.player().video("source", None).video(
+            "source2", None
+        ).populate(self.data_facade)
+
+        source_id = IdentityService.id_video("source")
+        self.evt_expecter.expect(Evt.VideoRemoved, self.player_id, source_id).from_(
+            Cmd.RemoveVideo, self.player_id, source_id
+        )
+
+    def test_remove_video_not_found(self):
+        self.data_producer.video("source", None).populate(self.data_facade)
+
+        source_id = IdentityService.id_video("source")
+        self.evt_expecter.expect(OperationError, f"unknown video: {source_id}").from_(
+            Cmd.RemoveVideo, self.player_id, source_id
         )
 
     def test_stop_player(self):

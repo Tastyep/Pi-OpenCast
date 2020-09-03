@@ -47,6 +47,12 @@ class PlayerService(Service):
 
         self._update(cmd.id, impl)
 
+    def _remove_video(self, cmd):
+        def impl(player):
+            player.remove(cmd.video_id)
+
+        self._update(cmd.id, impl)
+
     def _stop_player(self, cmd):
         def impl(model):
             model.stop()
@@ -100,7 +106,7 @@ class PlayerService(Service):
 
     def _video_deleted(self, evt):
         def impl(model):
-            if model.has_media(evt.model_id):
+            if model.has_video(evt.model_id):
                 model.remove(evt.model_id)
 
         self._update(evt.id, impl)

@@ -18,6 +18,10 @@ function lint() {
   "$PROJECT_DIR/tool/lint.sh" "$@"
 }
 
+function serve() {
+  "$PROJECT_DIR/tool/serve.sh" "$@"
+}
+
 function service() {
   "$PROJECT_DIR/tool/service.sh" "$@"
 }
@@ -33,6 +37,7 @@ COMMANDS=(
   [format]="Format source code."
   [gen]="Generate content."
   [lint]="Run linters on given targets."
+  [serve]="Serve static web pages."
   [service]="Operate services."
   [test]="Run the test suite of a service."
 )

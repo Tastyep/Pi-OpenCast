@@ -35,7 +35,8 @@ class PlayerMonitController(MonitorController):
         self._route("GET", "/", self.get)
         self._route("POST", "/stream", self.stream)
         self._route("POST", "/queue", self.queue)
-        self._route("POST", "/play", self.play_video)
+        self._route("POST", "/remove", self.remove)
+        self._route("POST", "/play", self.play)
         self._route("POST", "/stop", self.stop)
         self._route("POST", "/pause", self.pause)
         self._route("POST", "/seek", self.seek)
@@ -89,7 +90,18 @@ class PlayerMonitController(MonitorController):
 
         return self._ok()
 
-    async def play_video(self, req):
+    async def remove(self, req):
+        video_id = Id(req.query["id"])
+        player = self._player_repo.get_player()
+        if not player.has_video(video_id):
+            return self._not_found()
+
+        handlers, channel = self._make_default_handlers(Evt.VideoRemoved)
+        self._observe_dispatch(handlers, Cmd.RemoveVideo, video_id)
+
+        return await channel.receive()
+
+    async def play(self, req):
         video_id = Id(req.query["id"])
         if not self._video_repo.exists(video_id):
             return self._not_found()
