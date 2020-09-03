@@ -1,6 +1,7 @@
 """ Manager and coordinator of workflows """
 
 from threading import RLock
+
 import structlog
 
 from . import Id

@@ -1,5 +1,6 @@
 """ Dispatch events to handlers """
 
+from copy import deepcopy
 from threading import Lock
 
 import structlog
@@ -56,12 +57,12 @@ class EventDispatcher:
 
         handlers = []
         with self._lock:
-            for evt_id in set([None, evt.id]):
+            for evt_id in set([self.ANY_EVENT, evt.id]):
                 evt_hash = hash((evt_id, type(evt)))
                 if evt_hash not in self._evt_to_handler_ids:
                     continue
 
-                handler_ids = self._evt_to_handler_ids[evt_hash]
+                handler_ids = deepcopy(self._evt_to_handler_ids[evt_hash])
                 for handler_id in handler_ids:
                     handler = self._handler_map[handler_id]
                     handlers.append(handler)
