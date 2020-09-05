@@ -4,7 +4,7 @@ USER="$(whoami)"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT="$(basename "$PROJECT_DIR")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
-SERVICE_NAME="${INTERNAL_NAME,,}"
+SERVICE_NAME="$(echo "$INTERNAL_NAME" | tr '[:upper:]' '[:lower:]')"
 SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
 
 # Log an info message.
