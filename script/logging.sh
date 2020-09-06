@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function log_status() {
+log_status() {
   local name status marker
 
   name="$1"

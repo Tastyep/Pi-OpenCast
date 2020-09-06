@@ -9,35 +9,35 @@ source "$ROOT/script/cli_builder.sh"
 
 #### CLI handlers
 
-function back() {
+back() {
   "$SERVICE_BACK" "$@"
 }
 
-function front() {
+front() {
   "$SERVICE_FRONT" "$@"
 }
 
-function start() {
+start() {
   "$SERVICE_BACK" "start" "$@" &&
     "$SERVICE_FRONT" "start" "$@"
 }
 
-function stop() {
+stop() {
   "$SERVICE_BACK" "stop" "$@" &&
     "$SERVICE_FRONT" "stop" "$@"
 }
 
-function restart() {
+restart() {
   "$SERVICE_BACK" "restart" "$@" &&
     "$SERVICE_FRONT" "restart" "$@"
 }
 
-function status() {
+status() {
   "$SERVICE_BACK" "status"
   "$SERVICE_FRONT" "status"
 }
 
-function test() {
+test() {
   "$SERVICE_BACK" "test" &&
     "$SERVICE_FRONT" "test"
 }

@@ -4,7 +4,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 
 source "$HERE/array.sh"
 
-function make_cli() {
+make_cli() {
   local display_help
   local -n commands
 
@@ -23,7 +23,7 @@ function make_cli() {
   fi
 }
 
-function default_help_display() {
+default_help_display() {
   printf "Usage: $0 command\n\n"
   printf "Available commands:\n"
 
@@ -53,7 +53,7 @@ function default_help_display() {
   done
 }
 
-function expect_params() {
+expect_params() {
   local -n params_ref parsed_ref
   local -a params_attr
   local command args count
@@ -107,7 +107,7 @@ function expect_params() {
   done
 }
 
-function decay() {
+decay() {
   local param type
 
   param="$1"
@@ -123,7 +123,7 @@ function decay() {
   echo "$param"
 }
 
-function display_help() {
+display_help() {
   printf "usage: $command"
   for param in "${params_ref[@]}"; do
     printf " $param"
@@ -132,7 +132,7 @@ function display_help() {
   exit 1
 }
 
-function identify_params() {
+identify_params() {
   local -n attrs_ref
 
   attrs_ref="$1"

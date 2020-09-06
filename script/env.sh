@@ -7,7 +7,7 @@ ROOT="$(cd "$HERE/.." && pwd)"
 # This is likely to be done by the display manager, but not always (lightdm).
 source ~/.profile
 
-function penv() {
+penv() {
   if [[ "$(pwd)" == "$ROOT"* ]]; then
     poetry run $@
   else
@@ -15,7 +15,7 @@ function penv() {
   fi
 }
 
-function jenv() {
+jenv() {
   local node_modules_path
 
   node_modules_path="$ROOT/webapp/node_modules/.bin"

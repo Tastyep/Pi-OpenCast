@@ -8,11 +8,11 @@ source "$ROOT/script/env.sh"
 
 #### CLI handlers
 
-function doc() {
+doc() {
   (cd "$ROOT/docs" && penv make clean && penv make html -b coverage)
 }
 
-function spec() {
+spec() {
   mkdir -p "$ROOT/gen"
   jenv "speccy --config $ROOT/specs/.speccy.yml resolve $ROOT/specs/openapi.yml --output $ROOT/gen/openapi.yml"
 }

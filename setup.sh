@@ -51,7 +51,7 @@ install_system_deps() {
 }
 
 # Install project dependencies.
-function install_project_deps() {
+install_project_deps() {
   info "Installing project dependencies..."
 
   "$PROJECT_DIR/$INTERNAL_NAME.sh" service back update

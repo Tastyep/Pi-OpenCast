@@ -9,12 +9,12 @@ source "$ROOT/script/logging.sh"
 
 #### CLI handlers
 
-function all() {
+all() {
   back "$@"
   front "$@"
 }
 
-function back() {
+back() {
   local -a params
   local -A parsed
   params=("--coverage" "[<selector>]")
@@ -32,7 +32,7 @@ function back() {
   [[ ! -z "${parsed["--coverage"]}" ]] && penv coverage xml
 }
 
-function front() {
+front() {
   printf "Webapp: no test available\n"
   log_status "Webapp" "0"
 }

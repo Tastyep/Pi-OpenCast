@@ -14,26 +14,26 @@ source "$ROOT/script/logging.sh"
 
 #### CLI handlers
 
-function log() {
+log() {
   tail -n 50 -f "$ROOT/$LOG_DIR/$LOG_FILE"
 }
 
-function start() {
+start() {
   mkdir -p "$LOG_DIR"
   penv python -m "$PROJECT_NAME" &
 }
 
-function stop() {
+stop() {
   echo "Killing $PROJECT_NAME..."
   lsof -t -a -i ":$API_PORT" -c python | xargs kill >/dev/null 2>&1
   echo "Done."
 }
 
-function restart() {
+restart() {
   stop && start ""
 }
 
-function status() {
+status() {
   local status
 
   status=1
@@ -41,7 +41,7 @@ function status() {
   log_status "$SERVICE_NAME" "$status"
 }
 
-function update() {
+update() {
   echo "Checking for updates."
 
   poetry update

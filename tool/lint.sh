@@ -9,17 +9,17 @@ source "$ROOT/script/logging.sh"
 
 #### CLI handlers
 
-function all() {
+all() {
   spec
   python
 }
 
-function python() {
+python() {
   penv flake8 "$ROOT/OpenCast" --statistics
   log_status "flake8" "$?"
 }
 
-function spec() {
+spec() {
   local cmd output status
 
   jenv "speccy --config $ROOT/specs/.speccy.yml lint $ROOT/specs/openapi.yml"

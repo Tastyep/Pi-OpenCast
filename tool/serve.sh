@@ -8,7 +8,7 @@ source "$ROOT/script/env.sh"
 
 #### CLI handlers
 
-function spec() {
+spec() {
   jenv "speccy --config $ROOT/specs/.speccy.yml serve $ROOT/specs/openapi.yml"
 }
 

@@ -6,27 +6,27 @@ source "$PROJECT_DIR/script/cli_builder.sh"
 
 #### CLI handlers
 
-function format() {
+format() {
   "$PROJECT_DIR/tool/format.sh" "$@"
 }
 
-function gen() {
+gen() {
   "$PROJECT_DIR/tool/generate.sh" "$@"
 }
 
-function lint() {
+lint() {
   "$PROJECT_DIR/tool/lint.sh" "$@"
 }
 
-function serve() {
+serve() {
   "$PROJECT_DIR/tool/serve.sh" "$@"
 }
 
-function service() {
+service() {
   "$PROJECT_DIR/tool/service.sh" "$@"
 }
 
-function test() {
+test() {
   "$PROJECT_DIR/tool/test.sh" "$@"
 }
 

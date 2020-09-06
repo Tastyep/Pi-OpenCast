@@ -9,11 +9,11 @@ source "$ROOT/script/logging.sh"
 
 #### CLI handlers
 
-function all() {
+all() {
   python "$@"
 }
 
-function python() {
+python() {
   local -a params
   local -A parsed
   params=("--check")
@@ -44,7 +44,7 @@ function python() {
 
 #### Internal functions
 
-function display_formatter_status() {
+display_formatter_status() {
   local name status marker
 
   name="$1"

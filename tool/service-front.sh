@@ -12,7 +12,7 @@ source "$ROOT/script/logging.sh"
 
 #### CLI handlers
 
-function start() {
+start() {
   local -a params
   local -A parsed
   params=("--dev")
@@ -25,15 +25,15 @@ function start() {
   (cd "$WEBAPP_DIR" && eval "$npm_cmd")
 }
 
-function stop() {
+stop() {
   (cd "$WEBAPP_DIR" && npm stop)
 }
 
-function restart() {
+restart() {
   stop "$@" && start "$@"
 }
 
-function status() {
+status() {
   local status
 
   status=1
