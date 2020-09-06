@@ -8,7 +8,7 @@ SERVICE_NAME="$(echo "$INTERNAL_NAME" | tr '[:upper:]' '[:lower:]')"
 SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
 
 # Log an info message.
-function info() {
+info() {
   local yel="\\033[1;33m"
   local nc="\\033[0m"
 
@@ -16,7 +16,7 @@ function info() {
 }
 
 # Log an error message and exit.
-function error() {
+error() {
   local red="\\033[0;31m"
   local nc="\\033[0m"
 
@@ -26,7 +26,7 @@ function error() {
 
 # Check if the script is executed from the project or standalone.
 # Clone the project and update PROJECT_DIR accordingly is executed in standalone mode.
-function setup_environment() {
+setup_environment() {
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     local homedir
 
@@ -40,7 +40,7 @@ function setup_environment() {
 }
 
 # Install system dependencies.
-function install_system_deps() {
+install_system_deps() {
   info "Installing system dependencies..."
 
   sudo apt-get update
@@ -50,13 +50,13 @@ function install_system_deps() {
 }
 
 # Install project dependencies.
-function install_project_deps() {
+install_project_deps() {
   chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
   "$PROJECT_DIR/$INTERNAL_NAME.sh" update
 }
 
 # Format and install the systemd config file.
-function start_at_boot() {
+start_at_boot() {
   info "Setting up startup at boot"
 
   local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"

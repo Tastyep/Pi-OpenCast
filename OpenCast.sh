@@ -9,24 +9,24 @@ DOC_DIR="docs"
 LOG_FILE="$PROJECT_NAME.log"
 TEST_DIR="test"
 
-function is_port_bound() {
+is_port_bound() {
   lsof -t -i ":$1"
 }
 
-function wait_for_server() {
+wait_for_server() {
   while [ ! "$(is_port_bound $1)" ]; do
     sleep 1
   done
 }
 
-function element_in() {
+element_in() {
   local e match="$1"
   shift
   for e; do [[ "$e" == "$match" ]] && return 0; done
   return 1
 }
 
-function start() {
+start() {
   if [ "$(is_port_bound $PROJECT_API_PORT)" ]; then
     echo "$PROJECT_NAME server is already running."
     return
@@ -48,7 +48,7 @@ function start() {
   echo "$pid" >"$PROJECT_DIR/$PROJECT_NAME.pid"
 }
 
-function stop() {
+stop() {
   echo "Killing $PROJECT_NAME..."
   # Todo hardcoded port
   lsof -t -i :2020 | xargs kill >/dev/null 2>&1
@@ -56,26 +56,26 @@ function stop() {
   echo "Done."
 }
 
-function restart() {
+restart() {
   stop && start ""
 }
 
-function update() {
+update() {
   echo "Checking for updates."
 
   (cd "$PROJECT_DIR" && poetry update)
 }
 
-function status() {
+status() {
   echo -n "$PROJECT_NAME is ... "
   [ "$(lsof -t -i :2020)" ] && echo "UP" || echo "DOWN"
 }
 
-function logs() {
+logs() {
   tail -n 50 -f "$PROJECT_DIR/$LOG_DIR/$LOG_FILE"
 }
 
-function test() {
+test() {
   cd "$PROJECT_DIR" || exit 1
   if [ -z "$1" ]; then
     run_in_env python -m unittest discover -v
@@ -89,14 +89,14 @@ function test() {
   fi
 }
 
-function gendoc() {
+gendoc() {
   cd "$DOC_DIR" || exit 1
 
   run_in_env make html
   xdg-open "build/html/index.html"
 }
 
-function run_in_env() {
+run_in_env() {
   poetry install
   poetry run "$@"
 }
