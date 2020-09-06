@@ -42,6 +42,29 @@ python() {
   log_status "isort" "$?"
 }
 
+shell() {
+  require_go
+  require_shfmt
+
+  local -a params
+  local -A parsed
+  params=("--check")
+  expect_params params parsed "shell" "$@"
+
+  local shfmt_opts=("-l" "-d" "-s")
+  [[ -z "${parsed["--check"]}" ]] && shfmt_opts+=("-w")
+
+  sh_files=()
+  sh_dirs=("" "tool" "script")
+  for sh_dir in "${sh_dirs[@]}"; do
+    while IFS= read -r -d $'\0'; do
+      sh_files+=("$REPLY")
+    done < <(find "$ROOT/$sh_dir" -name "*.sh" -print0)
+  done
+
+  shfmt "${shfmt_opts[@]}" "${sh_files[@]}"
+}
+
 #### Internal functions
 
 display_formatter_status() {
@@ -60,6 +83,7 @@ display_formatter_status() {
 declare -A COMMANDS
 COMMANDS=(
   [all]="Run all formatters."
-  [python]="Run formatters on the python code."
+  [python]="Run formatters on python code."
+  [shell]="Run formatters on shell code."
 )
 make_cli default_help_display COMMANDS "$@"
