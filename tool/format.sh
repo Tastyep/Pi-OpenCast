@@ -74,19 +74,6 @@ shell() {
   log_status "shfmt" "$?"
 }
 
-#### Internal functions
-
-display_formatter_status() {
-  local name status marker
-
-  name="$1"
-  status="$2"
-  [[ "$status" == "1" ]] && marker="✗" || marker="✓"
-
-  printf "%s %s\n" "$marker" "$name"
-  return "$status"
-}
-
 #### CLI definition
 
 declare -A COMMANDS

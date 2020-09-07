@@ -1,5 +1,6 @@
 #!/bin/bash
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 USER="$(whoami)"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT="$(basename "$PROJECT_DIR")"
@@ -7,22 +8,8 @@ INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
 SERVICE_NAME="$(echo "$INTERNAL_NAME" | tr '[:upper:]' '[:lower:]')"
 SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
 
-# Log an info message.
-info() {
-  local yel="\\033[1;33m"
-  local nc="\\033[0m"
-
-  echo -e "$yel>>$nc $1"
-}
-
-# Log an error message and exit.
-error() {
-  local red="\\033[0;31m"
-  local nc="\\033[0m"
-
-  echo -e "$red!!$nc $1"
-  exit 1
-}
+# shellcheck source=script/logging.sh
+source "$ROOT/script/logging.sh"
 
 # Check if the script is executed from the project or standalone.
 # Clone the project and update PROJECT_DIR accordingly is executed in standalone mode.
@@ -34,25 +21,25 @@ setup_environment() {
     PROJECT_DIR="$homedir/$PROJECT"
 
     # Download project
-    info "Cloning $PROJECT into $PROJECT_DIR"
+    log_info "Cloning $PROJECT into $PROJECT_DIR"
     git clone "https://github.com/Tastyep/$PROJECT" "$PROJECT_DIR"
   fi
 }
 
 # Install system dependencies.
 install_system_deps() {
-  info "Installing system dependencies..."
+  log_info "Installing system dependencies..."
 
   sudo apt-get update
   sudo apt-get install -y curl lsof python python3 python3-venv python3-pip \
     nodejs npm ||
-    error "failed to install dependencies"
+    log_error "failed to install dependencies"
   curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
 }
 
 # Install project dependencies.
 install_project_deps() {
-  info "Installing project dependencies..."
+  log_info "Installing project dependencies..."
 
   "$PROJECT_DIR/$INTERNAL_NAME.sh" service back update
   (cd "$PROJECT_DIR/webapp" && npm install)
@@ -60,7 +47,7 @@ install_project_deps() {
 
 # Format and install the systemd config file.
 start_at_boot() {
-  info "Setting up startup at boot"
+  log_info "Setting up startup at boot"
 
   local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"
   sed -i "s/{ USER }/$USER/g" "$config"
@@ -77,6 +64,6 @@ setup_environment
 install_project_deps
 start_at_boot
 
-info "Installation successful, reboot to finish."
+log_info "Installation successful, reboot to finish."
 
 exit 0
