@@ -38,7 +38,7 @@ shell() {
       sh_files+=("$REPLY")
     done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
   done
-  
+
   shellcheck -s bash "${sh_files[@]}"
   log_status "shellcheck" "$?"
 }

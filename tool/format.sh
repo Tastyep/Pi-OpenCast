@@ -16,6 +16,7 @@ source "$ROOT/script/deps.sh"
 
 all() {
   python "$@"
+  shell "$@"
 }
 
 python() {
@@ -56,7 +57,7 @@ shell() {
   export params=("--check")
   expect_params params parsed "shell" "$@"
 
-  local shfmt_opts=("-l" "-d" "-s" "-i" "2")
+  local shfmt_opts=("-l" "-d" "-i" "2")
   [[ -z "${parsed["--check"]}" ]] && shfmt_opts+=("-w")
 
   sh_files=()
