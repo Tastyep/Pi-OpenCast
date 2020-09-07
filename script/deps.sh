@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+GOLANG_VERSION="1.14.3"
+
 require_shellcheck() {
   if ! command -v "shellcheck" &>/dev/null; then
     local scversion="stable"
@@ -13,8 +15,8 @@ require_shellcheck() {
 
 require_go() {
   if ! command -v "go" &>/dev/null; then
-    tar -C /usr/local -xzf go1.14.3.linux-amd64.tar.gz
-    echo -e "export PATH=\"$PATH:/usr/local/go/bin\"" >> ~/.profile
+    wget -c "https://dl.google.com/go/go$GOLANG_VERSION.linux-amd64.tar.gz" -O - | sudo tar -xz -C /usr/local
+    echo -e "export PATH=\"$PATH:/usr/local/go/bin\"" >>~/.profile
     source ~/.profile
   fi
 }

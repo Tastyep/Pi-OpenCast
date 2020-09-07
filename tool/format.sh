@@ -6,6 +6,7 @@ ROOT="$(cd "$HERE/.." && pwd)"
 source "$ROOT/script/cli_builder.sh"
 source "$ROOT/script/env.sh"
 source "$ROOT/script/logging.sh"
+source "$ROOT/script/deps.sh"
 
 #### CLI handlers
 
@@ -51,18 +52,22 @@ shell() {
   params=("--check")
   expect_params params parsed "shell" "$@"
 
-  local shfmt_opts=("-l" "-d" "-s")
+  local shfmt_opts=("-l" "-d" "-s" "-i" "2")
   [[ -z "${parsed["--check"]}" ]] && shfmt_opts+=("-w")
 
   sh_files=()
-  sh_dirs=("" "tool" "script")
+  sh_dirs=("." "tool" "script")
   for sh_dir in "${sh_dirs[@]}"; do
+    local find_opts=()
+
+    [[ "$sh_dir" == "." ]] && find_opts+=("-maxdepth" "1")
     while IFS= read -r -d $'\0'; do
       sh_files+=("$REPLY")
-    done < <(find "$ROOT/$sh_dir" -name "*.sh" -print0)
+    done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
   done
 
   shfmt "${shfmt_opts[@]}" "${sh_files[@]}"
+  log_status "shfmt" "$?"
 }
 
 #### Internal functions

@@ -25,11 +25,14 @@ shell() {
   require_shellcheck
 
   sh_files=()
-  sh_dirs=("" "tool" "script")
+  sh_dirs=("." "tool" "script")
   for sh_dir in "${sh_dirs[@]}"; do
+    local find_opts=()
+
+    [[ "$sh_dir" == "." ]] && find_opts+=("-maxdepth" "1")
     while IFS= read -r -d $'\0'; do
       sh_files+=("$REPLY")
-    done < <(find "$ROOT/$sh_dir" -name "*.sh" -print0)
+    done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
   done
 
   shellcheck "${sh_files[@]}"
