@@ -2,65 +2,64 @@
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 USER="$(whoami)"
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT="$(basename "$PROJECT_DIR")"
+PROJECT="$(basename "$ROOT")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
-SERVICE_NAME="$(echo "$INTERNAL_NAME" | tr '[:upper:]' '[:lower:]')"
 SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
 
 # shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
 
-# Check if the script is executed from the project or standalone.
-# Clone the project and update PROJECT_DIR accordingly is executed in standalone mode.
-setup_environment() {
-  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    local homedir
-
-    homedir="$(getent passwd "$USER" | cut -d: -f6)"
-    PROJECT_DIR="$homedir/$PROJECT"
-
-    # Download project
-    log_info "Cloning $PROJECT into $PROJECT_DIR"
-    git clone "https://github.com/Tastyep/$PROJECT" "$PROJECT_DIR"
-  fi
-}
-
 # Install system dependencies.
-install_system_deps() {
-  log_info "Installing system dependencies..."
+check_system_deps() {
+  log_info "Checking system dependencies..."
+  local -a deps=("curl" "lsof" "python" "python3" "pip3" "node" "npm")
+  local status fail
 
-  sudo apt-get update
-  sudo apt-get install -y curl lsof python python3 python3-venv python3-pip \
-    nodejs npm ||
-    log_error "failed to install dependencies"
-  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+  fail=false
+  for dep in "${deps[@]}"; do
+    command -v "$dep" &>/dev/null
+    status="$?"
+    [[ "$status" = "1" ]] && fail=true
+    log_status "$dep" "$status"
+  done
+
+  if [[ "$fail" = true ]]; then
+    log_error "Missing dependencies, please install them."
+    exit 1
+  fi
 }
 
 # Install project dependencies.
 install_project_deps() {
   log_info "Installing project dependencies..."
 
-  "$PROJECT_DIR/$INTERNAL_NAME.sh" service back update
-  (cd "$PROJECT_DIR/webapp" && npm install)
+  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+  "$ROOT/$INTERNAL_NAME.sh" service back update
+  (cd "$ROOT/webapp" && npm install)
 }
 
 # Format and install the systemd config file.
 start_at_boot() {
   log_info "Setting up startup at boot"
 
-  local config="$PROJECT_DIR/dist/$SERVICE_NAME.service"
+  local service_name config
+  # lowercase
+  service_name="$(echo "$INTERNAL_NAME" | tr '[:upper:]' '[:lower:]')"
+  config="$ROOT/dist/$service_name.service"
   sed -i "s/{ USER }/$USER/g" "$config"
-  sed -i "s#{ START_COMMAND }#$PROJECT_DIR/$INTERNAL_NAME.sh service start#g" "$config"
+  sed -i "s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g" "$config"
   sudo cp "$config" "$SYSTEMD_CONFIG_DIR"
   sudo systemctl daemon-reload
-  sudo systemctl enable "$SERVICE_NAME"
+  sudo systemctl enable "$service_name"
 }
 
-chmod +x "$PROJECT_DIR/$INTERNAL_NAME.sh"
+# Prevent user from installing poetry as root
+if [[ "$EUID" = 0 ]]; then
+  log_error "Don't sudo me: './setup.sh'"
+  exit 1
+fi
 
-install_system_deps
-setup_environment
+check_system_deps
 install_project_deps
 start_at_boot
 

@@ -19,7 +19,7 @@ log_info() {
 
 # Log an error message and exit.
 log_error() {
-  printf "%s %s\n" "$(colorize "$RED_COL" ">>")" "$1"
+  printf "%s %s\n" "$(colorize "$RED_COL" "!!")" "$1"
   exit 1
 }
 
