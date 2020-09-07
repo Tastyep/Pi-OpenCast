@@ -2,6 +2,7 @@
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 
+# shellcheck source=script/array.sh
 source "$HERE/array.sh"
 
 make_cli() {
@@ -11,7 +12,6 @@ make_cli() {
   display_help="$1"
   commands="$2"
   shift 2
-  local args="$@"
 
   if element_in "$1" "${!commands[@]}"; then
     local cmd="$1"
@@ -24,7 +24,7 @@ make_cli() {
 }
 
 default_help_display() {
-  printf "Usage: $0 command\n\n"
+  printf "Usage: %s command\n\n" "$0"
   printf "Available commands:\n"
 
   local -n command_ref
@@ -37,19 +37,20 @@ default_help_display() {
     [[ "$len" > "$longest" ]] && longest="$len"
   done
 
-  local sorted_cmds=$(
+  local sorted_cmds
+  mapfile -t sorted_cmds < <(
     for cmd in "${!command_ref[@]}"; do
-      printf "$cmd\n"
+      printf "%s\n" "$cmd"
     done | sort
   )
 
-  for cmd in ${sorted_cmds[@]}; do
+  for cmd in "${sorted_cmds[@]}"; do
     local size_diff="$(("$longest" - "${#cmd}"))"
     local spaces=""
-    if [[ "$size_diff" > 0 ]]; then
+    if [[ "$size_diff" -gt 0 ]]; then
       spaces="$(printf ' %.0s' $(seq 1 "$size_diff"))"
     fi
-    printf " - $cmd:$spaces ${command_ref["$cmd"]}\n"
+    printf " - %s:%s %s\n" "$cmd" "$spaces" "${command_ref["$cmd"]}"
   done
 }
 
@@ -89,7 +90,7 @@ expect_params() {
       fi
     done
     if [[ "$found" == "0" ]]; then
-      printf "$0 $command: invalid argument $arg\n"
+      printf "%s %s: invalid argument %s\n" "$0" "$command" "$arg"
       display_help
     fi
 
@@ -97,11 +98,13 @@ expect_params() {
 
     decayed_name="$(decay "${params_ref["$index"]}" "${params_attr["$index"]}")"
     matched_params+=("$index")
+    # Ignore SC2034 since shellcheck doesn't follow references
+    # shellcheck disable=SC2034
     parsed_ref["$decayed_name"]="$arg"
   done
   for i in "${!params_ref[@]}"; do
     if [[ "${params_attr["$i"]}" == *"required"* ]] && ! element_in "$i" "${matched_params[@]}"; then
-      printf "$0 $command: missing required argument ${params_ref["$i"]}\n"
+      printf "%s %s: missing required argument %s\n" "$0" "$command" "${params_ref["$i"]}"
       display_help
     fi
   done
@@ -124,9 +127,9 @@ decay() {
 }
 
 display_help() {
-  printf "usage: $command"
+  printf "usage: %s" "$command"
   for param in "${params_ref[@]}"; do
-    printf " $param"
+    printf " %s" "$param"
   done
   printf "\n"
   exit 1

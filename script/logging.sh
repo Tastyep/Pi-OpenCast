@@ -7,6 +7,6 @@ log_status() {
   status="$2"
   [[ "$status" == "1" ]] && marker="✗" || marker="✓"
 
-  printf "$marker $name\n"
+  printf "%s %s\n" "$marker" "$name"
   return "$status"
 }

@@ -3,7 +3,9 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
 
 #### CLI handlers
@@ -15,7 +17,7 @@ spec() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [spec]="View specifications in beautiful human readable documentation."
 )
 make_cli default_help_display COMMANDS "$@"

@@ -3,9 +3,13 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
+# shellcheck source=script/deps.sh
 source "$ROOT/script/deps.sh"
 
 #### CLI handlers
@@ -34,13 +38,12 @@ shell() {
       sh_files+=("$REPLY")
     done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
   done
-
-  shellcheck "${sh_files[@]}"
+  
+  shellcheck -s bash "${sh_files[@]}"
+  log_status "shellcheck" "$?"
 }
 
 spec() {
-  local cmd output status
-
   jenv "speccy --config $ROOT/specs/.speccy.yml lint $ROOT/specs/openapi.yml"
   log_status "speccy" "$?"
 }
@@ -48,7 +51,7 @@ spec() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [all]="Run all linters."
   [python]="Run the linter on the python code."
   [shell]="Run the shellcheck on scripts."

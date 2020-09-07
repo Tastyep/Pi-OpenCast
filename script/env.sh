@@ -5,13 +5,14 @@ ROOT="$(cd "$HERE/.." && pwd)"
 
 # Source profile file as poetry use it to modify the PATH
 # This is likely to be done by the display manager, but not always (lightdm).
+# shellcheck source=/dev/null
 source ~/.profile
 
 penv() {
   if [[ "$(pwd)" == "$ROOT"* ]]; then
-    poetry run $@
+    poetry run "$@"
   else
-    (cd "$ROOT" && poetry run $@)
+    (cd "$ROOT" && poetry run "$@")
   fi
 }
 

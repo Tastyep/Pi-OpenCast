@@ -17,6 +17,7 @@ require_go() {
   if ! command -v "go" &>/dev/null; then
     wget -c "https://dl.google.com/go/go$GOLANG_VERSION.linux-amd64.tar.gz" -O - | sudo tar -xz -C /usr/local
     echo -e "export PATH=\"$PATH:/usr/local/go/bin\"" >>~/.profile
+    # shellcheck source=/dev/null
     source ~/.profile
   fi
 }

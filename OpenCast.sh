@@ -2,6 +2,7 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# shellcheck source=script/cli_builder.sh
 source "$PROJECT_DIR/script/cli_builder.sh"
 
 #### CLI handlers
@@ -33,7 +34,7 @@ test() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [format]="Format source code."
   [gen]="Generate content."
   [lint]="Run linters on given targets."

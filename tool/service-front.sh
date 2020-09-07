@@ -6,21 +6,22 @@ WEBAPP_DIR="$ROOT/webapp"
 WEBAPP_PORT="8081"
 SERVICE_NAME="front"
 
-source "$ROOT/script/cli_builder.sh"
-source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
+# shellcheck source=script/env.sh
+source "$ROOT/script/env.sh"
 
 #### CLI handlers
 
 start() {
   local -a params
   local -A parsed
-  params=("--dev")
+  export params=("--dev")
   expect_params params parsed "start" "$@"
 
   local npm_cmd
   npm_cmd="WEBAPP_PORT=$WEBAPP_PORT npm run serve &"
-  [[ ! -z "${parsed["--dev"]}" ]] && npm_cmd="npm start"
+  [[ -n "${parsed["--dev"]}" ]] && npm_cmd="npm start"
 
   (cd "$WEBAPP_DIR" && eval "$npm_cmd")
 }
@@ -44,7 +45,7 @@ status() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [start]="Start the service."
   [stop]="Stop the service."
   [restart]="Restart the service."

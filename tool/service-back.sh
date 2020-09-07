@@ -8,8 +8,11 @@ LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 SERVICE_NAME="back"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
 
 #### CLI handlers
@@ -50,7 +53,7 @@ update() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [log]="Tail the log file."
   [start]="Start the service."
   [stop]="Stop the service."

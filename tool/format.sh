@@ -3,9 +3,13 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
+# shellcheck source=script/deps.sh
 source "$ROOT/script/deps.sh"
 
 #### CLI handlers
@@ -17,11 +21,11 @@ all() {
 python() {
   local -a params
   local -A parsed
-  params=("--check")
+  export params=("--check")
   expect_params params parsed "python" "$@"
 
   local black_opts isort_opts=()
-  if [[ ! -z "${parsed["--check"]}" ]]; then
+  if [[ -n "${parsed["--check"]}" ]]; then
     black_opts+=("--check")
     isort_opts+=("--check-only")
   fi
@@ -49,7 +53,7 @@ shell() {
 
   local -a params
   local -A parsed
-  params=("--check")
+  export params=("--check")
   expect_params params parsed "shell" "$@"
 
   local shfmt_opts=("-l" "-d" "-s" "-i" "2")
@@ -79,14 +83,14 @@ display_formatter_status() {
   status="$2"
   [[ "$status" == "1" ]] && marker="✗" || marker="✓"
 
-  printf "$marker $name\n"
+  printf "%s %s\n" "$marker" "$name"
   return "$status"
 }
 
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [all]="Run all formatters."
   [python]="Run formatters on python code."
   [shell]="Run formatters on shell code."
