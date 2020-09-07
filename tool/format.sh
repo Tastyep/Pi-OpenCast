@@ -49,7 +49,6 @@ python() {
 }
 
 shell() {
-  require_go
   require_shfmt
 
   # shellcheck disable=SC2034
