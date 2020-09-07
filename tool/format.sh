@@ -3,24 +3,30 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
+# shellcheck source=script/deps.sh
+source "$ROOT/script/deps.sh"
 
 #### CLI handlers
 
 all() {
   python "$@"
+  shell "$@"
 }
 
 python() {
-  local -a params
+  # shellcheck disable=SC2034
+  local -a params=("--check")
   local -A parsed
-  params=("--check")
   expect_params params parsed "python" "$@"
 
   local black_opts isort_opts=()
-  if [[ ! -z "${parsed["--check"]}" ]]; then
+  if [[ -n "${parsed["--check"]}" ]]; then
     black_opts+=("--check")
     isort_opts+=("--check-only")
   fi
@@ -42,24 +48,38 @@ python() {
   log_status "isort" "$?"
 }
 
-#### Internal functions
+shell() {
+  require_shfmt
 
-display_formatter_status() {
-  local name status marker
+  # shellcheck disable=SC2034
+  local -a params=("--check")
+  local -A parsed
+  expect_params params parsed "shell" "$@"
 
-  name="$1"
-  status="$2"
-  [[ "$status" == "1" ]] && marker="✗" || marker="✓"
+  local shfmt_opts=("-l" "-d" "-i" "2")
+  [[ -z "${parsed["--check"]}" ]] && shfmt_opts+=("-w")
 
-  printf "$marker $name\n"
-  return "$status"
+  sh_files=()
+  sh_dirs=("." "tool" "script")
+  for sh_dir in "${sh_dirs[@]}"; do
+    local find_opts=()
+
+    [[ "$sh_dir" == "." ]] && find_opts+=("-maxdepth" "1")
+    while IFS= read -r -d $'\0'; do
+      sh_files+=("$REPLY")
+    done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
+  done
+
+  shfmt "${shfmt_opts[@]}" "${sh_files[@]}"
+  log_status "shfmt" "$?"
 }
 
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [all]="Run all formatters."
-  [python]="Run formatters on the python code."
+  [python]="Run formatters on python code."
+  [shell]="Run formatters on shell code."
 )
 make_cli default_help_display COMMANDS "$@"

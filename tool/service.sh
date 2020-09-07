@@ -5,6 +5,7 @@ ROOT="$(cd "$HERE/.." && pwd)"
 SERVICE_BACK="$HERE/service-back.sh"
 SERVICE_FRONT="$HERE/service-front.sh"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
 
 #### CLI handlers
@@ -45,7 +46,7 @@ test() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [back]="Back end service."
   [front]="Front end service."
   [start]="Start all services."

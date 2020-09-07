@@ -3,15 +3,21 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
+# shellcheck source=script/deps.sh
+source "$ROOT/script/deps.sh"
 
 #### CLI handlers
 
 all() {
-  spec
   python
+  shell
+  spec
 }
 
 python() {
@@ -19,9 +25,25 @@ python() {
   log_status "flake8" "$?"
 }
 
-spec() {
-  local cmd output status
+shell() {
+  require_shellcheck
 
+  sh_files=()
+  sh_dirs=("." "tool" "script")
+  for sh_dir in "${sh_dirs[@]}"; do
+    local find_opts=()
+
+    [[ "$sh_dir" == "." ]] && find_opts+=("-maxdepth" "1")
+    while IFS= read -r -d $'\0'; do
+      sh_files+=("$REPLY")
+    done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
+  done
+
+  shellcheck -s bash "${sh_files[@]}"
+  log_status "shellcheck" "$?"
+}
+
+spec() {
   jenv "speccy --config $ROOT/specs/.speccy.yml lint $ROOT/specs/openapi.yml"
   log_status "speccy" "$?"
 }
@@ -29,9 +51,10 @@ spec() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [all]="Run all linters."
   [python]="Run the linter on the python code."
+  [shell]="Run the shellcheck on scripts."
   [spec]="Run the linter on the API spec."
 )
 make_cli default_help_display COMMANDS "$@"

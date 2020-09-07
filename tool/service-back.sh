@@ -8,8 +8,11 @@ LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 SERVICE_NAME="back"
 
+# shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
+# shellcheck source=script/env.sh
 source "$ROOT/script/env.sh"
+# shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
 
 #### CLI handlers
@@ -24,13 +27,13 @@ start() {
 }
 
 stop() {
-  echo "Killing $PROJECT_NAME..."
+  log_info "Killing $PROJECT_NAME..."
   lsof -t -a -i ":$API_PORT" -c python | xargs kill >/dev/null 2>&1
-  echo "Done."
+  log_info "Done."
 }
 
 restart() {
-  stop && start ""
+  stop && start
 }
 
 status() {
@@ -42,7 +45,7 @@ status() {
 }
 
 update() {
-  echo "Checking for updates."
+  log_info "Checking for updates."
 
   poetry update
 }
@@ -50,7 +53,7 @@ update() {
 #### CLI definition
 
 declare -A COMMANDS
-COMMANDS=(
+export COMMANDS=(
   [log]="Tail the log file."
   [start]="Start the service."
   [stop]="Stop the service."
