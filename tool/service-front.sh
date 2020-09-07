@@ -14,9 +14,9 @@ source "$ROOT/script/env.sh"
 #### CLI handlers
 
 start() {
-  local -a params
+  # shellcheck disable=SC2034
+  local -a params=("--dev")
   local -A parsed
-  export params=("--dev")
   expect_params params parsed "start" "$@"
 
   local npm_cmd

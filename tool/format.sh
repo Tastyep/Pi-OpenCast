@@ -20,9 +20,9 @@ all() {
 }
 
 python() {
-  local -a params
+  # shellcheck disable=SC2034
+  local -a params=("--check")
   local -A parsed
-  export params=("--check")
   expect_params params parsed "python" "$@"
 
   local black_opts isort_opts=()
@@ -52,9 +52,9 @@ shell() {
   require_go
   require_shfmt
 
-  local -a params
+  # shellcheck disable=SC2034
+  local -a params=("--check")
   local -A parsed
-  export params=("--check")
   expect_params params parsed "shell" "$@"
 
   local shfmt_opts=("-l" "-d" "-i" "2")

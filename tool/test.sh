@@ -18,9 +18,9 @@ all() {
 }
 
 back() {
-  local -a params
+  # shellcheck disable=SC2034
+  local -a params=("--coverage" "[<selector>]")
   local -A parsed
-  export params=("--coverage" "[<selector>]")
   expect_params params parsed "back" "$@"
 
   local command selector
