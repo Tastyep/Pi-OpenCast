@@ -6,6 +6,8 @@ WEBAPP_DIR="$ROOT/webapp"
 WEBAPP_PORT="8081"
 SERVICE_NAME="front"
 
+# shellcheck source=script/cli_builder.sh
+source "$ROOT/script/cli_builder.sh"
 # shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
 # shellcheck source=script/env.sh
