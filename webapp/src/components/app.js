@@ -14,10 +14,20 @@ class App extends Component {
       <Grid container>
         <Grid item sm={1} md={2} />
         <Grid item container xs={12} sm={10} md={8}>
-          <Grid item container>
+          <Grid
+            item
+            container
+            style={{ display: "block", position: "relative" }}
+          >
             <Header />
             <Paper elevation={3} style={{ flex: 1, padding: 24 }}>
-              <Grid item container direction="column" spacing={4}>
+              <Grid
+                item
+                container
+                direction="column"
+                spacing={4}
+                style={{ display: "block" }}
+              >
                 <Grid item>
                   <StreamInput />
                 </Grid>
