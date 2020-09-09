@@ -25,7 +25,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       #
       - name: Install dependencies
-        run: ./setup.sh
+        run: ./setup.sh --ci
       #
       - name: Test
         run: ./OpenCast.sh test all --coverage

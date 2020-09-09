@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: "3.8"
       - name: Install dependencies
-        run: ./setup.sh
+        run: ./setup.sh --ci
       #
       - name: Generate documentation
         run: ./OpenCast.sh gen doc
