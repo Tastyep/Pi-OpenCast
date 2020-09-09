@@ -127,7 +127,10 @@ decay() {
 }
 
 display_help() {
-  printf "usage: %s" "$command"
+  local script_name
+
+  script_name="$(basename "$0")"
+  printf "usage: %s %s" "$script_name" "$command"
   for param in "${params_ref[@]}"; do
     printf " %s" "$param"
   done

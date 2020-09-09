@@ -6,14 +6,19 @@ PROJECT="$(basename "$ROOT")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
 SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
 
+# shellcheck source=script/cli_builder.sh
+source "$ROOT/script/cli_builder.sh"
 # shellcheck source=script/logging.sh
 source "$ROOT/script/logging.sh"
 
 # Install system dependencies.
 check_system_deps() {
+  local -n param_ref=$1
+
   log_info "Checking system dependencies..."
   local -a deps=("curl" "lsof" "python" "python3" "pip3" "node" "npm")
   local status fail
+  [[ -z "${param_ref["--ci"]}" ]] && deps+=("ffmpeg" "vlc")
 
   fail=false
   for dep in "${deps[@]}"; do
@@ -59,7 +64,12 @@ if [[ "$EUID" = 0 ]]; then
   exit 1
 fi
 
-check_system_deps
+# shellcheck disable=SC2034
+declare -a params=("--ci")
+declare -A parsed
+expect_params params parsed "" "$@"
+
+check_system_deps parsed
 install_project_deps
 start_at_boot
 
