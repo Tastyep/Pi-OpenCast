@@ -6,6 +6,9 @@
 #   all     Run all formatters.
 #   python  Run formatters on python code.
 #   shell   Run formatters on shell code.
+#
+# Options:
+#   --check  Don't edit files in place.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"

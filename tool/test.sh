@@ -6,6 +6,9 @@
 #   all    Run all tests.
 #   back   Run the test suite of the python application.
 #   front  Run the test suite of the web application.
+#
+# Options:
+#   --coverage  Mesure test coverage.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"

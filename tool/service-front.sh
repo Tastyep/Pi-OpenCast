@@ -7,6 +7,9 @@
 #   stop     Stop the service.
 #   restart  Restart the service.
 #   status   Display the status of the service.
+#
+# Options:
+#   --dev  Start the service in development mode.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"

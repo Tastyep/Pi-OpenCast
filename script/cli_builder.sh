@@ -11,6 +11,7 @@ declare -A ARGS
 parse_args() {
   local -a usage
   local -a commands
+  local -A options
   local -a params
   local -A params_type
   local -A params_attr
@@ -70,6 +71,8 @@ parse_usage_section() {
     params+=("$decayed_param")
     params_type["$decayed_param"]="$(param_type "$param")"
     params_attr["$decayed_param"]="$(param_attr "$param")"
+    # shellcheck disable=SC2034
+    [[ "${params_type["$decayed_param"]}" == "option" ]] && options["$decayed_param"]=""
   done
 }
 
@@ -85,8 +88,44 @@ parse_commands_section() {
 }
 
 parse_options_section() {
-  # Empty for now
-  return
+  local line="$1"
+  local opts help_msg
+
+  # Clean line from spaces to extract options
+  line="${line#"${line%%[![:space:]]*}"}"
+  help_msg="${line#*"  "}"
+  opts="${line%"  "*}"
+
+  if [[ -z "$opts" ]]; then
+    printf "Error: invalid option format '%s'.\n" "$line"
+    exit 1
+  fi
+
+  if [[ "$opts" == "$help_msg" ]]; then
+    printf "Error: can't parse help message for '%s'.\nOptions and descriptions should be separated by 2 spaces.\n" "$opts"
+    exit 1
+  fi
+
+  # Trim all white spaces
+  opts="${opts## }"
+  opts="${opts%% }"
+
+  local long_opt
+
+  # Replace commas with space to make it iterable
+  opts=${opts//,/ }
+
+  # Note: change this to add support for valued options
+  # Partial support for short options, see resolve_option
+  long_opt="${opts##* }"
+  for opt in $opts; do
+    if [[ "$opt" == "$long_opt" ]]; then
+      options["$opt"]="" # empty string signals that it's the used option.
+    else
+      options["$opt"]="$long_opt" # short options point to the long one
+      unset ARGS["$opt"]          # remove entry as long options are used
+    fi
+  done
 }
 
 parse_arguments() {
@@ -128,32 +167,49 @@ parse_arguments() {
     local param_attr="${params_attr["$param"]}"
 
     if [[ -z "${ARGS["$param"]}" && "$param_attr" == *"required"* ]]; then
-      printf "Error: missing required argument '%s'\n" "$param"
+      printf "Error: missing required argument '%s'.\n" "$param"
       print_usage
     fi
   done
 }
 
-# Only support options without arguments
+# Only support long options without arguments
 parse_option_arg() {
   local arg="$1"
 
   if [[ ("$param_attr" == *"repeating"*) ]]; then
     assign_repeating_arg
   else
-    if ! element_in "$arg" "${!ARGS[@]}"; then
-      printf "Error: invalid option: '%s'\n" "$arg"
+    # First condition refers to options only listed in the Usage section
+    if ! element_in "$arg" "${!ARGS[@]}" && ! element_in "$arg" "${!options[@]}"; then
+      printf "Error: invalid option: '%s'.\n" "$arg"
       print_usage
     fi
-    ARGS["$arg"]=true
+    local long_opt
+    long_opt="$(resolve_option "$arg")"
+    ARGS["$long_opt"]=true
   fi
+}
+
+# Resolve short options into long ones when available
+resolve_option() {
+  local opt="$1"
+
+  if ! element_in "$opt" "${options[@]}"; then
+    echo "$opt"
+    return
+  fi
+  while [[ -n "${options["$opt"]}" ]]; do
+    opt="${options["$opt"]}"
+  done
+  echo "$opt"
 }
 
 parse_command_arg() {
   local arg="$1"
 
   if ! element_in "$arg" "${commands[@]}"; then
-    printf "Error: invalid command %s\n" "$arg"
+    printf "Error: invalid command %s.\n" "$arg"
     print_usage
   fi
   ARGS["$param"]="$arg"

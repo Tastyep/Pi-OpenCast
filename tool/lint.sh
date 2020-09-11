@@ -5,7 +5,7 @@
 # Commands:
 #   all     Run all linters.
 #   python  Run the linter on the python code.
-#   shell   Run the shellcheck on scripts.
+#   shell   Run shellcheck on scripts.
 #   spec    Run the linter on the API spec.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
