@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./test.sh command [<selector>] [--coverage]
+#
+# Commands:
+#   all    Run all tests.
+#   back   Run the test suite of the python application.
+#   front  Run the test suite of the web application.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -18,21 +25,16 @@ all() {
 }
 
 back() {
-  # shellcheck disable=SC2034
-  local -a params=("--coverage" "[<selector>]")
-  local -A parsed
-  expect_params params parsed "back" "$@"
-
   local command selector
   command=("python")
   selector="discover"
-  [[ -n "${parsed["--coverage"]}" ]] && command=("coverage" "run")
-  [[ -n "${parsed["selector"]}" ]] && selector="${parsed["selector"]}"
+  [[ "${ARGS["--coverage"]}" == true ]] && command=("coverage" "run")
+  [[ -n "${ARGS["selector"]}" ]] && selector="${ARGS["selector"]}"
 
   penv "${command[@]}" -m unittest "$selector" -v
   log_status "Python" "$?"
 
-  [[ -n "${parsed["--coverage"]}" ]] && penv coverage xml
+  [[ "${ARGS["--coverage"]}" == true ]] && penv coverage xml
 }
 
 front() {
@@ -40,12 +42,5 @@ front() {
   log_status "Webapp" "0"
 }
 
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [all]="Run all tests."
-  [back]="Run the test suite of the python application."
-  [front]="Run the test suite of the web application."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+${ARGS["command"]}

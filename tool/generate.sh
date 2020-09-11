@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./generate.sh command
+#
+# Commands:
+#   doc   Generate documentation files.
+#   spec  Generate a merged openapi file.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -19,11 +25,5 @@ spec() {
   jenv "speccy --config $ROOT/specs/.speccy.yml resolve $ROOT/specs/openapi.yml --output $ROOT/gen/openapi.yml"
 }
 
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [doc]="Generate documentation files."
-  [spec]="Generate a merged openapi file."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+${ARGS["command"]}

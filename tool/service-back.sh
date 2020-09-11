@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./service-back.sh command
+#
+# Commands:
+#   log      Tail the log file.
+#   start    Start the service.
+#   stop     Stop the service.
+#   restart  Restart the service.
+#   status   Display the status of the service.
+#   update   Update the dependencies of the service.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -50,15 +60,5 @@ update() {
   poetry update
 }
 
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [log]="Tail the log file."
-  [start]="Start the service."
-  [stop]="Stop the service."
-  [restart]="Restart the service."
-  [status]="Display the status of the service."
-  [update]="Update the dependencies of the service."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+${ARGS["command"]}

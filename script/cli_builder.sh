@@ -5,150 +5,245 @@ HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 # shellcheck source=script/array.sh
 source "$HERE/array.sh"
 
-make_cli() {
-  local display_help
-  local -n commands
+# Map exposed to user
+declare -A ARGS
 
-  display_help="$1"
-  commands="$2"
-  shift 2
+parse_args() {
+  local -a usage
+  local -a commands
+  local -a params
+  local -A params_type
+  local -A params_attr
 
-  if element_in "$1" "${!commands[@]}"; then
-    local cmd="$1"
-    shift
+  # Read the usage
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && break
+    [[ "$line" == "#!"* ]] && continue
+    usage+=("${line/\#/}")
+  done <"$0"
 
-    "$cmd" "$@"
+  parse_sections
+  parse_arguments "$@"
+}
+
+parse_sections() {
+  local section=""
+
+  for line in "${usage[@]}"; do
+    local lwc_line="${line,,}"
+    [[ "${lwc_line}" == *"usage:"* ]] && section="usage" && continue
+    [[ "${lwc_line}" == *"commands:"* ]] && section="commands" && continue
+    [[ "${lwc_line}" == *"options:"* ]] && section="options" && continue
+    [[ -z "$section" ]] && continue
+
+    case "$section" in
+    "usage")
+      parse_usage_section "$line"
+      ;;
+    "commands")
+      parse_commands_section "$line"
+      ;;
+    "options")
+      parse_options_section "$line"
+      ;;
+    esac
+
+  done
+}
+
+parse_usage_section() {
+  local line="$1"
+
+  # Clean line to extract params
+  line="${line#"${line%%[![:space:]]*}"}"
+
+  # Read params into an array
+  read -ra usage_params <<<"$line"
+  local count="${#usage_params[@]}"
+
+  for ((i = 1; i < count; i++)); do
+    local param="${usage_params["$i"]}"
+    local decayed_param
+
+    decayed_param="$(decay "$param")"
+    ARGS["$decayed_param"]=""
+    params+=("$decayed_param")
+    params_type["$decayed_param"]="$(param_type "$param")"
+    params_attr["$decayed_param"]="$(param_attr "$param")"
+  done
+}
+
+parse_commands_section() {
+  local line="$1"
+
+  # Clean line from spaces to extract commands
+  line="${line#"${line%%[![:space:]]*}"}"
+
+  # Read command desc into an array
+  read -ra words <<<"$line"
+  commands+=("${words[0]}")
+}
+
+parse_options_section() {
+  # Empty for now
+  return
+}
+
+parse_arguments() {
+  local args=("$@")
+  local count="${#args[@]}"
+  local param_idx=0
+  local param_count="${#params[@]}"
+
+  if element_in "--help" "${args[@]}"; then
+    print_usage
+  fi
+
+  for ((i = 0; i < count && param_idx < param_count; i++)); do
+    local arg="${args["$i"]}"
+    local param="${params["$param_idx"]}"
+    local param_type="${params_type["$param"]}"
+    local param_attr="${params_attr["$param"]}"
+
+    # echo "arg: $arg, param: $param, param_type $param_type"
+    if [[ "$(param_type "$arg")" == "option" ]]; then
+      parse_option_arg "$arg"
+    elif [[ "$param_type" == "command" ]]; then
+      parse_command_arg "$arg"
+    else
+      parse_arg "$arg"
+    fi
+  done
+
+  if [[ "$i" -lt "$count" ]]; then
+    printf "Error: could not match arguments:"
+    for (( ; i < count; i++)); do
+      printf " %s" "${args["$i"]}"
+    done
+    printf "\n"
+    print_usage
+  fi
+
+  for param in "${params[@]}"; do
+    local param_attr="${params_attr["$param"]}"
+
+    if [[ -z "${ARGS["$param"]}" && "$param_attr" == *"required"* ]]; then
+      printf "Error: missing required argument '%s'\n" "$param"
+      print_usage
+    fi
+  done
+}
+
+# Only support options without arguments
+parse_option_arg() {
+  local arg="$1"
+
+  if [[ ("$param_attr" == *"repeating"*) ]]; then
+    assign_repeating_arg
   else
-    "$display_help" commands
+    if ! element_in "$arg" "${!ARGS[@]}"; then
+      printf "Error: invalid option: '%s'\n" "$arg"
+      print_usage
+    fi
+    ARGS["$arg"]=true
   fi
 }
 
-default_help_display() {
-  printf "Usage: %s command\n\n" "$0"
-  printf "Available commands:\n"
+parse_command_arg() {
+  local arg="$1"
 
-  local -n command_ref
-  local longest=0
-
-  command_ref="$1"
-  for cmd in "${!command_ref[@]}"; do
-    local len="${#cmd}"
-
-    [[ "$len" > "$longest" ]] && longest="$len"
-  done
-
-  local sorted_cmds
-  mapfile -t sorted_cmds < <(
-    for cmd in "${!command_ref[@]}"; do
-      printf "%s\n" "$cmd"
-    done | sort
-  )
-
-  for cmd in "${sorted_cmds[@]}"; do
-    local size_diff="$(("$longest" - "${#cmd}"))"
-    local spaces=""
-    if [[ "$size_diff" -gt 0 ]]; then
-      spaces="$(printf ' %.0s' $(seq 1 "$size_diff"))"
-    fi
-    printf " - %s:%s %s\n" "$cmd" "$spaces" "${command_ref["$cmd"]}"
-  done
+  if ! element_in "$arg" "${commands[@]}"; then
+    printf "Error: invalid command %s\n" "$arg"
+    print_usage
+  fi
+  ARGS["$param"]="$arg"
+  [[ "$param_attr" != *"repeating"* ]] && param_idx=$((param_idx + 1))
 }
 
-expect_params() {
-  local -n params_ref parsed_ref
-  local -a params_attr
-  local command args count
+parse_arg() {
+  local arg="$1"
 
-  params_ref="$1"
-  parsed_ref="$2"
-  command="$3"
-  args=("$@")
-  count="${#args[@]}"
-
-  identify_params params_attr
-
-  local matched_params
-  matched_params=()
-  # Iterate on arguments
-  for ((i = 3; i < count; i++)); do
-    local arg found index
-
-    arg="${args[$i]}"
-    found=0
-    for j in "${!params_ref[@]}"; do
-      if element_in "$j" "${matched_params[@]}"; then
-        continue
-      fi
-      if [[ "$arg" == "${params_ref["$j"]}" ]]; then
-        found=1
-        index="$j"
-        break
-      fi
-      if [[ "$found" == "0" && "${params_attr["$j"]}" == *"argument"* ]]; then
-        found=1
-        index="$j"
-      fi
-    done
-    if [[ "$found" == "0" ]]; then
-      printf "%s %s: invalid argument %s\n" "$0" "$command" "$arg"
-      display_help
-    fi
-
-    local decayed_name
-
-    decayed_name="$(decay "${params_ref["$index"]}" "${params_attr["$index"]}")"
-    matched_params+=("$index")
-    # Ignore SC2034 since shellcheck doesn't follow references
-    # shellcheck disable=SC2034
-    parsed_ref["$decayed_name"]="$arg"
-  done
-  for i in "${!params_ref[@]}"; do
-    if [[ "${params_attr["$i"]}" == *"required"* ]] && ! element_in "$i" "${matched_params[@]}"; then
-      printf "%s %s: missing required argument %s\n" "$0" "$command" "${params_ref["$i"]}"
-      display_help
-    fi
-  done
+  if [[ ("$param_attr" == *"repeating"*) ]]; then
+    assign_repeating_arg
+  else
+    ARGS["$param"]="$arg"
+    param_idx=$((param_idx + 1))
+  fi
 }
 
-decay() {
-  local param type
-
-  param="$1"
-  type="$2"
-  IFS='|' read -r -a attrs <<<"$type"
-  for attr in "${attrs[@]}"; do
-    case "$attr" in
-    "optional" | "required" | "argument")
-      param="${param:1:${#param}-2}"
-      ;;
-    esac
-  done
-  echo "$param"
+assign_repeating_arg() {
+  if [[ -n "${ARGS["$param"]}" ]]; then
+    ARGS["$param"]="${ARGS["$param"]};$arg"
+  else
+    ARGS["$param"]="$arg"
+  fi
 }
 
-display_help() {
-  local script_name
+print_usage() {
+  local min_space="${#usage}"
 
-  script_name="$(basename "$0")"
-  printf "usage: %s %s" "$script_name" "$command"
-  for param in "${params_ref[@]}"; do
-    printf " %s" "$param"
+  for line in "${usage[@]}"; do
+    local trimed_line="${line#"${line%%[![:space:]]*}"}"
+    [[ -z "$trimed_line" ]] && continue
+
+    local len="$((${#line} - ${#trimed_line}))"
+    [[ "$len" -lt "$min_space" ]] && min_space="$len"
   done
-  printf "\n"
+
+  for line in "${usage[@]}"; do
+    printf "%s\n" "${line:$min_space:${#line}}"
+  done
   exit 1
 }
 
-identify_params() {
-  local -n attrs_ref
+# param types:
+# <> argument
+# -- option
+# command
+#
+# param attr
+# [] optional
+# () required
+# ... repeating
 
-  attrs_ref="$1"
-  for param in "${params_ref[@]}"; do
-    local attr=""
+param_type() {
+  local param="$1"
 
-    [[ "$param" =~ \[.*\] ]] && attr="$attr|optional"
-    [[ "$param" =~ \(.*\) ]] && attr="$attr|required"
-    [[ "$param" =~ \<.*\> ]] && attr="$attr|argument"
-    [[ "$param" =~ --.* ]] && attr="$attr|option"
-    attrs_ref+=("$attr")
+  if [[ "$param" =~ \<.*\> ]]; then
+    echo "argument"
+    return
+  fi
+  if [[ "$param" =~ --.* ]]; then
+    echo "option"
+    return
+  fi
+  echo "command"
+}
+
+param_attr() {
+  local param="$1"
+  local attr=""
+
+  [[ "$param" =~ \[.*\] ]] && attr="$attr|optional"
+  [[ "$param" =~ \(.*\) ]] && attr="$attr|required"
+  [[ "$param" =~ [^\.]*\.{3} ]] && attr="$attr|repeating"
+  [[ "$attr" != *"optional"* && "$attr" != *"required"* ]] && attr="$attr|required"
+
+  echo "$attr"
+}
+
+decay() {
+  local param="$1"
+  local decayed=true
+
+  while "$decayed"; do
+    local copy="$param"
+
+    [[ "$param" =~ ^\[.*\]$ ]] && param="${param:1:${#param}-2}"
+    [[ "$param" =~ ^\<.*\>$ ]] && param="${param:1:${#param}-2}"
+    [[ "$param" =~ [^\.]*\.{3} ]] && param="${param:0:${#param}-3}"
+    [[ "$param" == "$copy" ]] && decayed=false
   done
+
+  echo "$param"
 }

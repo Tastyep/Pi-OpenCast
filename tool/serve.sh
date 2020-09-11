@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./serve.sh command
+#
+# Commands:
+#   spec  View specifications in beautiful human readable documentation.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -14,10 +19,5 @@ spec() {
   jenv "speccy --config $ROOT/specs/.speccy.yml serve $ROOT/specs/openapi.yml"
 }
 
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [spec]="View specifications in beautiful human readable documentation."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+${ARGS["command"]}
