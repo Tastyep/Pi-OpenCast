@@ -28,5 +28,7 @@ require_shfmt() {
     local dest="/usr/local/bin/shfmt"
     sudo wget -q "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64" -O "$dest"
     sudo chmod +x "$dest"
+
+    log_info "shfmt is installed in /usr/local/bin"
   fi
 }
