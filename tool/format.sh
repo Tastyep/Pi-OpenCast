@@ -22,8 +22,7 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-  python "$@"
-  shell "$@"
+  python "$@" && shell "$@"
 }
 
 python() {
@@ -44,10 +43,14 @@ python() {
     done < <(find "$ROOT/$py_dir" -name "*.py" -print0)
   done
 
+  local black_status isort_status
   penv black "${black_opts[@]}" "${py_files[@]}"
-  log_status "black" "$?"
+  black_status="$?"
+  log_status "black" "$black_status"
   penv isort "${isort_opts[@]}" "${py_files[@]}"
-  log_status "isort" "$?"
+  isort_status="$?"
+  log_status "isort" "$isort_status"
+  return "$((black_status | isort_status))"
 }
 
 shell() {

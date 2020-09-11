@@ -20,8 +20,7 @@ source "$ROOT/script/logging.sh"
 #### CLI handlers
 
 all() {
-  back "$@"
-  front "$@"
+  back "$@" && front "$@"
 }
 
 back() {
@@ -32,9 +31,10 @@ back() {
   [[ -n "${ARGS["selector"]}" ]] && selector="${ARGS["selector"]}"
 
   penv "${command[@]}" -m unittest "$selector" -v
-  log_status "Python" "$?"
+  local status="$?"
 
   [[ "${ARGS["--coverage"]}" == true ]] && penv coverage xml
+  log_status "Python" "$status"
 }
 
 front() {

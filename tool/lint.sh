@@ -23,9 +23,7 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-  python
-  shell
-  spec
+  python && shell && spec
 }
 
 python() {
