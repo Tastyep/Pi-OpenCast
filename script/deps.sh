@@ -16,6 +16,8 @@ require_shellcheck() {
     wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION?}/shellcheck-${SC_VERSION?}.linux.x86_64.tar.xz" | tar -xJv
     sudo cp "shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
     rm -rf "shellcheck-${SC_VERSION}"
+
+    log_info "shellcheck is installed in /usr/local/bin"
   fi
 }
 
