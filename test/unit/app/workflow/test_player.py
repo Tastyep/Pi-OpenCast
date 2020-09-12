@@ -28,7 +28,9 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
             IdentityService.id_playlist("source"),
         )
         self.workflow = self.make_workflow(
-            QueueVideoWorkflow, self.video_repo, self.video,
+            QueueVideoWorkflow,
+            self.video_repo,
+            self.video,
         )
 
     def test_initial(self):
@@ -65,7 +67,11 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_QUEUEING(event)
         cmd = self.expect_dispatch(Cmd.QueueVideo, self.player_id, self.video.id)
         self.raise_event(
-            self.workflow, Evt.VideoQueued, cmd.id, self.player_id, self.video.id,
+            self.workflow,
+            Evt.VideoQueued,
+            cmd.id,
+            self.player_id,
+            self.video.id,
         )
         self.assertTrue(self.workflow.is_COMPLETED())
 
@@ -137,7 +143,9 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
             IdentityService.id_playlist("source"),
         )
         self.workflow = self.make_workflow(
-            StreamVideoWorkflow, self.video_repo, self.video,
+            StreamVideoWorkflow,
+            self.video_repo,
+            self.video,
         )
 
     def test_initial(self):
@@ -174,7 +182,11 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_STARTING(event)
         cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
         self.raise_event(
-            self.workflow, Evt.PlayerStarted, cmd.id, self.player_id, self.video.id,
+            self.workflow,
+            Evt.PlayerStarted,
+            cmd.id,
+            self.player_id,
+            self.video.id,
         )
         self.assertTrue(self.workflow.is_COMPLETED())
 

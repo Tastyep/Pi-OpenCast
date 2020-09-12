@@ -46,7 +46,10 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_CREATING()
         cmd = self.expect_dispatch(Cmd.CreateVideo, *self.video.to_tuple())
         self.raise_event(
-            self.workflow, Evt.VideoCreated, cmd.id, *self.video.to_tuple(),
+            self.workflow,
+            Evt.VideoCreated,
+            cmd.id,
+            *self.video.to_tuple(),
         )
         self.assertTrue(self.workflow.is_IDENTIFYING())
 
@@ -62,7 +65,11 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_IDENTIFYING(event)
         cmd = self.expect_dispatch(Cmd.IdentifyVideo, self.video.id)
         self.raise_event(
-            self.workflow, Evt.VideoIdentified, cmd.id, self.video.id, "",
+            self.workflow,
+            Evt.VideoIdentified,
+            cmd.id,
+            self.video.id,
+            "",
         )
         self.assertTrue(self.workflow.is_RETRIEVING())
 
@@ -78,7 +85,11 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
         self.raise_event(
-            self.workflow, Evt.VideoRetrieved, cmd.id, self.video.id, "/tmp/video.mp4",
+            self.workflow,
+            Evt.VideoRetrieved,
+            cmd.id,
+            self.video.id,
+            "/tmp/video.mp4",
         )
         self.assertTrue(self.workflow.is_PARSING())
 
@@ -94,7 +105,11 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_PARSING(event)
         cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
         self.raise_event(
-            self.workflow, Evt.VideoParsed, cmd.id, self.video.id, {},
+            self.workflow,
+            Evt.VideoParsed,
+            cmd.id,
+            self.video.id,
+            {},
         )
         self.assertTrue(self.workflow.is_FINALISING())
 
@@ -114,7 +129,11 @@ class VideoWorkflowTest(WorkflowTestCase):
             Cmd.FetchVideoSubtitle, self.video.id, config["subtitle.language"]
         )
         self.raise_event(
-            self.workflow, Evt.VideoSubtitleFetched, cmd.id, self.video.id, "/tmp",
+            self.workflow,
+            Evt.VideoSubtitleFetched,
+            cmd.id,
+            self.video.id,
+            "/tmp",
         )
         self.assertTrue(self.workflow.is_COMPLETED())
 
@@ -124,6 +143,9 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_DELETING(error)
         cmd = self.expect_dispatch(Cmd.DeleteVideo, self.video.id)
         self.raise_event(
-            self.workflow, Evt.VideoDeleted, cmd.id, self.video.id,
+            self.workflow,
+            Evt.VideoDeleted,
+            cmd.id,
+            self.video.id,
         )
         self.assertTrue(self.workflow.is_ABORTED())

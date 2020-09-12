@@ -23,7 +23,13 @@ class Workflow(Machine):
     """
 
     def __init__(
-        self, logger, derived, id_: Id, app_facade, *args, **kwargs,
+        self,
+        logger,
+        derived,
+        id_: Id,
+        app_facade,
+        *args,
+        **kwargs,
     ):
         super().__init__(
             model=self,

@@ -17,7 +17,7 @@ class ConfigError(Exception):
 
 
 class ConfigContentError(ConfigError):
-    """ The error raised when given invalid configuration entries.
+    """The error raised when given invalid configuration entries.
 
     Attributes:
         errors: A list of pairs.
@@ -36,7 +36,7 @@ class ConfigContentError(ConfigError):
 
 
 class Config:
-    """ Configuration wrapper around a dict object.
+    """Configuration wrapper around a dict object.
 
     Configuration entries are accessible using the [] operator just like a dict.
     The main difference is that entries are read only.
@@ -44,7 +44,7 @@ class Config:
     """
 
     def __init__(self, content: dict, check_env=False):
-        """ Construct the configuration given a dict
+        """Construct the configuration given a dict
 
         Args:
             content:    The default content of the configuration.
@@ -57,7 +57,7 @@ class Config:
             self._override_from_env(self._content, environ, ["OpenCast"])
 
     def __getitem__(self, key: str):
-        """ Access a configuration by keys
+        """Access a configuration by keys
 
         Args:
             key: The key to the configuration entry.
@@ -79,7 +79,7 @@ class Config:
         return self._content == other._content
 
     def load_from_file(self, path: str):
-        """ Loads the configuration from a YAML file.
+        """Loads the configuration from a YAML file.
 
         Args:
             path: The absolute path to the YAML file.
@@ -103,7 +103,7 @@ class Config:
                 raise ConfigError("Can't load the file's content") from e
 
     def load_from_dict(self, content: dict):
-        """ Loads the configuration from a dict.
+        """Loads the configuration from a dict.
 
         Args:
             content: The object containing the overrides to apply on the configuration.

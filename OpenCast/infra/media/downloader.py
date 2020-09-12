@@ -48,7 +48,10 @@ class Downloader:
             if not Path(dest).exists():
                 error = "video path points to non existent file"
                 self._logger.error(
-                    "Download error", video=dest, source=source, error=error,
+                    "Download error",
+                    video=dest,
+                    source=source,
+                    error=error,
                 )
                 self._evt_dispatcher.dispatch(DownloadError(op_id, str(error)))
                 return

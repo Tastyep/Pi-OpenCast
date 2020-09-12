@@ -5,7 +5,7 @@ from OpenCast.domain.service.identity import IdentityService
 
 
 def make_cmd(cmd_cls, model_id, *args, **kwargs):
-    """ Command factory method.
+    """Command factory method.
 
     Args:
         cmd_cls: The class of the command.

@@ -5,11 +5,10 @@ from .subtitle import SubtitleService
 
 
 class ServiceFactory:
-    """ The domain service factory
-    """
+    """The domain service factory"""
 
     def __init__(self, infra_service_factory):
-        """ The domain service factory constructor
+        """The domain service factory constructor
 
         Args:
             infra_service_factory: Unused at the moment
