@@ -49,9 +49,11 @@ class MonitorControllerTestCase(IsolatedAsyncioTestCase):
 
         self.infra_facade = InfraFacadeMock()
         self.infra_facade.io_factory = IoFactory()
-        self.infra_facade.server.make_json_response.side_effect = lambda status, body, _: (
-            status,
-            body,
+        self.infra_facade.server.make_json_response.side_effect = (
+            lambda status, body, _: (
+                status,
+                body,
+            )
         )
 
     def make_request(

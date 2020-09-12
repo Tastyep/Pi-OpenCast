@@ -181,7 +181,9 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_volume(self):
         req = self.make_request("POST", "/volume", query={"value": 80})
         self.set_cmd_response(
-            make_cmd(Cmd.UpdateVolume, self.player_id, 80), Evt.VolumeUpdated, 80,
+            make_cmd(Cmd.UpdateVolume, self.player_id, 80),
+            Evt.VolumeUpdated,
+            80,
         )
 
         resp = await self.route(self.controller.volume, req)
@@ -197,7 +199,8 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_subtitle_toggle(self):
         req = self.make_request("POST", "/subtitle/toggle")
         self.set_cmd_response(
-            make_cmd(Cmd.ToggleSubtitle, self.player_id), Evt.SubtitleStateUpdated,
+            make_cmd(Cmd.ToggleSubtitle, self.player_id),
+            Evt.SubtitleStateUpdated,
         )
 
         resp = await self.route(self.controller.subtitle_toggle, req)

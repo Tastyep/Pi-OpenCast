@@ -39,7 +39,11 @@ class QueueVideoWorkflow(Workflow):
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super().__init__(
-            logger, self, id, app_facade, initial=QueueVideoWorkflow.States.INITIAL,
+            logger,
+            self,
+            id,
+            app_facade,
+            initial=QueueVideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
         self._video = video
@@ -89,16 +93,26 @@ class QueuePlaylistWorkflow(Workflow):
     # fmt: on
 
     def __init__(
-        self, id, app_facade, video_repo, videos: List[Video],
+        self,
+        id,
+        app_facade,
+        video_repo,
+        videos: List[Video],
     ):
         logger = structlog.get_logger(__name__)
         super().__init__(
-            logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
+            logger,
+            self,
+            id,
+            app_facade,
+            initial=StreamVideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
         self._videos = videos[::-1]
 
-    def start(self,):
+    def start(
+        self,
+    ):
         self._queue_videos(None)
 
     # States
@@ -146,7 +160,11 @@ class StreamVideoWorkflow(Workflow):
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super().__init__(
-            logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
+            logger,
+            self,
+            id,
+            app_facade,
+            initial=StreamVideoWorkflow.States.INITIAL,
         )
 
         self._video_repo = video_repo
@@ -203,11 +221,19 @@ class StreamPlaylistWorkflow(Workflow):
     # fmt: on
 
     def __init__(
-        self, id, app_facade, video_repo, videos: List[Video],
+        self,
+        id,
+        app_facade,
+        video_repo,
+        videos: List[Video],
     ):
         logger = structlog.get_logger(__name__)
         super().__init__(
-            logger, self, id, app_facade, initial=StreamVideoWorkflow.States.INITIAL,
+            logger,
+            self,
+            id,
+            app_facade,
+            initial=StreamVideoWorkflow.States.INITIAL,
         )
 
         self._video_repo = video_repo
@@ -223,7 +249,9 @@ class StreamPlaylistWorkflow(Workflow):
         workflow = self._factory.make_stream_video_workflow(
             workflow_id, self._app_facade, self._video_repo, video
         )
-        self._observe_start(workflow,)
+        self._observe_start(
+            workflow,
+        )
 
     def on_enter_QUEUEING(self, _):
         video = self._videos.pop()
@@ -231,7 +259,9 @@ class StreamPlaylistWorkflow(Workflow):
         workflow = self._factory.make_queue_video_workflow(
             workflow_id, self._app_facade, self._video_repo, video
         )
-        self._observe_start(workflow,)
+        self._observe_start(
+            workflow,
+        )
 
     def on_enter_COMPLETED(self, _):
         self.complete()

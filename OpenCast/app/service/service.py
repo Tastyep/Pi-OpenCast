@@ -61,7 +61,10 @@ class Service:
             return
         except Exception as e:
             self._logger.error(
-                "Operation error", evt=evt, error=e, traceback=traceback.format_exc(),
+                "Operation error",
+                evt=evt,
+                error=e,
+                traceback=traceback.format_exc(),
             )
             self._abort_operation(evt.id, str(e))
 

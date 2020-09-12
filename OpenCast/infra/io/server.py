@@ -13,7 +13,9 @@ class Server:
             self._app,
             defaults={
                 "*": cors.ResourceOptions(
-                    allow_credentials=True, expose_headers="*", allow_headers="*",
+                    allow_credentials=True,
+                    expose_headers="*",
+                    allow_headers="*",
                 )
             },
         )

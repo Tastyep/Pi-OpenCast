@@ -59,7 +59,11 @@ class VideoWorkflow(Workflow):
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
         super().__init__(
-            logger, self, id, app_facade, initial=VideoWorkflow.States.INITIAL,
+            logger,
+            self,
+            id,
+            app_facade,
+            initial=VideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
         self._video = video
@@ -75,7 +79,9 @@ class VideoWorkflow(Workflow):
 
     def on_enter_IDENTIFYING(self, _):
         self._observe_dispatch(
-            VideoEvt.VideoIdentified, Cmd.IdentifyVideo, self._video.id,
+            VideoEvt.VideoIdentified,
+            Cmd.IdentifyVideo,
+            self._video.id,
         )
 
     def on_enter_RETRIEVING(self, _):
@@ -88,7 +94,9 @@ class VideoWorkflow(Workflow):
 
     def on_enter_PARSING(self, _):
         self._observe_dispatch(
-            VideoEvt.VideoParsed, Cmd.ParseVideo, self._video.id,
+            VideoEvt.VideoParsed,
+            Cmd.ParseVideo,
+            self._video.id,
         )
 
     def on_enter_FINALISING(self, _):
