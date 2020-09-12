@@ -42,8 +42,7 @@ install_project_deps() {
   log_info "Installing project dependencies..."
 
   curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
-  "$ROOT/$INTERNAL_NAME.sh" service back update
-  (cd "$ROOT/webapp" && npm install)
+  "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
 # Format and install the systemd config file.

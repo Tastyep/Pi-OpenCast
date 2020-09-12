@@ -3,6 +3,7 @@
 #   ./OpenCast.sh command [<args>...]
 #
 # Commands:
+#   deps     Interact with dependencies.
 #   format   Run formatters on the source code.
 #   generate Generate content.
 #   lint     Lint the source code.

@@ -8,7 +8,6 @@
 #   stop     Stop the service.
 #   restart  Restart the service.
 #   status   Display the status of the service.
-#   update   Update the dependencies of the service.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -52,12 +51,6 @@ status() {
   status=1
   [[ "$(lsof -t -a -i ":$API_PORT" -c python)" ]] && status=0
   log_status "$SERVICE_NAME" "$status"
-}
-
-update() {
-  log_info "Checking for updates."
-
-  poetry update
 }
 
 parse_args "$@"
