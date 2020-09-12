@@ -1,6 +1,7 @@
 """ Parse, download and extract a media with its metadata """
 
 
+from pathlib import Path
 from typing import List
 
 import structlog
@@ -43,6 +44,14 @@ class Downloader:
                     )
                     self._evt_dispatcher.dispatch(DownloadError(op_id, str(e)))
                     return
+
+            if not Path(dest).exists():
+                error = "video path points to non existent file"
+                self._logger.error(
+                    "Download error", video=dest, source=source, error=error,
+                )
+                self._evt_dispatcher.dispatch(DownloadError(op_id, str(error)))
+                return
 
             self._logger.debug("Download success", video=dest)
             self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
