@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Usage:
+#   ./setup.sh [--ci]
+#
+# Options:
+#   --ci  Remove dependency checks for vlc and ffmpeg
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 USER="$(whoami)"
@@ -13,12 +18,10 @@ source "$ROOT/script/logging.sh"
 
 # Install system dependencies.
 check_system_deps() {
-  local -n param_ref=$1
-
   log_info "Checking system dependencies..."
   local -a deps=("curl" "lsof" "python" "python3" "pip3" "node" "npm")
   local status fail
-  [[ -z "${param_ref["--ci"]}" ]] && deps+=("ffmpeg" "vlc")
+  [[ "${ARGS["--ci"]}" == false ]] && deps+=("ffmpeg" "vlc")
 
   fail=false
   for dep in "${deps[@]}"; do
@@ -49,7 +52,7 @@ start_at_boot() {
 
   local service_name config
   # lowercase
-  service_name="$(echo "$INTERNAL_NAME" | tr '[:upper:]' '[:lower:]')"
+  service_name="${INTERNAL_NAME,,}"
   config="$ROOT/dist/$service_name.service"
   sed -i "s/{ USER }/$USER/g" "$config"
   sed -i "s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g" "$config"
@@ -64,12 +67,9 @@ if [[ "$EUID" = 0 ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC2034
-declare -a params=("--ci")
-declare -A parsed
-expect_params params parsed "" "$@"
+parse_args "$@"
 
-check_system_deps parsed
+check_system_deps
 install_project_deps
 start_at_boot
 

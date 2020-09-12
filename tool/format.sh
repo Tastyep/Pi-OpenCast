@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./format.sh command [--check]
+#
+# Commands:
+#   all     Run all formatters.
+#   python  Run formatters on python code.
+#   shell   Run formatters on shell code.
+#
+# Options:
+#   --check  Don't edit files in place.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -15,18 +25,12 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-  python "$@"
-  shell "$@"
+  python "$@" && shell "$@"
 }
 
 python() {
-  # shellcheck disable=SC2034
-  local -a params=("--check")
-  local -A parsed
-  expect_params params parsed "python" "$@"
-
   local black_opts isort_opts=()
-  if [[ -n "${parsed["--check"]}" ]]; then
+  if [[ "${ARGS["--check"]}" == true ]]; then
     black_opts+=("--check")
     isort_opts+=("--check-only")
   fi
@@ -42,22 +46,21 @@ python() {
     done < <(find "$ROOT/$py_dir" -name "*.py" -print0)
   done
 
+  local black_status isort_status
   penv black "${black_opts[@]}" "${py_files[@]}"
-  log_status "black" "$?"
+  black_status="$?"
+  log_status "black" "$black_status"
   penv isort "${isort_opts[@]}" "${py_files[@]}"
-  log_status "isort" "$?"
+  isort_status="$?"
+  log_status "isort" "$isort_status"
+  return "$((black_status | isort_status))"
 }
 
 shell() {
   require_shfmt
 
-  # shellcheck disable=SC2034
-  local -a params=("--check")
-  local -A parsed
-  expect_params params parsed "shell" "$@"
-
   local shfmt_opts=("-l" "-d" "-i" "2")
-  [[ -z "${parsed["--check"]}" ]] && shfmt_opts+=("-w")
+  [[ "${ARGS["--check"]}" == false ]] && shfmt_opts+=("-w")
 
   sh_files=()
   sh_dirs=("." "tool" "script")
@@ -74,12 +77,5 @@ shell() {
   log_status "shfmt" "$?"
 }
 
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [all]="Run all formatters."
-  [python]="Run formatters on python code."
-  [shell]="Run formatters on shell code."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+${ARGS["command"]}

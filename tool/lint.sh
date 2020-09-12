@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./lint.sh command
+#
+# Commands:
+#   all     Run all linters.
+#   python  Run the linter on the python code.
+#   shell   Run shellcheck on scripts.
+#   spec    Run the linter on the API spec.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -15,9 +23,7 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-  python
-  shell
-  spec
+  python && shell && spec
 }
 
 python() {
@@ -48,13 +54,5 @@ spec() {
   log_status "speccy" "$?"
 }
 
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [all]="Run all linters."
-  [python]="Run the linter on the python code."
-  [shell]="Run the shellcheck on scripts."
-  [spec]="Run the linter on the API spec."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+${ARGS["command"]}

@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+# Usage:
+#   ./service.sh command [<args>...]
+#
+# Commands:
+#   back     Command the back-end service.
+#   front    Command the front-end service.
+#   start    Start all services.
+#   stop     Stop all services.
+#   restart  Restart all services.
+#   status   Display the status of all service.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -38,21 +48,6 @@ status() {
   "$SERVICE_FRONT" "status"
 }
 
-test() {
-  "$SERVICE_BACK" "test" &&
-    "$SERVICE_FRONT" "test"
-}
-
-#### CLI definition
-
-declare -A COMMANDS
-export COMMANDS=(
-  [back]="Back end service."
-  [front]="Front end service."
-  [start]="Start all services."
-  [stop]="Stop all services."
-  [restart]="Restart all services."
-  [status]="Display the status of all service."
-  [test]="Run tests for all services."
-)
-make_cli default_help_display COMMANDS "$@"
+parse_args "$@"
+IFS=";" read -r -a arguments <<<"${ARGS["args"]}"
+${ARGS["command"]} "${arguments[@]}"
