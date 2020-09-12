@@ -14,7 +14,7 @@ keywords = ['raspberry', 'opencast', 'chromecast']
 
 [tool.poetry.dependencies]
 python = "^3.7"
-toml = "^0.9"
+toml = "^0.10"
 youtube-dl = ">= 2020.3.24"
 pyyaml = "^5.3.1"
 "hurry.filesize" = "^0.9"
