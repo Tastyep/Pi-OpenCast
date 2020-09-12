@@ -1,5 +1,10 @@
+""" Abstract representation of a command """
+
+
 from dataclasses import dataclass
-from uuid import UUID
+
+from OpenCast.domain.model import Id as ModelId
+from OpenCast.infra import Id
 
 
 def command(cls):
@@ -8,5 +13,5 @@ def command(cls):
 
 @command
 class Command:
-    id: UUID
-    model_id: UUID
+    id: Id
+    model_id: ModelId

@@ -143,34 +143,34 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
     def test_initial(self):
         self.assertTrue(self.workflow.is_INITIAL())
 
-    def test_init_to_collecting(self):
-        self.expect_workflow_creation(VideoWorkflow)
+    def test_init_to_queueing(self):
+        self.expect_workflow_creation(QueueVideoWorkflow)
         self.workflow.start()
-        self.assertTrue(self.workflow.is_COLLECTING())
+        self.assertTrue(self.workflow.is_QUEUEING())
 
-    def test_collecting_to_aborted(self):
-        video_workflow = self.expect_workflow_creation(VideoWorkflow)
-        self.workflow.to_COLLECTING()
-        video_workflow.start.assert_called_once()
-        self.raise_event(self.workflow, video_workflow.Aborted, video_workflow.id)
+    def test_queueing_to_aborted(self):
+        queue_workflow = self.expect_workflow_creation(QueueVideoWorkflow)
+        self.workflow.to_QUEUEING()
+        queue_workflow.start.assert_called_once()
+        self.raise_event(self.workflow, queue_workflow.Aborted, queue_workflow.id)
         self.assertTrue(self.workflow.is_ABORTED())
 
-    def test_collecting_to_starting(self):
-        video_workflow = self.expect_workflow_creation(VideoWorkflow)
-        self.workflow.to_COLLECTING()
-        video_workflow.start.assert_called_once()
-        self.raise_event(self.workflow, video_workflow.Completed, video_workflow.id)
+    def test_queueing_to_starting(self):
+        queue_workflow = self.expect_workflow_creation(QueueVideoWorkflow)
+        self.workflow.to_QUEUEING()
+        queue_workflow.start.assert_called_once()
+        self.raise_event(self.workflow, queue_workflow.Completed, queue_workflow.id)
         self.assertTrue(self.workflow.is_STARTING())
 
     def test_starting_to_aborted(self):
-        event = VideoWorkflow.Completed(self.workflow.id)
+        event = QueueVideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_STARTING(event)
         cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
         self.raise_error(self.workflow, cmd)
         self.assertTrue(self.workflow.is_ABORTED())
 
     def test_queueing_to_completed(self):
-        event = VideoWorkflow.Completed(self.workflow.id)
+        event = QueueVideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_STARTING(event)
         cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
         self.raise_event(
@@ -198,39 +198,39 @@ class StreamPlaylistWorkflowTest(WorkflowTestCase):
         workflow = self.make_test_workflow()
         self.assertTrue(workflow.is_INITIAL())
 
-    def test_init_to_playing(self):
+    def test_init_to_starting(self):
         workflow = self.make_test_workflow()
         self.expect_workflow_creation(StreamVideoWorkflow)
         workflow.start()
-        self.assertTrue(workflow.is_PLAYING())
+        self.assertTrue(workflow.is_STARTING())
 
-    def test_playing_to_queueing_from_completed(self):
+    def test_starting_to_queueing_from_completed(self):
         workflow = self.make_test_workflow()
         play_workflow = self.expect_workflow_creation(StreamVideoWorkflow)
-        workflow.to_PLAYING(None)
+        workflow.to_STARTING(None)
 
         self.expect_workflow_creation(QueueVideoWorkflow)
         self.raise_event(workflow, play_workflow.Completed, workflow.id)
         self.assertTrue(workflow.is_QUEUEING())
 
-    def test_playing_to_playing_from_aborted(self):
+    def test_starting_to_starting_from_aborted(self):
         workflow = self.make_test_workflow()
         play_workflow = self.expect_workflow_creation(StreamVideoWorkflow)
-        workflow.to_PLAYING(None)
+        workflow.to_STARTING(None)
         self.raise_event(workflow, play_workflow.Aborted, workflow.id)
-        self.assertTrue(workflow.is_PLAYING())
+        self.assertTrue(workflow.is_STARTING())
 
-    def test_playing_to_completed_from_completed(self):
+    def test_starting_to_completed_from_completed(self):
         workflow = self.make_test_workflow(video_count=1)
         play_workflow = self.expect_workflow_creation(StreamVideoWorkflow)
-        workflow.to_PLAYING(None)
+        workflow.to_STARTING(None)
         self.raise_event(workflow, play_workflow.Completed, workflow.id)
         self.assertTrue(workflow.is_COMPLETED())
 
-    def test_playing_to_completed_from_aborted(self):
+    def test_starting_to_completed_from_aborted(self):
         workflow = self.make_test_workflow(video_count=1)
         play_workflow = self.expect_workflow_creation(StreamVideoWorkflow)
-        workflow.to_PLAYING(None)
+        workflow.to_STARTING(None)
         self.raise_event(workflow, play_workflow.Aborted, workflow.id)
         self.assertTrue(workflow.is_COMPLETED())
 

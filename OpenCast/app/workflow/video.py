@@ -1,21 +1,24 @@
+""" Workflows running video related operations """
+
 from collections import namedtuple
 from dataclasses import astuple, dataclass
 from enum import Enum, auto
-from uuid import UUID
 
 import structlog
+
 from OpenCast.app.command import video as Cmd
 from OpenCast.config import config
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model import Id
 
 from .workflow import Workflow
 
 
 @dataclass
 class Video:
-    id: UUID
+    id: Id
     source: str
-    playlist_id: UUID
+    playlist_id: Id
 
     def to_tuple(self):
         return astuple(self)
@@ -55,7 +58,7 @@ class VideoWorkflow(Workflow):
 
     def __init__(self, id, app_facade, video_repo, video: Video):
         logger = structlog.get_logger(__name__)
-        super(VideoWorkflow, self).__init__(
+        super().__init__(
             logger, self, id, app_facade, initial=VideoWorkflow.States.INITIAL,
         )
         self._video_repo = video_repo
@@ -100,10 +103,10 @@ class VideoWorkflow(Workflow):
         self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
     def on_enter_COMPLETED(self, *_):
-        self._complete()
+        self.complete()
 
     def on_enter_ABORTED(self, _):
-        self._abort()
+        self.cancel()
 
     # Conditions
     def is_complete(self):

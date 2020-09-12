@@ -1,0 +1,73 @@
+root:
+  get:
+    tags:
+      - video
+    summary: List videos
+    description: |
+      Retrieve a list of all videos on file in the host
+    operationId: listVideos
+    responses:
+      "200":
+        description: successful operation
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "../definitions/video.yml#/Video"
+
+id:
+  get:
+    tags:
+      - video
+    summary: Find video
+    description: |
+      Querie and return a video with a given ID
+    operationId: getVideoById
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+          format: int64
+        required: true
+        description: ID of the video to query
+    responses:
+      "200":
+        description: successful operation
+        content:
+          application/json:
+            schema:
+              $ref: "../definitions/video.yml#/Video"
+      "404":
+        description: Video not found
+        content:
+          application/json:
+            schema:
+              $ref: "../definitions/error.yml#/Error"
+
+  delete:
+    tags:
+      - video
+    summary: Remove video
+    description: |
+      Remove a video with a given ID
+    operationId: deleteVideoById
+    parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+          format: int64
+        required: true
+        description: |
+          ID of the video to remove
+    responses:
+      "204":
+        description: No content
+      "404":
+        description: Video not found
+        content:
+          application/json:
+            schema:
+              $ref: "../definitions/error.yml#/Error"

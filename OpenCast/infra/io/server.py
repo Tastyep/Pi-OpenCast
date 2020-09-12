@@ -1,39 +1,31 @@
+""" High level HTTP server """
+
+import aiohttp_cors as cors
 import structlog
-from bottle import Bottle, request, response, run, template
-
-
-class EnableCors:
-    api = 2
-
-    def apply(self, fn, context):
-        def _enable_cors(*args, **kwargs):
-            # set CORS headers
-            response.headers["Access-Control-Allow-Origin"] = "*"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
-            response.headers[
-                "Access-Control-Allow-Headers"
-            ] = "Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token"
-
-            if request.method != "OPTIONS":
-                # actual request; reply with the actual response
-                return fn(*args, **kwargs)
-
-        return _enable_cors
+from aiohttp import web
 
 
 class Server:
     def __init__(self):
-        self._server = Bottle()
-        self._server.install(EnableCors())
+        self._app = web.Application()
         self._logger = structlog.get_logger(__name__)
+        self._cors = cors.setup(
+            self._app,
+            defaults={
+                "*": cors.ResourceOptions(
+                    allow_credentials=True, expose_headers="*", allow_headers="*",
+                )
+            },
+        )
 
-    def route(self, route, *args, **kwargs):
-        self._server.route(route, *args, **kwargs)
+    def route(self, method, route, handle):
+        route = self._app.router.add_route(method, route, handle)
+        self._cors.add(route)
 
     def run(self, host, port):
-        self._logger.info(f"Started", host=host, port=port)
+        self._logger.info("Started", host=host, port=port)
 
-        run(self._server, host=host, port=port, reloader=False, debug=True, quiet=True)
+        web.run_app(self._app, host=host, port=port)
 
-    def template(self, *args, **kwargs):
-        return template(*args, **kwargs)
+    def make_json_response(self, status, body, dumps):
+        return web.json_response(body, status=status, dumps=dumps)

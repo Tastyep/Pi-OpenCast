@@ -6,4 +6,5 @@ class AppFacadeMock(Mock):
         super(AppFacadeMock, self).__init__()
         self.cmd_dispatcher = Mock()
         self.evt_dispatcher = Mock()
+        self.workflow_manager = Mock()
         self.workflow_factory = Mock()

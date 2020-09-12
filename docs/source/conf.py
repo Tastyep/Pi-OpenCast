@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information -----------------------------------------------------
 
-project = "Opencast"
+project = "OpenCast"
 copyright = "2020, Luc Sinet"
 author = "Luc Sinet"
 
@@ -31,13 +31,21 @@ release = "0.1"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",  # Core Sphinx library for auto html doc generation from docstrings
+    "sphinx.ext.napoleon",  # Adapts google style docstrings
+    "sphinx.ext.autosummary",  # Create neat summary tables for modules/classes/methods etc
+    "sphinx_autodoc_typehints",  # Automatically document param types (less noise in class signature)
+    "sphinxcontrib.openapi",  # Generate APIs docs from OpenAPI (fka Swagger) spec
     "sphinx.ext.coverage",
+    "sphinx.ext.githubpages",  # Creates .nojekyll file on generated HTML directory to publish the document on GitHub Pages.
 ]
 
 autosummary_generate = True
+autoclass_content = "both"  # Add __init__ doc (ie. params) to class summaries
+html_show_sourcelink = (
+    False  # Remove 'view source code' from top of page (for html, not python)
+)
+autodoc_inherit_docstrings = True  # If no class summary, inherit base class summary
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
@@ -51,8 +59,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
-
+exclude_patterns = ["_templates"]
 
 # -- Options for HTML output -------------------------------------------------
 

@@ -1,7 +1,10 @@
+""" Abstraction of an applicative service """
+
 import inspect
 import traceback
 from functools import partial
 
+from OpenCast.infra import Id
 from OpenCast.infra.data.repo.error import RepoError
 from OpenCast.util.naming import name_handler_method
 
@@ -25,21 +28,22 @@ class Service:
                 observe_func(cls)
 
     def _observe_command(self, cls):
-        self._cmd_dispatcher.observe(cls, self._dispatch_to_handler)
+        self._cmd_dispatcher.observe(cls, self._dispatch_cmd_to_handler)
 
-    def _observe_event(self, evt_id, cls):
-        self._evt_dispatcher.observe(evt_id, {cls: self._dispatch_to_handler})
+    def _observe_event(self, cls):
+        self._evt_dispatcher.observe({cls: self._dispatch_evt_to_handler})
 
-    def _dispatch_to_handler(self, cmd):
+    def _dispatch_cmd_to_handler(self, cmd):
         handler_name = name_handler_method(cmd.__class__)
-        retry_count = 5
-        while retry_count > 0:
+        try_count = 1
+        while try_count > 0:
             try:
                 getattr(self, handler_name)(cmd)
                 return
             except RepoError as e:
+                # TODO: Reaching outside of the loop should trigger an error
                 self._logger.error("Repo error", cmd=cmd, error=e)
-                retry_count -= 1
+                try_count -= 1
             except Exception as e:
                 self._logger.error(
                     "Operation error",
@@ -47,11 +51,22 @@ class Service:
                     error=e,
                     traceback=traceback.format_exc(),
                 )
-                self._abort_operation(cmd, str(e))
+                self._abort_operation(cmd.id, str(e))
                 return
 
-    def _abort_operation(self, cmd, error: str):
-        self._evt_dispatcher.dispatch(OperationError(cmd.id, error))
+    def _dispatch_evt_to_handler(self, evt):
+        handler_name = name_handler_method(evt.__class__)
+        try:
+            getattr(self, handler_name)(evt)
+            return
+        except Exception as e:
+            self._logger.error(
+                "Operation error", evt=evt, error=e, traceback=traceback.format_exc(),
+            )
+            self._abort_operation(evt.id, str(e))
+
+    def _abort_operation(self, cmd_id: Id, error: str):
+        self._evt_dispatcher.dispatch(OperationError(cmd_id, error))
 
     def _start_transaction(self, repo, cmd_id, impl, *args):
         context = repo.make_context()
@@ -60,7 +75,9 @@ class Service:
         models_events = []
         for model in models:
             events = model.release_events()
-            models_events.append([evtcls(cmd_id, *events[evtcls]) for evtcls in events])
+            models_events.append(
+                [evtcls(cmd_id, *event[evtcls]) for event in events for evtcls in event]
+            )
 
         context.commit()
         for model_events in models_events:

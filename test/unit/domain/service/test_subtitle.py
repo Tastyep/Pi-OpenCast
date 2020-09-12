@@ -9,29 +9,42 @@ from OpenCast.domain.service.subtitle import SubtitleService
 class SubtitleServiceTest(TestCase):
     def setUp(self):
         self.downloader = Mock()
+        self.lang = config["subtitle.language"]
+
+        self.video = Mock()
+        path_mock = MagicMock()
+        self.video.path = path_mock
+
         self.service = SubtitleService(self.downloader)
 
-    def test_load_from_disk(self):
-        path_mock = MagicMock()
-        language = config["subtitle.language"]
-
+    def expect_from_disk(self, files):
         parent_mock = Mock()
-        path_mock.parents.__getitem__.return_value = parent_mock
-        exp_subtitle = Path("/tmp/source.srt")
-        path_mock.with_suffix.return_value = exp_subtitle
+        self.video.path.parents.__getitem__.return_value = parent_mock
+        self.video.path.with_suffix.return_value = Path("/tmp/video.srt")
+        parent_mock.glob.return_value = [Path(file) for file in files]
 
-        parent_mock.glob.return_value = [exp_subtitle]
+    def expect_from_source(self, file):
+        self.video.from_disk.return_value = False
+        self.downloader.download_subtitle.return_value = file
 
-        subtitle = self.service.load_from_disk(path_mock, language)
-        self.assertEqual(str(exp_subtitle), subtitle)
+    def test_load_from_disk(self):
+        found_sub = "/tmp/video.srt"
+        self.expect_from_disk([found_sub])
+
+        subtitle = self.service.fetch_subtitle(self.video, self.lang)
+        self.assertEqual(found_sub, subtitle)
 
     def test_download_from_source(self):
-        video_source = "http://someurl/id"
-        video_path = Mock()
-        language = config["subtitle.language"]
+        self.expect_from_disk([])
 
         source_subtitle = "/tmp/source.vtt"
-        self.downloader.download_subtitle.return_value = source_subtitle
+        self.expect_from_source(source_subtitle)
 
-        subtitle = self.service.download_from_source(video_source, video_path, language)
+        subtitle = self.service.fetch_subtitle(self.video, self.lang)
         self.assertEqual(Path(source_subtitle), subtitle)
+
+    def test_fetch_online(self):
+        self.expect_from_disk([])
+        self.expect_from_source(None)
+        subtitle = self.service.fetch_subtitle(self.video, self.lang)
+        self.assertEqual(None, subtitle)

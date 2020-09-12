@@ -1,8 +1,12 @@
+""" Abstract representation of a domain event """
+
 from dataclasses import dataclass
-from uuid import UUID
+
+from OpenCast.domain.model import Id as ModelId
+from OpenCast.infra import Id
 
 
 @dataclass
 class Event:
-    id: UUID
-    model_id: UUID
+    id: Id
+    model_id: ModelId

@@ -1,10 +1,12 @@
+""" Conceptual representation of a media """
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
 from OpenCast.domain.event import video as Evt
 
-from .entity import Entity
+from .entity import Entity, Id
 
 
 @dataclass
@@ -15,10 +17,13 @@ class Stream:
 
 
 class Video(Entity):
-    def __init__(self, id_, source, playlist_id):
-        super(Video, self).__init__(id_)
+    METADATA_FIELDS = ["title", "thumbnail"]
+
+    def __init__(self, id_: Id, source, playlist_id: Id):
+        super().__init__(id_)
         self._source = source
         self._playlist_id = playlist_id
+        self._thumbnail = None
         self._title = None
         self._path = None
         self._streams = []
@@ -27,8 +32,11 @@ class Video(Entity):
         self._record(Evt.VideoCreated, self._source, self._playlist_id)
 
     def __repr__(self):
-        base_repr = super(Video, self).__repr__()
-        return f"{Video.__name__}({base_repr}, title='{self._title}', playlist={self._playlist_id})"
+        base_repr = super().__repr__()
+        return (
+            f"{Video.__name__}({base_repr}, title='{self.title}',"
+            f"playlist={self._playlist_id})"
+        )
 
     @property
     def source(self):
@@ -54,14 +62,12 @@ class Video(Entity):
     def subtitle(self):
         return self._subtitle
 
-    @title.setter
-    def title(self, title):
-        self._title = str(title.encode("ascii", "ignore"))
+    def metadata(self, metadata: dict):
+        self._title = metadata.get("title", None)
+        self._thumbnail = metadata.get("thumbnail", None)
+        self._record(Evt.VideoIdentified, metadata)
 
-    @title.setter
-    def title(self, title: str):
-        self._title = title
-        self._record(Evt.VideoIdentified, self._title)
+    metadata = property(None, metadata)
 
     @path.setter
     def path(self, path: Path):

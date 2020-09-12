@@ -1,19 +1,26 @@
+""" Dispatch events to handlers """
+
+from copy import deepcopy
 from threading import Lock
 
 import structlog
 
+from OpenCast.infra import Id
+
 
 class EventDispatcher:
+    ANY_EVENT = None
+
     class _Handler:
-        def __init__(self, evtcls_to_handler, count):
-            self._evtcls_to_handler = evtcls_to_handler
+        def __init__(self, evtcls_handler, count):
+            self._evtcls_handler = evtcls_handler
             self._count = count
 
         def __call__(self, evt, *args):
-            self._evtcls_to_handler[type(evt)](evt, *args)
+            self._evtcls_handler[type(evt)](evt, *args)
 
         def handled_evts(self):
-            return self._evtcls_to_handler.keys()
+            return self._evtcls_handler.keys()
 
         def update_expires(self):
             if self._count > 0:
@@ -28,11 +35,14 @@ class EventDispatcher:
         self._lock = Lock()
 
     def once(self, evt_cls, handler):
-        self.observe(None, {evt_cls: handler}, 1)
+        self.observe_result(self.ANY_EVENT, {evt_cls: handler}, 1)
 
-    def observe(self, evt_id, evtcls_to_handler: dict, times=-1):
+    def observe(self, evtcls_handler: dict, times=-1):
+        self.observe_result(self.ANY_EVENT, evtcls_handler, times)
+
+    def observe_result(self, evt_id: Id, evtcls_handler: dict, times=-1):
         self._observe(
-            evt_id, evtcls_to_handler.keys(), self._Handler(evtcls_to_handler, times)
+            evt_id, evtcls_handler.keys(), self._Handler(evtcls_handler, times)
         )
 
     def dispatch(self, evt):
@@ -47,12 +57,12 @@ class EventDispatcher:
 
         handlers = []
         with self._lock:
-            for evt_id in set([None, evt.id]):
+            for evt_id in set([self.ANY_EVENT, evt.id]):
                 evt_hash = hash((evt_id, type(evt)))
                 if evt_hash not in self._evt_to_handler_ids:
                     continue
 
-                handler_ids = self._evt_to_handler_ids[evt_hash]
+                handler_ids = deepcopy(self._evt_to_handler_ids[evt_hash])
                 for handler_id in handler_ids:
                     handler = self._handler_map[handler_id]
                     handlers.append(handler)
@@ -62,7 +72,7 @@ class EventDispatcher:
         for handler in handlers:
             handler(evt)
 
-    def _observe(self, evt_id, evt_clss: list, handler):
+    def _observe(self, evt_id: Id, evt_clss: list, handler):
         with self._lock:
             handler_id = id(handler)
             self._handler_map[handler_id] = handler

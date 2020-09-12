@@ -1,0 +1,43 @@
+openapi: "3.0.0"
+
+info:
+  description: The API for sending requests to Opencast
+  version: "0.0.0"
+  title: OpenCast API
+
+servers:
+  - url: http://localhost:2020/api
+tags:
+  - name: player
+    description: The media player
+  - name: video
+    description: Media queued for playing
+
+paths:
+  /videos:
+    $ref: "./paths/video.yml#/root"
+  /videos/{id}:
+    $ref: "./paths/video.yml#/id"
+
+  /player:
+    $ref: "./paths/player.yml#/root"
+  /player/stream:
+    $ref: "./paths/player.yml#/stream"
+  /player/queue:
+    $ref: "./paths/player.yml#/queue"
+  /player/remove:
+    $ref: "./paths/player.yml#/remove"
+  /player/play:
+    $ref: "./paths/player.yml#/play"
+  /player/stop:
+    $ref: "./paths/player.yml#/stop"
+  /player/pause:
+    $ref: "./paths/player.yml#/pause"
+  /player/seek:
+    $ref: "./paths/player.yml#/seek"
+  /player/volume:
+    $ref: "./paths/player.yml#/volume"
+  /player/subtitle/toggle:
+    $ref: "./paths/player.yml#/subtitle_toggle"
+  /player/subtitle/seek:
+    $ref: "./paths/player.yml#/subtitle_seek"

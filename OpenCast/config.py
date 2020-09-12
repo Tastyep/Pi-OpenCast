@@ -6,9 +6,8 @@ Use one of the different methods to update/retrieve its content.
 import collections.abc
 from os import environ
 
-import yaml
-
 import structlog
+import yaml
 
 
 class ConfigError(Exception):

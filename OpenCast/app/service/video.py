@@ -1,6 +1,9 @@
+""" Handlers for video commands """
+
 from pathlib import Path
 
 import structlog
+
 from OpenCast.app.command import video as video_cmds
 from OpenCast.domain.model.video import Video
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
@@ -11,7 +14,7 @@ from .service import Service
 class VideoService(Service):
     def __init__(self, app_facade, service_factory, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
-        super(VideoService, self).__init__(app_facade, logger, self, video_cmds)
+        super().__init__(app_facade, logger, self, video_cmds)
         self._video_repo = data_facade.video_repo
         self._downloader = media_factory.make_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(
@@ -19,7 +22,7 @@ class VideoService(Service):
         )
         self._subtitle_service = service_factory.make_subtitle_service(self._downloader)
 
-    # Command handler interface implementation
+    # Command handler implementation
     def _create_video(self, cmd):
         def impl(ctx):
             video = Video(cmd.model_id, cmd.source, cmd.playlist_id)
@@ -37,13 +40,13 @@ class VideoService(Service):
 
     def _identify_video(self, cmd):
         def impl(ctx, video, metadata):
-            video.title = metadata["title"]
+            video.metadata = metadata
             ctx.update(video)
 
         video = self._video_repo.get(cmd.model_id)
         metadata = self._source_service.pick_stream_metadata(video)
         if metadata is None:
-            self._abort_operation(cmd, "can't fetch metadata")
+            self._abort_operation(cmd.id, "can't fetch metadata")
             return
 
         self._start_transaction(self._video_repo, cmd.id, impl, video, metadata)
@@ -65,10 +68,10 @@ class VideoService(Service):
             self._start_transaction(self._video_repo, cmd.id, impl)
 
         def abort_operation(evt):
-            self._abort_operation(cmd, evt.error)
+            self._abort_operation(cmd.id, evt.error)
 
         video.path = Path(cmd.output_directory) / f"{video.title}.mp4"
-        self._evt_dispatcher.observe(
+        self._evt_dispatcher.observe_result(
             cmd.id,
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
             times=1,

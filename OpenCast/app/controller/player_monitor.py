@@ -1,7 +1,7 @@
-import uuid
+""" Player capabilities monitoring routes """
 
-from bottle import request
 from OpenCast.app.command import player as Cmd
+from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
@@ -9,15 +9,20 @@ from OpenCast.app.workflow.player import (
     StreamVideoWorkflow,
     Video,
 )
+from OpenCast.domain.event import player as Evt
+from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.service.identity import IdentityService
+from OpenCast.util.conversion import str_to_bool
 
-from .controller import Controller
+from .monitor import MonitorController
 
 
-class PlayerMonitController(Controller):
+class PlayerMonitController(MonitorController):
+    """ The controller in charge of player related requests """
+
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
-        super(PlayerMonitController, self).__init__(app_facade)
+        super().__init__(app_facade, infra_facade, "/player")
 
         media_factory = infra_facade.media_factory
         self._source_service = service_factory.make_source_service(
@@ -26,19 +31,25 @@ class PlayerMonitController(Controller):
         )
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
-        self._player_repo.create(Player(uuid.uuid4()))
 
-        # TODO add video monit controller
-        server = infra_facade.server
-        server.route("/stream", callback=self._stream)
-        server.route("/queue", callback=self._queue)
-        server.route("/video", callback=self._video)
-        server.route("/subtitle", callback=self._subtitle)
-        server.route("/sound", callback=self._sound)
-        server.route("/running", callback=self._running)
+        self._route("GET", "/", self.get)
+        self._route("POST", "/stream", self.stream)
+        self._route("POST", "/queue", self.queue)
+        self._route("POST", "/remove", self.remove)
+        self._route("POST", "/play", self.play)
+        self._route("POST", "/stop", self.stop)
+        self._route("POST", "/pause", self.pause)
+        self._route("POST", "/seek", self.seek)
+        self._route("POST", "/volume", self.volume)
+        self._route("POST", "/subtitle/toggle", self.subtitle_toggle)
+        self._route("POST", "/subtitle/seek", self.subtitle_seek)
 
-    def _stream(self):
-        source = request.query["url"]
+    async def get(self, _):
+        player = self._player_repo.get_player()
+        return self._ok(player)
+
+    async def stream(self, req):
+        source = req.query["url"]
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
             playlist_id = IdentityService.id_playlist(source)
@@ -50,16 +61,16 @@ class PlayerMonitController(Controller):
             self._start_workflow(
                 StreamPlaylistWorkflow, playlist_id, self._video_repo, videos
             )
-            return
+            return self._ok()
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
         self._start_workflow(StreamVideoWorkflow, video_id, self._video_repo, video)
 
-        return "1"
+        return self._ok()
 
-    def _queue(self):
-        source = request.query["url"]
+    async def queue(self, req):
+        source = req.query["url"]
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
             playlist_id = IdentityService.id_playlist(source)
@@ -71,57 +82,91 @@ class PlayerMonitController(Controller):
             self._start_workflow(
                 QueuePlaylistWorkflow, playlist_id, self._video_repo, videos
             )
-            return
+            return self._ok()
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
         self._start_workflow(QueueVideoWorkflow, video_id, self._video_repo, video)
 
-    def _video(self):
-        control = request.query["control"]
-        if control == "pause":
-            self._dispatch(Cmd.ToggleVideoState)
-        elif control == "stop":
-            self._dispatch(Cmd.StopPlayer)
-        elif control == "right":
-            self._dispatch(Cmd.SeekVideo, Player.SHORT_TIME_STEP)
-        elif control == "left":
-            self._dispatch(Cmd.SeekVideo, -Player.SHORT_TIME_STEP)
-        elif control == "longright":
-            self._dispatch(Cmd.SeekVideo, Player.LONG_TIME_STEP)
-        elif control == "longleft":
-            self._dispatch(Cmd.SeekVideo, -Player.LONG_TIME_STEP)
-        elif control == "prev":
-            self._dispatch(Cmd.PrevVideo)
-        elif control == "next":
-            self._dispatch(Cmd.NextVideo)
-        else:
-            return "0"
+        return self._ok()
 
-        return "1"
+    async def remove(self, req):
+        video_id = Id(req.query["id"])
+        player = self._player_repo.get_player()
+        if not player.has_video(video_id):
+            return self._not_found()
 
-    def _sound(self):
-        if request.query["vol"] == "more":
-            self._dispatch(Cmd.ChangeVolume, Player.VOLUME_STEP)
-        else:
-            self._dispatch(Cmd.ChangeVolume, -Player.VOLUME_STEP)
-        return "1"
+        handlers, channel = self._make_default_handlers(Evt.VideoRemoved)
+        self._observe_dispatch(handlers, Cmd.RemoveVideo, video_id)
 
-    def _subtitle(self):
-        action = request.query["action"]
+        return await channel.receive()
 
-        if action == "toggle":
-            self._dispatch(Cmd.ToggleSubtitle)
-        elif action == "increase":
-            self._dispatch(Cmd.IncreaseSubtitleDelay, Player.SUBTITLE_DELAY_STEP)
-        elif action == "decrease":
-            self._dispatch(Cmd.DecreaseSubtitleDelay, -Player.SUBTITLE_DELAY_STEP)
+    async def play(self, req):
+        video_id = Id(req.query["id"])
+        if not self._video_repo.exists(video_id):
+            return self._not_found()
 
-    def _running(self):
-        return 1
+        handlers, channel = self._make_default_handlers(Evt.PlayerStarted)
+        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id)
 
-    def _dispatch(self, cmd_cls, *args, **kwargs):
+        return await channel.receive()
+
+    async def stop(self, _):
+        handlers, channel = self._make_default_handlers(Evt.PlayerStopped)
+        self._observe_dispatch(handlers, Cmd.StopPlayer)
+
+        return await channel.receive()
+
+    async def pause(self, _):
+        handlers, channel = self._make_default_handlers(Evt.PlayerStateToggled)
+        self._observe_dispatch(handlers, Cmd.TogglePlayerState)
+
+        return await channel.receive()
+
+    async def seek(self, req):
+        forward = str_to_bool(req.query["forward"])
+        long = str_to_bool(req.query["long"])
+        side = 1 if forward is True else -1
+        step = Player.LONG_TIME_STEP if long is True else Player.SHORT_TIME_STEP
+        handlers, channel = self._make_default_handlers(Evt.VideoSeeked)
+        self._observe_dispatch(handlers, Cmd.SeekVideo, side * step)
+
+        return await channel.receive()
+
+    async def volume(self, req):
+        volume = int(req.query["value"])
+        handlers, channel = self._make_default_handlers(Evt.VolumeUpdated)
+        self._observe_dispatch(handlers, Cmd.UpdateVolume, volume)
+
+        return await channel.receive()
+
+    async def subtitle_toggle(self, _):
+        handlers, channel = self._make_default_handlers(Evt.SubtitleStateUpdated)
+        self._observe_dispatch(handlers, Cmd.ToggleSubtitle)
+
+        return await channel.receive()
+
+    async def subtitle_seek(self, req):
+        forward = str_to_bool(req.query["forward"])
+        step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
+        handlers, channel = self._make_default_handlers(Evt.SubtitleDelayUpdated)
+        self._observe_dispatch(handlers, Cmd.AdjustSubtitleDelay, step)
+
+        return await channel.receive()
+
+    def _make_default_handlers(self, evt_cls):
+        channel = self._io_factory.make_janus_channel()
+
+        def on_success(evt):
+            player = self._player_repo.get_player()
+            channel.send(self._ok(player))
+
+        def on_error(error):
+            channel.send(self._bad_request())
+
+        evtcls_handler = {evt_cls: on_success, OperationError: on_error}
+        return evtcls_handler, channel
+
+    def _observe_dispatch(self, evtcls_handler, cmd_cls, *args, **kwargs):
         player_id = IdentityService.id_player()
-        return super(PlayerMonitController, self)._dispatch(
-            cmd_cls, player_id, *args, **kwargs
-        )
+        super()._observe_dispatch(evtcls_handler, cmd_cls, player_id, *args, **kwargs)

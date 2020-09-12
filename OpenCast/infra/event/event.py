@@ -1,7 +1,10 @@
+""" Abstract Event definition """
+
 from dataclasses import dataclass
-from uuid import UUID
+
+from OpenCast.infra import Id
 
 
 @dataclass
 class Event:
-    id: UUID
+    id: Id

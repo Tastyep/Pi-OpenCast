@@ -1,7 +1,10 @@
+""" Media source operations """
+
 from pathlib import Path
 from typing import List
 
 import structlog
+
 from OpenCast.domain.model.video import Stream
 
 
@@ -20,7 +23,9 @@ class SourceService:
     def pick_stream_metadata(self, video):
         if video.from_disk():
             return {"title": Path(video.source).stem}
-        return self._downloader.pick_stream_metadata(video.source, ["title"])
+        return self._downloader.pick_stream_metadata(
+            video.source, video.METADATA_FIELDS
+        )
 
     def list_streams(self, video) -> List[Stream]:
         video_path = str(video.path)

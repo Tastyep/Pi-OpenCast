@@ -1,9 +1,13 @@
+""" Parse, download and extract a media with its metadata """
+
+
+from pathlib import Path
 from typing import List
 
+import structlog
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import ISO639Utils
 
-import structlog
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
 from .download_logger import DownloadLogger
@@ -41,6 +45,14 @@ class Downloader:
                     self._evt_dispatcher.dispatch(DownloadError(op_id, str(e)))
                     return
 
+            if not Path(dest).exists():
+                error = "video path points to non existent file"
+                self._logger.error(
+                    "Download error", video=dest, source=source, error=error,
+                )
+                self._evt_dispatcher.dispatch(DownloadError(op_id, str(error)))
+                return
+
             self._logger.debug("Download success", video=dest)
             self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
@@ -56,7 +68,7 @@ class Downloader:
                 "skip_download": True,
                 "subtitleslangs": [lang],
                 "subtitlesformat": ext,
-                "writeautomaticsub": True,
+                "writeautomaticsub": False,
                 "outtmpl": dest,
                 "progress_hooks": [self._dl_logger.log_download_progress],
                 "quiet": True,
@@ -73,15 +85,17 @@ class Downloader:
         return None
 
     def pick_stream_metadata(self, url, fields):
+        self._logger.debug("Downloading stream metadata", url=url, fields=fields)
         options = {
             "noplaylist": True,
         }
         data = self._download_stream_metadata(url, options)
         if data is None:
             return None
-        return {k: data[k] for k in fields}
+        return {k: data.get(k, None) for k in fields}
 
     def unfold_playlist(self, url):
+        self._logger.debug("Unfolding playlist", url=url)
         options = {
             "extract_flat": "in_playlist",
         }

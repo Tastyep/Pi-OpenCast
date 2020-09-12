@@ -1,3 +1,5 @@
+""" Factory for creating workflow objects """
+
 from .player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,

@@ -1,3 +1,5 @@
+""" OpenCast application's backend """
+
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -9,7 +11,9 @@ from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
 from .app.service.module import ServiceModule
 from .config import ConfigError, config
+from .domain.model.player import Player
 from .domain.service.factory import ServiceFactory
+from .domain.service.identity import IdentityService
 from .infra.data.facade import DataFacade
 from .infra.data.repo.factory import RepoFactory
 from .infra.facade import InfraFacade
@@ -42,6 +46,7 @@ def main(argv=None):
 
     repo_factory = RepoFactory()
     data_facade = DataFacade(repo_factory)
+    data_facade.player_repo.create(Player(IdentityService.id_player()))
 
     io_factory = IoFactory()
     media_factory = MediaFactory(

@@ -1,7 +1,10 @@
+""" Logging configurations """
+
 import logging.config
 from pathlib import Path
 
 import structlog
+
 from OpenCast.config import config
 
 
