@@ -31,8 +31,8 @@ all() {
 python() {
   local black_opts isort_opts=()
   if [[ "${ARGS["--check"]}" == true ]]; then
-    black_opts+=("--check")
-    isort_opts+=("--check-only")
+    black_opts+=("--check" "--diff")
+    isort_opts+=("--check-only" "--stdout")
   fi
   # Collect python files
   local py_files
