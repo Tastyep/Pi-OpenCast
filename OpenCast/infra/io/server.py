@@ -13,9 +13,7 @@ class Server:
             self._app,
             defaults={
                 "*": cors.ResourceOptions(
-                    allow_credentials=True,
-                    expose_headers="*",
-                    allow_headers="*",
+                    allow_credentials=True, expose_headers="*", allow_headers="*",
                 )
             },
         )
@@ -28,6 +26,9 @@ class Server:
         self._logger.info("Started", host=host, port=port)
 
         web.run_app(self._app, host=host, port=port)
+
+    def make_web_socket(self):
+        return web.WebSocketResponse()
 
     def make_json_response(self, status, body, dumps):
         return web.json_response(body, status=status, dumps=dumps)
