@@ -19,12 +19,16 @@ class Controller:
         cmd = make_cmd(cmd_cls, component_id, *args, **kwargs)
         self._cmd_dispatcher.dispatch(cmd)
 
-    def _observe(self, module):
+    def _observe(self, module, handler_factory):
         classes = inspect.getmembers(module, inspect.isclass)
         for _, cls in classes:
             if cls.__module__ == module.__name__:
-                handler_name = name_handler_method(cls)
-                self._evt_dispatcher.observe({cls: getattr(self, handler_name)})
+                handler = handler_factory(cls)
+                self._evt_dispatcher.observe({cls: handler})
+
+    def _default_handler_factory(self, evt_cls):
+        handler_name = name_handler_method(evt_cls)
+        return getattr(self, handler_name)
 
     def _start_workflow(self, workflow_cls, resource_id, *args, **kwargs):
         workflow_id = IdentityService.id_workflow(workflow_cls, resource_id)

@@ -17,7 +17,7 @@ class PlayerController(Controller):
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
 
-        self._observe(player_events)
+        self._observe(PlayerEvt, self._default_handler_factory)
 
     # Infra event handler interface implementation
 
