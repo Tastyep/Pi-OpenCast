@@ -6,6 +6,7 @@ from json import JSONEncoder
 from pathlib import Path
 
 from OpenCast.domain.model.entity import Entity
+from OpenCast.domain.event.event import Event
 from OpenCast.infra import Id
 
 
@@ -32,4 +33,15 @@ class ModelEncoder(EnhancedJSONEncoder):
         data = obj.to_dict()
         data = {k[1:] if k[0] == "_" else k: v for k, v in data.items()}
         data.pop("version")
+        return data
+
+
+class EventEncoder(EnhancedJSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Event):
+            return self._encode_event(obj)
+        return super().default(obj)
+
+    def _encode_event(self, obj):
+        data = obj.to_dict()
         return data

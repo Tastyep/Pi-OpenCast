@@ -1,9 +1,11 @@
 import json
 from test.util import TestCase
 
-from OpenCast.app.tool.json_encoder import ModelEncoder
+from OpenCast.app.tool.json_encoder import ModelEncoder, EventEncoder
+from OpenCast.app.command.video import CreateVideo
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.video import Path, Stream, Video
+from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.service.identity import IdentityService
 
 
@@ -21,3 +23,9 @@ class JsonEncoderTest(TestCase):
         video.streams = [Stream(0, "audio", "en")]
         video.subtitle = Path("/tmp/video.srt")
         json.dumps(video, cls=ModelEncoder)
+
+    def test_encode_event(self):
+        video_id = IdentityService.id_video("source")
+        cmd_id = IdentityService.id_command(CreateVideo, video_id)
+        event = VideoCreated(cmd_id, video_id, "source", None)
+        json.dumps(event, cls=EventEncoder)
