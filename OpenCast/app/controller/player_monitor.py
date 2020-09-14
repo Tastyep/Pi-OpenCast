@@ -171,7 +171,6 @@ class PlayerMonitController(MonitorController):
             event = await channel.receive()
             await self._send_ws_event(ws, event)
 
-        # TODO: cleanup websocket
         return ws
 
     def _make_default_handlers(self, evt_cls):
