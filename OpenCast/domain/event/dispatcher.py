@@ -9,7 +9,7 @@ from OpenCast.infra import Id
 
 
 class EventDispatcher:
-    ANY_EVENT = None
+    ANY_ID = None
 
     class _Handler:
         def __init__(self, evtcls_handler, count):
@@ -35,10 +35,10 @@ class EventDispatcher:
         self._lock = Lock()
 
     def once(self, evt_cls, handler):
-        self.observe_result(self.ANY_EVENT, {evt_cls: handler}, 1)
+        self.observe_result(self.ANY_ID, {evt_cls: handler}, 1)
 
     def observe(self, evtcls_handler: dict, times=-1):
-        self.observe_result(self.ANY_EVENT, evtcls_handler, times)
+        self.observe_result(self.ANY_ID, evtcls_handler, times)
 
     def observe_result(self, evt_id: Id, evtcls_handler: dict, times=-1):
         self._observe(
@@ -57,7 +57,7 @@ class EventDispatcher:
 
         handlers = []
         with self._lock:
-            for evt_id in set([self.ANY_EVENT, evt.id]):
+            for evt_id in set([self.ANY_ID, evt.id]):
                 evt_hash = hash((evt_id, type(evt)))
                 if evt_hash not in self._evt_to_handler_ids:
                     continue
