@@ -8,7 +8,8 @@ from OpenCast.util.naming import name_handler_method
 
 
 class Controller:
-    def __init__(self, app_facade):
+    def __init__(self, logger, app_facade):
+        self._logger = logger
         self._app_facade = app_facade
         self._cmd_dispatcher = app_facade.cmd_dispatcher
         self._evt_dispatcher = app_facade.evt_dispatcher

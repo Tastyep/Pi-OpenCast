@@ -4,16 +4,16 @@ import structlog
 
 from OpenCast.app.command import player as Cmd
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.infra.event import player as player_events
+from OpenCast.infra.event import player as PlayerEvt
 
 from .controller import Controller
 
 
 class PlayerController(Controller):
     def __init__(self, app_facade, data_facade):
-        super().__init__(app_facade)
+        logger = structlog.get_logger(__name__)
+        super().__init__(logger, app_facade)
 
-        self._logger = structlog.get_logger(__name__)
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
 

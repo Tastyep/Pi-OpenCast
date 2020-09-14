@@ -1,7 +1,8 @@
 """ Video capabilities monitoring routes """
 
+import structlog
 from OpenCast.app.command import video as Cmd
-from OpenCast.domain.event import video as Evt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id
 
 from .monitor import MonitorController
@@ -9,7 +10,8 @@ from .monitor import MonitorController
 
 class VideoMonitController(MonitorController):
     def __init__(self, app_facade, infra_facade, data_facade):
-        super().__init__(app_facade, infra_facade, "/videos")
+        logger = structlog.get_logger(__name__)
+        super().__init__(logger, app_facade, infra_facade, "/videos")
         self._video_repo = data_facade.video_repo
 
         self._route("GET", "/", handle=self.list)
@@ -37,6 +39,6 @@ class VideoMonitController(MonitorController):
         def on_success(evt):
             channel.send(self._no_content())
 
-        self._observe_dispatch({Evt.VideoDeleted: on_success}, Cmd.DeleteVideo, id)
+        self._observe_dispatch({VideoEvt.VideoDeleted: on_success}, Cmd.DeleteVideo, id)
 
         return await channel.receive()
