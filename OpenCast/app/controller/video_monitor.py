@@ -15,8 +15,8 @@ class VideoMonitController(MonitorController):
         self._video_repo = data_facade.video_repo
 
         self._route("GET", "/", handle=self.list)
-        self._route("GET", "/{id}", handle=self.get)
-        self._route("DELETE", "/{id}", handle=self.delete)
+        self._route("GET", "/{id:" + self.UUID + "}", handle=self.get)
+        self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
         self._route("GET", "/events", self.stream_events)
 
     async def list(self, req):
