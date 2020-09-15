@@ -1,6 +1,7 @@
 """ Video capabilities monitoring routes """
 
 import structlog
+
 from OpenCast.app.command import video as Cmd
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id

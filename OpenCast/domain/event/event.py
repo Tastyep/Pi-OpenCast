@@ -1,6 +1,6 @@
 """ Abstract representation of a domain event """
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 
 from OpenCast.domain.model import Id as ModelId
 from OpenCast.infra import Id

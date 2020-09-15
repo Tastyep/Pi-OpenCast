@@ -1,11 +1,11 @@
 import json
 from test.util import TestCase
 
-from OpenCast.app.tool.json_encoder import ModelEncoder, EventEncoder
 from OpenCast.app.command.video import CreateVideo
+from OpenCast.app.tool.json_encoder import EventEncoder, ModelEncoder
+from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.video import Path, Stream, Video
-from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.service.identity import IdentityService
 
 

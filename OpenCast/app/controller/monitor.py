@@ -1,11 +1,11 @@
 """ Abstraction of a monitoring controller """
 
+import asyncio
 import functools
 import json
-import asyncio
 
 from OpenCast.app.command import make_cmd
-from OpenCast.app.tool.json_encoder import ModelEncoder, EventEncoder
+from OpenCast.app.tool.json_encoder import EventEncoder, ModelEncoder
 
 from .controller import Controller
 

@@ -5,8 +5,8 @@ from enum import Enum
 from json import JSONEncoder
 from pathlib import Path
 
-from OpenCast.domain.model.entity import Entity
 from OpenCast.domain.event.event import Event
+from OpenCast.domain.model.entity import Entity
 from OpenCast.infra import Id
 
 
