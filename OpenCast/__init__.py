@@ -59,6 +59,6 @@ def main(argv=None):
 
     try:
         server = infra_facade.server
-        server.run(config["server.host"], config["server.port"])
+        server.start(config["server.host"], config["server.port"])
     except Exception as e:
         logger.error(f"{__name__} stopped", error=e)

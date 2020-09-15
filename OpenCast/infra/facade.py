@@ -1,6 +1,6 @@
 """ Infrastructural components exposed the applicative layer """
 
-from .io.server import Server
+from .io.server import make_server
 
 
 class InfraFacade:
@@ -8,7 +8,7 @@ class InfraFacade:
         self._io_factory = io_factory
         self._media_factory = media_factory
 
-        self._server = Server()
+        self._server = make_server()
 
     # IO objects
 
