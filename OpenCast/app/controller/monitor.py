@@ -47,7 +47,23 @@ class MonitorController(Controller):
     def _make_response(self, status, body):
         return self._server.make_json_response(status, body, self._model_dumps)
 
-    async def run_web_socket(self, request):
+    async def _stream_ws_events(self, request, evt_module):
+        ws = await self._run_web_socket(request)
+        channel = self._io_factory.make_janus_channel()
+        self._logger.debug("websocket created")
+
+        def handler_factory(_):
+            return channel.send
+
+        self._observe(evt_module, handler_factory)
+
+        while True:
+            event = await channel.receive()
+            await self._send_ws_event(ws, event)
+
+        return ws
+
+    async def _run_web_socket(self, request):
         ws = self._server.make_web_socket()
         await ws.prepare(request)
         return ws

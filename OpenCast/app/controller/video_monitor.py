@@ -46,17 +46,4 @@ class VideoMonitController(MonitorController):
         return await channel.receive()
 
     async def stream_events(self, request):
-        ws = await self.run_web_socket(request)
-        channel = self._io_factory.make_janus_channel()
-        self._logger.debug("video websocket created")
-
-        def handler_factory(_):
-            return channel.send
-
-        self._observe(VideoEvt, handler_factory)
-
-        while True:
-            event = await channel.receive()
-            await self._send_ws_event(ws, event)
-
-        return ws
+        return await self._stream_ws_events(request, VideoEvt)
