@@ -43,7 +43,7 @@ class PlayerService(Service):
     def _queue_video(self, cmd):
         def impl(player):
             video = self._video_repo.get(cmd.video_id)
-            player.queue(video)
+            player.queue(video, cmd.queue_front)
 
         self._update(cmd.id, impl)
 

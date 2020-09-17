@@ -13,11 +13,11 @@ class PlayerTest(ModelTestCase):
     def setUp(self):
         self.player = Player(None)
 
-    def make_videos(self, video_count):
-        return [self.make_video(f"source_{i}") for i in range(video_count)]
+    def make_videos(self, video_count, playlist_id=None):
+        return [self.make_video(f"source_{i}", playlist_id) for i in range(video_count)]
 
-    def make_video(self, source="source_1"):
-        return Video(IdentityService.id_video(source), source, None)
+    def make_video(self, source="source_1", playlist_id=None):
+        return Video(IdentityService.id_video(source), source, playlist_id)
 
     def test_construction(self):
         self.assertEqual(70, self.player.volume)
@@ -53,29 +53,75 @@ class PlayerTest(ModelTestCase):
             self.player.stop()
         self.assertEqual("the player is already stopped", str(ctx.exception))
 
-    def test_queue(self):
-        video = self.make_video()
-        self.player.queue(video)
-        self.assertListEqual([video.id], self.player.video_queue)
-        self.expect_events(self.player, Evt.VideoQueued)
-
-    def test_queue_multiple_unrelated(self):
+    def test_queue_last(self):
         videos = self.make_videos(video_count=3)
         for video in videos:
             self.player.queue(video)
+
         expected = [video.id for video in videos]
         self.assertListEqual(expected, self.player.video_queue)
 
-    def test_queue_multiple_related(self):
-        videos = [
-            Video(None, "source_1", "playlist_1"),
-            Video(None, "source_2", None),
-            Video(None, "source_3", "playlist_1"),
-        ]
+    def test_queue_front_without_queue(self):
+        videos = self.make_videos(video_count=3)
         for video in videos:
+            self.player.queue(video, front=True)
+
+        expected = [video.id for video in videos]
+        self.assertListEqual(expected, self.player.video_queue)
+
+    def test_queue_front_with_queue(self):
+        queued_videos = self.make_videos(video_count=3)
+        for video in queued_videos:
             self.player.queue(video)
 
-        expected_queue = [videos[0].id, videos[2].id, videos[1].id]
+        self.player.play(queued_videos[1])
+
+        videos = self.make_videos(video_count=3)
+        for video in videos:
+            self.player.queue(video, front=True)
+
+        expected = (
+            [video.id for video in queued_videos[:2]]
+            + [video.id for video in videos]
+            + [video.id for video in queued_videos[2:]]
+        )
+        self.assertListEqual(expected, self.player.video_queue)
+
+    def test_queue_back_merge_playlist(self):
+        playlist_id = IdentityService.id_playlist("playlist")
+        videos = self.make_videos(3, playlist_id)
+        other_video = self.make_video("other")
+        self.player.queue(videos[0])
+        self.player.queue(videos[1])
+        self.player.queue(other_video)
+        self.player.queue(videos[2])
+
+        expected_queue = [videos[0].id, videos[1].id, videos[2].id, other_video.id]
+        self.assertListEqual(expected_queue, self.player.video_queue)
+
+    def test_queue_front_merge_playlist(self):
+        playlist_id = IdentityService.id_playlist("playlist")
+        videos = self.make_videos(3, playlist_id)
+        other_video = self.make_video("other")
+        self.player.queue(videos[0], front=True)
+        self.player.queue(videos[1], front=True)
+        self.player.queue(other_video)
+        self.player.queue(videos[2], front=True)
+
+        expected_queue = [videos[0].id, videos[1].id, videos[2].id, other_video.id]
+        self.assertListEqual(expected_queue, self.player.video_queue)
+
+    def test_queue_no_merge_past_index(self):
+        playlist_id = IdentityService.id_playlist("playlist")
+        videos = self.make_videos(3, playlist_id)
+        other_video = self.make_video("other")
+        self.player.queue(videos[0])
+        self.player.queue(videos[1])
+        self.player.queue(other_video)
+        self.player.play(other_video)
+        self.player.queue(videos[2], front=True)
+
+        expected_queue = [videos[0].id, videos[1].id, other_video.id, videos[2].id]
         self.assertListEqual(expected_queue, self.player.video_queue)
 
     def test_remove(self):
