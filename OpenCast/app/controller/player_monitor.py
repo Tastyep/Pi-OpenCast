@@ -89,7 +89,9 @@ class PlayerMonitController(MonitorController):
 
         video_id = IdentityService.id_video(source)
         video = Video(video_id, source, None)
-        self._start_workflow(QueueVideoWorkflow, video_id, self._video_repo, video)
+        self._start_workflow(
+            QueueVideoWorkflow, video_id, self._video_repo, video, queue_front=False
+        )
 
         return self._ok()
 
