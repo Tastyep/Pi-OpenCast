@@ -4,7 +4,7 @@ import inspect
 
 from OpenCast.app.command import make_cmd
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.util.naming import name_handler_method, name_factory_method
+from OpenCast.util.naming import name_factory_method, name_handler_method
 
 
 class Controller:

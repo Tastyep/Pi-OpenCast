@@ -3,14 +3,14 @@ from unittest.mock import Mock
 from OpenCast.app.command import make_cmd
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.controller.player_monitor import Player, PlayerMonitController
-from OpenCast.domain.event import player as Evt
-from OpenCast.domain.service.identity import IdentityService
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
     StreamPlaylistWorkflow,
     StreamVideoWorkflow,
 )
+from OpenCast.domain.event import player as Evt
+from OpenCast.domain.service.identity import IdentityService
 
 from .util import MonitorControllerTestCase
 

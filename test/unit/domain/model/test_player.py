@@ -1,3 +1,6 @@
+import random
+import string
+
 import OpenCast.domain.event.player as Evt
 from OpenCast.config import config
 from OpenCast.domain.error import DomainError
@@ -7,8 +10,6 @@ from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
-import random
-import string
 
 
 class PlayerTest(ModelTestCase):
