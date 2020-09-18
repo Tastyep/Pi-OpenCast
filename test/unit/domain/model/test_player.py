@@ -7,6 +7,8 @@ from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
+import random
+import string
 
 
 class PlayerTest(ModelTestCase):
@@ -14,9 +16,11 @@ class PlayerTest(ModelTestCase):
         self.player = Player(None)
 
     def make_videos(self, video_count, playlist_id=None):
-        return [self.make_video(f"source_{i}", playlist_id) for i in range(video_count)]
+        return [self.make_video(None, playlist_id) for i in range(video_count)]
 
-    def make_video(self, source="source_1", playlist_id=None):
+    def make_video(self, source=None, playlist_id=None):
+        if source is None:
+            source = "".join(random.choice(string.ascii_letters) for _ in range(10))
         return Video(IdentityService.id_video(source), source, playlist_id)
 
     def test_construction(self):
@@ -53,30 +57,41 @@ class PlayerTest(ModelTestCase):
             self.player.stop()
         self.assertEqual("the player is already stopped", str(ctx.exception))
 
-    def test_queue_last(self):
-        videos = self.make_videos(video_count=3)
+    def test_queue_back(self):
+        videos = self.make_videos(3)
         for video in videos:
             self.player.queue(video)
 
         expected = [video.id for video in videos]
         self.assertListEqual(expected, self.player.video_queue)
 
-    def test_queue_front_without_queue(self):
-        videos = self.make_videos(video_count=3)
+    def test_queue_front_empty_queue(self):
+        videos = self.make_videos(3)
+        for video in videos:
+            self.player.queue(video, front=True)
+
+        expected = [video.id for video in reversed(videos)]
+        self.assertListEqual(expected, self.player.video_queue)
+
+    def test_queue_front_playlist_empty_queue(self):
+        playlist_id = IdentityService.id_playlist("playlist")
+        videos = self.make_videos(3, playlist_id)
         for video in videos:
             self.player.queue(video, front=True)
 
         expected = [video.id for video in videos]
         self.assertListEqual(expected, self.player.video_queue)
 
-    def test_queue_front_with_queue(self):
-        queued_videos = self.make_videos(video_count=3)
+    def test_queue_front_playlist_while_playing(self):
+        playlist_id = IdentityService.id_playlist("playlist1")
+        queued_videos = self.make_videos(3, playlist_id)
         for video in queued_videos:
             self.player.queue(video)
 
         self.player.play(queued_videos[1])
 
-        videos = self.make_videos(video_count=3)
+        playlist_id = IdentityService.id_playlist("playlist2")
+        videos = self.make_videos(3, playlist_id)
         for video in videos:
             self.player.queue(video, front=True)
 
@@ -86,18 +101,6 @@ class PlayerTest(ModelTestCase):
             + [video.id for video in queued_videos[2:]]
         )
         self.assertListEqual(expected, self.player.video_queue)
-
-    def test_queue_back_merge_playlist(self):
-        playlist_id = IdentityService.id_playlist("playlist")
-        videos = self.make_videos(3, playlist_id)
-        other_video = self.make_video("other")
-        self.player.queue(videos[0])
-        self.player.queue(videos[1])
-        self.player.queue(other_video)
-        self.player.queue(videos[2])
-
-        expected_queue = [videos[0].id, videos[1].id, videos[2].id, other_video.id]
-        self.assertListEqual(expected_queue, self.player.video_queue)
 
     def test_queue_front_merge_playlist(self):
         playlist_id = IdentityService.id_playlist("playlist")
@@ -115,8 +118,8 @@ class PlayerTest(ModelTestCase):
         playlist_id = IdentityService.id_playlist("playlist")
         videos = self.make_videos(3, playlist_id)
         other_video = self.make_video("other")
-        self.player.queue(videos[0])
-        self.player.queue(videos[1])
+        self.player.queue(videos[0], front=True)
+        self.player.queue(videos[1], front=True)
         self.player.queue(other_video)
         self.player.play(other_video)
         self.player.queue(videos[2], front=True)
@@ -145,7 +148,7 @@ class PlayerTest(ModelTestCase):
 
     def test_next(self):
         config.load_from_dict({"player": {"loop_last": False}})
-        videos = self.make_videos(video_count=2)
+        videos = self.make_videos(2)
         for video in videos:
             self.player.queue(video)
         self.assertEqual(videos[1].id, self.player.next_video())

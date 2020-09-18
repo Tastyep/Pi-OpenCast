@@ -104,14 +104,20 @@ class Player(Entity):
         self._record(Evt.PlayerStopped)
 
     def queue(self, video: Video, front: bool = False):
-        idx = min(self._index + 1, len(self._queue)) if front else len(self._queue)
+        # If the video has already been started, then push the new video after it
+        idx = (
+            min(self._index + (self._state is not State.STOPPED), len(self._queue))
+            if front
+            else len(self._queue)
+        )
 
         # Try to order videos from the same playlist together
-        next_videos = self._queue[self._index :]
-        for i, q_video in enumerate(reversed(next_videos)):
-            if q_video.playlist_id == video.playlist_id:
-                idx = len(next_videos) - i
-                break
+        if front and video.playlist_id is not None:
+            next_reversed = reversed(self._queue[idx:])
+            for i, q_video in enumerate(next_reversed):
+                if q_video.playlist_id == video.playlist_id:
+                    idx = len(self._queue) - i
+                    break
 
         self._queue.insert(idx, self._Video(video.id, video.playlist_id))
         self._record(Evt.VideoQueued, video.id)
