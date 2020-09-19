@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
@@ -33,8 +33,11 @@ function StreamInput() {
       setQueueVariant("contained");
       setAction(() => playerAPI.queueMedia);
     }
-    handleSubmit(undefined);
   };
+
+  useEffect(() => {
+    handleSubmit(undefined);
+  }, [action]);
 
   return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">

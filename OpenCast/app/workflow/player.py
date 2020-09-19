@@ -36,7 +36,7 @@ class QueueVideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, app_facade, video_repo, video: Video):
+    def __init__(self, id, app_facade, video_repo, video: Video, queue_front):
         logger = structlog.get_logger(__name__)
         super().__init__(
             logger,
@@ -47,6 +47,7 @@ class QueueVideoWorkflow(Workflow):
         )
         self._video_repo = video_repo
         self._video = video
+        self._queue_front = queue_front
 
     # States
     def on_enter_COLLECTING(self):
@@ -62,6 +63,7 @@ class QueueVideoWorkflow(Workflow):
             PlayerCmd.QueueVideo,
             IdentityService.id_player(),
             self._video.id,
+            self._queue_front,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -120,7 +122,7 @@ class QueuePlaylistWorkflow(Workflow):
         video = self._videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(
-            workflow_id, self._app_facade, self._video_repo, video
+            workflow_id, self._app_facade, self._video_repo, video, queue_front=False
         )
         self._observe_start(workflow)
 
@@ -174,7 +176,11 @@ class StreamVideoWorkflow(Workflow):
     def on_enter_QUEUEING(self):
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, self._video.id)
         workflow = self._factory.make_queue_video_workflow(
-            workflow_id, self._app_facade, self._video_repo, self._video
+            workflow_id,
+            self._app_facade,
+            self._video_repo,
+            self._video,
+            queue_front=False,
         )
         self._observe_start(workflow)
 
@@ -257,7 +263,7 @@ class StreamPlaylistWorkflow(Workflow):
         video = self._videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(
-            workflow_id, self._app_facade, self._video_repo, video
+            workflow_id, self._app_facade, self._video_repo, video, queue_front=True
         )
         self._observe_start(
             workflow,

@@ -11,6 +11,7 @@ class PlayVideo(Command):
 @command
 class QueueVideo(Command):
     video_id: ModelId
+    queue_front: bool
 
 
 @command

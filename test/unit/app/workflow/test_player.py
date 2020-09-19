@@ -31,6 +31,7 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
             QueueVideoWorkflow,
             self.video_repo,
             self.video,
+            queue_front=False,
         )
 
     def test_initial(self):
@@ -58,14 +59,18 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
     def test_queueing_to_aborted(self):
         event = VideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_QUEUEING(event)
-        cmd = self.expect_dispatch(Cmd.QueueVideo, self.player_id, self.video.id)
+        cmd = self.expect_dispatch(
+            Cmd.QueueVideo, self.player_id, self.video.id, queue_front=False
+        )
         self.raise_error(self.workflow, cmd)
         self.assertTrue(self.workflow.is_ABORTED())
 
     def test_queueing_to_completed(self):
         event = VideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_QUEUEING(event)
-        cmd = self.expect_dispatch(Cmd.QueueVideo, self.player_id, self.video.id)
+        cmd = self.expect_dispatch(
+            Cmd.QueueVideo, self.player_id, self.video.id, queue_front=False
+        )
         self.raise_event(
             self.workflow,
             Evt.VideoQueued,

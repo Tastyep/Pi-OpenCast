@@ -3,6 +3,12 @@ from unittest.mock import Mock
 from OpenCast.app.command import make_cmd
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.controller.player_monitor import Player, PlayerMonitController
+from OpenCast.app.workflow.player import (
+    QueuePlaylistWorkflow,
+    QueueVideoWorkflow,
+    StreamPlaylistWorkflow,
+    StreamVideoWorkflow,
+)
 from OpenCast.domain.event import player as Evt
 from OpenCast.domain.service.identity import IdentityService
 
@@ -28,6 +34,80 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         req = self.make_request("GET", "/")
         resp = await self.route(self.controller.get, req)
         self.assertEqual(resp, (200, self.data_facade.player_repo.get_player()))
+
+    async def test_stream_simple(self):
+        url = "http://video-provider/watch&video=id"
+        req = self.make_request("POST", "/stream", query={"url": url})
+        self.source_service.is_playlist.return_value = False
+        workflow = None
+
+        def make_workflow(*args, **kwargs):
+            nonlocal workflow
+            workflow = StreamVideoWorkflow(*args, **kwargs)
+            return workflow
+
+        self.app_facade.workflow_factory.make_stream_video_workflow.side_effect = (
+            make_workflow
+        )
+        resp = await self.route(self.controller.stream, req)
+        self.assertEqual(resp, (200, None))
+        self.app_facade.workflow_manager.start.assert_called_with(workflow)
+
+    async def test_stream_playlist(self):
+        url = "http://video-provider/watch&video=id"
+        req = self.make_request("POST", "/stream", query={"url": url})
+        self.source_service.is_playlist.return_value = True
+        self.source_service.unfold.return_value = [url]
+        workflow = None
+
+        def make_workflow(*args, **kwargs):
+            nonlocal workflow
+            workflow = StreamPlaylistWorkflow(*args, **kwargs)
+            return workflow
+
+        self.app_facade.workflow_factory.make_stream_playlist_workflow.side_effect = (
+            make_workflow
+        )
+        resp = await self.route(self.controller.stream, req)
+        self.assertEqual(resp, (200, None))
+        self.app_facade.workflow_manager.start.assert_called_with(workflow)
+
+    async def test_queue_simple(self):
+        url = "http://video-provider/watch&video=id"
+        req = self.make_request("POST", "/queue", query={"url": url})
+        self.source_service.is_playlist.return_value = False
+        workflow = None
+
+        def make_workflow(*args, **kwargs):
+            nonlocal workflow
+            workflow = QueueVideoWorkflow(*args, **kwargs)
+            return workflow
+
+        self.app_facade.workflow_factory.make_queue_video_workflow.side_effect = (
+            make_workflow
+        )
+        resp = await self.route(self.controller.queue, req)
+        self.assertEqual(resp, (200, None))
+        self.app_facade.workflow_manager.start.assert_called_with(workflow)
+
+    async def test_queue_playlist(self):
+        url = "http://video-provider/watch&video=id"
+        req = self.make_request("POST", "/queue", query={"url": url})
+        self.source_service.is_playlist.return_value = True
+        self.source_service.unfold.return_value = [url]
+        workflow = None
+
+        def make_workflow(*args, **kwargs):
+            nonlocal workflow
+            workflow = QueuePlaylistWorkflow(*args, **kwargs)
+            return workflow
+
+        self.app_facade.workflow_factory.make_queue_playlist_workflow.side_effect = (
+            make_workflow
+        )
+        resp = await self.route(self.controller.queue, req)
+        self.assertEqual(resp, (200, None))
+        self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
     async def test_remove(self):
         self.data_producer.player().video("source", None).populate(self.data_facade)

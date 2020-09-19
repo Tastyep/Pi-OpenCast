@@ -41,7 +41,10 @@ class PlayerServiceTest(ServiceTestCase):
 
         video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(Evt.VideoQueued, self.player_id, video_id).from_(
-            Cmd.QueueVideo, self.player_id, video_id
+            Cmd.QueueVideo,
+            self.player_id,
+            video_id,
+            queue_front=False,
         )
 
     def test_remove_video(self):
