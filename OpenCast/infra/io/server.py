@@ -4,9 +4,7 @@ import re
 
 import structlog
 from aiohttp import web
-from aiohttp_middlewares import (
-    cors_middleware,
-)
+from aiohttp_middlewares import cors_middleware
 
 
 class Server:
