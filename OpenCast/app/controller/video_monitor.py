@@ -18,7 +18,7 @@ class VideoMonitController(MonitorController):
         self._route("GET", "/", handle=self.list)
         self._route("GET", "/{id:" + self.UUID + "}", handle=self.get)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
-        self._route("GET", "/events", self.stream_events)
+        self._route("GET", "/events", handle=self.stream_events)
 
     async def list(self, req):
         videos = self._video_repo.list()

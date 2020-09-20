@@ -1,8 +1,10 @@
 """ High level HTTP server """
 
-import aiohttp_cors as cors
+import re
+
 import structlog
 from aiohttp import web
+from aiohttp_middlewares import cors_middleware
 
 
 class Server:
@@ -11,20 +13,9 @@ class Server:
         self._app["websockets"] = []
         self._app.on_shutdown.append(self._on_shutdown)
         self._logger = structlog.get_logger(__name__)
-        self._cors = cors.setup(
-            self._app,
-            defaults={
-                "*": cors.ResourceOptions(
-                    allow_credentials=True,
-                    expose_headers="*",
-                    allow_headers="*",
-                )
-            },
-        )
 
     def route(self, method, route, handle):
         route = self._app.router.add_route(method, route, handle)
-        self._cors.add(route)
 
     def start(self, host, port):
         self._logger.info("Started", host=host, port=port)
@@ -45,4 +36,13 @@ class Server:
 
 
 def make_server():
-    return Server(web.Application())
+    return Server(
+        web.Application(
+            middlewares=[
+                # Allow CORS requests for API url from all localhost urls
+                cors_middleware(
+                    origins=[re.compile(r"^https?\:\/\/(localhost|0\.0\.0\.0)")]
+                ),
+            ]
+        )
+    )
