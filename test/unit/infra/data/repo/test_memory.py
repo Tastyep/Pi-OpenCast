@@ -1,8 +1,7 @@
 from test.util import TestCase
-from unittest.mock import Mock
-from uuid import uuid4
 
 from OpenCast.domain.model.entity import Entity
+from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.data.repo.error import RepoError
 from OpenCast.infra.data.repo.memory import MemoryRepo
 
@@ -10,7 +9,7 @@ from OpenCast.infra.data.repo.memory import MemoryRepo
 class MemoryRepoTest(TestCase):
     def setUp(self):
         self.repo = MemoryRepo()
-        self.entity = Entity(uuid4())
+        self.entity = Entity(IdentityService.random())
 
     def test_create(self):
         self.repo.create(self.entity)

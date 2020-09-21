@@ -1,4 +1,3 @@
-import uuid
 from test.shared.app.facade_mock import AppFacadeMock
 from test.util import TestCase
 from unittest.mock import Mock
@@ -19,7 +18,7 @@ class WorkflowTestCase(TestCase):
         self.app_facade.workflow_manager.start.side_effect = start_workflow
 
     def make_workflow(self, workflow_cls, *args, **kwargs):
-        return workflow_cls(uuid.uuid4(), self.app_facade, *args, **kwargs)
+        return workflow_cls(IdentityService.random(), self.app_facade, *args, **kwargs)
 
     def expect_dispatch(self, cmd_cls, model_id, *args, **kwargs):
         cmd_id = IdentityService.id_command(cmd_cls, model_id)
