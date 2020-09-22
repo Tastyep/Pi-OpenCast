@@ -33,11 +33,16 @@ class WorkflowTestCase(TestCase):
         event = evt_cls(*args, **kwargs)
         getattr(workflow, name_handler_method(evt_cls))(event)
 
-    def expect_workflow_creation(self, wf_cls):
-        wf_mock = Mock()
-        wf_mock.Completed = wf_cls.Completed
-        wf_mock.Aborted = wf_cls.Aborted
+    def expect_workflow_creation(self, wf_cls, times=1):
+        mocks = []
+        for i in range(times):
+            wf_mock = Mock()
+            wf_mock.Completed = wf_cls.Completed
+            wf_mock.Aborted = wf_cls.Aborted
+            mocks.append(wf_mock)
+
         getattr(
             self.app_facade.workflow_factory, name_factory_method(wf_cls)
-        ).return_value = wf_mock
-        return wf_mock
+        ).side_effect = mocks
+
+        return tuple(mocks)
