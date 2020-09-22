@@ -4,7 +4,6 @@ import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-import structlog
 from vlc import Instance as VlcInstance
 
 from .app.controller.module import ControllerModule
@@ -35,7 +34,6 @@ def main(argv=None):
 
     # Get and update the log level
     logging.getLogger(__name__).setLevel(config["log.level"])
-    logger = structlog.get_logger(__name__)
 
     # TODO: make worker count configurable
     app_executor = ThreadPoolExecutor(max_workers=1)
@@ -52,13 +50,13 @@ def main(argv=None):
     media_factory = MediaFactory(
         VlcInstance(), ThreadPoolExecutor(config["downloader.max_concurrency"])
     )
-    infra_facade = InfraFacade(io_factory, media_factory)
+    infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory)
 
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)
     ServiceModule(app_facade, infra_facade, data_facade, service_factory)
 
-    try:
-        server = infra_facade.server
-        server.start(config["server.host"], config["server.port"])
-    except Exception as e:
-        logger.error(f"{__name__} stopped", error=e)
+    workflow_id = IdentityService.random()
+    workflow = app_facade.workflow_factory.make_root_workflow(
+        workflow_id, app_facade, infra_facade, data_facade
+    )
+    app_facade.workflow_manager.start(workflow)
