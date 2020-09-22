@@ -65,10 +65,10 @@ function VideoList() {
   };
 
   const listVideos = () => {
-    videoAPI
-      .list()
+    playerAPI
+      .get()
       .then((response) => {
-        setVideos(response.data);
+        setVideos(response.data.queue);
       })
       .catch((error) => console.log(error));
   };
