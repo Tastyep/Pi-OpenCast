@@ -35,6 +35,7 @@ class WorkflowManager:
                 {workflow.Completed: on_completion, workflow.Aborted: on_completion},
                 times=1,
             )
-            self._logger.debug("Starting workflow", workflow=workflow)
-            workflow.start(*args, **kwargs)
-            return True
+
+        self._logger.debug("Starting workflow", workflow=workflow)
+        workflow.start(*args, **kwargs)
+        return True
