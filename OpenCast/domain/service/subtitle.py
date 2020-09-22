@@ -6,8 +6,9 @@ import structlog
 
 
 class SubtitleService:
-    def __init__(self, downloader):
+    def __init__(self, file_service, downloader):
         self._logger = structlog.get_logger(__name__)
+        self._file_service = file_service
         self._downloader = downloader
 
     def fetch_subtitle(self, video, language: str, search_online=True) -> Path:
@@ -29,7 +30,7 @@ class SubtitleService:
         parent_path = video_path.parents[0]
         subtitle = str(video_path.with_suffix(".srt"))
         # Find the matching subtitle from a .srt file
-        srtFiles = parent_path.glob("*.srt")
+        srtFiles = self._file_service.list_directory(parent_path, "*.srt")
         if Path(subtitle) in srtFiles:
             self._logger.debug("Found srt file", subtitle=subtitle)
             return subtitle

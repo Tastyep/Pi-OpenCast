@@ -19,4 +19,4 @@ class ServiceFactory:
         return SourceService(*args)
 
     def make_subtitle_service(self, *args):
-        return SubtitleService(*args)
+        return SubtitleService(self._infra_service_factory.make_file_service(), *args)
