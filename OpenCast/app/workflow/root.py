@@ -77,7 +77,7 @@ class RootWorkflow(Workflow):
                 config["server.host"], config["server.port"]
             )
         except Exception as e:
-            self._logger.error(f"Server exception caught", error=e)
+            self._logger.error("Server exception caught", error=e)
             self.to_ABORTED(e)
 
     def on_enter_ABORTED(self, _):

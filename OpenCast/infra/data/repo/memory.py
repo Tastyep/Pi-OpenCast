@@ -31,8 +31,10 @@ class MemoryRepo:
         if len(self._table) == prev_size:
             raise RepoError(f"cannot delete: '{model}' doesn't exist")
 
-    def list(self):
-        return deepcopy(self._table)
+    def list(self, ids=None):
+        return deepcopy(
+            self._table if ids is None else [m for m in self._table if m.id in ids]
+        )
 
     def get(self, id_):
         model = next((m for m in self._table if m.id == id_), None)
