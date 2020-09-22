@@ -1,3 +1,5 @@
+""" Filesystem operations """
+
 from pathlib import Path
 
 
