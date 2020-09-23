@@ -1,4 +1,3 @@
-import uuid
 from test.shared.app.facade_mock import AppFacadeMock
 from test.util import TestCase
 from unittest.mock import Mock
@@ -19,7 +18,7 @@ class WorkflowTestCase(TestCase):
         self.app_facade.workflow_manager.start.side_effect = start_workflow
 
     def make_workflow(self, workflow_cls, *args, **kwargs):
-        return workflow_cls(uuid.uuid4(), self.app_facade, *args, **kwargs)
+        return workflow_cls(IdentityService.random(), self.app_facade, *args, **kwargs)
 
     def expect_dispatch(self, cmd_cls, model_id, *args, **kwargs):
         cmd_id = IdentityService.id_command(cmd_cls, model_id)
@@ -34,11 +33,16 @@ class WorkflowTestCase(TestCase):
         event = evt_cls(*args, **kwargs)
         getattr(workflow, name_handler_method(evt_cls))(event)
 
-    def expect_workflow_creation(self, wf_cls):
-        wf_mock = Mock()
-        wf_mock.Completed = wf_cls.Completed
-        wf_mock.Aborted = wf_cls.Aborted
+    def expect_workflow_creation(self, wf_cls, times=1):
+        mocks = []
+        for i in range(times):
+            wf_mock = Mock()
+            wf_mock.Completed = wf_cls.Completed
+            wf_mock.Aborted = wf_cls.Aborted
+            mocks.append(wf_mock)
+
         getattr(
             self.app_facade.workflow_factory, name_factory_method(wf_cls)
-        ).return_value = wf_mock
-        return wf_mock
+        ).side_effect = mocks
+
+        return tuple(mocks)

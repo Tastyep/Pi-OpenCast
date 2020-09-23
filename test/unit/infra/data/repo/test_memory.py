@@ -1,8 +1,7 @@
 from test.util import TestCase
-from unittest.mock import Mock
-from uuid import uuid4
 
 from OpenCast.domain.model.entity import Entity
+from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.data.repo.error import RepoError
 from OpenCast.infra.data.repo.memory import MemoryRepo
 
@@ -10,7 +9,7 @@ from OpenCast.infra.data.repo.memory import MemoryRepo
 class MemoryRepoTest(TestCase):
     def setUp(self):
         self.repo = MemoryRepo()
-        self.entity = Entity(uuid4())
+        self.entity = Entity(IdentityService.random())
 
     def test_create(self):
         self.repo.create(self.entity)
@@ -65,8 +64,15 @@ class MemoryRepoTest(TestCase):
     def test_list(self):
         self.repo.create(self.entity)
         entity_list = self.repo.list()
-        self.assertEqual(1, len(entity_list))
+        self.assertEqual([self.entity], entity_list)
         self.assertNotEqual(id(self.entity), id(entity_list[0]))
+
+    def test_list_filtered(self):
+        entities = [Entity(IdentityService.random()) for i in range(5)]
+        for entity in entities:
+            self.repo.create(entity)
+        entity_list = self.repo.list([entities[0].id, entities[2].id])
+        self.assertEqual([entities[0], entities[2]], entity_list)
 
     def test_get(self):
         self.repo.create(self.entity)

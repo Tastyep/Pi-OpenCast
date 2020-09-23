@@ -41,6 +41,9 @@ class VideoParser:
 
         raise_on_error()
         streams = media.tracks_get()
+        if streams is None:
+            self._logger.error("No stream found", video=video_path)
+            raise VideoParsingError(f"No stream found for '{video_path}'")
 
         type_to_code = {
             TrackType.audio: "audio",

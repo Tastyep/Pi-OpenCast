@@ -1,14 +1,14 @@
 from test.util import TestCase
 from unittest.mock import Mock
-from uuid import uuid4
 
 from OpenCast.domain.event.dispatcher import EventDispatcher
+from OpenCast.domain.service.identity import IdentityService
 
 
 class EventDispatcherTest(TestCase):
     def setUp(self):
         self.dispatcher = EventDispatcher()
-        self.cmd_id = uuid4()
+        self.cmd_id = IdentityService.random()
         self.evt = Mock()
         self.evt.id = self.cmd_id
         self.handler = Mock()
@@ -21,7 +21,9 @@ class EventDispatcherTest(TestCase):
     def test_observe_event_by_id(self):
         self.dispatcher.observe_result(self.cmd_id, {type(self.evt): self.handler})
         # Unrelated event should not call the handler
-        self.dispatcher.observe_result(uuid4(), {type(self.evt): self.handler})
+        self.dispatcher.observe_result(
+            IdentityService.random(), {type(self.evt): self.handler}
+        )
         self.dispatcher.dispatch(self.evt)
         self.handler.assert_called_once_with(self.evt)
 

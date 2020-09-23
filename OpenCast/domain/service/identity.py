@@ -9,6 +9,10 @@ class IdentityService:
     PLAYLIST_NS = uuid4()
 
     @staticmethod
+    def random():
+        return uuid4()
+
+    @staticmethod
     def id_workflow(workflow_cls, model_id):
         return uuid3(model_id, workflow_cls.__name__)
 

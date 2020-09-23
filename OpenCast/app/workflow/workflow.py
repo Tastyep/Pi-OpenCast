@@ -53,6 +53,7 @@ class Workflow(Machine):
 
     def reset(self):
         """ Reset the workflow and its sub-workflows to their initial state"""
+        # TODO: Remove as unused and incompatible with the workflow manager
         self.set_state(self._initial)
         for workflow in self._sub_workflows:
             workflow.reset()
@@ -66,10 +67,15 @@ class Workflow(Machine):
 
     def _observe_start(self, workflow, *args, **kwargs):
         self._observe(workflow.id, [workflow.Completed, workflow.Aborted])
+        self._start_workflow(workflow, *args, **kwargs)
+
+    def _start_workflow(self, workflow, *args, **kwargs):
         if self._app_facade.workflow_manager.start(workflow, *args, **kwargs):
             self._sub_workflows.append(workflow)
 
     def _observe_dispatch(self, evt_cls, cmd_cls, model_id: Id, *args, **kwargs):
+        # TODO consider using the workflow id for commands from a same workflow
+        # cmd = cmd_cls(self.id, model_id, *args, **kwargs)
         cmd = make_cmd(cmd_cls, model_id, *args, **kwargs)
         self._observe(cmd.id, [evt_cls, OperationError])
         self._cmd_dispatcher.dispatch(cmd)

@@ -26,16 +26,19 @@ class ServiceTestCase(TestCase):
         self.data_producer = DataProducer.make()
         self.data_producer.player().populate(self.data_facade)
 
-        infraServiceFactory = Mock()
-        self.service_factory = ServiceFactory(infraServiceFactory)
-
         self.downloader = Mock()
         self.video_parser = Mock()
+        self.file_service = Mock()
         self.infra_facade = InfraFacadeMock()
         self.infra_facade.media_factory.make_downloader.return_value = self.downloader
         self.infra_facade.media_factory.make_video_parser.return_value = (
             self.video_parser
         )
+        self.infra_facade.service_factory.make_file_service.return_value = (
+            self.file_service
+        )
+
+        self.service_factory = ServiceFactory(self.infra_facade.service_factory)
 
         self.evt_expecter = EventExpecter(
             self.app_facade.cmd_dispatcher, self.app_facade.evt_dispatcher

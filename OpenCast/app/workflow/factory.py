@@ -6,11 +6,15 @@ from .player import (
     StreamPlaylistWorkflow,
     StreamVideoWorkflow,
 )
+from .root import RootWorkflow
 from .video import VideoWorkflow
 
 
 class WorkflowFactory(object):
     """Creates instances of workflows."""
+
+    def make_root_workflow(self, *args, **kwargs):
+        return RootWorkflow(*args, **kwargs)
 
     def make_video_workflow(self, *args, **kwargs):
         return VideoWorkflow(*args, **kwargs)

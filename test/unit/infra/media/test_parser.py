@@ -60,3 +60,19 @@ class VideoParserTest(TestCase):
             f"Can't parse streams from '{video_path}', status='{status}'",
             str(ctx.exception),
         )
+
+    def test_parse_streams_no_stream(self):
+        video_path = "/tmp/source.mp4"
+        media = Mock()
+        self.vlc.media_new.return_value = media
+        media.parse_with_options.return_value = 0
+        media.get_parsed_status.return_value = MediaParsedStatus.done
+        media.is_parsed.return_value = 1
+        media.tracks_get.return_value = None
+
+        with self.assertRaises(VideoParsingError) as ctx:
+            self.parser.parse_streams(video_path)
+        self.assertEqual(
+            f"No stream found for '{video_path}'",
+            str(ctx.exception),
+        )

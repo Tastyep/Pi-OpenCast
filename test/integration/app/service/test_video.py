@@ -118,9 +118,7 @@ class VideoServiceTest(ServiceTestCase):
         # Load from disk
         disk_subtitle = "/tmp/source.srt"
         path_mock.with_suffix.return_value = disk_subtitle
-        parent_mock = Mock()
-        path_mock.parents.__getitem__.return_value = parent_mock
-        parent_mock.glob.return_value = []
+        self.file_service.list_directory.return_value = [Path(disk_subtitle)]
 
         # Download from source
         source_subtitle = "/tmp/source.vtt"
