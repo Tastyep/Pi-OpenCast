@@ -10,6 +10,7 @@ from OpenCast.app.workflow.player import (
     StreamVideoWorkflow,
 )
 from OpenCast.domain.event import player as Evt
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import MonitorControllerTestCase
@@ -186,7 +187,9 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_pause(self):
         req = self.make_request("POST", "/pause")
         self.set_cmd_response(
-            make_cmd(Cmd.TogglePlayerState, self.player_id), Evt.PlayerStateToggled
+            make_cmd(Cmd.TogglePlayerState, self.player_id),
+            Evt.PlayerStateToggled,
+            PlayerState.PAUSED,
         )
 
         resp = await self.route(self.controller.pause, req)
@@ -281,6 +284,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.set_cmd_response(
             make_cmd(Cmd.ToggleSubtitle, self.player_id),
             Evt.SubtitleStateUpdated,
+            False,
         )
 
         resp = await self.route(self.controller.subtitle_toggle, req)
@@ -300,6 +304,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
             ),
             Evt.SubtitleDelayUpdated,
+            Player.SUBTITLE_DELAY_STEP,
         )
 
         resp = await self.route(self.controller.subtitle_seek, req)
@@ -312,6 +317,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 Cmd.AdjustSubtitleDelay, self.player_id, -Player.SUBTITLE_DELAY_STEP
             ),
             Evt.SubtitleDelayUpdated,
+            -Player.SUBTITLE_DELAY_STEP,
         )
 
         resp = await self.route(self.controller.subtitle_seek, req)

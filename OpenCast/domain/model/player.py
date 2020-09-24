@@ -68,12 +68,12 @@ class Player(Entity):
     @subtitle_state.setter
     def subtitle_state(self, state):
         self._sub_state = state
-        self._record(Evt.SubtitleStateUpdated)
+        self._record(Evt.SubtitleStateUpdated, self._sub_state)
 
     @subtitle_delay.setter
     def subtitle_delay(self, delay):
         self._sub_delay = delay
-        self._record(Evt.SubtitleDelayUpdated)
+        self._record(Evt.SubtitleDelayUpdated, self._sub_delay)
 
     @volume.setter
     def volume(self, v):
@@ -144,7 +144,7 @@ class Player(Entity):
             self._state = State.PLAYING
         else:
             raise DomainError("the player is not started")
-        self._record(Evt.PlayerStateToggled)
+        self._record(Evt.PlayerStateToggled, self._state)
 
     def seek_video(self):
         if self._state is State.STOPPED:

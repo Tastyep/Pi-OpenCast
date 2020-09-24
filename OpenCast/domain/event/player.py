@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+from OpenCast.domain.model.player import State
+
 from .event import Event, ModelId
 
 
@@ -27,7 +29,7 @@ class PlayerStopped(Event):
 
 @dataclass
 class PlayerStateToggled(Event):
-    pass
+    state: State
 
 
 @dataclass
@@ -42,9 +44,9 @@ class VolumeUpdated(Event):
 
 @dataclass
 class SubtitleStateUpdated(Event):
-    pass
+    state: bool
 
 
 @dataclass
 class SubtitleDelayUpdated(Event):
-    pass
+    delay: int
