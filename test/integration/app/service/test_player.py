@@ -2,6 +2,7 @@ from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.event import player as Evt
 from OpenCast.domain.model.player import Player
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ServiceTestCase
@@ -79,9 +80,12 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.PlayerStateToggled, self.player_id).from_(
-            Cmd.TogglePlayerState, self.player_id
-        )
+        self.evt_expecter.expect(
+            Evt.PlayerStateToggled, self.player_id, PlayerState.PAUSED
+        ).from_(Cmd.TogglePlayerState, self.player_id)
+        self.evt_expecter.expect(
+            Evt.PlayerStateToggled, self.player_id, PlayerState.PLAYING
+        ).from_(Cmd.TogglePlayerState, self.player_id)
 
     def test_seek_video(self):
         self.data_producer.player().video("source", None).play().populate(
@@ -111,20 +115,23 @@ class PlayerServiceTest(ServiceTestCase):
     def test_toggle_subtitle(self):
         self.data_producer.populate(self.data_facade)
 
-        self.evt_expecter.expect(Evt.SubtitleStateUpdated, self.player_id).from_(
+        self.evt_expecter.expect(Evt.SubtitleStateUpdated, self.player_id, False).from_(
+            Cmd.ToggleSubtitle, self.player_id
+        )
+        self.evt_expecter.expect(Evt.SubtitleStateUpdated, self.player_id, True).from_(
             Cmd.ToggleSubtitle, self.player_id
         )
 
     def test_increase_subtitle_delay(self):
         self.data_producer.populate(self.data_facade)
 
-        self.evt_expecter.expect(Evt.SubtitleDelayUpdated, self.player_id).from_(
-            Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
-        )
+        self.evt_expecter.expect(
+            Evt.SubtitleDelayUpdated, self.player_id, Player.SUBTITLE_DELAY_STEP
+        ).from_(Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP)
 
     def test_decrease_subtitle_delay(self):
         self.data_producer.populate(self.data_facade)
 
-        self.evt_expecter.expect(Evt.SubtitleDelayUpdated, self.player_id).from_(
-            Cmd.DecreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP
-        )
+        self.evt_expecter.expect(
+            Evt.SubtitleDelayUpdated, self.player_id, -Player.SUBTITLE_DELAY_STEP
+        ).from_(Cmd.DecreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP)
