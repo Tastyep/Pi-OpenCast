@@ -1,33 +1,27 @@
 """ Abstract representation of a versionable entity """
 
-
 from copy import deepcopy
 
-from . import Id
+import dacite
 
 
 class Entity:
-    def __init__(self, id_: Id):
-        self._id = id_
-        self._version = 0
+    def __init__(self, data_cls, *args, **kwargs):
+        if not args:  # Initialized from a dict
+            self._data = dacite.from_dict(data_cls, kwargs)
+        else:
+            self._data = data_cls(*args, **kwargs)
         self._events = []
 
     def __eq__(self, other):
         return isinstance(other, type(self)) and self.id == other.id
 
     def __repr__(self):
-        return f"id: {self.id}, version: {self.version}"
+        return f"{type(self).__name__}({self._data})"
 
     @property
     def id(self):
-        return self._id
-
-    @property
-    def version(self):
-        return self._version
-
-    def update_version(self):
-        self._version += 1
+        return self._data.id
 
     def release_events(self):
         events = deepcopy(self._events)
@@ -35,9 +29,7 @@ class Entity:
         return events
 
     def to_dict(self):
-        data = self.__dict__
-        data.pop("_events")
-        return data
+        return self.Schema().dump(self._data)
 
     def _record(self, evtcls, *args):
         self._events.append({evtcls: (self.id,) + args})
