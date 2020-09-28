@@ -9,11 +9,12 @@ from vlc import Instance as VlcInstance
 from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
 from .app.service.module import ServiceModule
+from .app.tool.json_encoder import ModelEncoder
 from .config import ConfigError, config
 from .domain.model.player import Player
 from .domain.service.factory import ServiceFactory
 from .domain.service.identity import IdentityService
-from .infra.data.facade import DataFacade
+from .infra.data.manager import DataManager, StorageType
 from .infra.data.repo.factory import RepoFactory
 from .infra.facade import InfraFacade
 from .infra.io.factory import IoFactory
@@ -43,7 +44,14 @@ def main(argv=None):
     service_factory = ServiceFactory(infra_service_factory)
 
     repo_factory = RepoFactory()
-    data_facade = DataFacade(repo_factory)
+    data_manager = DataManager(repo_factory)
+    data_facade = data_manager.connect(
+        StorageType.JSON,
+        path=config["database.file"],
+        indent=4,
+        separators=(",", ": "),
+        cls=ModelEncoder,
+    )
     data_facade.player_repo.create(Player(IdentityService.id_player()))
 
     io_factory = IoFactory()

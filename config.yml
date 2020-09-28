@@ -8,13 +8,17 @@ server:
   # The port used by the server
   port: 2020
 
+database:
+  # The database file
+  file: opencast.db
+
 player:
   # Fill the background with black to not see what's behind the player.
-  hide_background : True
+  hide_background: True
   # Loop the last video until a new one becomes available.
-  loop_last       : True
+  loop_last: True
   # The maximum number of files on disk.
-  history_size    : 15
+  history_size: 15
 
 downloader:
   # The directory used to store downloaded videos.

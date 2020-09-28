@@ -31,8 +31,6 @@ class ModelEncoder(EnhancedJSONEncoder):
 
     def _encode_entity(self, obj):
         data = obj.to_dict()
-        data = {k[1:] if k[0] == "_" else k: v for k, v in data.items()}
-        data.pop("version")
         return data
 
 

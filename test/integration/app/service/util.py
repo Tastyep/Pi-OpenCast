@@ -8,7 +8,7 @@ from OpenCast.app.controller.module import ControllerModule
 from OpenCast.app.facade import AppFacade
 from OpenCast.app.service.module import ServiceModule
 from OpenCast.domain.service.factory import ServiceFactory
-from OpenCast.infra.data.facade import DataFacade
+from OpenCast.infra.data.manager import DataManager, StorageType
 from OpenCast.infra.data.repo.factory import RepoFactory
 
 
@@ -22,7 +22,8 @@ class ServiceTestCase(TestCase):
         self.app_facade = AppFacade(app_executor)
 
         repo_factory = RepoFactory()
-        self.data_facade = DataFacade(repo_factory)
+        data_manager = DataManager(repo_factory)
+        self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
         self.data_producer.player().populate(self.data_facade)
 

@@ -2,6 +2,7 @@
 *.pyc
 *~
 *.xpi
+*.db
 
 
 # node modules
