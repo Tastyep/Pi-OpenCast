@@ -16,9 +16,9 @@ from OpenCast.domain.service.identity import IdentityService
 from .workflow import Workflow
 
 
-class RootWorkflow(Workflow):
-    Completed = namedtuple("RootWorkflowCompleted", ("id"))
-    Aborted = namedtuple("RootWorkflowAborted", ("id"))
+class InitWorkflow(Workflow):
+    Completed = namedtuple("InitWorkflowCompleted", ("id"))
+    Aborted = namedtuple("InitWorkflowAborted", ("id"))
 
     # fmt: off
     class States(Enum):
@@ -53,7 +53,7 @@ class RootWorkflow(Workflow):
             self,
             id,
             app_facade,
-            initial=RootWorkflow.States.INITIAL,
+            initial=InitWorkflow.States.INITIAL,
         )
         self._infra_facade = infra_facade
         self._data_facade = data_facade

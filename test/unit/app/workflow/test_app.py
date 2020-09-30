@@ -4,8 +4,7 @@ from unittest.mock import Mock
 
 from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import video as VideoCmd
-from OpenCast.app.workflow.root import RootWorkflow
-from OpenCast.app.workflow.video import VideoWorkflow
+from OpenCast.app.workflow.app import InitWorkflow
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import State as PlayerState
@@ -15,7 +14,7 @@ from OpenCast.domain.service.identity import IdentityService
 from .util import WorkflowTestCase
 
 
-class RootWorkflowTest(WorkflowTestCase):
+class InitWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super().setUp()
         self.video_repo = Mock()
@@ -31,7 +30,7 @@ class RootWorkflowTest(WorkflowTestCase):
         )
 
         self.workflow = self.make_workflow(
-            RootWorkflow, self.infra_facade, self.data_facade
+            InitWorkflow, self.infra_facade, self.data_facade
         )
 
     def make_videos(self, count: int):

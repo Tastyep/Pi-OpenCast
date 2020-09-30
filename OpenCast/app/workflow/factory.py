@@ -1,20 +1,20 @@
 """ Factory for creating workflow objects """
 
+from .app import InitWorkflow
 from .player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
     StreamPlaylistWorkflow,
     StreamVideoWorkflow,
 )
-from .root import RootWorkflow
 from .video import VideoWorkflow
 
 
 class WorkflowFactory(object):
     """Creates instances of workflows."""
 
-    def make_root_workflow(self, *args, **kwargs):
-        return RootWorkflow(*args, **kwargs)
+    def make_init_workflow(self, *args, **kwargs):
+        return InitWorkflow(*args, **kwargs)
 
     def make_video_workflow(self, *args, **kwargs):
         return VideoWorkflow(*args, **kwargs)

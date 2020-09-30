@@ -62,7 +62,7 @@ def main(argv=None):
     ServiceModule(app_facade, infra_facade, data_facade, service_factory)
 
     workflow_id = IdentityService.random()
-    workflow = app_facade.workflow_factory.make_root_workflow(
+    workflow = app_facade.workflow_factory.make_init_workflow(
         workflow_id, app_facade, infra_facade, data_facade
     )
     app_facade.workflow_manager.start(workflow)
