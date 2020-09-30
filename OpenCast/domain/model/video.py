@@ -17,13 +17,13 @@ from .fields import PathField
 class Stream:
     index: int
     type: str
-    language: str
+    language: Optional[str]
 
 
 class StreamSchema(Schema):
     index = fields.Integer()
     type = fields.String()
-    language = fields.String()
+    language = fields.String(allow_none=True)
 
 
 class VideoSchema(Schema):
