@@ -2,8 +2,11 @@
 
 import logging
 import os
+import traceback
 from concurrent.futures import ThreadPoolExecutor
+from queue import SimpleQueue
 
+import structlog
 from vlc import Instance as VlcInstance
 
 from .app.controller.module import ControllerModule
@@ -22,6 +25,33 @@ from .infra.media.factory import MediaFactory
 from .infra.service.factory import ServiceFactory as InfraServiceFactory
 
 
+def run_server(logger, infra_facade):
+    try:
+        infra_facade.server.start(config["server.host"], config["server.port"])
+    except Exception as e:
+        logger.error(
+            "Server exception caught", error=e, traceback=traceback.format_exc()
+        )
+        return False
+    return True
+
+
+def run_init_workflow(app_facade, infra_facade, data_facade):
+    queue = SimpleQueue()
+
+    workflow_id = IdentityService.random()
+    workflow = app_facade.workflow_factory.make_init_workflow(
+        workflow_id, app_facade, infra_facade, data_facade
+    )
+    app_facade.evt_dispatcher.observe(
+        {workflow.Completed: queue.put, workflow.Aborted: queue.put}, times=1
+    )
+    app_facade.workflow_manager.start(workflow)
+
+    queue.get()
+    return workflow.is_COMPLETED()
+
+
 def main(argv=None):
     app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
@@ -34,6 +64,7 @@ def main(argv=None):
 
     # Get and update the log level
     logging.getLogger(__name__).setLevel(config["log.level"])
+    logger = structlog.get_logger(__name__)
 
     # TODO: make worker count configurable
     app_executor = ThreadPoolExecutor(max_workers=1)
@@ -61,8 +92,5 @@ def main(argv=None):
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)
     ServiceModule(app_facade, infra_facade, data_facade, service_factory)
 
-    workflow_id = IdentityService.random()
-    workflow = app_facade.workflow_factory.make_init_workflow(
-        workflow_id, app_facade, infra_facade, data_facade
-    )
-    app_facade.workflow_manager.start(workflow)
+    if run_init_workflow(app_facade, infra_facade, data_facade):
+        run_server(logger, infra_facade)

@@ -76,14 +76,14 @@ class InitWorkflowTest(WorkflowTestCase):
         )
         self.assertTrue(self.workflow.is_PURGING_VIDEOS())
 
-    def test_purging_videos_to_running_no_deletion(self):
+    def test_purging_videos_to_completed_no_deletion(self):
         video = Mock()
         video.path.exists.return_value = True
         self.video_repo.list.return_value = [video]
         self.workflow.to_PURGING_VIDEOS()
-        self.assertTrue(self.workflow.is_RUNNING())
+        self.assertTrue(self.workflow.is_COMPLETED())
 
-    def test_purging_videos_to_running_with_deletion(self):
+    def test_purging_videos_to_completed_with_deletion(self):
         video1 = Mock()
         video1.id = IdentityService.id_video("mock1")
         video1.path.exists.return_value = False
@@ -109,12 +109,4 @@ class InitWorkflowTest(WorkflowTestCase):
             cmd.id,
             video1.id,
         )
-        self.assertTrue(self.workflow.is_RUNNING())
-
-    def test_running_to_aborted(self):
-        def raise_exception(*_):
-            raise RuntimeError("server stopped")
-
-        self.infra_facade.server.start.side_effect = raise_exception
-        self.workflow.to_RUNNING()
-        self.assertTrue(self.workflow.is_ABORTED())
+        self.assertTrue(self.workflow.is_COMPLETED())

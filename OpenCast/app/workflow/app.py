@@ -1,6 +1,5 @@
 """ The application's workflow """
 
-import traceback
 from collections import namedtuple
 from enum import Enum, auto
 
@@ -8,7 +7,6 @@ import structlog
 
 from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import video as VideoCmd
-from OpenCast.config import config
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
@@ -25,7 +23,7 @@ class InitWorkflow(Workflow):
         INITIAL = auto()
         CREATING_PLAYER = auto()
         PURGING_VIDEOS = auto()
-        RUNNING = auto()
+        COMPLETED = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
@@ -33,7 +31,7 @@ class InitWorkflow(Workflow):
         ["start",             States.INITIAL,         States.PURGING_VIDEOS, "player_exists"],
         ["start",             States.INITIAL,         States.CREATING_PLAYER],
         ["_player_created",   States.CREATING_PLAYER, States.PURGING_VIDEOS],
-        ["_video_deleted",    States.PURGING_VIDEOS,  States.RUNNING,        "videos_purged"],
+        ["_video_deleted",    States.PURGING_VIDEOS,  States.COMPLETED,      "videos_purged"],
         ["_video_deleted",    States.PURGING_VIDEOS,  "="],
 
         ["_operation_error",  '*',                    States.ABORTED],
@@ -78,24 +76,16 @@ class InitWorkflow(Workflow):
                 if video.path is None or not video.path.exists()
             ]
             if not self._missing_videos:
-                self.to_RUNNING()
+                self.to_COMPLETED()
                 return
 
         video_id = self._missing_videos.pop()
         self._observe_dispatch(VideoEvt.VideoDeleted, VideoCmd.DeleteVideo, video_id)
 
-    def on_enter_RUNNING(self, *_):
-        try:
-            self._infra_facade.server.start(
-                config["server.host"], config["server.port"]
-            )
-        except Exception as e:
-            self._logger.error(
-                "Server exception caught", error=e, traceback=traceback.format_exc()
-            )
-            self.to_ABORTED(e)
+    def on_enter_COMPLETED(self, *_):
+        self.complete()
 
-    def on_enter_ABORTED(self, _):
+    def on_enter_ABORTED(self, *_):
         self.cancel()
 
     # Conditions
