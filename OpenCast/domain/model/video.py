@@ -38,7 +38,6 @@ class VideoSchema(Schema):
 
     @post_load
     def make_video(self, data, **_):
-        print(f"GENERATED: {data}")
         return Video(**data)
 
 

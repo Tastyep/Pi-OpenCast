@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest.mock import MagicMock, Mock
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError

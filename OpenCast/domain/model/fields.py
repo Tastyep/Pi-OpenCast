@@ -3,7 +3,7 @@
 import typing
 from pathlib import Path
 
-from marshmallow.fields import Field, utils
+from marshmallow.fields import Field
 
 
 class PathField(Field):
@@ -15,7 +15,6 @@ class PathField(Field):
     }
 
     def _serialize(self, value, attr, obj, **kwargs) -> typing.Optional[Path]:
-        print(f"SERIALIZE {value}")
         if value is None:
             return None
         if not isinstance(value, Path):
@@ -23,7 +22,6 @@ class PathField(Field):
         return str(value)
 
     def _deserialize(self, value, attr, data, **kwargs) -> typing.Any:
-        print(f"UNSERIALIZE {value}")
         if value is None:
             return None
         return Path(value)
