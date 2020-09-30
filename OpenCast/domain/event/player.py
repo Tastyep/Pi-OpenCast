@@ -8,6 +8,14 @@ from .event import Event, ModelId
 
 
 @dataclass
+class PlayerCreated(Event):
+    state: State
+    sub_state: bool
+    sub_delay: int
+    volume: int
+
+
+@dataclass
 class PlayerStarted(Event):
     video_id: ModelId
 

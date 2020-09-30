@@ -25,12 +25,13 @@ class ServiceTestCase(TestCase):
         data_manager = DataManager(repo_factory)
         self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
-        self.data_producer.player().populate(self.data_facade)
 
+        self.media_player = Mock()
         self.downloader = Mock()
         self.video_parser = Mock()
         self.file_service = Mock()
         self.infra_facade = InfraFacadeMock()
+        self.infra_facade.media_factory.make_player.return_value = self.media_player
         self.infra_facade.media_factory.make_downloader.return_value = self.downloader
         self.infra_facade.media_factory.make_video_parser.return_value = (
             self.video_parser

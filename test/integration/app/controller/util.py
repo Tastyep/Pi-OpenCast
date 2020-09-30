@@ -36,7 +36,6 @@ class MonitorControllerTestCase(AioHTTPTestCase):
         data_manager = DataManager(repo_factory)
         self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
-        self.data_producer.player().populate(self.data_facade)
 
         infraServiceFactory = Mock()
         self.service_factory = ServiceFactory(infraServiceFactory)

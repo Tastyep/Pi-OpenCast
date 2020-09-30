@@ -68,6 +68,13 @@ class Player(Entity):
 
     def __init__(self, *attrs, **kattrs):
         super().__init__(self.Data, *attrs, **kattrs)
+        self._record(
+            Evt.PlayerCreated,
+            self._data.state,
+            self._data.sub_state,
+            self._data.sub_delay,
+            self._data.volume,
+        )
 
     @property
     def state(self):
