@@ -28,10 +28,10 @@ class InitWorkflow(Workflow):
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["start",             States.INITIAL,         States.PURGING_VIDEOS, "player_exists"],
+        ["start",             States.INITIAL,         States.PURGING_VIDEOS, "player_exists"],  # noqa: E501
         ["start",             States.INITIAL,         States.CREATING_PLAYER],
         ["_player_created",   States.CREATING_PLAYER, States.PURGING_VIDEOS],
-        ["_video_deleted",    States.PURGING_VIDEOS,  States.COMPLETED,      "videos_purged"],
+        ["_video_deleted",    States.PURGING_VIDEOS,  States.COMPLETED,      "videos_purged"],  # noqa: E501
         ["_video_deleted",    States.PURGING_VIDEOS,  "="],
 
         ["_operation_error",  '*',                    States.ABORTED],

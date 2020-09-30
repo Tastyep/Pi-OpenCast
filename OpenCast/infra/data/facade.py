@@ -1,7 +1,5 @@
 """ The facade exposing persistence capabilities """
 
-from OpenCast.config import config
-
 
 class DataFacade:
     def __init__(self, database, repo_factory):
