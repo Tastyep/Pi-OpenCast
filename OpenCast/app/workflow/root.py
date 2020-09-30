@@ -1,5 +1,6 @@
 """ The application's workflow """
 
+import traceback
 from collections import namedtuple
 from enum import Enum, auto
 from pathlib import Path
@@ -77,7 +78,9 @@ class RootWorkflow(Workflow):
                 config["server.host"], config["server.port"]
             )
         except Exception as e:
-            self._logger.error("Server exception caught", error=e)
+            self._logger.error(
+                "Server exception caught", error=e, traceback=traceback.format_exc()
+            )
             self.to_ABORTED(e)
 
     def on_enter_ABORTED(self, _):
