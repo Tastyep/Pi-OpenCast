@@ -3,14 +3,16 @@
 import traceback
 from collections import namedtuple
 from enum import Enum, auto
-from pathlib import Path
 
 import structlog
 
+from OpenCast.app.command import player as PlayerCmd
+from OpenCast.app.command import video as VideoCmd
 from OpenCast.config import config
+from OpenCast.domain.event import player as PlayerEvt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .video import Video, VideoWorkflow
 from .workflow import Workflow
 
 
@@ -21,13 +23,20 @@ class RootWorkflow(Workflow):
     # fmt: off
     class States(Enum):
         INITIAL = auto()
-        LOADING = auto()
+        CREATING_PLAYER = auto()
+        PURGING_VIDEOS = auto()
         RUNNING = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["start", States.INITIAL, States.LOADING],
+        ["start",             States.INITIAL,         States.PURGING_VIDEOS, "player_exists"],
+        ["start",             States.INITIAL,         States.CREATING_PLAYER],
+        ["_player_created",   States.CREATING_PLAYER, States.PURGING_VIDEOS],
+        ["_video_deleted",    States.PURGING_VIDEOS,  States.RUNNING,        "videos_purged"],
+        ["_video_deleted",    States.PURGING_VIDEOS,  "="],
+
+        ["_operation_error",  '*',                    States.ABORTED],
     ]
     # fmt: on
 
@@ -49,30 +58,33 @@ class RootWorkflow(Workflow):
         self._infra_facade = infra_facade
         self._data_facade = data_facade
 
-        self._file_service = infra_facade.service_factory.make_file_service()
+        self._player_repo = data_facade.player_repo
+        self._video_repo = data_facade.video_repo
+
+        self._missing_videos = []
 
     # States
-    def on_enter_LOADING(self):
-        # TODO: move this logic in a separate task and spawn a new one from here
-        download_dir = Path(config["downloader.output_directory"])
-        files = self._file_service.list_directory(download_dir, "*")
-        for path in files:
-            if not path.is_file():
-                continue
-            source = str(path)
-            media_id = IdentityService.id_video(source)
-            workflow_id = IdentityService.id_workflow(VideoWorkflow, media_id)
-            workflow = self._factory.make_video_workflow(
-                workflow_id,
-                self._app_facade,
-                self._data_facade.video_repo,
-                Video(media_id, source, None),
-            )
-            self._start_workflow(workflow)
+    def on_enter_CREATING_PLAYER(self):
+        self._observe_dispatch(
+            PlayerEvt.PlayerCreated, PlayerCmd.CreatePlayer, IdentityService.id_player()
+        )
 
-        self.to_RUNNING()
+    def on_enter_PURGING_VIDEOS(self, *_):
+        if not self._missing_videos:
+            videos = self._video_repo.list()
+            self._missing_videos = [
+                video.id
+                for video in videos
+                if video.path is None or not video.path.exists()
+            ]
+            if not self._missing_videos:
+                self.to_RUNNING()
+                return
 
-    def on_enter_RUNNING(self):
+        video_id = self._missing_videos.pop()
+        self._observe_dispatch(VideoEvt.VideoDeleted, VideoCmd.DeleteVideo, video_id)
+
+    def on_enter_RUNNING(self, *_):
         try:
             self._infra_facade.server.start(
                 config["server.host"], config["server.port"]
@@ -85,3 +97,10 @@ class RootWorkflow(Workflow):
 
     def on_enter_ABORTED(self, _):
         self.cancel()
+
+    # Conditions
+    def player_exists(self):
+        return self._player_repo.exists(IdentityService.id_player())
+
+    def videos_purged(self, *_):
+        return len(self._missing_videos) == 0

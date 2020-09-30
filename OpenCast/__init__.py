@@ -11,7 +11,6 @@ from .app.facade import AppFacade
 from .app.service.module import ServiceModule
 from .app.tool.json_encoder import ModelEncoder
 from .config import ConfigError, config
-from .domain.model.player import Player
 from .domain.service.factory import ServiceFactory
 from .domain.service.identity import IdentityService
 from .infra.data.manager import DataManager, StorageType
@@ -52,7 +51,6 @@ def main(argv=None):
         separators=(",", ": "),
         cls=ModelEncoder,
     )
-    data_facade.player_repo.create(Player(IdentityService.id_player()))
 
     io_factory = IoFactory()
     media_factory = MediaFactory(
