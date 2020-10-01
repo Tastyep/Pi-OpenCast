@@ -45,7 +45,9 @@ class PlayerSchema(Schema):
 
     @post_load
     def make_player(self, data, **_):
-        return Player(**data)
+        player = Player(**data)
+        player._events.clear()
+        return player
 
 
 class Player(Entity):

@@ -38,7 +38,9 @@ class VideoSchema(Schema):
 
     @post_load
     def make_video(self, data, **_):
-        return Video(**data)
+        video = Video(**data)
+        video._events.clear()
+        return video
 
 
 class Video(Entity):
