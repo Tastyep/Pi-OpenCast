@@ -3,8 +3,9 @@ from test.util import TestCase
 from unittest.mock import Mock
 
 from OpenCast.app.service.error import OperationError
+from OpenCast.domain.event.dispatcher import EventDispatcher
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.util.naming import name_factory_method, name_handler_method
+from OpenCast.util.naming import name_factory_method
 
 
 class WorkflowTestCase(TestCase):
@@ -16,6 +17,7 @@ class WorkflowTestCase(TestCase):
             return True
 
         self.app_facade.workflow_manager.start.side_effect = start_workflow
+        self.app_facade.evt_dispatcher = EventDispatcher()
 
     def make_workflow(self, workflow_cls, *args, **kwargs):
         return workflow_cls(IdentityService.random(), self.app_facade, *args, **kwargs)
@@ -24,14 +26,15 @@ class WorkflowTestCase(TestCase):
         cmd_id = IdentityService.id_command(cmd_cls, model_id)
         cmd = cmd_cls(cmd_id, model_id, *args, **kwargs)
         self.app_facade.cmd_dispatcher.dispatch.assert_called_once_with(cmd)
+        self.app_facade.cmd_dispatcher.dispatch.reset_mock()
         return cmd
 
-    def raise_error(self, workflow, cmd):
-        self.raise_event(workflow, OperationError, cmd, "")
+    def raise_error(self, cmd):
+        self.raise_event(OperationError, cmd.id, "")
 
-    def raise_event(self, workflow, evt_cls, *args, **kwargs):
+    def raise_event(self, evt_cls, *args, **kwargs):
         event = evt_cls(*args, **kwargs)
-        getattr(workflow, name_handler_method(evt_cls))(event)
+        self.app_facade.evt_dispatcher.dispatch(event)
 
     def expect_workflow_creation(self, wf_cls, times=1):
         mocks = []

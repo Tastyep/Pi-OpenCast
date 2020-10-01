@@ -1,5 +1,6 @@
 from aiohttp.test_utils import unittest_run_loop
 
+from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import video as VideoCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
@@ -13,24 +14,26 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
         super(VideoMonitorControllerTest, self).setUp()
         self.player_id = IdentityService.id_player()
         self.video_id = IdentityService.id_video("source")
-        self.cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video_id)
 
     @unittest_run_loop
     async def test_event_listening(self):
         async with self.client.ws_connect(f"/api/videos/events") as ws:
-            id_evt = VideoEvt.VideoIdentified(self.cmd_id, self.video_id, {})
-            self.evt_dispatcher.dispatch(id_evt)
-            await self.expect_ws_events(ws, [id_evt])
+            cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video_id)
+            created_evt = VideoEvt.VideoCreated(cmd_id, self.video_id, "source", None)
+            self.evt_dispatcher.dispatch(created_evt)
+            await self.expect_ws_events(ws, [created_evt])
 
-            del_evt = VideoEvt.VideoDeleted(self.cmd_id, self.video_id)
-            self.evt_dispatcher.dispatch(del_evt)
+            cmd_id = IdentityService.id_command(VideoCmd.IdentifyVideo, self.video_id)
+            id_evt = VideoEvt.VideoIdentified(cmd_id, self.video_id, {})
+            self.evt_dispatcher.dispatch(created_evt)
             self.evt_dispatcher.dispatch(id_evt)
-            await self.expect_ws_events(ws, [del_evt, id_evt])
+            await self.expect_ws_events(ws, [created_evt, id_evt])
 
     @unittest_run_loop
     async def test_invalid_event_listening(self):
         async with self.client.ws_connect(f"/api/videos/events") as ws:
-            player_evt = PlayerEvt.PlayerStopped(self.cmd_id, self.player_id)
+            cmd_id = IdentityService.id_command(PlayerCmd.PlayVideo, self.player_id)
+            player_evt = PlayerEvt.PlayerStarted(cmd_id, self.player_id, self.video_id)
             self.evt_dispatcher.dispatch(player_evt)
             with self.assertRaises(asyncio.TimeoutError):
                 await self.expect_ws_events(ws, [player_evt])

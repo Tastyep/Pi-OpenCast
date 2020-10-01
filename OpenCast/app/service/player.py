@@ -5,7 +5,9 @@ import structlog
 
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import config
+from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
 
 from .service import Service
@@ -16,16 +18,25 @@ class PlayerService(Service):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, self, player_cmds)
 
+        self._observe_event(PlayerEvt.PlayerCreated)
         self._observe_event(VideoEvt.VideoDeleted)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
         self._player = media_factory.make_player(app_facade.evt_dispatcher)
 
-        model = self._player_model()
-        self._player.set_volume(model.volume)
+        player = self._player_repo.get_player()
+        if player is not None:
+            self._init_player(player.volume)
 
     # Command handler implementation
+
+    def _create_player(self, cmd):
+        def impl(ctx):
+            player = Player(cmd.model_id)
+            ctx.add(player)
+
+        self._start_transaction(self._player_repo, cmd.id, impl)
 
     def _play_video(self, cmd):
         def impl(player):
@@ -107,6 +118,9 @@ class PlayerService(Service):
 
     # Event handler implementation
 
+    def _player_created(self, evt):
+        self._init_player(evt.volume)
+
     def _video_deleted(self, evt):
         def impl(model):
             if model.has_video(evt.model_id):
@@ -117,6 +131,9 @@ class PlayerService(Service):
     # Private
     def _player_model(self):
         return self._player_repo.get_player()
+
+    def _init_player(self, volume):
+        self._player.set_volume(volume)
 
     def _update(self, cmd_id, mutator, *args):
         def impl(ctx):

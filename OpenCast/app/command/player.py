@@ -4,6 +4,11 @@ from .command import Command, ModelId, command
 
 
 @command
+class CreatePlayer(Command):
+    pass
+
+
+@command
 class PlayVideo(Command):
     video_id: ModelId
 

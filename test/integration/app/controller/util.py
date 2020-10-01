@@ -14,7 +14,7 @@ from OpenCast.app.facade import AppFacade
 from OpenCast.app.service.module import ServiceModule
 from OpenCast.app.tool.json_encoder import EventEncoder
 from OpenCast.domain.service.factory import ServiceFactory
-from OpenCast.infra.data.facade import DataFacade
+from OpenCast.infra.data.manager import DataManager, StorageType
 from OpenCast.infra.data.repo.factory import RepoFactory
 from OpenCast.infra.io.factory import IoFactory
 from OpenCast.infra.io.server import Server
@@ -33,9 +33,9 @@ class MonitorControllerTestCase(AioHTTPTestCase):
         self.evt_dispatcher = self.app_facade.evt_dispatcher
 
         repo_factory = RepoFactory()
-        self.data_facade = DataFacade(repo_factory)
+        data_manager = DataManager(repo_factory)
+        self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
-        self.data_producer.player().populate(self.data_facade)
 
         infraServiceFactory = Mock()
         self.service_factory = ServiceFactory(infraServiceFactory)

@@ -10,7 +10,7 @@ from aiohttp.test_utils import make_mocked_request
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.event.dispatcher import EventDispatcher
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.infra.data.facade import DataFacade
+from OpenCast.infra.data.manager import DataManager, StorageType
 from OpenCast.infra.data.repo.factory import RepoFactory
 from OpenCast.infra.io.factory import IoFactory
 from OpenCast.util.naming import name_handler_method
@@ -21,7 +21,8 @@ class ControllerTestCase(TestCase):
         self.app_facade = AppFacadeMock()
 
         repo_factory = RepoFactory()
-        self.data_facade = DataFacade(repo_factory)
+        data_manager = DataManager(repo_factory)
+        self.data_facade = data_manager.connect(StorageType.MEMORY)
 
         self.data_producer = DataProducer.make()
 
@@ -44,7 +45,8 @@ class MonitorControllerTestCase(IsolatedAsyncioTestCase):
         self.app_facade.evt_dispatcher = EventDispatcher()
 
         repo_factory = RepoFactory()
-        self.data_facade = DataFacade(repo_factory)
+        data_manager = DataManager(repo_factory)
+        self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
 
         self.infra_facade = InfraFacadeMock()

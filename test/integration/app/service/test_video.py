@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest.mock import MagicMock, Mock
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError
@@ -110,15 +109,12 @@ class VideoServiceTest(ServiceTestCase):
         )
 
     def test_fetch_video_subtitle(self):
-        path_mock = MagicMock()
-        self.data_producer.video("source", None, path=path_mock).populate(
+        self.data_producer.video("source", None, path=Path("/tmp/source.mp4")).populate(
             self.data_facade
         )
 
         # Load from disk
-        disk_subtitle = "/tmp/source.srt"
-        path_mock.with_suffix.return_value = disk_subtitle
-        self.file_service.list_directory.return_value = [Path(disk_subtitle)]
+        self.file_service.list_directory.return_value = []
 
         # Download from source
         source_subtitle = "/tmp/source.vtt"

@@ -1,12 +1,13 @@
 """ Entity identification operations """
 
-from uuid import uuid3, uuid4
+from uuid import UUID, uuid3, uuid4
 
 
 class IdentityService:
-    PLAYER_NS = uuid4()
-    VIDEO_NS = uuid4()
-    PLAYLIST_NS = uuid4()
+    # Randomly generated
+    PLAYER_NS = UUID("d4ff6d03-f5de-4153-8382-7f7da42be559")
+    VIDEO_NS = UUID("eee85b82-3d83-4531-80f8-c0b5e3b7cef3")
+    PLAYLIST_NS = UUID("83c99116-66f0-4191-bc26-0e979ba2e835")
 
     @staticmethod
     def random():
@@ -22,7 +23,7 @@ class IdentityService:
 
     @classmethod
     def id_player(cls):
-        return uuid3(cls.PLAYER_NS, str(cls.PLAYER_NS))
+        return cls.PLAYER_NS
 
     @classmethod
     def id_video(cls, source):

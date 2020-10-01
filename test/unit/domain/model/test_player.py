@@ -14,7 +14,8 @@ from .util import ModelTestCase
 
 class PlayerTest(ModelTestCase):
     def setUp(self):
-        self.player = Player(None)
+        self.player = Player(IdentityService.id_player())
+        self.player.release_events()
 
     def make_videos(self, video_count, playlist_id=None):
         return [self.make_video(None, playlist_id) for i in range(video_count)]
@@ -25,10 +26,12 @@ class PlayerTest(ModelTestCase):
         return Video(IdentityService.id_video(source), source, playlist_id)
 
     def test_construction(self):
-        self.assertEqual(70, self.player.volume)
-        self.assertTrue(self.player.subtitle_state)
-        self.assertEqual(0, self.player.subtitle_delay)
-        self.assertEqual(PlayerState.STOPPED, self.player.state)
+        player = Player(IdentityService.id_player())
+        self.assertEqual(70, player.volume)
+        self.assertTrue(player.subtitle_state)
+        self.assertEqual(0, player.subtitle_delay)
+        self.assertEqual(PlayerState.STOPPED, player.state)
+        self.expect_events(player, Evt.PlayerCreated)
 
     def test_play(self):
         video = self.make_video()

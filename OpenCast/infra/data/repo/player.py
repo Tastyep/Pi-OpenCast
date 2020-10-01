@@ -1,14 +1,14 @@
 """ Player repository """
 
-from copy import deepcopy
+from OpenCast.domain.model.player import PlayerSchema
 
-from .memory import MemoryRepo
+from .repository import Repository
 
 
-class PlayerRepo(MemoryRepo):
-    def __init__(self):
-        super().__init__()
+class PlayerRepo(Repository):
+    def __init__(self, database):
+        super().__init__(database, PlayerSchema())
 
     def get_player(self):
-        players = self.list()
-        return deepcopy(players[0]) if len(players) > 0 else None
+        collection = self.list()
+        return collection[0] if collection else None
