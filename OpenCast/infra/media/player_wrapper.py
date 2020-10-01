@@ -6,7 +6,6 @@ import structlog
 from vlc import EventType
 
 import OpenCast.infra.event.player as e
-from OpenCast.infra import Id
 
 from .error import PlayerError
 
@@ -19,17 +18,14 @@ class PlayerWrapper:
         self._evt_dispatcher = evt_dispatcher
 
         self._player = self._instance.media_player_new()
-        self._id_to_media = {}
 
         player_events = self._player.event_manager()
         player_events.event_attach(EventType.MediaPlayerEndReached, self._on_media_end)
 
-    def play(self, video_id: Id, video_path: str):
-        media = self._id_to_media.get(video_id, None)
-        if media is None:
-            media = self._instance.media_new(video_path)
-            self._id_to_media[video_id] = media
+    def play(self, video_path: str):
+        media = self._instance.media_new_path(video_path)
         self._player.set_media(media)
+        media.release()
         self._player.play()
 
     def stop(self):
