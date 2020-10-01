@@ -17,7 +17,7 @@ class VideoParserTest(TestCase):
     def test_parse_streams(self):
         video_path = "/tmp/source.mp4"
         media = Mock()
-        self.vlc.media_new.return_value = media
+        self.vlc.media_new_path.return_value = media
         media.parse_with_options.return_value = 0
         media.get_parsed_status.return_value = MediaParsedStatus.done
         media.is_parsed.return_value = 1
@@ -36,7 +36,7 @@ class VideoParserTest(TestCase):
     def test_parse_streams_failed(self):
         video_path = "/tmp/source.mp4"
         media = Mock()
-        self.vlc.media_new.return_value = media
+        self.vlc.media_new_path.return_value = media
         status = MediaParsedStatus.failed
         media.get_parsed_status.return_value = status
         media.parse_with_options.return_value = -1
@@ -50,7 +50,7 @@ class VideoParserTest(TestCase):
     def test_parse_streams_timeout(self):
         video_path = "/tmp/source.mp4"
         media = Mock()
-        self.vlc.media_new.return_value = media
+        self.vlc.media_new_path.return_value = media
         status = MediaParsedStatus.timeout
         media.get_parsed_status.return_value = status
         media.parse_with_options.return_value = 0
@@ -64,7 +64,7 @@ class VideoParserTest(TestCase):
     def test_parse_streams_no_stream(self):
         video_path = "/tmp/source.mp4"
         media = Mock()
-        self.vlc.media_new.return_value = media
+        self.vlc.media_new_path.return_value = media
         media.parse_with_options.return_value = 0
         media.get_parsed_status.return_value = MediaParsedStatus.done
         media.is_parsed.return_value = 1

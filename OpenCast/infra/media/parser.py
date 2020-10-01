@@ -14,7 +14,7 @@ class VideoParser:
         self._vlc = vlc_instance
 
     def parse_streams(self, video_path: str):
-        media = self._vlc.media_new(video_path)
+        media = self._vlc.media_new_path(video_path)
         cv = Condition()
 
         def parse_status_update(_):
@@ -41,6 +41,7 @@ class VideoParser:
 
         raise_on_error()
         streams = media.tracks_get()
+        media.release()
         if streams is None:
             self._logger.error("No stream found", video=video_path)
             raise VideoParsingError(f"No stream found for '{video_path}'")
