@@ -1,4 +1,5 @@
 from OpenCast.domain.model.player import Player
+from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 
@@ -8,7 +9,7 @@ class Population:
         self._entities = {}
         self._last_entity = {}
 
-    def add(self, cls, id, args, attrs):
+    def add(self, cls, id, *args, **attrs):
         id_to_entity = self._entities.get(cls, {})
         if id in id_to_entity:
             self._last_entity[cls] = id
@@ -36,6 +37,7 @@ class Population:
 
         register(data_facade.player_repo, self._entities.get(Player, {}))
         register(data_facade.video_repo, self._entities.get(Video, {}))
+        register(data_facade.playlist_repo, self._entities.get(Playlist, {}))
 
     def _update_attrs(self, entity, attrs):
         for attr, value in attrs.items():
@@ -56,17 +58,19 @@ class DataProducer:
     def video(self, *args, **attrs):
         return VideoProducer(self._population).video(*args, **attrs)
 
+    def playlist(self, *args, **attrs):
+        return PlaylistProducer(self._population).playlist(*args, **attrs)
+
     def populate(self, data_facade):
         self._population.register(data_facade)
 
 
 class PlayerProducer(DataProducer):
-    def __init__(self, population):
-        super(PlayerProducer, self).__init__(population)
-
     def player(self, *args, **attrs):
+        playlist_id = IdentityService.id_playlist()
+        PlaylistProducer(self._population).playlist(playlist_id, "queue", [])
         player_id = IdentityService.id_player()
-        self._population.add(Player, player_id, args, attrs)
+        self._population.add(Player, player_id, playlist_id, *args, **attrs)
         return self
 
     def video(self, *args, **attrs):
@@ -84,10 +88,13 @@ class PlayerProducer(DataProducer):
 
 
 class VideoProducer(DataProducer):
-    def __init__(self, population):
-        super(VideoProducer, self).__init__(population)
-
     def video(self, *args, **attrs):
         video_id = IdentityService.id_video(args[0])
-        self._population.add(Video, video_id, args, attrs)
+        self._population.add(Video, video_id, *args, **attrs)
+        return self
+
+
+class PlaylistProducer(DataProducer):
+    def playlist(self, *args, **attrs):
+        self._population.add(Playlist, *args, **attrs)
         return self
