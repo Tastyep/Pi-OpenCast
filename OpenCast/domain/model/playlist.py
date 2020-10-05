@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 
 from OpenCast.domain.event import playlist as Evt
 
@@ -15,12 +15,6 @@ class PlaylistSchema(Schema):
     id = fields.UUID()
     name = fields.String()
     ids = fields.List(fields.UUID())
-
-    @post_load
-    def make_playlist(self, data, **_):
-        playlist = Playlist(**data)
-        playlist._events.clear()
-        return playlist
 
 
 class Playlist(Entity):

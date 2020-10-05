@@ -19,6 +19,12 @@ class Entity:
     def __repr__(self):
         return f"{type(self).__name__}({self._data})"
 
+    @classmethod
+    def from_dict(cls, data: dict):
+        entity = cls(**cls.Schema().load(data))
+        entity._events.clear()
+        return entity
+
     @property
     def id(self):
         return self._data.id

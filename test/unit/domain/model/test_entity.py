@@ -11,7 +11,6 @@ from OpenCast.domain.service.identity import IdentityService
 
 class DumbEntitySchema(Schema):
     id = fields.UUID()
-    name = fields.String()
 
 
 class DumbEntity(Entity):
@@ -33,6 +32,12 @@ class EntityTest(TestCase):
     def test_construction(self):
         self.assertEqual(self.entity_id, self.entity.id)
         self.assertEmpty(self.entity.release_events())
+
+    def test_from_dict(self):
+        entity_id = IdentityService.random()
+        entity = DumbEntity.from_dict({"id": entity_id})
+        self.assertEqual(entity_id, entity.id)
+        self.assertEmpty(entity.release_events())
 
     def test_release_events(self):
         self.entity._record(Mock)

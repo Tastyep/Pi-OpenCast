@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 
 from OpenCast.domain.event import video as Evt
 
@@ -35,12 +35,6 @@ class VideoSchema(Schema):
     path = PathField(allow_none=True)
     streams = fields.Nested(StreamSchema(many=True))
     subtitle = fields.String(allow_none=True)
-
-    @post_load
-    def make_video(self, data, **_):
-        video = Video(**data)
-        video._events.clear()
-        return video
 
 
 class Video(Entity):

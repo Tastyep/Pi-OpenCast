@@ -1,9 +1,8 @@
 """ Conceptual representation of the media player (VLC) """
 
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
 
 from marshmallow import Schema, fields, post_load
 from marshmallow_enum import EnumField
@@ -42,12 +41,6 @@ class PlayerSchema(Schema):
     sub_state = fields.Bool()
     sub_delay = fields.Integer()
     volume = fields.Integer()
-
-    @post_load
-    def make_player(self, data, **_):
-        player = Player(**data)
-        player._events.clear()
-        return player
 
 
 class Player(Entity):
