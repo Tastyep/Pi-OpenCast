@@ -1,6 +1,7 @@
 """ Module in charge of registering application services """
 
 from .player import PlayerService
+from .playlist import PlaylistService
 from .video import VideoService
 
 
@@ -11,4 +12,7 @@ class ServiceModule:
         )
         self._video_service = VideoService(
             app_facade, service_factory, data_facade, infra_facade.media_factory
+        )
+        self._playlist_service = PlaylistService(
+            app_facade, service_factory, data_facade
         )
