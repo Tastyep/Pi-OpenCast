@@ -3,6 +3,7 @@
 import structlog
 
 from OpenCast.app.command import playlist as playlist_cmds
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.playlist import Playlist
 
 from .service import Service
@@ -12,6 +13,9 @@ class PlaylistService(Service):
     def __init__(self, app_facade, service_factory, data_facade):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, self, playlist_cmds)
+
+        self._observe_event(VideoEvt.VideoDeleted)
+
         self._playlist_repo = data_facade.playlist_repo
         self._queueing_service = service_factory.make_queueing_service(
             data_facade.player_repo, data_facade.video_repo, data_facade.playlist_repo
@@ -57,3 +61,14 @@ class PlaylistService(Service):
             ctx.update(playlist)
 
         self._start_transaction(self._playlist_repo, cmd.id, impl)
+
+    # Event handler implementation
+
+    def _video_deleted(self, evt):
+        def impl(ctx):
+            playlists = self._playlist_repo.list_containing(evt.model_id)
+            for playlist in playlists:
+                playlist.remove(evt.model_id)
+                ctx.update(playlist)
+
+        self._start_transaction(self._playlist_repo, evt.id, impl)

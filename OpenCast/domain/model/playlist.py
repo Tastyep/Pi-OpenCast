@@ -5,6 +5,7 @@ from typing import List
 
 from marshmallow import Schema, fields
 
+from OpenCast.domain.error import DomainError
 from OpenCast.domain.event import playlist as Evt
 
 from . import Id
@@ -46,6 +47,13 @@ class Playlist(Entity):
     @ids.setter
     def ids(self, value: List[Id]):
         self._data.ids = value
+        self._record(Evt.PlaylistContentUpdated, self._data.ids)
+
+    def remove(self, video_id):
+        if video_id not in self.ids:
+            # TODO: update domain error to contain a dict
+            raise DomainError(f"video '{video_id}' not in playlist '{self.id}'")
+        self._data.ids.remove(video_id)
         self._record(Evt.PlaylistContentUpdated, self._data.ids)
 
     def delete(self):

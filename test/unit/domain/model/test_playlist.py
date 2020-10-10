@@ -25,6 +25,15 @@ class PlaylistTest(ModelTestCase):
         self.playlist.ids = [IdentityService.id_video("source")]
         self.expect_events(self.playlist, Evt.PlaylistContentUpdated)
 
+    def test_remove(self):
+        self.playlist.ids = [
+            IdentityService.id_video("source1"),
+            IdentityService.id_video("source2"),
+        ]
+        self.playlist.release_events()
+        self.playlist.remove(IdentityService.id_video("source1"))
+        self.expect_events(self.playlist, Evt.PlaylistContentUpdated)
+
     def test_delete(self):
         self.playlist.delete()
         self.expect_events(self.playlist, Evt.PlaylistDeleted)
