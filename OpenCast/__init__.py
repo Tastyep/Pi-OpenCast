@@ -36,12 +36,12 @@ def run_server(logger, infra_facade):
     return True
 
 
-def run_init_workflow(app_facade, infra_facade, data_facade):
+def run_init_workflow(app_facade, data_facade):
     queue = SimpleQueue()
 
     workflow_id = IdentityService.random()
     workflow = app_facade.workflow_factory.make_init_workflow(
-        workflow_id, app_facade, infra_facade, data_facade
+        workflow_id, app_facade, data_facade
     )
     app_facade.evt_dispatcher.observe(
         {workflow.Completed: queue.put, workflow.Aborted: queue.put}, times=1
