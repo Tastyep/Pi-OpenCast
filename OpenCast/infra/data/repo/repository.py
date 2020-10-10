@@ -31,11 +31,12 @@ class Repository:
         self._collection.remove(where("id") == str(entity.id))
 
     def list(self, ids=None):
-        results = (
-            self._collection.all()
-            if ids is None
-            else self._collection.search(lambda entity: Id(entity["id"]) in ids)
-        )
+        if ids is None:
+            results = self._collection.all()
+        else:
+            results = self._collection.search(lambda entity: Id(entity["id"]) in ids)
+            results.sort(key=lambda entity: ids.index(Id(entity["id"])))
+
         return [self._entity.from_dict(result) for result in results]
 
     def get(self, id_):
