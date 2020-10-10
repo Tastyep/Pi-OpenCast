@@ -58,44 +58,44 @@ class PlayerMonitController(MonitorController):
 
     async def stream(self, req):
         source = req.query["url"]
+        video_id = IdentityService.id_video(source)
+
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
-            playlist_id = IdentityService.id_playlist(source)
             videos = [
-                Video(IdentityService.id_video(source), source, playlist_id)
-                for source in sources
+                Video(IdentityService.id_video(source), source) for source in sources
             ]
 
+            workflow_id = IdentityService.id_workflow(StreamPlaylistWorkflow, video_id)
             self._start_workflow(
-                StreamPlaylistWorkflow, playlist_id, self._video_repo, videos
+                StreamPlaylistWorkflow, workflow_id, self._data_facade, videos
             )
             return self._ok()
 
-        video_id = IdentityService.id_video(source)
-        video = Video(video_id, source, None)
-        self._start_workflow(StreamVideoWorkflow, video_id, self._video_repo, video)
+        video = Video(video_id, source)
+        self._start_workflow(StreamVideoWorkflow, video_id, self._data_facade, video)
 
         return self._ok()
 
     async def queue(self, req):
         source = req.query["url"]
+        video_id = IdentityService.id_video(source)
+
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
-            playlist_id = IdentityService.id_playlist(source)
             videos = [
-                Video(IdentityService.id_video(source), source, playlist_id)
-                for source in sources
+                Video(IdentityService.id_video(source), source) for source in sources
             ]
 
+            workflow_id = IdentityService.id_workflow(QueuePlaylistWorkflow, video_id)
             self._start_workflow(
-                QueuePlaylistWorkflow, playlist_id, self._video_repo, videos
+                QueuePlaylistWorkflow, workflow_id, self._data_facade, videos
             )
             return self._ok()
 
-        video_id = IdentityService.id_video(source)
-        video = Video(video_id, source, None)
+        video = Video(video_id, source)
         self._start_workflow(
-            QueueVideoWorkflow, video_id, self._video_repo, video, queue_front=False
+            QueueVideoWorkflow, video_id, self._data_facade, video, queue_front=False
         )
 
         return self._ok()

@@ -33,7 +33,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_invalid_event_listening(self):
         async with self.client.ws_connect(f"/api/player/events") as ws:
             video_evt = VideoEvt.VideoCreated(
-                self.cmd_id, self.video_id, "source", None
+                self.cmd_id, self.video_id, "source", "title", "album", "thumbnail"
             )
             self.evt_dispatcher.dispatch(video_evt)
             with self.assertRaises(asyncio.TimeoutError):

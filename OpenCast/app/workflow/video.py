@@ -18,7 +18,6 @@ from .workflow import Workflow
 class Video:
     id: Id
     source: str
-    playlist_id: Id
 
     def to_tuple(self):
         return astuple(self)
@@ -32,7 +31,6 @@ class VideoWorkflow(Workflow):
     class States(Enum):
         INITIAL = auto()
         CREATING = auto()
-        IDENTIFYING = auto()
         RETRIEVING = auto()
         PARSING = auto()
         FINALISING = auto()
@@ -44,8 +42,7 @@ class VideoWorkflow(Workflow):
     transitions = [
         ["_create",                 States.INITIAL,     States.COMPLETED,  "is_complete"],  # noqa: E501
         ["_create",                 States.INITIAL,     States.CREATING],
-        ["_video_created",          States.CREATING,    States.IDENTIFYING],
-        ["_video_identified",       States.IDENTIFYING, States.RETRIEVING],
+        ["_video_created",          States.CREATING,    States.RETRIEVING],
         ["_video_retrieved",        States.RETRIEVING,  States.PARSING],
         ["_video_parsed",           States.PARSING,     States.FINALISING],
         ["_video_subtitle_fetched", States.FINALISING,  States.COMPLETED],
@@ -75,13 +72,6 @@ class VideoWorkflow(Workflow):
     def on_enter_CREATING(self):
         self._observe_dispatch(
             VideoEvt.VideoCreated, Cmd.CreateVideo, *self._video.to_tuple()
-        )
-
-    def on_enter_IDENTIFYING(self, _):
-        self._observe_dispatch(
-            VideoEvt.VideoIdentified,
-            Cmd.IdentifyVideo,
-            self._video.id,
         )
 
     def on_enter_RETRIEVING(self, _):

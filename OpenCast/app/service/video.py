@@ -24,11 +24,20 @@ class VideoService(Service):
 
     # Command handler implementation
     def _create_video(self, cmd):
-        def impl(ctx):
-            video = Video(cmd.model_id, cmd.source, cmd.playlist_id)
+        def impl(ctx, metadata):
+            video = Video(cmd.model_id, cmd.source, **metadata)
             ctx.add(video)
 
-        self._start_transaction(self._video_repo, cmd.id, impl)
+        if self._source_service.is_disk_path(cmd.source):
+            metadata = self._source_service.pick_file_metadata(cmd.source)
+        else:
+            metadata = self._source_service.pick_stream_metadata(cmd.source)
+
+        if metadata is None:
+            self._abort_operation(cmd.id, "can't fetch metadata")
+            return
+
+        self._start_transaction(self._video_repo, cmd.id, impl, metadata)
 
     def _delete_video(self, cmd):
         def impl(ctx):
@@ -37,19 +46,6 @@ class VideoService(Service):
             ctx.delete(video)
 
         self._start_transaction(self._video_repo, cmd.id, impl)
-
-    def _identify_video(self, cmd):
-        def impl(ctx, video, metadata):
-            video.metadata = metadata
-            ctx.update(video)
-
-        video = self._video_repo.get(cmd.model_id)
-        metadata = self._source_service.pick_stream_metadata(video)
-        if metadata is None:
-            self._abort_operation(cmd.id, "can't fetch metadata")
-            return
-
-        self._start_transaction(self._video_repo, cmd.id, impl, video, metadata)
 
     def _retrieve_video(self, cmd):
         def impl(ctx, video):

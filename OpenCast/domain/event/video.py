@@ -3,24 +3,22 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
-from .event import Event, ModelId
+from .event import Event
 
 
 @dataclass
 class VideoCreated(Event):
     source: str
-    playlist_id: ModelId
+    title: Optional[str]
+    collection_name: Optional[str]
+    thumbnail: Optional[str]
 
 
 @dataclass
 class VideoDeleted(Event):
     pass
-
-
-@dataclass
-class VideoIdentified(Event):
-    metadata: dict
 
 
 @dataclass
