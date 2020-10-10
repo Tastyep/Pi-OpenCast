@@ -92,5 +92,5 @@ def main(argv=None):
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)
     ServiceModule(app_facade, infra_facade, data_facade, service_factory)
 
-    if run_init_workflow(app_facade, infra_facade, data_facade):
+    if run_init_workflow(app_facade, data_facade):
         run_server(logger, infra_facade)

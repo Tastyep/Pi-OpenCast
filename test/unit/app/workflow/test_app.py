@@ -1,10 +1,10 @@
-from test.shared.infra.data.facade_mock import DataFacadeMock
-from test.shared.infra.facade_mock import InfraFacadeMock
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from OpenCast.app.command import player as PlayerCmd
+from OpenCast.app.command import playlist as PlaylistCmd
 from OpenCast.app.command import video as VideoCmd
 from OpenCast.app.workflow.app import InitWorkflow
+from OpenCast.domain.constant import PLAYER_PLAYLIST_NAME
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import State as PlayerState
@@ -18,20 +18,11 @@ class InitWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super().setUp()
         self.video_repo = Mock()
-        self.infra_facade = InfraFacadeMock()
-        self.data_facade = DataFacadeMock()
 
         self.player_repo = self.data_facade.player_repo
         self.video_repo = self.data_facade.video_repo
 
-        self.file_service = Mock()
-        self.infra_facade.service_factory.make_file_service.return_value = (
-            self.file_service
-        )
-
-        self.workflow = self.make_workflow(
-            InitWorkflow, self.infra_facade, self.data_facade
-        )
+        self.workflow = self.make_workflow(InitWorkflow)
 
     def make_videos(self, count: int):
         return [
@@ -53,22 +44,53 @@ class InitWorkflowTest(WorkflowTestCase):
         self.workflow.start()
         self.assertTrue(self.workflow.is_PURGING_VIDEOS())
 
-    def test_creating_player_to_aborted(self):
-        self.workflow.to_CREATING_PLAYER()
+    @patch("OpenCast.app.workflow.app.IdentityService")
+    def test_creating_player_to_aborted(self, identityMock):
+        playlist_id = IdentityService.id_playlist()
         player_id = IdentityService.id_player()
-        cmd = self.expect_dispatch(PlayerCmd.CreatePlayer, player_id)
-        self.raise_error(cmd)
+        identityMock.id_playlist.return_value = playlist_id
+        identityMock.id_player.return_value = player_id
+
+        self.workflow.to_CREATING_PLAYER()
+        createPlaylistId = IdentityService.id_command(
+            PlaylistCmd.CreatePlaylist, playlist_id
+        )
+        createPlayerId = IdentityService.id_command(PlayerCmd.CreatePlayer, player_id)
+        expected_cmds = [
+            PlaylistCmd.CreatePlaylist(
+                createPlaylistId, playlist_id, PLAYER_PLAYLIST_NAME, []
+            ),
+            PlayerCmd.CreatePlayer(createPlayerId, player_id, playlist_id),
+        ]
+        self.expect_dispatch_l(expected_cmds)
+        self.raise_error(expected_cmds[-1])
         self.assertTrue(self.workflow.is_ABORTED())
 
-    def test_creating_player_to_purging_videos(self):
-        self.workflow.to_CREATING_PLAYER()
-        self.video_repo.list.return_value = self.make_videos(3)
+    @patch("OpenCast.app.workflow.app.IdentityService")
+    def test_creating_player_to_purging_videos(self, identityMock):
+        playlist_id = IdentityService.id_playlist()
         player_id = IdentityService.id_player()
-        cmd = self.expect_dispatch(PlayerCmd.CreatePlayer, player_id)
+        identityMock.id_playlist.return_value = playlist_id
+        identityMock.id_player.return_value = player_id
+        self.video_repo.list.return_value = self.make_videos(3)
+
+        self.workflow.to_CREATING_PLAYER()
+        createPlaylistId = IdentityService.id_command(
+            PlaylistCmd.CreatePlaylist, playlist_id
+        )
+        createPlayerId = IdentityService.id_command(PlayerCmd.CreatePlayer, player_id)
+        expected_cmds = [
+            PlaylistCmd.CreatePlaylist(
+                createPlaylistId, playlist_id, PLAYER_PLAYLIST_NAME, []
+            ),
+            PlayerCmd.CreatePlayer(createPlayerId, player_id, playlist_id),
+        ]
+        self.expect_dispatch_l(expected_cmds)
         self.raise_event(
             PlayerEvt.PlayerCreated,
-            cmd.id,
+            createPlayerId,
             player_id,
+            playlist_id,
             PlayerState.STOPPED,
             True,
             0,

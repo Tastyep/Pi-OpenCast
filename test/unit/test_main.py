@@ -27,7 +27,6 @@ class MainTest(TestCase):
 
     def test_run_init_workflow_success(self):
         app_facade = AppFacadeMock()
-        infra_facade = Mock()
         data_facade = Mock()
 
         app_facade.workflow_factory = WorkflowFactory()
@@ -37,11 +36,10 @@ class MainTest(TestCase):
             workflow.to_COMPLETED()
 
         app_facade.workflow_manager.start.side_effect = start_workflow
-        self.assertTrue(run_init_workflow(app_facade, infra_facade, data_facade))
+        self.assertTrue(run_init_workflow(app_facade, data_facade))
 
     def test_run_init_workflow_failure(self):
         app_facade = AppFacadeMock()
-        infra_facade = Mock()
         data_facade = Mock()
 
         app_facade.workflow_factory = WorkflowFactory()
@@ -51,4 +49,4 @@ class MainTest(TestCase):
             workflow.to_ABORTED()
 
         app_facade.workflow_manager.start.side_effect = start_workflow
-        self.assertFalse(run_init_workflow(app_facade, infra_facade, data_facade))
+        self.assertFalse(run_init_workflow(app_facade, data_facade))

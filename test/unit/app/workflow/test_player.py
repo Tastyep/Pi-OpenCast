@@ -1,7 +1,9 @@
 from unittest.mock import Mock
 
-import OpenCast.app.command.player as Cmd
-import OpenCast.domain.event.player as Evt
+import OpenCast.app.command.player as PlayerCmd
+import OpenCast.app.command.playlist as PlaylistCmd
+import OpenCast.domain.event.player as PlayerEvt
+import OpenCast.domain.event.playlist as PlaylistEvt
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
@@ -18,18 +20,22 @@ from .util import WorkflowTestCase
 class QueueVideoWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(QueueVideoWorkflowTest, self).setUp()
-        self.video_repo = Mock()
+        self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
 
         self.player_id = IdentityService.id_player()
+        self.player_playlist_id = IdentityService.id_playlist()
+
+        player = Mock()
+        player.queue = self.player_playlist_id
+        self.data_facade.player_repo.get_player.return_value = player
+
         self.video = Video(
             IdentityService.id_video("source"),
             "source",
-            IdentityService.id_playlist("source"),
         )
         self.workflow = self.make_workflow(
             QueueVideoWorkflow,
-            self.video_repo,
             self.video,
             queue_front=False,
         )
@@ -60,7 +66,10 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         event = VideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_QUEUEING(event)
         cmd = self.expect_dispatch(
-            Cmd.QueueVideo, self.player_id, self.video.id, queue_front=False
+            PlaylistCmd.QueueVideo,
+            self.player_playlist_id,
+            self.video.id,
+            queue_front=False,
         )
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_ABORTED())
@@ -69,13 +78,16 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         event = VideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_QUEUEING(event)
         cmd = self.expect_dispatch(
-            Cmd.QueueVideo, self.player_id, self.video.id, queue_front=False
+            PlaylistCmd.QueueVideo,
+            self.player_playlist_id,
+            self.video.id,
+            queue_front=False,
         )
         self.raise_event(
-            Evt.VideoQueued,
+            PlaylistEvt.PlaylistContentUpdated,
             cmd.id,
-            self.player_id,
-            self.video.id,
+            self.player_playlist_id,
+            [self.video.id],
         )
         self.assertTrue(self.workflow.is_COMPLETED())
 
@@ -83,17 +95,13 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
 class QueuePlaylistWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(QueuePlaylistWorkflowTest, self).setUp()
-        self.video_repo = Mock()
+        self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
 
     def make_test_workflow(self, video_count=2):
-        playlist_id = IdentityService.id_playlist(f"playlist{video_count}")
         sources = [f"src{i}" for i in range(video_count)]
-        videos = [
-            Video(IdentityService.id_video(source), source, playlist_id)
-            for source in sources
-        ]
-        return self.make_workflow(QueuePlaylistWorkflow, self.video_repo, videos)
+        videos = [Video(IdentityService.id_video(source), source) for source in sources]
+        return self.make_workflow(QueuePlaylistWorkflow, videos)
 
     def test_initial(self):
         workflow = self.make_test_workflow()
@@ -137,18 +145,16 @@ class QueuePlaylistWorkflowTest(WorkflowTestCase):
 class StreamVideoWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(StreamVideoWorkflowTest, self).setUp()
-        self.video_repo = Mock()
+        self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
 
         self.player_id = IdentityService.id_player()
         self.video = Video(
             IdentityService.id_video("source"),
             "source",
-            IdentityService.id_playlist("source"),
         )
         self.workflow = self.make_workflow(
             StreamVideoWorkflow,
-            self.video_repo,
             self.video,
         )
 
@@ -177,16 +183,16 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
     def test_starting_to_aborted(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_STARTING(event)
-        cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
+        cmd = self.expect_dispatch(PlayerCmd.PlayVideo, self.player_id, self.video.id)
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_ABORTED())
 
     def test_queueing_to_completed(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id)
         self.workflow.to_STARTING(event)
-        cmd = self.expect_dispatch(Cmd.PlayVideo, self.player_id, self.video.id)
+        cmd = self.expect_dispatch(PlayerCmd.PlayVideo, self.player_id, self.video.id)
         self.raise_event(
-            Evt.PlayerStarted,
+            PlayerEvt.PlayerStarted,
             cmd.id,
             self.player_id,
             self.video.id,
@@ -197,17 +203,13 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
 class StreamPlaylistWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(StreamPlaylistWorkflowTest, self).setUp()
-        self.video_repo = Mock()
+        self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
 
     def make_test_workflow(self, video_count=2):
-        playlist_id = IdentityService.id_playlist(f"playlist{video_count}")
         sources = [f"src{i}" for i in range(video_count)]
-        videos = [
-            Video(IdentityService.id_video(source), source, playlist_id)
-            for source in sources
-        ]
-        return self.make_workflow(StreamPlaylistWorkflow, self.video_repo, videos)
+        videos = [Video(IdentityService.id_video(source), source) for source in sources]
+        return self.make_workflow(StreamPlaylistWorkflow, videos)
 
     def test_initial(self):
         workflow = self.make_test_workflow()
