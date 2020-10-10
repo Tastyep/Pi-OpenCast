@@ -1,6 +1,6 @@
 """ Conceptual representation of a playlist """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 from marshmallow import Schema, fields
@@ -24,7 +24,7 @@ class Playlist(Entity):
     class Data:
         id: Id
         name: str
-        ids: List[Id]
+        ids: List[Id] = field(default_factory=list)
 
     def __init__(self, *attrs, **kattrs):
         super().__init__(self.Data, *attrs, **kattrs)

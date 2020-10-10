@@ -23,7 +23,7 @@ class EventExpecter:
 
         for evt_cls, handler_data in self.evt_to_handler.items():
             handler_data.functor.assert_called_once_with(
-                evt_cls(cmd_id, *handler_data.attrs, *handler_data.dict_attrs)
+                evt_cls(cmd_id, *handler_data.attrs, **handler_data.dict_attrs)
             )
 
     def expect(self, evt_cls, *args, **kwargs):
