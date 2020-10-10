@@ -13,6 +13,9 @@ class PlaylistService(Service):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, self, playlist_cmds)
         self._playlist_repo = data_facade.playlist_repo
+        self._queueing_service = service_factory.make_queueing_service(
+            data_facade.player_repo, data_facade.video_repo, data_facade.playlist_repo
+        )
 
     # Command handler implementation
     def _create_playlist(self, cmd):
@@ -34,6 +37,15 @@ class PlaylistService(Service):
         def impl(ctx):
             playlist = self._playlist_repo.get(cmd.model_id)
             playlist.name = cmd.name
+            ctx.update(playlist)
+
+        self._start_transaction(self._playlist_repo, cmd.id, impl)
+
+    def _queue_video(self, cmd):
+        def impl(ctx):
+            playlist = self._playlist_repo.get(cmd.model_id)
+            ids = self._queueing_service.queue(playlist, cmd.video_id, cmd.queue_front)
+            playlist.ids = ids
             ctx.update(playlist)
 
         self._start_transaction(self._playlist_repo, cmd.id, impl)

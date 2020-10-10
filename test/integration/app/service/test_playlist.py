@@ -21,34 +21,42 @@ class PlaylistServiceTest(ServiceTestCase):
         )
 
     def test_delete_playlist(self):
-        playlist_id = IdentityService.id_playlist()
-        other_playlist_id = IdentityService.id_playlist()
-        self.data_producer.playlist(playlist_id, "name", []).playlist(
-            other_playlist_id, "other", []
-        ).populate(self.data_facade)
+        self.data_producer.playlist("name").playlist("other").populate(self.data_facade)
 
-        self.evt_expecter.expect(Evt.PlaylistDeleted, playlist_id).from_(
-            Cmd.DeletePlaylist, playlist_id
+        playlists = self.playlist_repo.list()
+        self.evt_expecter.expect(Evt.PlaylistDeleted, playlists[0].id).from_(
+            Cmd.DeletePlaylist, playlists[0].id
         )
 
         self.assertListEqual(
-            [self.playlist_repo.get(other_playlist_id)], self.playlist_repo.list()
+            [self.playlist_repo.get(playlists[1].id)], self.playlist_repo.list()
         )
 
     def test_rename_playlist(self):
-        playlist_id = IdentityService.id_playlist()
-        self.data_producer.playlist(playlist_id, "name", []).populate(self.data_facade)
+        self.data_producer.playlist("name", []).populate(self.data_facade)
 
+        playlists = self.playlist_repo.list()
         new_name = "renamed"
-        self.evt_expecter.expect(Evt.PlaylistRenamed, playlist_id, new_name).from_(
-            Cmd.RenamePlaylist, playlist_id, new_name
+        self.evt_expecter.expect(Evt.PlaylistRenamed, playlists[0].id, new_name).from_(
+            Cmd.RenamePlaylist, playlists[0].id, new_name
         )
 
-    def test_update_playlist_content(self):
-        playlist_id = IdentityService.id_playlist()
-        self.data_producer.playlist(playlist_id, "name", []).populate(self.data_facade)
+    def test_queue_video(self):
+        self.data_producer.video("source").playlist("name", []).populate(
+            self.data_facade
+        )
 
+        video_id = IdentityService.id_video("source")
+        playlists = self.playlist_repo.list()
+        self.evt_expecter.expect(
+            Evt.PlaylistContentUpdated, playlists[0].id, [video_id]
+        ).from_(Cmd.QueueVideo, playlists[0].id, video_id, queue_front=False)
+
+    def test_update_playlist_content(self):
+        self.data_producer.playlist("name", []).populate(self.data_facade)
+
+        playlists = self.playlist_repo.list()
         new_content = [IdentityService.id_video("source")]
         self.evt_expecter.expect(
-            Evt.PlaylistContentUpdated, playlist_id, new_content
-        ).from_(Cmd.UpdatePlaylistContent, playlist_id, new_content)
+            Evt.PlaylistContentUpdated, playlists[0].id, new_content
+        ).from_(Cmd.UpdatePlaylistContent, playlists[0].id, new_content)

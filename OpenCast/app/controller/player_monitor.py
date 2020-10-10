@@ -31,6 +31,7 @@ class PlayerMonitController(MonitorController):
             media_factory.make_downloader(app_facade.evt_dispatcher),
             media_factory.make_video_parser(),
         )
+        self._data_facade = data_facade
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
 
@@ -49,11 +50,6 @@ class PlayerMonitController(MonitorController):
 
     async def get(self, _):
         player = self._player_repo.get_player()
-
-        # TODO: Remove this quick workaround after the implementation of playlists
-        videos = self._video_repo.list(player.video_queue)
-        player._queue = videos
-
         return self._ok(player)
 
     async def stream(self, req):

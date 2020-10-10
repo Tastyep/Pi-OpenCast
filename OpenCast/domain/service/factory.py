@@ -1,5 +1,6 @@
 """ Factory for creating domain services """
 
+from .player import QueueingService
 from .source import SourceService
 from .subtitle import SubtitleService
 
@@ -20,3 +21,6 @@ class ServiceFactory:
 
     def make_subtitle_service(self, *args):
         return SubtitleService(self._infra_service_factory.make_file_service(), *args)
+
+    def make_queueing_service(self, *args):
+        return QueueingService(*args)

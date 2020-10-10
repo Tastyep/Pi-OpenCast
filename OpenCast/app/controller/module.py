@@ -13,4 +13,6 @@ class ControllerModule:
         self._video_monitor = VideoMonitController(
             app_facade, infra_facade, data_facade
         )
-        self._player_controller = PlayerController(app_facade, data_facade)
+        self._player_controller = PlayerController(
+            app_facade, data_facade, service_factory
+        )

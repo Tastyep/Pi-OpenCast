@@ -5,22 +5,11 @@ from .command import Command, ModelId, command
 
 @command
 class CreatePlayer(Command):
-    pass
+    playlist_id: ModelId
 
 
 @command
 class PlayVideo(Command):
-    video_id: ModelId
-
-
-@command
-class QueueVideo(Command):
-    video_id: ModelId
-    queue_front: bool
-
-
-@command
-class RemoveVideo(Command):
     video_id: ModelId
 
 

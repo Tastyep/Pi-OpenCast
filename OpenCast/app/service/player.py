@@ -19,7 +19,7 @@ class PlayerService(Service):
         super().__init__(app_facade, logger, self, player_cmds)
 
         self._observe_event(PlayerEvt.PlayerCreated)
-        self._observe_event(VideoEvt.VideoDeleted)
+        # self._observe_event(VideoEvt.VideoDeleted)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
@@ -33,7 +33,7 @@ class PlayerService(Service):
 
     def _create_player(self, cmd):
         def impl(ctx):
-            player = Player(cmd.model_id)
+            player = Player(cmd.model_id, cmd.playlist_id)
             ctx.add(player)
 
         self._start_transaction(self._player_repo, cmd.id, impl)
@@ -41,20 +41,13 @@ class PlayerService(Service):
     def _play_video(self, cmd):
         def impl(player):
             video = self._video_repo.get(cmd.video_id)
-            player.play(video)
+            player.play(video.id)
 
             self._player.play(str(video.path))
             if player.subtitle_state is True:
                 sub_stream = video.stream("subtitle", config["subtitle.language"])
                 if sub_stream is not None:
                     self._player.select_subtitle_stream(sub_stream.index)
-
-        self._update(cmd.id, impl)
-
-    def _queue_video(self, cmd):
-        def impl(player):
-            video = self._video_repo.get(cmd.video_id)
-            player.queue(video, cmd.queue_front)
 
         self._update(cmd.id, impl)
 
@@ -121,12 +114,13 @@ class PlayerService(Service):
     def _player_created(self, evt):
         self._init_player(evt.volume)
 
-    def _video_deleted(self, evt):
-        def impl(model):
-            if model.has_video(evt.model_id):
-                model.remove(evt.model_id)
-
-        self._update(evt.id, impl)
+    # TODO: move similar logic to playlist service
+    # def _video_deleted(self, evt):
+    #     def impl(model):
+    #         if model.has_video(evt.model_id):
+    #             model.remove(evt.model_id)
+    #
+    #     self._update(evt.id, impl)
 
     # Private
     def _player_model(self):

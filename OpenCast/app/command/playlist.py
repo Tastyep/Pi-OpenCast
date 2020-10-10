@@ -18,6 +18,12 @@ class RenamePlaylist(Command):
 
 
 @command
+class QueueVideo(Command):
+    video_id: ModelId
+    queue_front: bool
+
+
+@command
 class UpdatePlaylistContent(Command):
     ids: List[ModelId]
 
