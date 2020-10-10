@@ -30,5 +30,5 @@ class IdentityService:
         return uuid3(cls.VIDEO_NS, source)
 
     @classmethod
-    def id_playlist(cls, source):
-        return uuid3(cls.PLAYLIST_NS, source)
+    def id_playlist(cls):
+        return cls.random()
