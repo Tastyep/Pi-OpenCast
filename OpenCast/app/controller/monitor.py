@@ -38,8 +38,11 @@ class MonitorController(Controller):
     def _no_content(self):
         return self._make_response(204, None)
 
-    def _bad_request(self):
-        return self._make_response(400, None)
+    def _bad_request(self, message: str = None, details: dict = None):
+        body = None
+        if message is not None:
+            body = {"error": {"message": message, "detail": details}}
+        return self._make_response(400, body)
 
     def _not_found(self):
         return self._make_response(404, None)

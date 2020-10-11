@@ -9,17 +9,20 @@ class Population:
         self._entities = {}
         self._last_entity = {}
 
-    def add(self, cls, id, *args, **attrs):
+    def add(self, cls, model_id, *args, **attrs):
+        if "id" in attrs:
+            model_id = attrs["id"]
+            attrs.pop("id")
+
         id_to_entity = self._entities.get(cls, {})
-        if id in id_to_entity:
-            self._last_entity[cls] = id
-            self._update_attrs(id_to_entity[id], attrs)
+        if model_id in id_to_entity:
+            self._last_entity[cls] = model_id
+            self._update_attrs(id_to_entity[model_id], attrs)
             return
 
-        entity = cls(id, *args)
-        self._update_attrs(entity, attrs)
-        id_to_entity[id] = entity
-        self._last_entity[cls] = id
+        entity = cls(model_id, *args, **attrs)
+        id_to_entity[entity.id] = entity
+        self._last_entity[cls] = entity.id
         self._entities[cls] = id_to_entity
 
     def last(self, cls):
