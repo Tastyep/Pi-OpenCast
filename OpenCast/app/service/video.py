@@ -28,13 +28,13 @@ class VideoService(Service):
             video = Video(cmd.model_id, cmd.source, **metadata)
             ctx.add(video)
 
-        if self._source_service.is_disk_path(cmd.source):
-            metadata = self._source_service.pick_file_metadata(cmd.source)
+        if Path(cmd.source).is_file():
+            metadata = self._source_service.pick_file_metadata(Path(cmd.source))
         else:
             metadata = self._source_service.pick_stream_metadata(cmd.source)
 
         if metadata is None:
-            self._abort_operation(cmd.id, "can't fetch metadata")
+            self._abort_operation(cmd.id, "Can't fetch metadata")
             return
 
         self._start_transaction(self._video_repo, cmd.id, impl, metadata)

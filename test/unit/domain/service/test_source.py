@@ -62,6 +62,15 @@ class SourceServiceTest(TestCase):
         }
         self.assertEqual(expected, metadata)
 
+    def test_pick_file_metadata(self):
+        metadata = self.service.pick_file_metadata(Path("/tmp/video.mp4"))
+        expected = {
+            "title": "video",
+            "collection_name": None,
+            "thumbnail": None,
+        }
+        self.assertEqual(expected, metadata)
+
     def test_list_streams(self):
         video = Mock()
         video.Path = Path("/tmp/toto.mp4")

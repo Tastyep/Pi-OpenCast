@@ -28,8 +28,7 @@ class Server:
         return ws
 
     def make_json_response(self, status, body, dumps):
-        resp = web.json_response(body, status=status, dumps=dumps)
-        return resp
+        return web.json_response(body, status=status, dumps=dumps)
 
     async def _on_shutdown(self, app):
         for ws in app["websockets"]:

@@ -38,14 +38,12 @@ class SourceService:
 
         return metadata
 
-    def pick_file_metadata(self, source: Path, fields: dict):
-        # TODO
-        return None
+    def pick_file_metadata(self, source: Path):
+        metadata = {field: None for field in Video.METADATA_FIELDS}
+        metadata["title"] = source.stem
+        return metadata
 
     def list_streams(self, video) -> List[Stream]:
         video_path = str(video.path)
         streams = self._video_parser.parse_streams(video_path)
         return [Stream(*stream) for stream in streams]
-
-    def is_disk_path(self, source: str):
-        return Path(source).is_file()

@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import patch
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError
@@ -34,6 +35,34 @@ class VideoServiceTest(ServiceTestCase):
         self.evt_expecter.expect(
             VideoEvt.VideoCreated, video_id, source, **metadata
         ).from_(Cmd.CreateVideo, video_id, source)
+
+    @patch("OpenCast.app.service.video.Path")
+    def test_create_disk_video(self, path_cls_mock):
+        path_inst = path_cls_mock.return_value
+        source = "source"
+        video_id = IdentityService.id_video(source)
+
+        path_inst.is_file.return_value = True
+        metadata = {"title": "test_title", "collection_name": None, "thumbnail": None}
+        path_inst.stem = metadata["title"]
+
+        self.evt_expecter.expect(
+            VideoEvt.VideoCreated,
+            video_id,
+            source,
+            **metadata,
+        ).from_(Cmd.CreateVideo, video_id, source)
+
+    def test_create_video_missing_metadata(self):
+        source = "source"
+        video_id = IdentityService.id_video(source)
+
+        metadata = None
+        self.downloader.pick_stream_metadata.return_value = metadata
+
+        self.evt_expecter.expect(OperationError, "Can't fetch metadata").from_(
+            Cmd.CreateVideo, video_id, source
+        )
 
     def test_delete_video(self):
         self.data_producer.player().video("source").video("source2").populate(
