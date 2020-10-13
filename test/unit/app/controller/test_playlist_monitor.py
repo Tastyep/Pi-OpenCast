@@ -26,23 +26,6 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
     def update_playlist(self, **kwargs):
         self.data_producer.playlist(**kwargs).populate(self.data_facade)
 
-    async def test_list(self):
-        req = self.make_request("GET", "/")
-        resp = await self.route(self.controller.list, req)
-        self.assertEqual(resp, (200, self.playlists))
-
-    async def test_get(self):
-        playlist_id = self.playlists[0].id
-        req = self.make_request("GET", f"/{playlist_id}", {"id": str(playlist_id)})
-        resp = await self.route(self.controller.get, req)
-        self.assertEqual(resp, (200, self.playlists[0]))
-
-    async def test_get_not_found(self):
-        playlist_id = IdentityService.id_playlist()
-        req = self.make_request("GET", f"/{playlist_id}", {"id": str(playlist_id)})
-        resp = await self.route(self.controller.get, req)
-        self.assertEqual(resp, (404, None))
-
     async def test_create(self):
         req = self.make_request("POST", "/")
         body = {"name": "test_playlist"}
@@ -114,6 +97,39 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
                 },
             ),
         )
+
+    async def test_list(self):
+        req = self.make_request("GET", "/")
+        resp = await self.route(self.controller.list, req)
+        self.assertEqual(resp, (200, self.playlists))
+
+    async def test_get(self):
+        playlist_id = self.playlists[0].id
+        req = self.make_request("GET", f"/{playlist_id}", {"id": str(playlist_id)})
+        resp = await self.route(self.controller.get, req)
+        self.assertEqual(resp, (200, self.playlists[0]))
+
+    async def test_get_not_found(self):
+        playlist_id = IdentityService.id_playlist()
+        req = self.make_request("GET", f"/{playlist_id}", {"id": str(playlist_id)})
+        resp = await self.route(self.controller.get, req)
+        self.assertEqual(resp, (404, None))
+
+    async def test_list_videos(self):
+        playlist_id = self.playlists[0].id
+        req = self.make_request(
+            "GET", f"/{playlist_id}/videos", {"id": str(playlist_id)}
+        )
+        resp = await self.route(self.controller.list_videos, req)
+        self.assertEqual(resp, (200, self.video_repo.list(self.playlists[0].ids)))
+
+    async def test_list_videos_not_found(self):
+        playlist_id = IdentityService.id_playlist()
+        req = self.make_request(
+            "GET", f"/{playlist_id}/videos", {"id": str(playlist_id)}
+        )
+        resp = await self.route(self.controller.list_videos, req)
+        self.assertEqual(resp, (404, None))
 
     async def test_update(self):
         playlist_id = self.playlists[0].id
@@ -214,11 +230,3 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
 
         resp = await self.route(self.controller.delete, req)
         self.assertEqual(resp, (404, None))
-
-    async def test_list_videos(self):
-        playlist_id = self.playlists[0].id
-        req = self.make_request(
-            "GET", f"/{playlist_id}/videos", {"id": str(playlist_id)}
-        )
-        resp = await self.route(self.controller.list_videos, req)
-        self.assertEqual(resp, (200, self.video_repo.list(self.playlists[0].ids)))

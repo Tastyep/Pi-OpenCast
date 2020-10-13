@@ -19,23 +19,12 @@ class PlaylistMonitController(MonitorController):
         self._playlist_repo = data_facade.playlist_repo
         self._video_repo = data_facade.video_repo
 
+        self._route("POST", "/", handle=self.create)
         self._route("GET", "/", handle=self.list)
         self._route("GET", "/{id:" + self.UUID + "}", handle=self.get)
-        self._route("POST", "/", handle=self.create)
+        self._route("GET", "/{id:" + self.UUID + "}/videos", handle=self.list_videos)
         self._route("PATCH", "/{id:" + self.UUID + "}", handle=self.update)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
-        self._route("GET", "/{id:" + self.UUID + "}/videos", handle=self.list_videos)
-
-    async def list(self, req):
-        playlists = self._playlist_repo.list()
-        return self._ok(playlists)
-
-    async def get(self, req):
-        id = Id(req.match_info["id"])
-        playlist = self._playlist_repo.get(id)
-        if playlist is None:
-            return self._not_found()
-        return self._ok(playlist)
 
     async def create(self, req):
         data = await req.json()
@@ -60,6 +49,26 @@ class PlaylistMonitController(MonitorController):
         )
 
         return await channel.receive()
+
+    async def list(self, req):
+        playlists = self._playlist_repo.list()
+        return self._ok(playlists)
+
+    async def get(self, req):
+        id = Id(req.match_info["id"])
+        playlist = self._playlist_repo.get(id)
+        if playlist is None:
+            return self._not_found()
+        return self._ok(playlist)
+
+    async def list_videos(self, req):
+        id = Id(req.match_info["id"])
+        playlist = self._playlist_repo.get(id)
+        if playlist is None:
+            return self._not_found()
+
+        videos = self._video_repo.list(playlist.ids)
+        return self._ok(videos)
 
     async def update(self, req):
         id = Id(req.match_info["id"])
@@ -121,12 +130,3 @@ class PlaylistMonitController(MonitorController):
         )
 
         return await channel.receive()
-
-    async def list_videos(self, req):
-        id = Id(req.match_info["id"])
-        playlist = self._playlist_repo.get(id)
-        if playlist is None:
-            return self._not_found()
-
-        videos = self._video_repo.list(playlist.ids)
-        return self._ok(videos)
