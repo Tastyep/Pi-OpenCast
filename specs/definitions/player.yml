@@ -2,22 +2,17 @@ Player:
   type: object
   properties:
     id:
-      type: integer
-      format: int64
-      description: Unique ID for a video
+      type: string
+      description: Unique ID for a player
+    queue:
+      type: string
+      description: The playlist of the player
     state:
       type: string
       description: Operating state of the player
-    queue:
-      type: array
-      items:
-        type: integer
-        format: int64
-      description: List of video IDs
-    index:
-      type: integer
-      format: int32
-      description: Index of the current media
+    video_id:
+      type: string
+      description: Currently playing video ID
     sub_state:
       type: boolean
       description: True if subtitles are on, False otherwise
