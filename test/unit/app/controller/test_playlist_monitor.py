@@ -19,6 +19,7 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
         ).playlist("playlist2").populate(self.data_facade)
 
         self.playlist_repo = self.data_facade.playlist_repo
+        self.video_repo = self.data_facade.video_repo
         self.playlists = self.playlist_repo.list()
         self.controller = PlaylistMonitController(
             self.app_facade, self.infra_facade, self.data_facade
@@ -215,3 +216,11 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
 
         resp = await self.route(self.controller.delete, req)
         self.assertEqual(resp, (404, None))
+
+    async def test_list_videos(self):
+        playlist_id = self.playlists[0].id
+        req = self.make_request(
+            "GET", f"/{playlist_id}/videos", {"id": str(playlist_id)}
+        )
+        resp = await self.route(self.controller.list_videos, req)
+        self.assertEqual(resp, (200, self.video_repo.list(self.playlists[0].ids)))
