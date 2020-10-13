@@ -27,7 +27,7 @@ all() {
 }
 
 python() {
-  penv flake8 "$ROOT/OpenCast" --statistics
+  penv flake8 "$ROOT/OpenCast" "$ROOT/test" --statistics
   log_status "flake8" "$?"
 }
 

@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from OpenCast.app.command import make_cmd
 from OpenCast.app.command import playlist as Cmd
 from OpenCast.app.controller.playlist_monitor import PlaylistMonitController

@@ -17,7 +17,7 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_event_listening(self):
-        async with self.client.ws_connect(f"/api/videos/events") as ws:
+        async with self.client.ws_connect("/api/videos/events") as ws:
             cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video_id)
             created_evt = VideoEvt.VideoCreated(
                 cmd_id, self.video_id, "source", "title", "album", "thumbnail"
@@ -33,7 +33,7 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_invalid_event_listening(self):
-        async with self.client.ws_connect(f"/api/videos/events") as ws:
+        async with self.client.ws_connect("/api/videos/events") as ws:
             cmd_id = IdentityService.id_command(PlayerCmd.PlayVideo, self.player_id)
             player_evt = PlayerEvt.PlayerStarted(cmd_id, self.player_id, self.video_id)
             self.evt_dispatcher.dispatch(player_evt)
