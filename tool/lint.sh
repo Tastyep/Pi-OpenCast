@@ -50,8 +50,8 @@ shell() {
 }
 
 spec() {
-  jenv "speccy --config $ROOT/specs/.speccy.yml lint $ROOT/specs/openapi.yml"
-  log_status "speccy" "$?"
+  jenv "spectral --ruleset $ROOT/specs/.spectral.yml lint $ROOT/specs/openapi.yml"
+  log_status "spectral" "$?"
 }
 
 parse_args "$@"

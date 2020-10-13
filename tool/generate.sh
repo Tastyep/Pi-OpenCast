@@ -4,7 +4,6 @@
 #
 # Commands:
 #   doc   Generate documentation files.
-#   spec  Generate a merged openapi file.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -18,11 +17,6 @@ source "$ROOT/script/env.sh"
 
 doc() {
   (cd "$ROOT/docs" && penv make clean && penv make html -b coverage)
-}
-
-spec() {
-  mkdir -p "$ROOT/gen"
-  jenv "speccy --config $ROOT/specs/.speccy.yml resolve $ROOT/specs/openapi.yml --output $ROOT/gen/openapi.yml"
 }
 
 parse_args "$@"
