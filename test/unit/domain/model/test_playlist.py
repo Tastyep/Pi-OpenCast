@@ -1,4 +1,5 @@
 import OpenCast.domain.event.playlist as Evt
+from OpenCast.domain.error import DomainError
 from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.service.identity import IdentityService
 
@@ -33,6 +34,15 @@ class PlaylistTest(ModelTestCase):
         self.playlist.release_events()
         self.playlist.remove(IdentityService.id_video("source1"))
         self.expect_events(self.playlist, Evt.PlaylistContentUpdated)
+
+    def test_remove_unknown(self):
+        video_id = IdentityService.id_video("source1")
+        with self.assertRaises(DomainError) as ctx:
+            self.playlist.remove(video_id)
+        self.assertEqual(
+            f"video '{video_id}' not in playlist '{self.playlist.id}'",
+            str(ctx.exception),
+        )
 
     def test_delete(self):
         self.playlist.delete()
