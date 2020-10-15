@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.controller.player import PlayerController
 from OpenCast.domain.service.identity import IdentityService
@@ -11,19 +13,24 @@ class PlayerControllerTest(ControllerTestCase):
         super(PlayerControllerTest, self).setUp()
 
         self.data_producer.player().populate(self.data_facade)
-        self.controller = PlayerController(self.app_facade, self.data_facade)
+        self.service_factory = Mock()
+        self.queueing_service = Mock()
+        self.service_factory.make_queueing_service.return_value = self.queueing_service
+        self.controller = PlayerController(
+            self.app_facade, self.data_facade, self.service_factory
+        )
 
     def test_media_end_reached_without_video(self):
+        self.queueing_service.next_video.return_value = None
         self.raise_event(self.controller, Evt.MediaEndReached, None)
         self.expect_dispatch(Cmd.StopPlayer, IdentityService.id_player())
 
     def test_media_end_reached_with_videos(self):
-        self.data_producer.player().video("source", None).video(
-            "next_video", None
-        ).populate(self.data_facade)
+        next_video_id = IdentityService.id_video("source")
+        self.queueing_service.next_video.return_value = next_video_id
         self.raise_event(self.controller, Evt.MediaEndReached, None)
         self.expect_dispatch(
             Cmd.PlayVideo,
             IdentityService.id_player(),
-            IdentityService.id_video("next_video"),
+            next_video_id,
         )

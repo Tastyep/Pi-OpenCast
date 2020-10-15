@@ -27,7 +27,7 @@ all() {
 }
 
 python() {
-  penv flake8 "$ROOT/OpenCast" --statistics
+  penv flake8 "$ROOT/OpenCast" "$ROOT/test" --statistics
   log_status "flake8" "$?"
 }
 
@@ -50,8 +50,8 @@ shell() {
 }
 
 spec() {
-  jenv "speccy --config $ROOT/specs/.speccy.yml lint $ROOT/specs/openapi.yml"
-  log_status "speccy" "$?"
+  jenv "spectral --ruleset $ROOT/specs/.spectral.yml lint $ROOT/specs/openapi.yml"
+  log_status "spectral" "$?"
 }
 
 parse_args "$@"

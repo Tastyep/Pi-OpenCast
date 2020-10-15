@@ -7,7 +7,6 @@
 #   format   Run formatters on the source code.
 #   generate Generate content.
 #   lint     Lint the source code.
-#   serve    Serve static web pages.
 #   service  Operate services.
 #   test     Run the tests.
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from test.util import TestCase
 
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
@@ -15,10 +15,6 @@ from OpenCast.infra.data.repo.repository import Repository
 class TestEntitySchema(Schema):
     id = fields.UUID()
     name = fields.String()
-
-    @post_load
-    def make_test_entity(self, data, **_):
-        return TestEntity(**data)
 
 
 class TestEntity(Entity):
@@ -44,7 +40,7 @@ class TestEntity(Entity):
 class RepositoryTest(TestCase):
     def setUp(self):
         database = TinyDB(storage=MemoryStorage)
-        self.repo = Repository(database, TestEntitySchema())
+        self.repo = Repository(database, TestEntity)
         self.entity = TestEntity(IdentityService.random(), "test")
 
     def test_create(self):
@@ -90,6 +86,13 @@ class RepositoryTest(TestCase):
             self.repo.create(entity)
         entity_list = self.repo.list([entities[0].id, entities[2].id])
         self.assertEqual([entities[0], entities[2]], entity_list)
+
+    def test_list_filtered_ordered(self):
+        entities = [TestEntity(IdentityService.random(), f"{i}") for i in range(5)]
+        for entity in entities:
+            self.repo.create(entity)
+        entity_list = self.repo.list([entities[2].id, entities[0].id])
+        self.assertEqual([entities[2], entities[0]], entity_list)
 
     def test_get(self):
         self.repo.create(self.entity)

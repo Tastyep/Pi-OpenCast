@@ -1,6 +1,6 @@
 from test.shared.app.facade_mock import AppFacadeMock
 from test.util import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.event.dispatcher import EventDispatcher
@@ -11,6 +11,7 @@ from OpenCast.util.naming import name_factory_method
 class WorkflowTestCase(TestCase):
     def setUp(self):
         self.app_facade = AppFacadeMock()
+        self.data_facade = Mock()
 
         def start_workflow(workflow):
             workflow.start()
@@ -20,7 +21,9 @@ class WorkflowTestCase(TestCase):
         self.app_facade.evt_dispatcher = EventDispatcher()
 
     def make_workflow(self, workflow_cls, *args, **kwargs):
-        return workflow_cls(IdentityService.random(), self.app_facade, *args, **kwargs)
+        return workflow_cls(
+            IdentityService.random(), self.app_facade, self.data_facade, *args, **kwargs
+        )
 
     def expect_dispatch(self, cmd_cls, model_id, *args, **kwargs):
         cmd_id = IdentityService.id_command(cmd_cls, model_id)
@@ -28,6 +31,12 @@ class WorkflowTestCase(TestCase):
         self.app_facade.cmd_dispatcher.dispatch.assert_called_once_with(cmd)
         self.app_facade.cmd_dispatcher.dispatch.reset_mock()
         return cmd
+
+    def expect_dispatch_l(self, cmds):
+        self.app_facade.cmd_dispatcher.dispatch.assert_has_calls(
+            [call(cmd) for cmd in cmds]
+        )
+        self.app_facade.cmd_dispatcher.dispatch.reset_mock()
 
     def raise_error(self, cmd):
         self.raise_event(OperationError, cmd.id, "")

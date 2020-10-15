@@ -1,47 +1,46 @@
 import OpenCast.domain.event.video as Evt
-from OpenCast.domain.model.video import Video
+from OpenCast.domain.model.video import Path, Video
+from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
 
 
 class VideoTest(ModelTestCase):
+    def setUp(self):
+        self.video = Video(IdentityService.random(), "source")
+        self.video.release_events()
+
     def test_construction(self):
-        video = Video(None, "source", None)
-        self.assertEqual(None, video.playlist_id)
+        video = Video(
+            IdentityService.random(),
+            "source",
+            "title",
+            "album_name",
+            "thumbnail_url",
+            Path("/tmp/file"),
+            [],
+            "subtitle",
+        )
         self.assertEqual("source", video.source)
-        self.assertEqual(None, video.title)
-        self.assertEqual(None, video.path)
+        self.assertEqual("title", video.title)
+        self.assertEqual("album_name", video.collection_name)
+        self.assertEqual(Path("/tmp/file"), video.path)
         self.assertEqual([], video.streams)
-        self.assertEqual(None, video.subtitle)
+        self.assertEqual("subtitle", video.subtitle)
         self.expect_events(video, Evt.VideoCreated)
 
-    def make_video(self):
-        video = Video(None, "source", None)
-        # Pop the VideoCreatedEvent
-        video.release_events()
-        return video
-
-    def test_identify(self):
-        video = self.make_video()
-        video.metadata = {"title": "name", "thumbnail": "thumbnail_url"}
-        self.expect_events(video, Evt.VideoIdentified)
-
     def test_retrieve(self):
-        video = self.make_video()
-        video.path = "/tmp"
-        self.expect_events(video, Evt.VideoRetrieved)
+        self.video.path = "/tmp"
+        self.expect_events(self.video, Evt.VideoRetrieved)
 
     def test_parse(self):
-        video = self.make_video()
-        video.streams = {}
-        self.expect_events(video, Evt.VideoParsed)
+        self.video.streams = {}
+        self.expect_events(self.video, Evt.VideoParsed)
 
     def test_set_subtitles(self):
-        video = self.make_video()
-        video.subtitle = "/tmp/toto.srt"
-        self.expect_events(video, Evt.VideoSubtitleFetched)
+        self.video.subtitle = "/tmp/toto.srt"
+        self.expect_events(self.video, Evt.VideoSubtitleFetched)
 
     def test_delete(self):
-        video = self.make_video()
-        video.delete()
-        self.expect_events(video, Evt.VideoDeleted)
+        self.video.delete()
+        self.expect_events(self.video, Evt.VideoDeleted)

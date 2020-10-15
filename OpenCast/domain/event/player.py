@@ -9,6 +9,7 @@ from .event import Event, ModelId
 
 @dataclass
 class PlayerCreated(Event):
+    queue: ModelId
     state: State
     sub_state: bool
     sub_delay: int
@@ -17,16 +18,6 @@ class PlayerCreated(Event):
 
 @dataclass
 class PlayerStarted(Event):
-    video_id: ModelId
-
-
-@dataclass
-class VideoQueued(Event):
-    video_id: ModelId
-
-
-@dataclass
-class VideoRemoved(Event):
     video_id: ModelId
 
 

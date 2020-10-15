@@ -15,65 +15,32 @@ class PlayerServiceTest(ServiceTestCase):
         self.video_repo = self.data_facade.video_repo
 
         self.player_id = IdentityService.id_player()
+        self.player_playlist_id = IdentityService.id_player()
 
-    def test_create_player(self):
+    def test_create(self):
         self.evt_expecter.expect(
-            Evt.PlayerCreated, self.player_id, PlayerState.STOPPED, True, 0, 70
-        ).from_(Cmd.CreatePlayer, self.player_id)
+            Evt.PlayerCreated,
+            self.player_id,
+            self.player_playlist_id,
+            PlayerState.STOPPED,
+            True,
+            0,
+            70,
+        ).from_(Cmd.CreatePlayer, self.player_id, self.player_playlist_id)
         self.media_player.set_volume.assert_called_once_with(70)
 
     def test_play_video(self):
-        self.data_producer.player().video("source", None).video(
-            "source2", None
-        ).populate(self.data_facade)
+        self.data_producer.player().video("source").video("source2").populate(
+            self.data_facade
+        )
 
         video_id = IdentityService.id_video("source2")
         self.evt_expecter.expect(Evt.PlayerStarted, self.player_id, video_id).from_(
             Cmd.PlayVideo, self.player_id, video_id
         )
 
-    def test_play_video_not_found(self):
-        self.data_producer.video("source", None).player().video(
-            "source2", None
-        ).populate(self.data_facade)
-
-        video_id = IdentityService.id_video("source")
-        video = self.video_repo.get(video_id)
-        self.evt_expecter.expect(OperationError, f"unknown video: {video}").from_(
-            Cmd.PlayVideo, self.player_id, video_id
-        )
-
-    def test_queue_video(self):
-        self.data_producer.video("source", None).player().populate(self.data_facade)
-
-        video_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.VideoQueued, self.player_id, video_id).from_(
-            Cmd.QueueVideo,
-            self.player_id,
-            video_id,
-            queue_front=False,
-        )
-
-    def test_remove_video(self):
-        self.data_producer.player().video("source", None).video(
-            "source2", None
-        ).populate(self.data_facade)
-
-        source_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(Evt.VideoRemoved, self.player_id, source_id).from_(
-            Cmd.RemoveVideo, self.player_id, source_id
-        )
-
-    def test_remove_video_not_found(self):
-        self.data_producer.video("source", None).player().populate(self.data_facade)
-
-        source_id = IdentityService.id_video("source")
-        self.evt_expecter.expect(OperationError, f"unknown video: {source_id}").from_(
-            Cmd.RemoveVideo, self.player_id, source_id
-        )
-
     def test_stop_player(self):
-        self.data_producer.player().video("source", None).play().populate(
+        self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
@@ -82,7 +49,7 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
     def test_toggle_player_state(self):
-        self.data_producer.player().video("source", None).play().populate(
+        self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
@@ -94,7 +61,7 @@ class PlayerServiceTest(ServiceTestCase):
         ).from_(Cmd.TogglePlayerState, self.player_id)
 
     def test_seek_video(self):
-        self.data_producer.player().video("source", None).play().populate(
+        self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
@@ -103,14 +70,14 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
     def test_seek_video_not_started(self):
-        self.data_producer.player().video("source", None).populate(self.data_facade)
+        self.data_producer.player().video("source").populate(self.data_facade)
 
         self.evt_expecter.expect(OperationError, "the player is not started").from_(
             Cmd.SeekVideo, self.player_id, 1
         )
 
     def test_change_video_volume(self):
-        self.data_producer.player().video("source", None).play().populate(
+        self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 

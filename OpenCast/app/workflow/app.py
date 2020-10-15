@@ -6,12 +6,14 @@ from enum import Enum, auto
 import structlog
 
 from OpenCast.app.command import player as PlayerCmd
+from OpenCast.app.command import playlist as PlaylistCmd
 from OpenCast.app.command import video as VideoCmd
+from OpenCast.domain.constant import PLAYER_PLAYLIST_NAME
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .workflow import Workflow
+from .workflow import Workflow, make_cmd
 
 
 class InitWorkflow(Workflow):
@@ -42,7 +44,6 @@ class InitWorkflow(Workflow):
         self,
         id,
         app_facade,
-        infra_facade,
         data_facade,
     ):
         logger = structlog.get_logger(__name__)
@@ -53,7 +54,6 @@ class InitWorkflow(Workflow):
             app_facade,
             initial=InitWorkflow.States.INITIAL,
         )
-        self._infra_facade = infra_facade
         self._data_facade = data_facade
 
         self._player_repo = data_facade.player_repo
@@ -63,8 +63,14 @@ class InitWorkflow(Workflow):
 
     # States
     def on_enter_CREATING_PLAYER(self):
+        playlist_id = IdentityService.id_playlist()
+        cmd = make_cmd(PlaylistCmd.CreatePlaylist, playlist_id, PLAYER_PLAYLIST_NAME)
+        self._cmd_dispatcher.dispatch(cmd)
         self._observe_dispatch(
-            PlayerEvt.PlayerCreated, PlayerCmd.CreatePlayer, IdentityService.id_player()
+            PlayerEvt.PlayerCreated,
+            PlayerCmd.CreatePlayer,
+            IdentityService.id_player(),
+            playlist_id,
         )
 
     def on_enter_PURGING_VIDEOS(self, *_):

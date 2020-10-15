@@ -1,7 +1,5 @@
 """ High level HTTP server """
 
-import re
-
 import structlog
 from aiohttp import web
 from aiohttp_middlewares import cors_middleware
@@ -40,9 +38,7 @@ def make_server():
         web.Application(
             middlewares=[
                 # Allow CORS requests for API url from all localhost urls
-                cors_middleware(
-                    origins=[re.compile(r"^https?\:\/\/(localhost|0\.0\.0\.0)")]
-                ),
+                cors_middleware(allow_all=True),
             ]
         )
     )

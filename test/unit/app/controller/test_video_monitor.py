@@ -40,9 +40,7 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
         req = self.make_request(
             "DELETE", f"/{self.video_id}", {"id": str(self.video_id)}
         )
-        self.set_cmd_response(
-            make_cmd(Cmd.DeleteVideo, self.video_id), Evt.VideoDeleted
-        )
+        self.check_and_raise(make_cmd(Cmd.DeleteVideo, self.video_id), Evt.VideoDeleted)
 
         resp = await self.route(self.controller.delete, req)
         self.assertEqual(resp, (204, None))

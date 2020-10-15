@@ -12,7 +12,7 @@ from .controller import Controller
 
 class MonitorController(Controller):
     WS_CLOSE_TIMEOUT = 5.0
-    UUID = "[a-z0-9]{32}"
+    UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 
     def __init__(self, logger, app_facade, infra_facade, base_route):
         super().__init__(logger, app_facade)
@@ -38,8 +38,11 @@ class MonitorController(Controller):
     def _no_content(self):
         return self._make_response(204, None)
 
-    def _bad_request(self):
-        return self._make_response(400, None)
+    def _bad_request(self, message: str = None, details: dict = None):
+        body = None
+        if message is not None:
+            body = {"error": {"message": message, "detail": details}}
+        return self._make_response(400, body)
 
     def _not_found(self):
         return self._make_response(404, None)

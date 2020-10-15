@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 
 from OpenCast.domain.event import video as Evt
 
@@ -29,38 +29,38 @@ class StreamSchema(Schema):
 class VideoSchema(Schema):
     id = fields.UUID()
     source = fields.String()
-    playlist_id = fields.UUID(allow_none=True)
-    thumbnail = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
+    collection_name = fields.String(allow_none=True)
+    thumbnail = fields.String(allow_none=True)
     path = PathField(allow_none=True)
     streams = fields.Nested(StreamSchema(many=True))
     subtitle = fields.String(allow_none=True)
 
-    @post_load
-    def make_video(self, data, **_):
-        video = Video(**data)
-        video._events.clear()
-        return video
-
 
 class Video(Entity):
     Schema = VideoSchema
-    METADATA_FIELDS = ["title", "thumbnail"]
+    METADATA_FIELDS = ["title", "collection_name", "thumbnail"]
 
     @dataclass
     class Data:
         id: Id
         source: str
-        playlist_id: Optional[Id] = None
-        thumbnail: Optional[str] = None
         title: Optional[str] = None
+        collection_name: Optional[str] = None
+        thumbnail: Optional[str] = None
         path: Optional[Path] = None
         streams: List[Stream] = field(default_factory=list)
         subtitle: Optional[str] = None
 
     def __init__(self, *attrs, **kattrs):
         super().__init__(self.Data, *attrs, **kattrs)
-        self._record(Evt.VideoCreated, self._data.source, self._data.playlist_id)
+        self._record(
+            Evt.VideoCreated,
+            self._data.source,
+            self._data.title,
+            self._data.collection_name,
+            self._data.thumbnail,
+        )
 
     @property
     def source(self):
@@ -75,8 +75,8 @@ class Video(Entity):
         return self._data.title
 
     @property
-    def playlist_id(self):
-        return self._data.playlist_id
+    def collection_name(self):
+        return self._data.collection_name
 
     @property
     def streams(self):
@@ -85,13 +85,6 @@ class Video(Entity):
     @property
     def subtitle(self):
         return self._data.subtitle
-
-    def metadata(self, metadata: dict):
-        self._data.title = metadata.get("title", None)
-        self._data.thumbnail = metadata.get("thumbnail", None)
-        self._record(Evt.VideoIdentified, metadata)
-
-    metadata = property(None, metadata)
 
     @path.setter
     def path(self, path: Path):

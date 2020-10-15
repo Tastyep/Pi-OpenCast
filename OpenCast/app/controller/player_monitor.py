@@ -31,13 +31,13 @@ class PlayerMonitController(MonitorController):
             media_factory.make_downloader(app_facade.evt_dispatcher),
             media_factory.make_video_parser(),
         )
+        self._data_facade = data_facade
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
 
         self._route("GET", "/", self.get)
         self._route("POST", "/stream", self.stream)
         self._route("POST", "/queue", self.queue)
-        self._route("POST", "/remove", self.remove)
         self._route("POST", "/play", self.play)
         self._route("POST", "/stop", self.stop)
         self._route("POST", "/pause", self.pause)
@@ -49,67 +49,51 @@ class PlayerMonitController(MonitorController):
 
     async def get(self, _):
         player = self._player_repo.get_player()
-
-        # TODO: Remove this quick workaround after the implementation of playlists
-        videos = self._video_repo.list(player.video_queue)
-        player._queue = videos
-
         return self._ok(player)
 
     async def stream(self, req):
         source = req.query["url"]
+        video_id = IdentityService.id_video(source)
+
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
-            playlist_id = IdentityService.id_playlist(source)
             videos = [
-                Video(IdentityService.id_video(source), source, playlist_id)
-                for source in sources
+                Video(IdentityService.id_video(source), source) for source in sources
             ]
 
+            workflow_id = IdentityService.id_workflow(StreamPlaylistWorkflow, video_id)
             self._start_workflow(
-                StreamPlaylistWorkflow, playlist_id, self._video_repo, videos
+                StreamPlaylistWorkflow, workflow_id, self._data_facade, videos
             )
             return self._ok()
 
-        video_id = IdentityService.id_video(source)
-        video = Video(video_id, source, None)
-        self._start_workflow(StreamVideoWorkflow, video_id, self._video_repo, video)
+        video = Video(video_id, source)
+        self._start_workflow(StreamVideoWorkflow, video_id, self._data_facade, video)
 
         return self._ok()
 
     async def queue(self, req):
         source = req.query["url"]
+        video_id = IdentityService.id_video(source)
+
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
-            playlist_id = IdentityService.id_playlist(source)
             videos = [
-                Video(IdentityService.id_video(source), source, playlist_id)
-                for source in sources
+                Video(IdentityService.id_video(source), source) for source in sources
             ]
 
+            workflow_id = IdentityService.id_workflow(QueuePlaylistWorkflow, video_id)
             self._start_workflow(
-                QueuePlaylistWorkflow, playlist_id, self._video_repo, videos
+                QueuePlaylistWorkflow, workflow_id, self._data_facade, videos
             )
             return self._ok()
 
-        video_id = IdentityService.id_video(source)
-        video = Video(video_id, source, None)
+        video = Video(video_id, source)
         self._start_workflow(
-            QueueVideoWorkflow, video_id, self._video_repo, video, queue_front=False
+            QueueVideoWorkflow, video_id, self._data_facade, video, queue_front=False
         )
 
         return self._ok()
-
-    async def remove(self, req):
-        video_id = Id(req.query["id"])
-        player = self._player_repo.get_player()
-        if not player.has_video(video_id):
-            return self._not_found()
-
-        handlers, channel = self._make_default_handlers(PlayerEvt.VideoRemoved)
-        self._observe_dispatch(handlers, Cmd.RemoveVideo, video_id)
-
-        return await channel.receive()
 
     async def play(self, req):
         video_id = Id(req.query["id"])
