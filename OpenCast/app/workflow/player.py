@@ -17,8 +17,8 @@ from .workflow import Workflow
 
 
 class QueueVideoWorkflow(Workflow):
-    Completed = namedtuple("QueueVideoWorkflowCompleted", ("id"))
-    Aborted = namedtuple("QueueVideoWorkflowAborted", ("id"))
+    Completed = namedtuple("QueueVideoWorkflowCompleted", ("id", "model_id"))
+    Aborted = namedtuple("QueueVideoWorkflowAborted", ("id", "model_id"))
 
     # fmt: off
     class States(Enum):
@@ -70,10 +70,10 @@ class QueueVideoWorkflow(Workflow):
         )
 
     def on_enter_COMPLETED(self, _):
-        self.complete()
+        self._complete(self.video.id)
 
     def on_enter_ABORTED(self, _):
-        self.cancel()
+        self._cancel(self.video.id)
 
 
 class QueuePlaylistWorkflow(Workflow):
@@ -130,10 +130,10 @@ class QueuePlaylistWorkflow(Workflow):
         self._observe_start(workflow)
 
     def on_enter_COMPLETED(self, _):
-        self.complete()
+        self._complete()
 
     def on_enter_ABORTED(self, _):
-        self.cancel()
+        self._cancel()
 
     # Conditions
     def _is_last_video(self, evt):
@@ -141,8 +141,8 @@ class QueuePlaylistWorkflow(Workflow):
 
 
 class StreamVideoWorkflow(Workflow):
-    Completed = namedtuple("StreamVideoWorkflowCompleted", ("id"))
-    Aborted = namedtuple("StreamVideoWorkflowAborted", ("id"))
+    Completed = namedtuple("StreamVideoWorkflowCompleted", ("id", "model_id"))
+    Aborted = namedtuple("StreamVideoWorkflowAborted", ("id", "model_id"))
 
     # fmt: off
     class States(Enum):
@@ -196,10 +196,10 @@ class StreamVideoWorkflow(Workflow):
         )
 
     def on_enter_COMPLETED(self, _):
-        self.complete()
+        self._complete(self.video.id)
 
     def on_enter_ABORTED(self, _):
-        self.cancel()
+        self._cancel(self.video.id)
 
 
 class StreamPlaylistWorkflow(Workflow):
@@ -273,10 +273,10 @@ class StreamPlaylistWorkflow(Workflow):
         )
 
     def on_enter_COMPLETED(self, _):
-        self.complete()
+        self._complete()
 
     def on_enter_ABORTED(self, _):
-        self.cancel()
+        self._cancel()
 
     # Conditions
     def _is_last_video(self, _):

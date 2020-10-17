@@ -89,10 +89,10 @@ class InitWorkflow(Workflow):
         self._observe_dispatch(VideoEvt.VideoDeleted, VideoCmd.DeleteVideo, video_id)
 
     def on_enter_COMPLETED(self, *_):
-        self.complete()
+        self._complete()
 
     def on_enter_ABORTED(self, *_):
-        self.cancel()
+        self._cancel()
 
     # Conditions
     def player_exists(self):
