@@ -96,7 +96,6 @@ class QueuePlaylistWorkflow(Workflow):
         INITIAL = auto()
         QUEUEING = auto()
         COMPLETED = auto()
-        ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
@@ -144,9 +143,6 @@ class QueuePlaylistWorkflow(Workflow):
 
     def on_enter_COMPLETED(self, _):
         self._complete()
-
-    def on_enter_ABORTED(self, _):
-        self._cancel()
 
     # Conditions
     def _is_last_video(self, evt):
@@ -225,7 +221,6 @@ class StreamPlaylistWorkflow(Workflow):
         STARTING = auto()
         QUEUEING = auto()
         COMPLETED = auto()
-        ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
@@ -297,9 +292,6 @@ class StreamPlaylistWorkflow(Workflow):
 
     def on_enter_COMPLETED(self, _):
         self._complete()
-
-    def on_enter_ABORTED(self, _):
-        self._cancel()
 
     # Conditions
     def _is_last_video(self, _):
