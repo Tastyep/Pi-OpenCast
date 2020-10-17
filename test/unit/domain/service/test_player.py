@@ -19,7 +19,6 @@ class QueueingServiceTest(TestCase):
 
         self.service = QueueingService(
             self.data_facade.player_repo,
-            self.data_facade.video_repo,
             self.data_facade.playlist_repo,
         )
 
@@ -33,7 +32,9 @@ class QueueingServiceTest(TestCase):
 
         queue = self.playlist_repo.get(self.queue_id)
         videos = self.video_repo.list()
-        queue.ids = self.service.queue(queue, videos[-1].id, front=False)
+        queue.ids = self.service.queue(
+            queue, videos[-1].id, front=False, prev_video_id=None
+        )
         expected = [video.id for video in videos]
         self.assertListEqual(expected, queue.ids)
 
@@ -45,7 +46,9 @@ class QueueingServiceTest(TestCase):
         queue = self.playlist_repo.get(self.queue_id)
         videos = self.video_repo.list()
         for video in videos:
-            queue.ids = self.service.queue(queue, video.id, front=True)
+            queue.ids = self.service.queue(
+                queue, video.id, front=True, prev_video_id=None
+            )
         expected = [video.id for video in reversed(videos)]
         self.assertListEqual(expected, queue.ids)
 
@@ -56,8 +59,11 @@ class QueueingServiceTest(TestCase):
 
         queue = self.playlist_repo.get(self.queue_id)
         videos = self.video_repo.list()
-        for video in videos:
-            queue.ids = self.service.queue(queue, video.id, front=True)
+        for i, video in enumerate(videos):
+            prev_video_id = None if i == 0 else videos[i - 1].id
+            queue.ids = self.service.queue(
+                queue, video.id, front=True, prev_video_id=prev_video_id
+            )
         expected = [video.id for video in videos]
         self.assertListEqual(expected, queue.ids)
 
@@ -73,8 +79,11 @@ class QueueingServiceTest(TestCase):
         queue = self.playlist_repo.get(self.queue_id)
         videos = self.video_repo.list()
         playlist2 = [video for video in videos if video.collection_name == "2"]
-        for video in playlist2:
-            queue.ids = self.service.queue(queue, video.id, front=True)
+        for i, video in enumerate(playlist2):
+            prev_video_id = None if i == 0 else playlist2[i - 1].id
+            queue.ids = self.service.queue(
+                queue, video.id, front=True, prev_video_id=prev_video_id
+            )
 
         expected = [videos[0].id, videos[2].id, videos[3].id, videos[1].id]
         self.assertListEqual(expected, queue.ids)
@@ -86,9 +95,15 @@ class QueueingServiceTest(TestCase):
 
         queue = self.playlist_repo.get(self.queue_id)
         videos = self.video_repo.list()
-        queue.ids = self.service.queue(queue, videos[0].id, front=True)
-        queue.ids = self.service.queue(queue, videos[1].id, front=False)
-        queue.ids = self.service.queue(queue, videos[2].id, front=True)
+        queue.ids = self.service.queue(
+            queue, videos[0].id, front=True, prev_video_id=None
+        )
+        queue.ids = self.service.queue(
+            queue, videos[1].id, front=False, prev_video_id=None
+        )
+        queue.ids = self.service.queue(
+            queue, videos[2].id, front=True, prev_video_id=videos[0].id
+        )
         expected = [videos[0].id, videos[2].id, videos[1].id]
         self.assertListEqual(expected, queue.ids)
 
@@ -103,7 +118,9 @@ class QueueingServiceTest(TestCase):
 
         queue = self.playlist_repo.get(self.queue_id)
         videos = self.video_repo.list()
-        queue.ids = self.service.queue(queue, videos[2].id, front=True)
+        queue.ids = self.service.queue(
+            queue, videos[2].id, front=True, prev_video_id=videos[0].id
+        )
         expected = [videos[0].id, videos[1].id, videos[2].id]
         self.assertListEqual(expected, queue.ids)
 

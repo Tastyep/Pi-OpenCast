@@ -58,11 +58,11 @@ class Workflow(Machine):
         for workflow in self._sub_workflows:
             workflow.reset()
 
-    def cancel(self, *args):
+    def _cancel(self, *args):
         """ Cancel the workflow and dispatch the related event"""
         self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
 
-    def complete(self, *args):
+    def _complete(self, *args):
         self._evt_dispatcher.dispatch(self.__derived.Completed(self.id, *args))
 
     def _observe_start(self, workflow, *args, **kwargs):

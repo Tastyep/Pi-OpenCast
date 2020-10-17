@@ -24,8 +24,8 @@ class Video:
 
 
 class VideoWorkflow(Workflow):
-    Completed = namedtuple("VideoWorkflowCompleted", ("id"))
-    Aborted = namedtuple("VideoWorkflowAborted", ("id"))
+    Completed = namedtuple("VideoWorkflowCompleted", ("id", "model_id"))
+    Aborted = namedtuple("VideoWorkflowAborted", ("id", "model_id"))
 
     # fmt: off
     class States(Enum):
@@ -101,10 +101,10 @@ class VideoWorkflow(Workflow):
         self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
     def on_enter_COMPLETED(self, *_):
-        self.complete()
+        self._complete(self._video.id)
 
     def on_enter_ABORTED(self, _):
-        self.cancel()
+        self._cancel(self._video.id)
 
     # Conditions
     def is_complete(self):

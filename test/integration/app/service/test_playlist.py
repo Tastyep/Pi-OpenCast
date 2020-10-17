@@ -50,7 +50,13 @@ class PlaylistServiceTest(ServiceTestCase):
         playlists = self.playlist_repo.list()
         self.evt_expecter.expect(
             Evt.PlaylistContentUpdated, playlists[0].id, [video_id]
-        ).from_(Cmd.QueueVideo, playlists[0].id, video_id, queue_front=False)
+        ).from_(
+            Cmd.QueueVideo,
+            playlists[0].id,
+            video_id,
+            queue_front=False,
+            prev_video_id=None,
+        )
 
     def test_update_playlist_content(self):
         self.data_producer.playlist("name", []).populate(self.data_facade)
