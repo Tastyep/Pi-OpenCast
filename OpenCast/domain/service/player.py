@@ -11,13 +11,14 @@ from OpenCast.domain.model.playlist import Playlist
 
 
 class QueueingService:
-    def __init__(self, player_repo, video_repo, playlist_repo):
+    def __init__(self, player_repo, playlist_repo):
         self._logger = structlog.get_logger(__name__)
         self._player_repo = player_repo
-        self._video_repo = video_repo
         self._playlist_repo = playlist_repo
 
-    def queue(self, playlist: Playlist, video_id: Id, front: bool) -> List[Id]:
+    def queue(
+        self, playlist: Playlist, video_id: Id, front: bool, prev_video_id: Id
+    ) -> List[Id]:
         if not front:
             playlist.ids.append(video_id)
             return playlist.ids
@@ -29,18 +30,14 @@ class QueueingService:
             if player.video_id not in playlist.ids
             else playlist.ids.index(player.video_id)
         )
+        # Position the video after the one currently playing
         video_idx = min(player_video_idx + player_started, len(playlist.ids))
-        video = self._video_repo.get(video_id)
-        queue = self._video_repo.list(playlist.ids)
 
-        if video.collection_name is not None:
-            next_reversed = reversed(queue[video_idx:])
-            for i, q_video in enumerate(next_reversed):
-                if q_video.collection_name == video.collection_name:
-                    video_idx = len(queue) - i
-                    break
+        # Order videos of the same collection together
+        if prev_video_id in playlist.ids:
+            video_idx = max(video_idx, playlist.ids.index(prev_video_id) + 1)
 
-        playlist.ids.insert(video_idx, video.id)
+        playlist.ids.insert(video_idx, video_id)
         return playlist.ids
 
     def next_video(self, playlist_id: Id, video_id: Id) -> Id:

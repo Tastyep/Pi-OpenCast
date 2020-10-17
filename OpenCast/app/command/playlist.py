@@ -1,7 +1,7 @@
 """ Playlist commands """
 
 from dataclasses import field
-from typing import List
+from typing import List, Optional
 
 from .command import Command, ModelId, command
 
@@ -21,6 +21,7 @@ class RenamePlaylist(Command):
 class QueueVideo(Command):
     video_id: ModelId
     queue_front: bool
+    prev_video_id: Optional[ModelId]
 
 
 @command

@@ -10,6 +10,7 @@ from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import playlist as PlaylistCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
+from OpenCast.domain.model import Id
 from OpenCast.domain.service.identity import IdentityService
 
 from .video import Video, VideoWorkflow
@@ -38,7 +39,15 @@ class QueueVideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, app_facade, data_facade, video: Video, queue_front):
+    def __init__(
+        self,
+        id,
+        app_facade,
+        data_facade,
+        video: Video,
+        queue_front: bool,
+        prev_video_id: Id = None,
+    ):
         logger = structlog.get_logger(__name__)
         super().__init__(
             logger,
@@ -47,16 +56,17 @@ class QueueVideoWorkflow(Workflow):
             app_facade,
             initial=QueueVideoWorkflow.States.INITIAL,
         )
+        self.video = video
         self._data_facade = data_facade
-        self._video = video
         self._queue_front = queue_front
+        self._prev_video_id = prev_video_id
         self._player_playlist_id = self._data_facade.player_repo.get_player().queue
 
     # States
     def on_enter_COLLECTING(self):
-        workflow_id = IdentityService.id_workflow(VideoWorkflow, self._video.id)
+        workflow_id = IdentityService.id_workflow(VideoWorkflow, self.video.id)
         workflow = self._factory.make_video_workflow(
-            workflow_id, self._app_facade, self._data_facade, self._video
+            workflow_id, self._app_facade, self._data_facade, self.video
         )
         self._observe_start(workflow)
 
@@ -65,8 +75,9 @@ class QueueVideoWorkflow(Workflow):
             PlaylistEvt.PlaylistContentUpdated,
             PlaylistCmd.QueueVideo,
             self._player_playlist_id,
-            self._video.id,
+            self.video.id,
             self._queue_front,
+            self._prev_video_id,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -112,20 +123,22 @@ class QueuePlaylistWorkflow(Workflow):
             app_facade,
             initial=StreamVideoWorkflow.States.INITIAL,
         )
+        self.videos = videos[::-1]
         self._data_facade = data_facade
-        self._videos = videos[::-1]
 
-    def start(
-        self,
-    ):
+    def start(self):
         self._queue_videos(None)
 
     # States
     def on_enter_QUEUEING(self, _):
-        video = self._videos.pop()
+        video = self.videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(
-            workflow_id, self._app_facade, self._data_facade, video, queue_front=False
+            workflow_id,
+            self._app_facade,
+            self._data_facade,
+            video,
+            queue_front=False,
         )
         self._observe_start(workflow)
 
@@ -137,7 +150,7 @@ class QueuePlaylistWorkflow(Workflow):
 
     # Conditions
     def _is_last_video(self, evt):
-        return len(self._videos) == 0
+        return len(self.videos) == 0
 
 
 class StreamVideoWorkflow(Workflow):
@@ -172,17 +185,17 @@ class StreamVideoWorkflow(Workflow):
             initial=StreamVideoWorkflow.States.INITIAL,
         )
 
+        self.video = video
         self._data_facade = data_facade
-        self._video = video
 
     # States
     def on_enter_QUEUEING(self):
-        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, self._video.id)
+        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, self.video.id)
         workflow = self._factory.make_queue_video_workflow(
             workflow_id,
             self._app_facade,
             self._data_facade,
-            self._video,
+            self.video,
             queue_front=False,
         )
         self._observe_start(workflow)
@@ -192,7 +205,7 @@ class StreamVideoWorkflow(Workflow):
             PlayerEvt.PlayerStarted,
             PlayerCmd.PlayVideo,
             IdentityService.id_player(),
-            self._video.id,
+            self.video.id,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -245,15 +258,16 @@ class StreamPlaylistWorkflow(Workflow):
             initial=StreamVideoWorkflow.States.INITIAL,
         )
 
+        self.videos = videos[::-1]
         self._data_facade = data_facade
-        self._videos = videos[::-1]
+        self._prev_video_id = None
 
     def start(self):
         self._play_video(None)
 
     # States
     def on_enter_STARTING(self, _):
-        video = self._videos.pop()
+        video = self.videos.pop()
         workflow_id = IdentityService.id_workflow(StreamVideoWorkflow, video.id)
         workflow = self._factory.make_stream_video_workflow(
             workflow_id, self._app_facade, self._data_facade, video
@@ -262,11 +276,20 @@ class StreamPlaylistWorkflow(Workflow):
             workflow,
         )
 
-    def on_enter_QUEUEING(self, _):
-        video = self._videos.pop()
+    def on_enter_QUEUEING(self, evt):
+        evt_type = type(evt)
+        if evt_type in [StreamVideoWorkflow.Completed, QueueVideoWorkflow.Completed]:
+            self._prev_video_id = evt.model_id
+
+        video = self.videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(
-            workflow_id, self._app_facade, self._data_facade, video, queue_front=True
+            workflow_id,
+            self._app_facade,
+            self._data_facade,
+            video,
+            queue_front=True,
+            prev_video_id=self._prev_video_id,
         )
         self._observe_start(
             workflow,
@@ -280,4 +303,4 @@ class StreamPlaylistWorkflow(Workflow):
 
     # Conditions
     def _is_last_video(self, _):
-        return len(self._videos) == 0
+        return len(self.videos) == 0
