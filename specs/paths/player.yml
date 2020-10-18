@@ -50,28 +50,6 @@ queue:
       "200":
         description: successful operation
 
-remove:
-  post:
-    tags:
-      - player
-    summary: Remove media
-    description: |
-      Remove the media with the given ID from the queue
-    operationId: removeMedia
-    parameters:
-      - in: query
-        name: id
-        schema:
-          type: string
-        description: The ID of the media
-    responses:
-      "200":
-        description: successful operation
-      "404":
-        description: not found
-      "400":
-        description: operation failure
-
 play:
   post:
     tags:

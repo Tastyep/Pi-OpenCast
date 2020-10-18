@@ -5,7 +5,8 @@ import structlog
 
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import config
-from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.event import player as PlayerEvt
+from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
 
 from .service import Service
@@ -16,40 +17,35 @@ class PlayerService(Service):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, self, player_cmds)
 
-        self._observe_event(VideoEvt.VideoDeleted)
+        self._observe_event(PlayerEvt.PlayerCreated)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
         self._player = media_factory.make_player(app_facade.evt_dispatcher)
 
-        model = self._player_model()
-        self._player.set_volume(model.volume)
+        player = self._player_repo.get_player()
+        if player is not None:
+            self._init_player(player.volume)
 
     # Command handler implementation
+
+    def _create_player(self, cmd):
+        def impl(ctx):
+            player = Player(cmd.model_id, cmd.playlist_id)
+            ctx.add(player)
+
+        self._start_transaction(self._player_repo, cmd.id, impl)
 
     def _play_video(self, cmd):
         def impl(player):
             video = self._video_repo.get(cmd.video_id)
-            player.play(video)
+            player.play(video.id)
 
-            self._player.play(video.id, str(video.path))
+            self._player.play(str(video.path))
             if player.subtitle_state is True:
                 sub_stream = video.stream("subtitle", config["subtitle.language"])
                 if sub_stream is not None:
                     self._player.select_subtitle_stream(sub_stream.index)
-
-        self._update(cmd.id, impl)
-
-    def _queue_video(self, cmd):
-        def impl(player):
-            video = self._video_repo.get(cmd.video_id)
-            player.queue(video)
-
-        self._update(cmd.id, impl)
-
-    def _remove_video(self, cmd):
-        def impl(player):
-            player.remove(cmd.video_id)
 
         self._update(cmd.id, impl)
 
@@ -107,16 +103,15 @@ class PlayerService(Service):
 
     # Event handler implementation
 
-    def _video_deleted(self, evt):
-        def impl(model):
-            if model.has_video(evt.model_id):
-                model.remove(evt.model_id)
-
-        self._update(evt.id, impl)
+    def _player_created(self, evt):
+        self._init_player(evt.volume)
 
     # Private
     def _player_model(self):
         return self._player_repo.get_player()
+
+    def _init_player(self, volume):
+        self._player.set_volume(volume)
 
     def _update(self, cmd_id, mutator, *args):
         def impl(ctx):

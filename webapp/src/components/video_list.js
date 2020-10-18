@@ -11,6 +11,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 
 import videoAPI from "services/api/video";
 import playerAPI from "services/api/player";
+import playlistAPI from "services/api/playlist";
 
 import noPreview from "images/no-preview.png";
 
@@ -45,6 +46,7 @@ function VideoList() {
   const [videos, setVideos] = useState([]);
   const [timer, setTimer] = useState(0);
   const [videoId, setVideoId] = useState(null);
+  const [playlistId, setPlaylistId] = useState(null);
 
   const deleteVideo = (video) => {
     videoAPI
@@ -65,9 +67,10 @@ function VideoList() {
   };
 
   const listVideos = () => {
-    videoAPI
-      .list()
+    playlistAPI
+      .videos(playlistId)
       .then((response) => {
+        console.log("Videos: ", response.data);
         setVideos(response.data);
       })
       .catch((error) => console.log(error));
@@ -77,10 +80,19 @@ function VideoList() {
     let interval;
     interval = setInterval(() => setTimer(timer + 1), 10000);
 
-    listVideos();
+    if (playlistId === null) {
+      playerAPI
+        .get()
+        .then((response) => {
+          setPlaylistId(response.data.queue);
+        })
+        .catch((error) => console.log(error));
+    } else {
+      listVideos();
+    }
 
     return () => clearInterval(interval);
-  }, [timer]);
+  }, [timer, playlistId]);
 
   return (
     <div className={classes.root}>

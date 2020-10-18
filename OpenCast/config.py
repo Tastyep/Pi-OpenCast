@@ -168,6 +168,9 @@ config = Config({
         "host": "0.0.0.0",
         "port": 2020
     },
+    "database": {
+        "file": "opencast.db",
+    },
     "player": {
         "hide_background": True,
         "loop_last": True,

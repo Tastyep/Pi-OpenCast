@@ -1,8 +1,10 @@
 """ Video repository """
 
-from .memory import MemoryRepo
+from OpenCast.domain.model.video import Video
+
+from .repository import Repository
 
 
-class VideoRepo(MemoryRepo):
-    def __init__(self):
-        super().__init__()
+class VideoRepo(Repository):
+    def __init__(self, database):
+        super().__init__(database, Video)

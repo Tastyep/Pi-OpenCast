@@ -8,7 +8,7 @@ from OpenCast.app.controller.module import ControllerModule
 from OpenCast.app.facade import AppFacade
 from OpenCast.app.service.module import ServiceModule
 from OpenCast.domain.service.factory import ServiceFactory
-from OpenCast.infra.data.facade import DataFacade
+from OpenCast.infra.data.manager import DataManager, StorageType
 from OpenCast.infra.data.repo.factory import RepoFactory
 
 
@@ -22,20 +22,25 @@ class ServiceTestCase(TestCase):
         self.app_facade = AppFacade(app_executor)
 
         repo_factory = RepoFactory()
-        self.data_facade = DataFacade(repo_factory)
+        data_manager = DataManager(repo_factory)
+        self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
-        self.data_producer.player().populate(self.data_facade)
 
-        infraServiceFactory = Mock()
-        self.service_factory = ServiceFactory(infraServiceFactory)
-
+        self.media_player = Mock()
         self.downloader = Mock()
         self.video_parser = Mock()
+        self.file_service = Mock()
         self.infra_facade = InfraFacadeMock()
+        self.infra_facade.media_factory.make_player.return_value = self.media_player
         self.infra_facade.media_factory.make_downloader.return_value = self.downloader
         self.infra_facade.media_factory.make_video_parser.return_value = (
             self.video_parser
         )
+        self.infra_facade.service_factory.make_file_service.return_value = (
+            self.file_service
+        )
+
+        self.service_factory = ServiceFactory(self.infra_facade.service_factory)
 
         self.evt_expecter = EventExpecter(
             self.app_facade.cmd_dispatcher, self.app_facade.evt_dispatcher

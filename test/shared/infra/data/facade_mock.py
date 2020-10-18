@@ -6,3 +6,4 @@ class DataFacadeMock(Mock):
         super(DataFacadeMock, self).__init__()
         self.player_repo = Mock()
         self.video_repo = Mock()
+        self.playlist_repo = Mock()

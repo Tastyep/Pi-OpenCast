@@ -10,23 +10,18 @@ servers:
 tags:
   - name: player
     description: The media player
+  - name: playlist
+    description: Collection of videos
   - name: video
-    description: Media queued for playing
+    description: Media for playing
 
 paths:
-  /videos:
-    $ref: "./paths/video.yml#/root"
-  /videos/{id}:
-    $ref: "./paths/video.yml#/id"
-
   /player:
     $ref: "./paths/player.yml#/root"
   /player/stream:
     $ref: "./paths/player.yml#/stream"
   /player/queue:
     $ref: "./paths/player.yml#/queue"
-  /player/remove:
-    $ref: "./paths/player.yml#/remove"
   /player/play:
     $ref: "./paths/player.yml#/play"
   /player/stop:
@@ -41,3 +36,15 @@ paths:
     $ref: "./paths/player.yml#/subtitle_toggle"
   /player/subtitle/seek:
     $ref: "./paths/player.yml#/subtitle_seek"
+
+  /playlists:
+    $ref: "./paths/playlist.yml#/root"
+  /playlists/{id}:
+    $ref: "./paths/playlist.yml#/id"
+  /playlists/{id}/videos:
+    $ref: "./paths/playlist.yml#/videos"
+
+  /videos:
+    $ref: "./paths/video.yml#/root"
+  /videos/{id}:
+    $ref: "./paths/video.yml#/id"

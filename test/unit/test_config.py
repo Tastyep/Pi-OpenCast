@@ -57,7 +57,8 @@ class ConfigTest(TestCase):
         self.assertEqual(1, len(ctx.exception.errors))
         self.assertEqual(
             {
-                "a": f"type is '{type(new_value).__name__}' should be '{type(old_value).__name__}'",
+                "a": f"type is '{type(new_value).__name__}' "
+                f"should be '{type(old_value).__name__}'",
             },
             ctx.exception.errors,
         )

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
@@ -24,6 +24,14 @@ function StreamInput() {
   };
 
   const handleActionChange = (cast) => {
+    // If clicking on the contained button
+    if (
+      (cast === true && action === playerAPI.streamMedia) ||
+      (cast === false && action === playerAPI.queueMedia)
+    ) {
+      handleSubmit(undefined);
+      return;
+    }
     if (cast === true) {
       setCastVariant("contained");
       setQueueVariant("outlined");
@@ -33,8 +41,11 @@ function StreamInput() {
       setQueueVariant("contained");
       setAction(() => playerAPI.queueMedia);
     }
-    handleSubmit(undefined);
   };
+
+  useEffect(() => {
+    handleSubmit(undefined);
+  }, [action]);
 
   return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">

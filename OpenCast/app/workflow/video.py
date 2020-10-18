@@ -18,21 +18,19 @@ from .workflow import Workflow
 class Video:
     id: Id
     source: str
-    playlist_id: Id
 
     def to_tuple(self):
         return astuple(self)
 
 
 class VideoWorkflow(Workflow):
-    Completed = namedtuple("VideoWorkflowCompleted", ("id"))
-    Aborted = namedtuple("VideoWorkflowAborted", ("id"))
+    Completed = namedtuple("VideoWorkflowCompleted", ("id", "model_id"))
+    Aborted = namedtuple("VideoWorkflowAborted", ("id", "model_id"))
 
     # fmt: off
     class States(Enum):
         INITIAL = auto()
         CREATING = auto()
-        IDENTIFYING = auto()
         RETRIEVING = auto()
         PARSING = auto()
         FINALISING = auto()
@@ -44,8 +42,7 @@ class VideoWorkflow(Workflow):
     transitions = [
         ["_create",                 States.INITIAL,     States.COMPLETED,  "is_complete"],  # noqa: E501
         ["_create",                 States.INITIAL,     States.CREATING],
-        ["_video_created",          States.CREATING,    States.IDENTIFYING],
-        ["_video_identified",       States.IDENTIFYING, States.RETRIEVING],
+        ["_video_created",          States.CREATING,    States.RETRIEVING],
         ["_video_retrieved",        States.RETRIEVING,  States.PARSING],
         ["_video_parsed",           States.PARSING,     States.FINALISING],
         ["_video_subtitle_fetched", States.FINALISING,  States.COMPLETED],
@@ -56,7 +53,7 @@ class VideoWorkflow(Workflow):
     ]
     # fmt: on
 
-    def __init__(self, id, app_facade, video_repo, video: Video):
+    def __init__(self, id, app_facade, data_facade, video: Video):
         logger = structlog.get_logger(__name__)
         super().__init__(
             logger,
@@ -65,7 +62,7 @@ class VideoWorkflow(Workflow):
             app_facade,
             initial=VideoWorkflow.States.INITIAL,
         )
-        self._video_repo = video_repo
+        self._video_repo = data_facade.video_repo
         self._video = video
 
     def start(self):
@@ -75,13 +72,6 @@ class VideoWorkflow(Workflow):
     def on_enter_CREATING(self):
         self._observe_dispatch(
             VideoEvt.VideoCreated, Cmd.CreateVideo, *self._video.to_tuple()
-        )
-
-    def on_enter_IDENTIFYING(self, _):
-        self._observe_dispatch(
-            VideoEvt.VideoIdentified,
-            Cmd.IdentifyVideo,
-            self._video.id,
         )
 
     def on_enter_RETRIEVING(self, _):
@@ -111,10 +101,10 @@ class VideoWorkflow(Workflow):
         self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
     def on_enter_COMPLETED(self, *_):
-        self.complete()
+        self._complete(self._video.id)
 
     def on_enter_ABORTED(self, _):
-        self.cancel()
+        self._cancel(self._video.id)
 
     # Conditions
     def is_complete(self):

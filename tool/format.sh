@@ -60,7 +60,7 @@ shell() {
   require_shfmt
 
   local shfmt_opts=("-l" "-d" "-i" "2")
-  [[ "${ARGS["--check"]}" == false ]] && shfmt_opts+=("-w")
+  [[ -z "${ARGS["--check"]}" ]] && shfmt_opts+=("-w")
 
   sh_files=()
   sh_dirs=("." "tool" "script")

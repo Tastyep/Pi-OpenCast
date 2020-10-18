@@ -1,2 +1,9 @@
+""" Factory for creating infra services """
+
+
+from .file import FileService
+
+
 class ServiceFactory:
-    pass
+    def make_file_service(self, *args):
+        return FileService()

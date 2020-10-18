@@ -7,3 +7,4 @@ class InfraFacadeMock(Mock):
         self.io_factory = Mock()
         self.server = Mock()
         self.media_factory = Mock()
+        self.service_factory = Mock()

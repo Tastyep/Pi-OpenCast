@@ -21,7 +21,8 @@ check_system_deps() {
   log_info "Checking system dependencies..."
   local -a deps=("curl" "lsof" "python" "python3" "pip3" "node" "npm")
   local status fail
-  [[ "${ARGS["--ci"]}" == false ]] && deps+=("ffmpeg" "vlc")
+  # Set flags to false  by default
+  [[ -z "${ARGS["--ci"]}" ]] && deps+=("ffmpeg" "vlc")
 
   fail=false
   for dep in "${deps[@]}"; do

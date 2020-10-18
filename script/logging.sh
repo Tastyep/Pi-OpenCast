@@ -28,7 +28,7 @@ log_status() {
 
   name="$1"
   status="$2"
-  [[ "$status" == "1" ]] && marker="$(colorize "$RED_COL" "✗")" || marker="$(colorize "$GREEN_COL" "✓")"
+  [[ "$status" == "0" ]] && marker="$(colorize "$GREEN_COL" "✓")" || marker="$(colorize "$RED_COL" "✗")"
 
   printf "%s %s\n" "$marker" "$name"
   return "$status"

@@ -1,21 +1,15 @@
 """ Video commands """
 
-from .command import Command, ModelId, command
+from .command import Command, command
 
 
 @command
 class CreateVideo(Command):
     source: str
-    playlist_id: ModelId
 
 
 @command
 class DeleteVideo(Command):
-    pass
-
-
-@command
-class IdentifyVideo(Command):
     pass
 
 

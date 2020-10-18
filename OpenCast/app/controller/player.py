@@ -4,26 +4,28 @@ import structlog
 
 from OpenCast.app.command import player as Cmd
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.infra.event import player as player_events
+from OpenCast.infra.event import player as PlayerEvt
 
 from .controller import Controller
 
 
 class PlayerController(Controller):
-    def __init__(self, app_facade, data_facade):
-        super().__init__(app_facade)
+    def __init__(self, app_facade, data_facade, service_factory):
+        logger = structlog.get_logger(__name__)
+        super().__init__(logger, app_facade)
 
-        self._logger = structlog.get_logger(__name__)
         self._player_repo = data_facade.player_repo
-        self._video_repo = data_facade.video_repo
+        self._queueing_service = service_factory.make_queueing_service(
+            data_facade.player_repo, data_facade.playlist_repo
+        )
 
-        self._observe(player_events)
+        self._observe(PlayerEvt, self._default_handler_factory)
 
     # Infra event handler interface implementation
 
     def _media_end_reached(self, evt):
-        model = self._player_repo.get_player()
-        video_id = model.next_video()
+        player = self._player_repo.get_player()
+        video_id = self._queueing_service.next_video(player.queue, player.video_id)
         if video_id is None:
             self._dispatch(Cmd.StopPlayer)
         else:
