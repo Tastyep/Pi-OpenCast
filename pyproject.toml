@@ -39,7 +39,7 @@ mypy = "^0.782"
 sphinx-autodoc-typehints = "^1.11.0"
 sphinxcontrib-openapi = "^0.7.0"
 black = "^20.8b0"
-flake8 = "^3.8.3"
+flake8 = "^3.8.4"
 isort = "^5.5.2"
 coverage = "^5.3"
 
