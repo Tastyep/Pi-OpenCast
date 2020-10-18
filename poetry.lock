@@ -233,7 +233,7 @@ python-versions = "*"
 
 [[package]]
 name = "isort"
-version = "5.5.2"
+version = "5.6.4"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
@@ -834,7 +834,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "fc747ad96601dc642b2175add224cbf7f966715aed40d830fbf37d72f1258a20"
+content-hash = "3e4722405e5a6b2eb1262e79aa9717b686cf6a70a226dd1674880e8d6539cd6b"
 
 [metadata.files]
 aiohttp = [
@@ -966,8 +966,8 @@ iniconfig = [
     {file = "iniconfig-1.0.1.tar.gz", hash = "sha256:e5f92f89355a67de0595932a6c6c02ab4afddc6fcdc0bfc5becd0d60884d3f69"},
 ]
 isort = [
-    {file = "isort-5.5.2-py3-none-any.whl", hash = "sha256:ba91218eee31f1e300ecc079ef0c524cea3fc41bfbb979cbdf5fd3a889e3cfed"},
-    {file = "isort-5.5.2.tar.gz", hash = "sha256:171c5f365791073426b5ed3a156c2081a47f88c329161fd28228ff2da4c97ddb"},
+    {file = "isort-5.6.4-py3-none-any.whl", hash = "sha256:dcab1d98b469a12a1a624ead220584391648790275560e1a43e54c5dceae65e7"},
+    {file = "isort-5.6.4.tar.gz", hash = "sha256:dcaeec1b5f0eca77faea2a35ab790b4f3680ff75590bfcb7145986905aab2f58"},
 ]
 janus = [
     {file = "janus-0.6.0-py3-none-any.whl", hash = "sha256:3c7b56681de4c115fea76a933b7be5ed783e4b7c7922e9973751ad66806a0e03"},
