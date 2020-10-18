@@ -246,11 +246,11 @@ colors = ["colorama (>=0.4.3,<0.5.0)"]
 
 [[package]]
 name = "janus"
-version = "0.5.0"
+version = "0.6.0"
 description = "Mixed sync-async queue to interoperate between asyncio tasks and classic threads"
 category = "main"
 optional = false
-python-versions = ">=3.5.3"
+python-versions = ">=3.6"
 
 [[package]]
 name = "jinja2"
@@ -834,7 +834,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "33390eb766bb02b0b9831ea2f06157073faa779fe9f1770543ec0b607b33dfb1"
+content-hash = "1c7bd5849f47061787b3451a1bf3da185a45ba72ed00fe78b568854ebb3d768d"
 
 [metadata.files]
 aiohttp = [
@@ -970,8 +970,8 @@ isort = [
     {file = "isort-5.5.2.tar.gz", hash = "sha256:171c5f365791073426b5ed3a156c2081a47f88c329161fd28228ff2da4c97ddb"},
 ]
 janus = [
-    {file = "janus-0.5.0-py3-none-any.whl", hash = "sha256:f35c78f9cd13899438cce525e6ebabc7f8ad5f1b26b2f7d9ae153b4499acc84a"},
-    {file = "janus-0.5.0.tar.gz", hash = "sha256:0700f5537d076521851d19b7625545c5e76f6d5792ab17984f28230adcc3b34c"},
+    {file = "janus-0.6.0-py3-none-any.whl", hash = "sha256:3c7b56681de4c115fea76a933b7be5ed783e4b7c7922e9973751ad66806a0e03"},
+    {file = "janus-0.6.0.tar.gz", hash = "sha256:7bc6a9b99f401978113937f477b30ef5a104897e92f6f831aa5b95b57d103eb1"},
 ]
 jinja2 = [
     {file = "Jinja2-2.11.2-py2.py3-none-any.whl", hash = "sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035"},
