@@ -33,7 +33,7 @@ marshmallow_enum = "^1.5.1"
 [tool.poetry.dev-dependencies]
 pytest = "^6.0"
 pytest-cov = "^2.4"
-sphinx_rtd_theme = "^0.4.3"
+sphinx_rtd_theme = "^0.5.0"
 sphinx = "^3.1.1"
 mypy = "^0.782"
 sphinx-autodoc-typehints = "^1.11.0"
