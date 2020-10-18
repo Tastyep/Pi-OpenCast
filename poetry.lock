@@ -754,7 +754,7 @@ python-versions = ">=3.5,<4.0"
 
 [[package]]
 name = "toml"
-version = "0.9.6"
+version = "0.10.1"
 description = "Python Library for Tom's Obvious, Minimal Language"
 category = "main"
 optional = false
@@ -840,7 +840,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "fb011e2d77b2eae7bb9fe96598fa9e9ecf9ddda86a5af0c43a0a20dbe14e4f82"
+content-hash = "0e1e193953ad39167d464f46ce8beac93bab694a73eeabc83bf7ac06657ed1ef"
 
 [metadata.files]
 aiohttp = [
@@ -1235,8 +1235,8 @@ tinydb = [
     {file = "tinydb-4.1.1.tar.gz", hash = "sha256:1b8d7308ba2fe6d582c6ae69f33c62013053939f7ab8d1787b1e15950566a202"},
 ]
 toml = [
-    {file = "toml-0.9.6-py2.py3-none-any.whl", hash = "sha256:a7901919d3e4f92ffba7ff40a9d697e35bbbc8a8049fe8da742f34c83606d957"},
-    {file = "toml-0.9.6.tar.gz", hash = "sha256:380178cde50a6a79f9d2cf6f42a62a5174febe5eea4126fe4038785f1d888d42"},
+    {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
+    {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
 ]
 transitions = [
     {file = "transitions-0.8.2-py2.py3-none-any.whl", hash = "sha256:57ceb045d58e491e676efea306e9c475f112eeb563b6c103eae2ff9bc33759fb"},
