@@ -24,6 +24,14 @@ function StreamInput() {
   };
 
   const handleActionChange = (cast) => {
+    // If clicking on the contained button
+    if (
+      (cast === true && action === playerAPI.streamMedia) ||
+      (cast === false && action === playerAPI.queueMedia)
+    ) {
+      handleSubmit(undefined);
+      return;
+    }
     if (cast === true) {
       setCastVariant("contained");
       setQueueVariant("outlined");
