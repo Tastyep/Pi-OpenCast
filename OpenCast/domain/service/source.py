@@ -44,6 +44,6 @@ class SourceService:
         return metadata
 
     def list_streams(self, video) -> List[Stream]:
-        video_path = str(video.path)
+        video_path = video.location
         streams = self._video_parser.parse_streams(video_path)
         return [Stream(*stream) for stream in streams]

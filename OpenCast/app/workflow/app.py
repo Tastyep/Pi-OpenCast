@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 from enum import Enum, auto
+from pathlib import Path
 
 import structlog
 
@@ -76,10 +77,11 @@ class InitWorkflow(Workflow):
     def on_enter_PURGING_VIDEOS(self, *_):
         if not self._missing_videos:
             videos = self._video_repo.list()
+            # TODO: Update once support for streams is added
             self._missing_videos = [
                 video.id
                 for video in videos
-                if video.path is None or not video.path.exists()
+                if video.location is None or not Path(video.location).exists()
             ]
             if not self._missing_videos:
                 self.to_COMPLETED()

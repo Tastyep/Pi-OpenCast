@@ -48,13 +48,13 @@ class VideoService(Service):
         self._start_transaction(self._video_repo, cmd.id, impl)
 
     def _retrieve_video(self, cmd):
-        def impl(ctx, video):
-            video.path = Path(video.source)
+        def from_disk(ctx, video):
+            video.location = video.source
             ctx.update(video)
 
         video = self._video_repo.get(cmd.model_id)
         if video.from_disk():
-            self._start_transaction(self._video_repo, cmd.id, impl, video)
+            self._start_transaction(self._video_repo, cmd.id, from_disk, video)
             return
 
         def video_downloaded(_):
@@ -66,13 +66,13 @@ class VideoService(Service):
         def abort_operation(evt):
             self._abort_operation(cmd.id, evt.error)
 
-        video.path = Path(cmd.output_directory) / f"{video.title}.mp4"
+        video.location = str(Path(cmd.output_directory) / f"{video.title}.mp4")
         self._evt_dispatcher.observe_result(
             cmd.id,
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
             times=1,
         )
-        self._downloader.download_video(cmd.id, video.source, str(video.path))
+        self._downloader.download_video(cmd.id, video.source, video.location)
 
     def _parse_video(self, cmd):
         def impl(ctx):

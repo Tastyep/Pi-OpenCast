@@ -111,7 +111,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
     async def test_play(self):
-        self.data_producer.video("source", None).populate(self.data_facade)
+        self.data_producer.video("source").populate(self.data_facade)
         video_id = IdentityService.id_video("source")
         req = self.make_request("POST", "/play", query={"id": str(video_id)})
         self.check_and_raise(
@@ -131,7 +131,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.assertEqual(resp, (404, None))
 
     async def test_play_error(self):
-        self.data_producer.video("source", None).populate(self.data_facade)
+        self.data_producer.video("source").populate(self.data_facade)
         video_id = IdentityService.id_video("source")
         req = self.make_request("POST", "/play", query={"id": str(video_id)})
         self.check_and_error(make_cmd(Cmd.PlayVideo, self.player_id, video_id))

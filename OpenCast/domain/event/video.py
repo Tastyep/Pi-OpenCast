@@ -23,7 +23,7 @@ class VideoDeleted(Event):
 
 @dataclass
 class VideoRetrieved(Event):
-    path: Path
+    location: str
 
 
 @dataclass

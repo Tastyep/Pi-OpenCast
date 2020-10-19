@@ -98,21 +98,27 @@ class InitWorkflowTest(WorkflowTestCase):
         )
         self.assertTrue(self.workflow.is_PURGING_VIDEOS())
 
-    def test_purging_videos_to_completed_no_deletion(self):
+    @patch("OpenCast.app.workflow.app.Path")
+    def test_purging_videos_to_completed_no_deletion(self, path_cls_mock):
+        path_inst = path_cls_mock.return_value
+        path_inst.exists.return_value = True
+
         video = Mock()
         video.path.exists.return_value = True
         self.video_repo.list.return_value = [video]
         self.workflow.to_PURGING_VIDEOS()
         self.assertTrue(self.workflow.is_COMPLETED())
 
-    def test_purging_videos_to_completed_with_deletion(self):
+    @patch("OpenCast.app.workflow.app.Path")
+    def test_purging_videos_to_completed_with_deletion(self, path_cls_mock):
+        path_inst = path_cls_mock.return_value
+        path_inst.exists.return_value = False
+
         video1 = Mock()
         video1.id = IdentityService.id_video("mock1")
-        video1.path.exists.return_value = False
 
         video2 = Mock()
         video2.id = IdentityService.id_video("mock2")
-        video2.path.exists.return_value = False
 
         self.video_repo.list.return_value = [video1, video2]
         self.workflow.to_PURGING_VIDEOS()

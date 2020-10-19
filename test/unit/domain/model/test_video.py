@@ -1,5 +1,5 @@
 import OpenCast.domain.event.video as Evt
-from OpenCast.domain.model.video import Path, Video
+from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
@@ -17,20 +17,20 @@ class VideoTest(ModelTestCase):
             "title",
             "album_name",
             "thumbnail_url",
-            Path("/tmp/file"),
+            "/tmp/file",
             [],
             "subtitle",
         )
         self.assertEqual("source", video.source)
         self.assertEqual("title", video.title)
         self.assertEqual("album_name", video.collection_name)
-        self.assertEqual(Path("/tmp/file"), video.path)
+        self.assertEqual("/tmp/file", video.location)
         self.assertEqual([], video.streams)
         self.assertEqual("subtitle", video.subtitle)
         self.expect_events(video, Evt.VideoCreated)
 
     def test_retrieve(self):
-        self.video.path = "/tmp"
+        self.video.location = "/tmp"
         self.expect_events(self.video, Evt.VideoRetrieved)
 
     def test_parse(self):

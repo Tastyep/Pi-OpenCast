@@ -114,7 +114,7 @@ class VideoServiceTest(ServiceTestCase):
         )
 
     def test_parse_video(self):
-        self.data_producer.video("source", path=Path("/tmp/source.mp4")).populate(
+        self.data_producer.video("source", location="/tmp/source.mp4").populate(
             self.data_facade
         )
 
@@ -132,7 +132,7 @@ class VideoServiceTest(ServiceTestCase):
         )
 
     def test_fetch_video_subtitle(self):
-        self.data_producer.video("source", path=Path("/tmp/source.mp4")).populate(
+        self.data_producer.video("source", location="/tmp/source.mp4").populate(
             self.data_facade
         )
 
