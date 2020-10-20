@@ -26,8 +26,17 @@ class PlayerWrapperTest(TestCase):
         self.dispatcher = Mock()
         self.player = PlayerWrapper(self.instance, self.dispatcher)
 
-    def test_play(self):
-        self.player.play("/tmp/video.mp4")
+    def test_play_file(self):
+        location = "/tmp/video.mp4"
+        self.player.play(location, stream=False)
+        self.instance.media_new_path.assert_called_once_with(location)
+        self.player_impl.set_media.assert_called_once()
+        self.player_impl.play.assert_called_once()
+
+    def test_play_stream(self):
+        location = "https://url.m3u8"
+        self.player.play(location, stream=True)
+        self.instance.media_new_location.assert_called_once_with(location)
         self.player_impl.set_media.assert_called_once()
         self.player_impl.play.assert_called_once()
 
