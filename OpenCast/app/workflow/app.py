@@ -77,11 +77,10 @@ class InitWorkflow(Workflow):
     def on_enter_PURGING_VIDEOS(self, *_):
         if not self._missing_videos:
             videos = self._video_repo.list()
-            # TODO: Update once support for streams is added
             self._missing_videos = [
                 video.id
                 for video in videos
-                if video.location is None or not Path(video.location).exists()
+                if not (video.streamable() or Path(video.location).exists())
             ]
             if not self._missing_videos:
                 self.to_COMPLETED()
