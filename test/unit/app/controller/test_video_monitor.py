@@ -11,9 +11,7 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
     def setUp(self):
         super().setUp()
 
-        self.data_producer.video("source", None).video("source2", None).populate(
-            self.data_facade
-        )
+        self.data_producer.video("source").video("source2").populate(self.data_facade)
         self.video_id = IdentityService.id_video("source")
 
         self.controller = VideoMonitController(

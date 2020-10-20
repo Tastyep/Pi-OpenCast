@@ -11,6 +11,7 @@ from .event import Event
 @dataclass
 class VideoCreated(Event):
     source: str
+    source_protocol: str
     title: Optional[str]
     collection_name: Optional[str]
     thumbnail: Optional[str]
@@ -23,7 +24,7 @@ class VideoDeleted(Event):
 
 @dataclass
 class VideoRetrieved(Event):
-    path: Path
+    location: str
 
 
 @dataclass

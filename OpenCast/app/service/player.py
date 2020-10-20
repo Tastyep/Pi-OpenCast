@@ -41,7 +41,8 @@ class PlayerService(Service):
             video = self._video_repo.get(cmd.video_id)
             player.play(video.id)
 
-            self._player.play(str(video.path))
+            self._player.play(video.location, video.streamable())
+
             if player.subtitle_state is True:
                 sub_stream = video.stream("subtitle", config["subtitle.language"])
                 if sub_stream is not None:

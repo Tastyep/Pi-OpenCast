@@ -22,8 +22,12 @@ class PlayerWrapper:
         player_events = self._player.event_manager()
         player_events.event_attach(EventType.MediaPlayerEndReached, self._on_media_end)
 
-    def play(self, video_path: str):
-        media = self._instance.media_new_path(video_path)
+    def play(self, location: str, stream: bool):
+        media = (
+            self._instance.media_new_location(location)
+            if stream
+            else self._instance.media_new_path(location)
+        )
         self._player.set_media(media)
         media.release()
         self._player.play()

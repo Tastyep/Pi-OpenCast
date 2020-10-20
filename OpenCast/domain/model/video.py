@@ -10,7 +10,6 @@ from OpenCast.domain.event import video as Evt
 
 from . import Id
 from .entity import Entity
-from .fields import PathField
 
 
 @dataclass
@@ -29,26 +28,33 @@ class StreamSchema(Schema):
 class VideoSchema(Schema):
     id = fields.UUID()
     source = fields.String()
+    source_protocol = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
     collection_name = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
-    path = PathField(allow_none=True)
+    location = fields.String(allow_none=True)
     streams = fields.Nested(StreamSchema(many=True))
     subtitle = fields.String(allow_none=True)
 
 
 class Video(Entity):
     Schema = VideoSchema
-    METADATA_FIELDS = ["title", "collection_name", "thumbnail"]
+    METADATA_FIELDS = [
+        "source_protocol",
+        "title",
+        "collection_name",
+        "thumbnail",
+    ]
 
     @dataclass
     class Data:
         id: Id
         source: str
+        source_protocol: Optional[str] = None
         title: Optional[str] = None
         collection_name: Optional[str] = None
         thumbnail: Optional[str] = None
-        path: Optional[Path] = None
+        location: Optional[str] = None
         streams: List[Stream] = field(default_factory=list)
         subtitle: Optional[str] = None
 
@@ -57,6 +63,7 @@ class Video(Entity):
         self._record(
             Evt.VideoCreated,
             self._data.source,
+            self._data.source_protocol,
             self._data.title,
             self._data.collection_name,
             self._data.thumbnail,
@@ -67,8 +74,8 @@ class Video(Entity):
         return self._data.source
 
     @property
-    def path(self):
-        return self._data.path
+    def location(self):
+        return self._data.location
 
     @property
     def title(self):
@@ -86,10 +93,10 @@ class Video(Entity):
     def subtitle(self):
         return self._data.subtitle
 
-    @path.setter
-    def path(self, path: Path):
-        self._data.path = path
-        self._record(Evt.VideoRetrieved, self._data.path)
+    @location.setter
+    def location(self, location: str):
+        self._data.location = location
+        self._record(Evt.VideoRetrieved, self._data.location)
 
     @streams.setter
     def streams(self, streams: List[Stream]):
@@ -100,6 +107,9 @@ class Video(Entity):
     def subtitle(self, subtitle: str):
         self._data.subtitle = subtitle
         self._record(Evt.VideoSubtitleFetched, self._data.subtitle)
+
+    def streamable(self):
+        return self._data.source_protocol in ["m3u8"]
 
     def from_disk(self):
         return Path(self._data.source).is_file()
