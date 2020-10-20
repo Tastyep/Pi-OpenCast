@@ -28,6 +28,7 @@ class StreamSchema(Schema):
 class VideoSchema(Schema):
     id = fields.UUID()
     source = fields.String()
+    source_protocol = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
     collection_name = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
@@ -38,12 +39,18 @@ class VideoSchema(Schema):
 
 class Video(Entity):
     Schema = VideoSchema
-    METADATA_FIELDS = ["title", "collection_name", "thumbnail"]
+    METADATA_FIELDS = [
+        "source_protocol",
+        "title",
+        "collection_name",
+        "thumbnail",
+    ]
 
     @dataclass
     class Data:
         id: Id
         source: str
+        source_protocol: Optional[str] = None
         title: Optional[str] = None
         collection_name: Optional[str] = None
         thumbnail: Optional[str] = None
@@ -56,6 +63,7 @@ class Video(Entity):
         self._record(
             Evt.VideoCreated,
             self._data.source,
+            self._data.source_protocol,
             self._data.title,
             self._data.collection_name,
             self._data.thumbnail,
@@ -99,6 +107,9 @@ class Video(Entity):
     def subtitle(self, subtitle: str):
         self._data.subtitle = subtitle
         self._record(Evt.VideoSubtitleFetched, self._data.subtitle)
+
+    def streamable(self):
+        return self._data.source_protocol in ["m3u8"]
 
     def from_disk(self):
         return Path(self._data.source).is_file()

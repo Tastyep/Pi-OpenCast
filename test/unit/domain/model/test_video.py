@@ -14,6 +14,7 @@ class VideoTest(ModelTestCase):
         video = Video(
             IdentityService.random(),
             "source",
+            "protocol",
             "title",
             "album_name",
             "thumbnail_url",
@@ -40,6 +41,11 @@ class VideoTest(ModelTestCase):
     def test_set_subtitles(self):
         self.video.subtitle = "/tmp/toto.srt"
         self.expect_events(self.video, Evt.VideoSubtitleFetched)
+
+    def test_streamable(self):
+        self.assertFalse(self.video.streamable())
+        video = Video(IdentityService.random(), "source", source_protocol="m3u8")
+        self.assertTrue(video.streamable())
 
     def test_delete(self):
         self.video.delete()

@@ -13,7 +13,10 @@ class SourceService:
         self._logger = structlog.get_logger(__name__)
         self._downloader = downloader
         self._video_parser = video_parser
-        self._metadata_mapper = {"collection_name": ["album"]}
+        self._metadata_mapper = {
+            "source_protocol": ["protocol"],
+            "collection_name": ["album"],
+        }
 
     def is_playlist(self, source):
         return "/playlist" in source

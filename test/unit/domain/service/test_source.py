@@ -24,12 +24,14 @@ class SourceServiceTest(TestCase):
 
     def test_pick_stream_metadata(self):
         self.downloader.pick_stream_metadata.return_value = {
+            "source_protocol": "http",
             "title": "test",
             "collection_name": "collection",
             "thumbnail": "url",
         }
         metadata = self.service.pick_stream_metadata("source")
         expected = {
+            "source_protocol": "http",
             "title": "test",
             "collection_name": "collection",
             "thumbnail": "url",
@@ -42,6 +44,7 @@ class SourceServiceTest(TestCase):
         }
         metadata = self.service.pick_stream_metadata("source")
         expected = {
+            "source_protocol": None,
             "title": "test",
             "collection_name": None,
             "thumbnail": None,
@@ -50,12 +53,14 @@ class SourceServiceTest(TestCase):
 
     def test_pick_stream_metadata_alternative_fields(self):
         self.downloader.pick_stream_metadata.return_value = {
+            "protocol": "http",
             "title": "test",
             "album": "album_name",
             "thumbnail": "url",
         }
         metadata = self.service.pick_stream_metadata("source")
         expected = {
+            "source_protocol": "http",
             "title": "test",
             "collection_name": "album_name",
             "thumbnail": "url",
@@ -65,6 +70,7 @@ class SourceServiceTest(TestCase):
     def test_pick_file_metadata(self):
         metadata = self.service.pick_file_metadata(Path("/tmp/video.mp4"))
         expected = {
+            "source_protocol": None,
             "title": "video",
             "collection_name": None,
             "thumbnail": None,

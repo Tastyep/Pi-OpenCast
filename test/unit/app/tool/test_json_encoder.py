@@ -29,5 +29,7 @@ class EventEncoderTest(TestCase):
     def test_encode_event(self):
         video_id = IdentityService.id_video("source")
         cmd_id = IdentityService.id_command(CreateVideo, video_id)
-        event = VideoCreated(cmd_id, video_id, "source", "title", "album", "thumbnail")
+        event = VideoCreated(
+            cmd_id, video_id, "source", "protocol", "title", "album", "thumbnail"
+        )
         json.dumps({"id": IdentityService.random(), "event": event}, cls=EventEncoder)

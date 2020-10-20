@@ -43,6 +43,7 @@ class VideoWorkflowTest(WorkflowTestCase):
             Evt.VideoCreated,
             cmd.id,
             *self.video.to_tuple(),
+            "http",
             "title",
             "album",
             "thumbnail"
@@ -51,7 +52,7 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_retrieving_to_deleting(self):
         event = Evt.VideoCreated(
-            None, self.video.id, "title", "source", "album", "thumbnail"
+            None, self.video.id, "http", "title", "source", "album", "thumbnail"
         )
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
@@ -60,7 +61,7 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_retrieving_to_parsing(self):
         event = Evt.VideoCreated(
-            None, self.video.id, "title", "source", "album", "thumbnail"
+            None, self.video.id, "http", "title", "source", "album", "thumbnail"
         )
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
