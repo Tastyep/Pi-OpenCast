@@ -46,6 +46,10 @@ class SourceService:
         metadata["title"] = source.stem
         return metadata
 
+    def fetch_stream_link(self, source: str):
+        data = self._downloader.pick_stream_metadata(source)
+        return data.get("url", None)
+
     def list_streams(self, video) -> List[Stream]:
         video_path = video.location
         streams = self._video_parser.parse_streams(video_path)

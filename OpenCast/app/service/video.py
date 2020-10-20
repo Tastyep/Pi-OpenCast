@@ -48,6 +48,7 @@ class VideoService(Service):
         self._start_transaction(self._video_repo, cmd.id, impl)
 
     def _retrieve_video(self, cmd):
+        # Video source is a filesystem path
         def from_disk(ctx, video):
             video.location = video.source
             ctx.update(video)
@@ -57,6 +58,23 @@ class VideoService(Service):
             self._start_transaction(self._video_repo, cmd.id, from_disk, video)
             return
 
+        # Video source points to a stream
+        def stream_fetched(ctx, video, link):
+            video.location = link
+            ctx.update(video)
+
+        if video.streamable():
+            link = self._source_service.fetch_stream_link(video.source)
+            if link is None:
+                self._abort_operation(cmd.id, "Could not fetch the streaming URL")
+                return
+
+            self._start_transaction(
+                self._video_repo, cmd.id, stream_fetched, video, link
+            )
+            return
+
+        # Video source points downloadable media
         def video_downloaded(_):
             def impl(ctx):
                 ctx.update(video)

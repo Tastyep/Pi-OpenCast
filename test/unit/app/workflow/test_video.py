@@ -3,6 +3,7 @@ import OpenCast.domain.event.video as Evt
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.video import Video, VideoWorkflow
 from OpenCast.config import config
+from OpenCast.domain.model.video import Video as VideoModel
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import WorkflowTestCase
@@ -58,6 +59,28 @@ class VideoWorkflowTest(WorkflowTestCase):
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
+
+    def test_retrieving_to_completed(self):
+        event = Evt.VideoCreated(
+            None, self.video.id, "m3u8", "title", "source", "album", "thumbnail"
+        )
+        self.workflow.to_RETRIEVING(event)
+
+        cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
+
+        def return_video(id):
+            self.assertEqual(self.video.id, id)
+            return VideoModel(self.video.id, self.video.source, source_protocol="m3u8")
+
+        self.video_repo.get.side_effect = return_video
+
+        self.raise_event(
+            Evt.VideoRetrieved,
+            cmd.id,
+            self.video.id,
+            "https://url.m3u8",
+        )
+        self.assertTrue(self.workflow.is_COMPLETED())
 
     def test_retrieving_to_parsing(self):
         event = Evt.VideoCreated(

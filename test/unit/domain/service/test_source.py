@@ -77,6 +77,18 @@ class SourceServiceTest(TestCase):
         }
         self.assertEqual(expected, metadata)
 
+    def test_fetch_stream_link(self):
+        self.downloader.pick_stream_metadata.return_value = {
+            "url": "test_url",
+        }
+        url = self.service.fetch_stream_link("source")
+        self.assertEqual("test_url", url)
+
+    def test_fetch_stream_link_missing(self):
+        self.downloader.pick_stream_metadata.return_value = {}
+        url = self.service.fetch_stream_link("source")
+        self.assertEqual(None, url)
+
     def test_list_streams(self):
         video = Mock()
         video.Path = Path("/tmp/toto.mp4")
