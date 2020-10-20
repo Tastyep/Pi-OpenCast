@@ -34,9 +34,7 @@ class InitWorkflowTest(WorkflowTestCase):
     def test_init_to_purging_videos(self):
         self.player_repo.exists.return_value = True
 
-        video = Video(
-            IdentityService.id_video(f"source"), f"source", location="unknown"
-        )
+        video = Video(IdentityService.id_video("source"), "source", location="unknown")
         self.video_repo.list.return_value = [video]
 
         self.workflow.start()
@@ -70,9 +68,7 @@ class InitWorkflowTest(WorkflowTestCase):
         player_id = IdentityService.id_player()
         identityMock.id_playlist.return_value = playlist_id
         identityMock.id_player.return_value = player_id
-        video = Video(
-            IdentityService.id_video(f"source"), f"source", location="unknown"
-        )
+        video = Video(IdentityService.id_video("source"), "source", location="unknown")
         self.video_repo.list.return_value = [video]
 
         self.workflow.to_CREATING_PLAYER()
