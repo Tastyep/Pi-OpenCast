@@ -15,7 +15,6 @@ keywords = ['raspberry', 'opencast', 'chromecast']
 [tool.poetry.dependencies]
 python = "^3.7"
 toml = "^0.10"
-youtube-dl = ">= 2020.3.24"
 pyyaml = "^5.3.1"
 "hurry.filesize" = "^0.9"
 transitions = "^0.8.4"
@@ -29,6 +28,7 @@ tinydb = "^4.1.1"
 dacite = "^1.5.1"
 marshmallow = "^3.8.0"
 marshmallow_enum = "^1.5.1"
+youtube-dlc = "^2020.10.26"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1"
