@@ -838,7 +838,7 @@ description = "Media downloader supporting various sites such as youtube"
 name = "youtube-dlc"
 optional = false
 python-versions = ">=2.6"
-version = "2020.10.26"
+version = "2020.10.31"
 
 [[package]]
 category = "dev"
@@ -1307,8 +1307,8 @@ yarl = [
     {file = "yarl-1.5.1.tar.gz", hash = "sha256:c22c75b5f394f3d47105045ea551e08a3e804dc7e01b37800ca35b58f856c3d6"},
 ]
 youtube-dlc = [
-    {file = "youtube_dlc-2020.10.26-py2.py3-none-any.whl", hash = "sha256:a7874a15f6adb177f645d41ca961c91a4a1e94d6f74aad56597ea0e381702366"},
-    {file = "youtube_dlc-2020.10.26.tar.gz", hash = "sha256:cf0300b921ce17cb640ac1c9783e88e018e4c6a19e0d59648152e0fed910a9e9"},
+    {file = "youtube_dlc-2020.10.31-py2.py3-none-any.whl", hash = "sha256:44eaad1a0d76b9416a733f2632e2a7098d50741103a110dfb454e11283ad3ae3"},
+    {file = "youtube_dlc-2020.10.31.tar.gz", hash = "sha256:c3878dcf3f574973e7c1b486fca151311bd6b4836c183b808e4b78750a6c343b"},
 ]
 zipp = [
     {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
