@@ -13,7 +13,10 @@ class SourceService:
         self._logger = structlog.get_logger(__name__)
         self._downloader = downloader
         self._video_parser = video_parser
-        self._metadata_mapper = {"collection_name": ["album"]}
+        self._metadata_mapper = {
+            "source_protocol": ["protocol"],
+            "collection_name": ["album"],
+        }
 
     def is_playlist(self, source):
         return "/playlist" in source
@@ -43,7 +46,11 @@ class SourceService:
         metadata["title"] = source.stem
         return metadata
 
+    def fetch_stream_link(self, source: str):
+        data = self._downloader.pick_stream_metadata(source)
+        return data.get("url", None)
+
     def list_streams(self, video) -> List[Stream]:
-        video_path = str(video.path)
+        video_path = video.location
         streams = self._video_parser.parse_streams(video_path)
         return [Stream(*stream) for stream in streams]

@@ -1,5 +1,5 @@
 import OpenCast.domain.event.video as Evt
-from OpenCast.domain.model.video import Path, Video
+from OpenCast.domain.model.video import Video
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
@@ -14,23 +14,24 @@ class VideoTest(ModelTestCase):
         video = Video(
             IdentityService.random(),
             "source",
+            "protocol",
             "title",
             "album_name",
             "thumbnail_url",
-            Path("/tmp/file"),
+            "/tmp/file",
             [],
             "subtitle",
         )
         self.assertEqual("source", video.source)
         self.assertEqual("title", video.title)
         self.assertEqual("album_name", video.collection_name)
-        self.assertEqual(Path("/tmp/file"), video.path)
+        self.assertEqual("/tmp/file", video.location)
         self.assertEqual([], video.streams)
         self.assertEqual("subtitle", video.subtitle)
         self.expect_events(video, Evt.VideoCreated)
 
     def test_retrieve(self):
-        self.video.path = "/tmp"
+        self.video.location = "/tmp"
         self.expect_events(self.video, Evt.VideoRetrieved)
 
     def test_parse(self):
@@ -40,6 +41,11 @@ class VideoTest(ModelTestCase):
     def test_set_subtitles(self):
         self.video.subtitle = "/tmp/toto.srt"
         self.expect_events(self.video, Evt.VideoSubtitleFetched)
+
+    def test_streamable(self):
+        self.assertFalse(self.video.streamable())
+        video = Video(IdentityService.random(), "source", source_protocol="m3u8")
+        self.assertTrue(video.streamable())
 
     def test_delete(self):
         self.video.delete()

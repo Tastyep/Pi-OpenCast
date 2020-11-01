@@ -43,6 +43,7 @@ class VideoWorkflow(Workflow):
         ["_create",                 States.INITIAL,     States.COMPLETED,  "is_complete"],  # noqa: E501
         ["_create",                 States.INITIAL,     States.CREATING],
         ["_video_created",          States.CREATING,    States.RETRIEVING],
+        ["_video_retrieved",        States.RETRIEVING,  States.COMPLETED,  "is_stream"],  # noqa: E501
         ["_video_retrieved",        States.RETRIEVING,  States.PARSING],
         ["_video_parsed",           States.PARSING,     States.FINALISING],
         ["_video_subtitle_fetched", States.FINALISING,  States.COMPLETED],
@@ -109,3 +110,6 @@ class VideoWorkflow(Workflow):
     # Conditions
     def is_complete(self):
         return self._video_repo.exists(self._video.id)
+
+    def is_stream(self, _):
+        return self._video_repo.get(self._video.id).streamable()

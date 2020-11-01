@@ -24,12 +24,6 @@ class InitWorkflowTest(WorkflowTestCase):
 
         self.workflow = self.make_workflow(InitWorkflow)
 
-    def make_videos(self, count: int):
-        return [
-            Video(IdentityService.id_video(f"source_{i}"), f"source_{i}", None)
-            for i in range(count)
-        ]
-
     def test_initial(self):
         self.assertTrue(self.workflow.is_INITIAL())
 
@@ -39,7 +33,9 @@ class InitWorkflowTest(WorkflowTestCase):
 
     def test_init_to_purging_videos(self):
         self.player_repo.exists.return_value = True
-        self.video_repo.list.return_value = self.make_videos(3)
+
+        video = Video(IdentityService.id_video("source"), "source", location="unknown")
+        self.video_repo.list.return_value = [video]
 
         self.workflow.start()
         self.assertTrue(self.workflow.is_PURGING_VIDEOS())
@@ -72,7 +68,8 @@ class InitWorkflowTest(WorkflowTestCase):
         player_id = IdentityService.id_player()
         identityMock.id_playlist.return_value = playlist_id
         identityMock.id_player.return_value = player_id
-        self.video_repo.list.return_value = self.make_videos(3)
+        video = Video(IdentityService.id_video("source"), "source", location="unknown")
+        self.video_repo.list.return_value = [video]
 
         self.workflow.to_CREATING_PLAYER()
         createPlaylistId = IdentityService.id_command(
@@ -98,21 +95,46 @@ class InitWorkflowTest(WorkflowTestCase):
         )
         self.assertTrue(self.workflow.is_PURGING_VIDEOS())
 
-    def test_purging_videos_to_completed_no_deletion(self):
+    @patch("OpenCast.app.workflow.app.Path")
+    def test_purging_videos_to_completed_no_deletion_because_on_disk(
+        self, path_cls_mock
+    ):
+        path_inst = path_cls_mock.return_value
+        path_inst.exists.return_value = True
+
         video = Mock()
-        video.path.exists.return_value = True
+        video.streamable.return_value = False
+
         self.video_repo.list.return_value = [video]
         self.workflow.to_PURGING_VIDEOS()
         self.assertTrue(self.workflow.is_COMPLETED())
 
-    def test_purging_videos_to_completed_with_deletion(self):
+    @patch("OpenCast.app.workflow.app.Path")
+    def test_purging_videos_to_completed_no_deletion_because_streamable(
+        self, path_cls_mock
+    ):
+        path_inst = path_cls_mock.return_value
+        path_inst.exists.return_value = False
+
+        video = Mock()
+        video.streamable.return_value = True
+
+        self.video_repo.list.return_value = [video]
+        self.workflow.to_PURGING_VIDEOS()
+        self.assertTrue(self.workflow.is_COMPLETED())
+
+    @patch("OpenCast.app.workflow.app.Path")
+    def test_purging_videos_to_completed_with_deletion(self, path_cls_mock):
+        path_inst = path_cls_mock.return_value
+        path_inst.exists.return_value = False
+
         video1 = Mock()
         video1.id = IdentityService.id_video("mock1")
-        video1.path.exists.return_value = False
+        video1.streamable.return_value = False
 
         video2 = Mock()
         video2.id = IdentityService.id_video("mock2")
-        video2.path.exists.return_value = False
+        video2.streamable.return_value = False
 
         self.video_repo.list.return_value = [video1, video2]
         self.workflow.to_PURGING_VIDEOS()

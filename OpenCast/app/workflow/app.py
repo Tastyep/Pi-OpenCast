@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 from enum import Enum, auto
+from pathlib import Path
 
 import structlog
 
@@ -79,7 +80,7 @@ class InitWorkflow(Workflow):
             self._missing_videos = [
                 video.id
                 for video in videos
-                if video.path is None or not video.path.exists()
+                if not (video.streamable() or Path(video.location).exists())
             ]
             if not self._missing_videos:
                 self.to_COMPLETED()
