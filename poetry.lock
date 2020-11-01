@@ -741,7 +741,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "simp
 
 [[package]]
 name = "tinydb"
-version = "4.1.1"
+version = "4.2.0"
 description = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
 category = "main"
 optional = false
@@ -835,7 +835,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6aeebe93821e13ac3e2c40e36218ad94db3485234b1adf4ef6c0925852f1e532"
+content-hash = "6380c7a69f58a470ec11e09a50a6dfaa2eaabe3302723ee257203095506acd9f"
 
 [metadata.files]
 aiohttp = [
@@ -1243,8 +1243,8 @@ structlog = [
     {file = "structlog-20.1.0.tar.gz", hash = "sha256:7a48375db6274ed1d0ae6123c486472aa1d0890b08d314d2b016f3aa7f35990b"},
 ]
 tinydb = [
-    {file = "tinydb-4.1.1-py3-none-any.whl", hash = "sha256:68eb9d1b32931ea657319c7dff70c0d735fc10ecbde29c824a2a5e1333b8ed49"},
-    {file = "tinydb-4.1.1.tar.gz", hash = "sha256:1b8d7308ba2fe6d582c6ae69f33c62013053939f7ab8d1787b1e15950566a202"},
+    {file = "tinydb-4.2.0-py3-none-any.whl", hash = "sha256:8cfc0bdf7b284e4fa6ae6931dbf9591831368042e706f8d1688ae0307fdc11a3"},
+    {file = "tinydb-4.2.0.tar.gz", hash = "sha256:b58964df6f7337bdeb6c8f4938da2876b98fdbd4e1468ddb2ea5fb4b9316ad65"},
 ]
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
