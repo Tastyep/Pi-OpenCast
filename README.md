@@ -14,6 +14,7 @@ OpenCast is a streaming application whose goal is to transform a computer as sma
 
 - Lightweight and Fast, runs on Raspberry Pi.
 - Many [supported sites](https://rg3.github.io/youtube-dl/supportedsites.html).
+- Stream support (Youtube, Twitch ...)
 - Reworked interface.
 - Youtube playlist support.
 - Subtitle support for both local and remote videos.

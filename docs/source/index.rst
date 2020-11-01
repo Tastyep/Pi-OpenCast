@@ -12,6 +12,7 @@ Key Features
 
  - Lightweight fast media server, able to run on raspberry-pi.
  - Tons of `supported sites <https://ytdl-org.github.io/youtube-dl/supportedsites.html>`_.
+ - Stream support (Youtube, Twitch ...)
  - Local library.
  - VLC under the hood.
 
