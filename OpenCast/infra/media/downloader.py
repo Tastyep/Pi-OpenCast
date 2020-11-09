@@ -87,42 +87,20 @@ class Downloader:
                     )
         return None
 
-    def pick_stream_metadata(self, url):
-        self._logger.debug("Downloading stream metadata", url=url)
+    def download_metadata(self, url: str, process_ie_data: bool):
+        self._logger.debug("Downloading metadata", url=url)
         options = {
-            "noplaylist": True,
+            "noplaylist": True,  # Allow getting the _type value set to URL when passing a playlist entry
+            "extract_flat": False,
+            "ignoreerrors": True,  # Causes ydl to return None on error
+            "debug_printtraffic": self._log_debug,
+            "quiet": True,
+            "progress_hooks": [self._dl_logger.log_download_progress],
         }
-        return self._download_stream_metadata(url, options)
-
-    def unfold_playlist(self, url):
-        self._logger.debug("Unfolding playlist", url=url)
-        options = {
-            "extract_flat": "in_playlist",
-        }
-        # Download the playlist data without downloading the videos.
-        data = self._download_stream_metadata(url, options)
-        if data is None:
-            return []
-
-        # NOTE(specific) youtube specific
-        base_url = url.split("/playlist", 1)[0]
-        urls = [base_url + "/watch?v=" + entry["id"] for entry in data["entries"]]
-        return urls
-
-    def _download_stream_metadata(self, url, options):
-        self._logger.debug("Fetching metadata", url=url)
-        options.update(
-            {
-                "ignoreerrors": True,  # Causes ydl to return None on error
-                "debug_printtraffic": self._log_debug,
-                "quiet": True,
-                "progress_hooks": [self._dl_logger.log_download_progress],
-            }
-        )
         ydl = YoutubeDL(options)
         with ydl:
             try:
-                return ydl.extract_info(url, download=False)
+                return ydl.extract_info(url, download=False, process=process_ie_data)
             except Exception as e:
-                self._logger.error("Fetching metadata error", url=url, error=e)
+                self._logger.error("Downloading metadata error", url=url, error=e)
         return None
