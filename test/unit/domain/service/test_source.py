@@ -12,18 +12,28 @@ class SourceServiceTest(TestCase):
         self.video_parser = Mock()
         self.service = SourceService(self.downloader, self.video_parser)
 
-    def test_is_playlist(self):
+    def test_is_playlist_with_playlist(self):
+        self.downloader.download_metadata.return_value = {
+            "_type": "playlist",
+        }
+
         self.assertTrue(
             self.service.is_playlist("https://www.youtube.com/playlist?list=id")
         )
+
+    def test_is_playlist_with_video(self):
+        self.downloader.download_metadata.return_value = {
+            "_type": "video",
+        }
+
         self.assertFalse(
             self.service.is_playlist(
-                "https://www.youtube.com/watch?v=id&list=id&index=2"
+                "https://www.youtube.com/watch?v=ciXp&list=cCY&index=1"
             )
         )
 
     def test_pick_stream_metadata(self):
-        self.downloader.pick_stream_metadata.return_value = {
+        self.downloader.download_metadata.return_value = {
             "source_protocol": "http",
             "title": "test",
             "collection_name": "collection",
@@ -39,7 +49,7 @@ class SourceServiceTest(TestCase):
         self.assertEqual(expected, metadata)
 
     def test_pick_stream_metadata_partial(self):
-        self.downloader.pick_stream_metadata.return_value = {
+        self.downloader.download_metadata.return_value = {
             "title": "test",
         }
         metadata = self.service.pick_stream_metadata("source")
@@ -52,7 +62,7 @@ class SourceServiceTest(TestCase):
         self.assertEqual(expected, metadata)
 
     def test_pick_stream_metadata_alternative_fields(self):
-        self.downloader.pick_stream_metadata.return_value = {
+        self.downloader.download_metadata.return_value = {
             "protocol": "http",
             "title": "test",
             "album": "album_name",
@@ -78,14 +88,14 @@ class SourceServiceTest(TestCase):
         self.assertEqual(expected, metadata)
 
     def test_fetch_stream_link(self):
-        self.downloader.pick_stream_metadata.return_value = {
+        self.downloader.download_metadata.return_value = {
             "url": "test_url",
         }
         url = self.service.fetch_stream_link("source")
         self.assertEqual("test_url", url)
 
     def test_fetch_stream_link_missing(self):
-        self.downloader.pick_stream_metadata.return_value = {}
+        self.downloader.download_metadata.return_value = {}
         url = self.service.fetch_stream_link("source")
         self.assertEqual(None, url)
 
