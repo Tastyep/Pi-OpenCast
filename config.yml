@@ -23,5 +23,7 @@ downloader:
   max_concurrency: 3
 
 subtitle:
+  # The flag to enable/disable subtitle retrieval
+  enabled: True
   # The default language for subtitles.
   language: eng
