@@ -144,6 +144,15 @@ class DownloaderTest(TestCase):
             ),
         )
 
+    def test_download_subtitle_not_found(self):
+        self.ydl.download.side_effect = RuntimeError()
+        self.assertEqual(
+            None,
+            self.downloader.download_subtitle(
+                "url", dest="/tmp/media", lang="eng", exts=["vtt", "srt"]
+            ),
+        )
+
     def test_download_subtitle_second_choice(self):
         step = 0
 
