@@ -756,7 +756,7 @@ python-versions = "*"
 
 [[package]]
 name = "transitions"
-version = "0.8.4"
+version = "0.8.5"
 description = "A lightweight, object-oriented Python state machine implementation with many extensions."
 category = "main"
 optional = false
@@ -834,7 +834,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "3e4b29d82410f82d71fb50c8da94354aed577c4254f7bce1009064340fc2ac73"
+content-hash = "6aedca2e100d90ff1c1498f849f36e345d78ea221060766735ef6c587e5e25ef"
 
 [metadata.files]
 aiohttp = [
@@ -1250,8 +1250,8 @@ toml = [
     {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
 ]
 transitions = [
-    {file = "transitions-0.8.4-py2.py3-none-any.whl", hash = "sha256:1238a081e95ff5aa4a8255dc2ad926cca234695afaf041f9515a2e06d6249f1c"},
-    {file = "transitions-0.8.4.tar.gz", hash = "sha256:9a2841b24789dfd345267cb92e26b79da75fd03f6021d1a5222c71b5c9ae3c16"},
+    {file = "transitions-0.8.5-py2.py3-none-any.whl", hash = "sha256:bb05d3283c91e091046ed5484da2e4f8b489eb5f1bca1a5c76d47d19d703b3ff"},
+    {file = "transitions-0.8.5.tar.gz", hash = "sha256:e441c66a0c753d56c01c3e5e547f21dbe4a5569c939f12477475c5e81d79769b"},
 ]
 typed-ast = [
     {file = "typed_ast-1.4.1-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:73d785a950fc82dd2a25897d525d003f6378d1cb23ab305578394694202a58c3"},
