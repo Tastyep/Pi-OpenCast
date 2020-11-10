@@ -179,6 +179,7 @@ config = Config({
         "max_concurrency": 3
     },
     "subtitle": {
+        "enabled": True,
         "language": "eng"
     }
 }, check_env=True)
