@@ -32,6 +32,37 @@ class SourceServiceTest(TestCase):
             )
         )
 
+    def test_unfold(self):
+        self.downloader.download_metadata.return_value = {
+            "entries": [
+                {"webpage_url": "url1"},
+                {"webpage_url": "url2"},
+            ],
+        }
+
+        self.assertEqual(
+            ["url1", "url2"],
+            self.service.unfold("https://www.youtube.com/playlist?list=id"),
+        )
+
+    def test_unfold_partial_metadata(self):
+        self.downloader.download_metadata.return_value = {
+            "entries": [],
+        }
+
+        self.assertEqual(
+            [],
+            self.service.unfold("https://www.youtube.com/playlist?list=id"),
+        )
+
+    def test_unfold_no_metadata(self):
+        self.downloader.download_metadata.return_value = None
+
+        self.assertEqual(
+            [],
+            self.service.unfold("https://www.youtube.com/playlist?list=id"),
+        )
+
     def test_pick_stream_metadata(self):
         self.downloader.download_metadata.return_value = {
             "source_protocol": "http",
