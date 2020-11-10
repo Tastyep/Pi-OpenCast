@@ -47,6 +47,12 @@ class MonitorController(Controller):
     def _not_found(self):
         return self._make_response(404, None)
 
+    def _internal_error(self, message: str = None, details: dict = None):
+        body = None
+        if message is not None:
+            body = {"error": {"message": message, "detail": details}}
+        return self._make_response(500, body)
+
     def _make_response(self, status, body):
         return self._server.make_json_response(status, body, self._model_dumps)
 
