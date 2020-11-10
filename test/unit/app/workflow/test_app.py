@@ -134,7 +134,7 @@ class InitWorkflowTest(WorkflowTestCase):
 
         video2 = Mock()
         video2.id = IdentityService.id_video("mock2")
-        video2.streamable.return_value = False
+        video2.location = None
 
         self.video_repo.list.return_value = [video1, video2]
         self.workflow.to_PURGING_VIDEOS()
