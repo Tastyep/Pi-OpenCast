@@ -136,9 +136,11 @@ class Downloader:
     def download_metadata(self, url: str, process_ie_data: bool):
         self._logger.debug("Downloading metadata", url=url)
         options = {
-            "noplaylist": True,  # Allow getting the _type value set to URL when passing a playlist entry
+            # Allow getting the _type value set to URL when passing a playlist entry
+            "noplaylist": True,
             "extract_flat": False,
-            "ignoreerrors": True,  # Causes ydl to return None on error
+            # Causes ydl to return None on error
+            "ignoreerrors": True,
             "quiet": True,
             "progress_hooks": [self._dl_logger.log_download_progress],
         }
