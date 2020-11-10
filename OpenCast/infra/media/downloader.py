@@ -5,12 +5,60 @@ from pathlib import Path
 from typing import List
 
 import structlog
+from hurry.filesize import alternative, size
 from youtube_dlc import YoutubeDL
 from youtube_dlc.utils import ISO639Utils
 
+from OpenCast.infra import Id
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
-from .download_logger import DownloadLogger
+
+class Logger:
+    def __init__(self, logger):
+        self._logger = logger
+
+    def log_download_progress(self, d):
+        status = d.get("status", "N/A")
+        if status not in ["downloading", "error", "finished"]:
+            return
+
+        getattr(self, f"_log_{status}")(d)
+
+    def _log_downloading(self, d):
+        filename = d.get("filename", "unknown")
+        self._logger.info(
+            "Downloading",
+            filename=filename,
+            ratio=self._format_ratio(d),
+            speed=self._format_speed(d),
+        )
+
+    def _log_error(self, d):
+        filename = d.get("filename", "unknown")
+        self._logger.error("Error downloading", filename=filename, error=d)
+
+    def _log_finished(self, d):
+        filename = d.get("filename", "unknown")
+        total = d.get("total_bytes", 0)
+        self._logger.info(
+            "Finished downloading",
+            filename=filename,
+            size=size(total, system=alternative),
+        )
+
+    def _format_ratio(self, d):
+        downloaded = d.get("downloaded_bytes", None)
+        total = d.get("total_bytes", None)
+        if downloaded is None or total is None:
+            return "N/A"
+
+        return "{0:.2f}%".format(100 * (downloaded / total))
+
+    def _format_speed(self, d):
+        speed = d.get("speed", 0)
+        if speed is None:
+            speed = 0
+        return "{}/s".format(size(speed, system=alternative))
 
 
 class Downloader:
@@ -18,16 +66,14 @@ class Downloader:
         self._executor = executor
         self._evt_dispatcher = evt_dispatcher
         self._logger = structlog.get_logger(__name__)
-        self._dl_logger = DownloadLogger(self._logger)
-        self._log_debug = False  # self._dl_logger.is_enabled_for(logging.DEBUG)
+        self._dl_logger = Logger(self._logger)
 
-    def download_video(self, op_id, source: str, dest: str):
+    def download_video(self, op_id: Id, source: str, dest: str):
         def impl():
             self._logger.debug("Downloading", video=dest)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
                 "bestvideo+bestaudio/best",
-                "debug_printtraffic": self._log_debug,
                 "noplaylist": True,
                 "merge_output_format": "mp4",
                 "outtmpl": dest,
@@ -53,7 +99,7 @@ class Downloader:
                     source=source,
                     error=error,
                 )
-                self._evt_dispatcher.dispatch(DownloadError(op_id, str(error)))
+                self._evt_dispatcher.dispatch(DownloadError(op_id, error))
                 return
 
             self._logger.debug("Download success", video=dest)
@@ -93,7 +139,6 @@ class Downloader:
             "noplaylist": True,  # Allow getting the _type value set to URL when passing a playlist entry
             "extract_flat": False,
             "ignoreerrors": True,  # Causes ydl to return None on error
-            "debug_printtraffic": self._log_debug,
             "quiet": True,
             "progress_hooks": [self._dl_logger.log_download_progress],
         }
