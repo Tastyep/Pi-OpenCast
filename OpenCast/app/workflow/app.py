@@ -80,7 +80,8 @@ class InitWorkflow(Workflow):
             self._missing_videos = [
                 video.id
                 for video in videos
-                if not (video.streamable() or Path(video.location).exists())
+                if video.location is None
+                or not (video.streamable() or Path(video.location).exists())
             ]
             if not self._missing_videos:
                 self.to_COMPLETED()
