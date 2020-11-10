@@ -73,6 +73,26 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.assertEqual(resp, (200, None))
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
+    async def test_stream_playlist_non_unfoldable(self):
+        url = "http://video-provider/watch&video=id"
+        req = self.make_request("POST", "/stream", query={"url": url})
+        self.source_service.is_playlist.return_value = True
+        self.source_service.unfold.return_value = []
+
+        resp = await self.route(self.controller.stream, req)
+        self.assertEqual(
+            resp,
+            (
+                500,
+                {
+                    "error": {
+                        "detail": None,
+                        "message": "Could not unfold the playlist URL",
+                    }
+                },
+            ),
+        )
+
     async def test_queue_simple(self):
         url = "http://video-provider/watch&video=id"
         req = self.make_request("POST", "/queue", query={"url": url})
@@ -109,6 +129,26 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         resp = await self.route(self.controller.queue, req)
         self.assertEqual(resp, (200, None))
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
+
+    async def test_queue_playlist_non_unfoldable(self):
+        url = "http://video-provider/watch&video=id"
+        req = self.make_request("POST", "/queue", query={"url": url})
+        self.source_service.is_playlist.return_value = True
+        self.source_service.unfold.return_value = []
+
+        resp = await self.route(self.controller.stream, req)
+        self.assertEqual(
+            resp,
+            (
+                500,
+                {
+                    "error": {
+                        "detail": None,
+                        "message": "Could not unfold the playlist URL",
+                    }
+                },
+            ),
+        )
 
     async def test_play(self):
         self.data_producer.video("source").populate(self.data_facade)
