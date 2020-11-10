@@ -2,7 +2,92 @@ from test.util import TestCase
 from unittest.mock import Mock, patch
 
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.infra.media.downloader import Downloader, DownloadError, DownloadSuccess
+from OpenCast.infra.media.downloader import (
+    Downloader,
+    DownloadError,
+    DownloadSuccess,
+    Logger,
+)
+
+
+class LoggerTest(TestCase):
+    def setUp(self):
+        self.impl = Mock()
+        self.logger = Logger(self.impl)
+
+    def test_downloading_log_missing_status(self):
+        data = {}
+        self.logger.log_download_progress(data)
+
+        self.impl.info.assert_not_called()
+        self.impl.error.assert_not_called()
+
+    def test_downloading_log(self):
+        data = {
+            "status": "downloading",
+            "filename": "/tmp/media.mp4",
+            "downloaded_bytes": 50,
+            "total_bytes": 100,
+            "speed": 10,
+        }
+        self.logger.log_download_progress(data)
+
+        self.impl.info.assert_called_with(
+            "Downloading", filename="/tmp/media.mp4", ratio="50.00%", speed="10 bytes/s"
+        )
+
+    def test_downloading_log_missing_data(self):
+        data = {
+            "status": "downloading",
+        }
+        self.logger.log_download_progress(data)
+
+        self.impl.info.assert_called_with(
+            "Downloading", filename="unknown", ratio="N/A", speed="0 bytes/s"
+        )
+
+    def test_error_log(self):
+        data = {
+            "status": "error",
+            "filename": "/tmp/media.mp4",
+        }
+        self.logger.log_download_progress(data)
+
+        self.impl.error.assert_called_with(
+            "Downloading error", filename="/tmp/media.mp4", error=data
+        )
+
+    def test_error_log_missing_data(self):
+        data = {
+            "status": "error",
+        }
+        self.logger.log_download_progress(data)
+
+        self.impl.error.assert_called_with(
+            "Downloading error", filename="unknown", error=data
+        )
+
+    def test_finished_log(self):
+        data = {
+            "status": "finished",
+            "filename": "/tmp/media.mp4",
+            "total_bytes": 100,
+        }
+        self.logger.log_download_progress(data)
+
+        self.impl.info.assert_called_with(
+            "Downloading success", filename="/tmp/media.mp4", size="100 bytes"
+        )
+
+    def test_finished_log_missing_data(self):
+        data = {
+            "status": "finished",
+        }
+        self.logger.log_download_progress(data)
+
+        self.impl.info.assert_called_with(
+            "Downloading success", filename="unknown", size="0 bytes"
+        )
 
 
 class DownloaderTest(TestCase):

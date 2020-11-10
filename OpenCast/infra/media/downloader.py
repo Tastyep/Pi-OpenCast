@@ -35,13 +35,13 @@ class Logger:
 
     def _log_error(self, d):
         filename = d.get("filename", "unknown")
-        self._logger.error("Error downloading", filename=filename, error=d)
+        self._logger.error("Downloading error", filename=filename, error=d)
 
     def _log_finished(self, d):
         filename = d.get("filename", "unknown")
         total = d.get("total_bytes", 0)
         self._logger.info(
-            "Finished downloading",
+            "Downloading success",
             filename=filename,
             size=size(total, system=alternative),
         )
@@ -55,7 +55,7 @@ class Logger:
         return "{0:.2f}%".format(100 * (downloaded / total))
 
     def _format_speed(self, d):
-        speed = d.get("speed", 0)
+        speed = d.get("speed", None)
         if speed is None:
             speed = 0
         return "{}/s".format(size(speed, system=alternative))
