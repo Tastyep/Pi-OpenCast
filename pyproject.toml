@@ -28,7 +28,7 @@ tinydb = "^4.2.0"
 dacite = "^1.5.1"
 marshmallow = "^3.9.1"
 marshmallow_enum = "^1.5.1"
-youtube-dlc = "^2020.10.26"
+youtube-dlc = "^2020.11.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1"
