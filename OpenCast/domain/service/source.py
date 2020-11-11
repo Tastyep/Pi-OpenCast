@@ -20,6 +20,9 @@ class SourceService:
 
     def is_playlist(self, source: str) -> bool:
         data = self._downloader.download_metadata(source, process_ie_data=False)
+        if data is None:
+            return False
+
         return data.get("_type", None) == "playlist"
 
     def unfold(self, source: str) -> List[str]:
@@ -55,6 +58,9 @@ class SourceService:
 
     def fetch_stream_link(self, source: str) -> Optional[str]:
         data = self._downloader.download_metadata(source, process_ie_data=True)
+        if data is None:
+            return None
+
         return data.get("url", None)
 
     def list_streams(self, video) -> List[Stream]:
