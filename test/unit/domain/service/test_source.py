@@ -32,6 +32,15 @@ class SourceServiceTest(TestCase):
             )
         )
 
+    def test_is_playlist_no_metadata(self):
+        self.downloader.download_metadata.return_value = None
+
+        self.assertFalse(
+            self.service.is_playlist(
+                "https://www.youtube.com/watch?v=ciXp&list=cCY&index=1"
+            )
+        )
+
     def test_unfold(self):
         self.downloader.download_metadata.return_value = {
             "entries": [
@@ -108,6 +117,11 @@ class SourceServiceTest(TestCase):
         }
         self.assertEqual(expected, metadata)
 
+    def test_pick_stream_metadata_no_metadata(self):
+        self.downloader.download_metadata.return_value = None
+        metadata = self.service.pick_stream_metadata("source")
+        self.assertEqual(None, metadata)
+
     def test_pick_file_metadata(self):
         metadata = self.service.pick_file_metadata(Path("/tmp/video.mp4"))
         expected = {
@@ -127,6 +141,11 @@ class SourceServiceTest(TestCase):
 
     def test_fetch_stream_link_missing(self):
         self.downloader.download_metadata.return_value = {}
+        url = self.service.fetch_stream_link("source")
+        self.assertEqual(None, url)
+
+    def test_fetch_stream_link_no_metadata(self):
+        self.downloader.download_metadata.return_value = None
         url = self.service.fetch_stream_link("source")
         self.assertEqual(None, url)
 
