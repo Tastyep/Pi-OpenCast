@@ -16,6 +16,10 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.video = Video(IdentityService.id_video("source"), "source")
         self.workflow = self.make_workflow(VideoWorkflow, self.video)
 
+    def tearDown(self):
+        # Reset modified config entries to their default value
+        config.load_from_dict({"subtitle": {"enabled": True}})
+
     def test_initial(self):
         self.assertTrue(self.workflow.is_INITIAL())
 
@@ -47,7 +51,7 @@ class VideoWorkflowTest(WorkflowTestCase):
             "http",
             "title",
             "album",
-            "thumbnail"
+            "thumbnail",
         )
         self.assertTrue(self.workflow.is_RETRIEVING())
 
@@ -103,7 +107,8 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_parsing_to_finalising(self):
+    def test_parsing_to_completed(self):
+        config.load_from_dict({"subtitle": {"enabled": False}})
         event = Evt.VideoRetrieved(None, self.video.id, "/tmp")
         self.workflow.to_PARSING(event)
         cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
@@ -113,20 +118,32 @@ class VideoWorkflowTest(WorkflowTestCase):
             self.video.id,
             {},
         )
-        self.assertTrue(self.workflow.is_FINALISING())
+        self.assertTrue(self.workflow.is_COMPLETED())
 
-    def test_finalising_to_deleting(self):
+    def test_parsing_to_sub_fetching(self):
+        event = Evt.VideoRetrieved(None, self.video.id, "/tmp")
+        self.workflow.to_PARSING(event)
+        cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
+        self.raise_event(
+            Evt.VideoParsed,
+            cmd.id,
+            self.video.id,
+            {},
+        )
+        self.assertTrue(self.workflow.is_SUB_RETRIEVING())
+
+    def test_sub_fetching_to_deleting(self):
         event = Evt.VideoParsed(None, self.video.id, {})
-        self.workflow.to_FINALISING(event)
+        self.workflow.to_SUB_RETRIEVING(event)
         cmd = self.expect_dispatch(
             Cmd.FetchVideoSubtitle, self.video.id, config["subtitle.language"]
         )
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_finalising_to_completed(self):
+    def test_sub_fetching_to_completed(self):
         event = Evt.VideoParsed(None, self.video.id, {})
-        self.workflow.to_FINALISING(event)
+        self.workflow.to_SUB_RETRIEVING(event)
         cmd = self.expect_dispatch(
             Cmd.FetchVideoSubtitle, self.video.id, config["subtitle.language"]
         )

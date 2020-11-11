@@ -172,15 +172,14 @@ config = Config({
         "file": "opencast.db",
     },
     "player": {
-        "hide_background": True,
         "loop_last": True,
-        "history_size": 15
     },
     "downloader": {
         "output_directory": "/tmp",
         "max_concurrency": 3
     },
     "subtitle": {
+        "enabled": True,
         "language": "eng"
     }
 }, check_env=True)
