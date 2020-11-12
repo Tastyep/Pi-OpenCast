@@ -813,7 +813,7 @@ typing-extensions = {version = ">=3.7.4", markers = "python_version < \"3.8\""}
 
 [[package]]
 name = "youtube-dlc"
-version = "2020.11.7"
+version = "2020.11.11.post3"
 description = "Media downloader supporting various sites such as youtube"
 category = "main"
 optional = false
@@ -834,7 +834,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "8f82f383a93c9d8f9a79373bf490da02040ebef5c4898989bb24d8d5d39b7234"
+content-hash = "47a7301998b01d781cb8f642f6d1d231e667aaec85274e08bcfbcee1bf1f337a"
 
 [metadata.files]
 aiohttp = [
@@ -1314,8 +1314,8 @@ yarl = [
     {file = "yarl-1.5.1.tar.gz", hash = "sha256:c22c75b5f394f3d47105045ea551e08a3e804dc7e01b37800ca35b58f856c3d6"},
 ]
 youtube-dlc = [
-    {file = "youtube_dlc-2020.11.7-py2.py3-none-any.whl", hash = "sha256:acef24e236496448559a5cf5e6dc9ce33b0f3304525d2ce9c36153d1add43318"},
-    {file = "youtube_dlc-2020.11.7.tar.gz", hash = "sha256:ceb11b2147679b27e09ace441eb709245f90afd7f7ef6a885de6a24bb16209ab"},
+    {file = "youtube_dlc-2020.11.11.post3-py2.py3-none-any.whl", hash = "sha256:bbd4f554e9d63b6e8de7cbace0abd0b9707ed32798fbeb2abbb9c17fcb9f7ec3"},
+    {file = "youtube_dlc-2020.11.11.post3.tar.gz", hash = "sha256:5aaa0aa5fbd53d9acdfa95bab3c26802926eb27e425f23dc83d55cb18f11d053"},
 ]
 zipp = [
     {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
