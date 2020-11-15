@@ -19,7 +19,7 @@ source "$ROOT/script/logging.sh"
 # Install system dependencies.
 check_system_deps() {
   log_info "Checking system dependencies..."
-  local -a deps=("curl" "lsof" "python" "python3" "pip3" "node" "npm")
+  local -a deps=("curl" "lsof" "python" "python3" "pip3" "npm" "node")
   local status fail
   # Set flags to false  by default
   [[ -z "${ARGS["--ci"]}" ]] && deps+=("ffmpeg" "vlc")
@@ -28,14 +28,33 @@ check_system_deps() {
   for dep in "${deps[@]}"; do
     command -v "$dep" &>/dev/null
     status="$?"
-    [[ "$status" = "1" ]] && fail=true
     log_status "$dep" "$status"
+
+    if [[ "$status" != "0" ]]; then
+      case "$dep" in
+      "npm" | "node")
+        install_nvm
+        status="$?"
+        ;;
+      esac
+    fi
+    [[ "$status" != "0" ]] && fail=true
   done
 
   if [[ "$fail" = true ]]; then
     log_error "Missing dependencies, please install them."
     exit 1
   fi
+}
+
+# Install node version manager (nvm)
+# Install node and npm using nvm
+install_nvm() {
+  log_info "Installing nvm..."
+  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh" | PROFILE=~/.profile bash
+  source ~/.profile
+  # Install npm as well
+  nvm install node
 }
 
 # Install project dependencies.
