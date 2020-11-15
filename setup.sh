@@ -52,6 +52,7 @@ check_system_deps() {
 install_nvm() {
   log_info "Installing nvm..."
   curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh" | PROFILE=~/.profile bash
+  # shellcheck source=/dev/null
   source ~/.profile
   # Install npm as well
   nvm install node
