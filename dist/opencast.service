@@ -4,10 +4,12 @@ After=network.target
 
 [Service]
 Type=simple
+User={ USER }
 RemainAfterExit=true
 TimeoutStartSec=infinity
-User={ USER }
+TimeoutStopSec=infinity
 ExecStart={ START_COMMAND }
+ExecStop={ STOP_COMMAND }
 
 [Install]
 WantedBy=multi-user.target
