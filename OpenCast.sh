@@ -12,6 +12,11 @@
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
+# Source profile file as poetry and nvm use it to modify the PATH
+# This is likely to be done by the display manager, but not always (lightdm).
+# shellcheck source=/dev/null
+source ~/.profile
+
 # shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
 
