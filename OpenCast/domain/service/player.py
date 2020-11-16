@@ -43,7 +43,7 @@ class QueueingService:
     def next_video(self, playlist_id: Id, video_id: Id) -> Id:
         playlist = self._playlist_repo.get(playlist_id)
         if video_id not in playlist.ids:
-            self._logger.error("unknown video", video=video_id, playlist=playlist)
+            self._logger.warning("unknown video", video=video_id, playlist=playlist)
             return None
 
         video_idx = playlist.ids.index(video_id)

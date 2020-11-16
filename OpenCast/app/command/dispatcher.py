@@ -18,7 +18,7 @@ class CommandDispatcher:
 
     def dispatch(self, cmd):
         def impl():
-            self._logger.debug(type(cmd).__name__, cmd=cmd)
+            self._logger.info(type(cmd).__name__, cmd=cmd)
             cmd_id = id(type(cmd))
             if cmd_id in self._handlers_map:
                 handlers = self._handlers_map[cmd_id]
