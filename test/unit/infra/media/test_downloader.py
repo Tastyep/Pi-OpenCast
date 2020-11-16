@@ -19,7 +19,7 @@ class LoggerTest(TestCase):
         data = {}
         self.logger.log_download_progress(data)
 
-        self.impl.info.assert_not_called()
+        self.impl.debug.assert_not_called()
         self.impl.error.assert_not_called()
 
     def test_downloading_log(self):
@@ -32,7 +32,7 @@ class LoggerTest(TestCase):
         }
         self.logger.log_download_progress(data)
 
-        self.impl.info.assert_called_with(
+        self.impl.debug.assert_called_with(
             "Downloading", filename="/tmp/media.mp4", ratio="50.00%", speed="10 bytes/s"
         )
 
@@ -42,7 +42,7 @@ class LoggerTest(TestCase):
         }
         self.logger.log_download_progress(data)
 
-        self.impl.info.assert_called_with(
+        self.impl.debug.assert_called_with(
             "Downloading", filename="unknown", ratio="N/A", speed="0 bytes/s"
         )
 
@@ -75,7 +75,7 @@ class LoggerTest(TestCase):
         }
         self.logger.log_download_progress(data)
 
-        self.impl.info.assert_called_with(
+        self.impl.debug.assert_called_with(
             "Downloading success", filename="/tmp/media.mp4", size="100 bytes"
         )
 
@@ -85,7 +85,7 @@ class LoggerTest(TestCase):
         }
         self.logger.log_download_progress(data)
 
-        self.impl.info.assert_called_with(
+        self.impl.debug.assert_called_with(
             "Downloading success", filename="unknown", size="0 bytes"
         )
 
