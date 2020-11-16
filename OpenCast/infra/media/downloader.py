@@ -26,7 +26,7 @@ class Logger:
 
     def _log_downloading(self, d):
         filename = d.get("filename", "unknown")
-        self._logger.info(
+        self._logger.debug(
             "Downloading",
             filename=filename,
             ratio=self._format_ratio(d),
@@ -40,7 +40,7 @@ class Logger:
     def _log_finished(self, d):
         filename = d.get("filename", "unknown")
         total = d.get("total_bytes", 0)
-        self._logger.info(
+        self._logger.debug(
             "Downloading success",
             filename=filename,
             size=size(total, system=alternative),
@@ -70,7 +70,7 @@ class Downloader:
 
     def download_video(self, op_id: Id, source: str, dest: str):
         def impl():
-            self._logger.debug("Downloading", video=dest)
+            self._logger.info("Downloading", video=dest)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
                 "bestvideo+bestaudio/best",
@@ -102,14 +102,13 @@ class Downloader:
                 self._evt_dispatcher.dispatch(DownloadError(op_id, error))
                 return
 
-            self._logger.debug("Download success", video=dest)
             self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
         self._logger.debug("Queing", video=dest)
         self._executor.submit(impl)
 
     def download_subtitle(self, url: str, dest: str, lang: str, exts: List[str]):
-        self._logger.debug("Downloading subtitle", subtitle=dest, lang=lang)
+        self._logger.info("Downloading subtitle", subtitle=dest, lang=lang)
 
         lang = ISO639Utils.long2short(lang)
         for ext in exts:

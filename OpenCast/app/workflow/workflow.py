@@ -91,7 +91,7 @@ class Workflow(Machine):
         try:
             return getattr(self.__derived, handler_name)
         except AttributeError:
-            self._logger.error(
+            self._logger.critical(
                 "Missing handler", handler=handler_name, cls=evt_cls.__name__
             )
             # Raise the exception as it is a developer error

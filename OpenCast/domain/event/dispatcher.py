@@ -53,7 +53,7 @@ class EventDispatcher:
                 self._evt_to_handler_ids[evt_hash].remove(handler_id)
             self._handler_map.pop(handler_id)
 
-        self._logger.debug(type(evt).__name__, evt=evt)
+        self._logger.info(type(evt).__name__, evt=evt)
 
         handlers = []
         with self._lock:
