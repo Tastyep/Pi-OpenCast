@@ -1,6 +1,6 @@
 from os import environ
 from test.util import TestCase
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import mock_open, patch
 
 from yaml import YAMLError
 

@@ -11,7 +11,7 @@ from yaml import YAMLError
 from yaml import safe_load as yaml_safe_load
 
 # fmt: off
-DEFAULT_CONFIG={
+DEFAULT_CONFIG = {
     "log": {
         "level": "INFO"
     },
