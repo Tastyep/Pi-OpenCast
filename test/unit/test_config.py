@@ -103,3 +103,13 @@ class ConfigTest(TestCase):
             "Can't load the file's content",
             str(ctx.exception),
         )
+
+    def test_override_from_env_simple(self):
+        config = Config({"a": 1})
+        config.override_from_env({"TEST_A": 0}, prefix="TEST")
+        self.assertEqual(0, config["a"])
+
+    def test_override_from_env_nested(self):
+        config = Config({"a": {"b": 1}})
+        config.override_from_env({"TEST_A_B": 0}, prefix="TEST")
+        self.assertEqual(0, config["a.b"])
