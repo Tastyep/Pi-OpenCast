@@ -2,7 +2,22 @@
 
 import structlog
 from aiohttp import web
+from aiohttp.abc import AbstractAccessLogger
 from aiohttp_middlewares import cors_middleware
+
+
+class AccessLogger(AbstractAccessLogger):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._logger = structlog.get_logger(__name__)
+
+    def log(self, request, response, time):
+        self._logger.debug(
+            f"{response.status}",
+            method=request.method,
+            path=request.path,
+            duration=f"{0:.3f}s".format(time),
+        )
 
 
 class Server:
@@ -18,7 +33,7 @@ class Server:
     def start(self, host, port):
         self._logger.info("Started", host=host, port=port)
 
-        web.run_app(self._app, host=host, port=port)
+        web.run_app(self._app, host=host, port=port, access_log_class=AccessLogger)
 
     def make_web_socket(self):
         ws = web.WebSocketResponse()
