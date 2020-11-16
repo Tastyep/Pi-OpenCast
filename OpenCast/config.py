@@ -81,7 +81,7 @@ class Config:
         self._logger = structlog.get_logger(__name__)
         self._content = content
         if check_env:
-            self._override_from_env(self._content, environ, ["OpenCast"])
+            self.override_from_env(environ, prefix="OPENCAST")
 
     def __getitem__(self, key: str):
         """Access a configuration by keys
@@ -145,6 +145,25 @@ class Config:
 
         self._update_content(self._content, content)
 
+    def override_from_env(self, env: dict, prefix: str):
+        """Override the existing configuration with values from the environment.
+
+        Args:
+            env: A dictionary representing the environment variables.
+            prefix: The prefix identifying the environment variables.
+        """
+
+        def override_content(content, prefix):
+            for k, v in content.items():
+                env_key = f"{prefix}_{k}".upper()
+                if type(v) is dict:
+                    override_content(content[k], env_key)
+                    return
+                if env_key in env:
+                    content[k] = type(content[k])(env[env_key])
+
+        override_content(self._content, prefix)
+
     def _update_content(self, content, updates):
         for k, v in updates.items():
             if isinstance(v, collections.abc.Mapping):
@@ -175,16 +194,6 @@ class Config:
                 }
 
         return errors
-
-    def _override_from_env(self, content: dict, env: dict, key: list):
-        for k, v in content.items():
-            env_keys = [*key, k]
-            if type(v) is dict:
-                self._override_from_env(content[k], env, env_keys)
-                return
-            env_key = "_".join(env_keys).upper()
-            if env_key in env:
-                content[k] = type(content[k])(env[env_key])
 
 
 config = Config(DEFAULT_CONFIG, check_env=True)
