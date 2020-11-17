@@ -15,7 +15,7 @@ from .service import Service
 class PlayerService(Service):
     def __init__(self, app_facade, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
-        super().__init__(app_facade, logger, self, player_cmds)
+        super().__init__(app_facade, logger, player_cmds)
 
         self._observe_event(PlayerEvt.PlayerCreated)
 
