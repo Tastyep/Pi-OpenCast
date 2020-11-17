@@ -12,11 +12,10 @@ from .error import OperationError
 
 
 class Service:
-    def __init__(self, app_facade, logger, derived, cmd_module, evt_module=None):
+    def __init__(self, app_facade, logger, cmd_module, evt_module=None):
         self._cmd_dispatcher = app_facade.cmd_dispatcher
         self._evt_dispatcher = app_facade.evt_dispatcher
         self._logger = logger
-        self.__derived = derived
         self._observe(cmd_module, self._observe_command)
         if evt_module is not None:
             self._observe(evt_module, partial(self._observe_event, None))

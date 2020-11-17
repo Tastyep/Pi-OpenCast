@@ -12,7 +12,7 @@ from .service import Service
 class PlaylistService(Service):
     def __init__(self, app_facade, service_factory, data_facade):
         logger = structlog.get_logger(__name__)
-        super().__init__(app_facade, logger, self, playlist_cmds)
+        super().__init__(app_facade, logger, playlist_cmds)
 
         self._observe_event(VideoEvt.VideoDeleted)
 
