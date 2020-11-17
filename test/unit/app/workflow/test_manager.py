@@ -21,7 +21,7 @@ class WorkflowManagerTest(TestCase):
     def test_is_running_none(self):
         self.assertFalse(self.manager.is_running(self.queue_workflow_id))
 
-    def test_is_running_one(self):
+    def test_start(self):
         self.workflow.id = self.queue_workflow_id
         self.workflow.complete = None
 
@@ -40,3 +40,21 @@ class WorkflowManagerTest(TestCase):
         self.workflow.complete(None)
 
         self.assertFalse(self.manager.is_running(self.workflow.id))
+
+    def test_start_duplicate(self):
+        self.workflow.id = self.queue_workflow_id
+        self.workflow.complete = None
+
+        def fake_observe(workflow_id: Id, evtcls_handler: dict, times: int):
+            self.workflow.complete = evtcls_handler.get(self.workflow.Completed, None)
+
+        self.evt_dispatcher.observe_result.side_effect = fake_observe
+
+        self.assertTrue(self.manager.start(self.workflow))
+        self.assertFalse(self.manager.start(self.workflow))
+        self.assertTrue(self.manager.is_running(self.workflow.id))
+
+        self.workflow.complete(None)
+        self.assertFalse(self.manager.is_running(self.workflow.id))
+
+        self.assertTrue(self.manager.start(self.workflow))
