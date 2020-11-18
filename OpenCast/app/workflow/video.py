@@ -33,24 +33,25 @@ class VideoWorkflow(Workflow):
         CREATING = auto()
         RETRIEVING = auto()
         PARSING = auto()
-        FINALISING = auto()
+        SUB_RETRIEVING = auto()
         COMPLETED = auto()
         DELETING = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["_create",                 States.INITIAL,     States.COMPLETED,  "is_complete"],  # noqa: E501
-        ["_create",                 States.INITIAL,     States.CREATING],
-        ["_video_created",          States.CREATING,    States.RETRIEVING],
-        ["_video_retrieved",        States.RETRIEVING,  States.COMPLETED,  "is_stream"],  # noqa: E501
-        ["_video_retrieved",        States.RETRIEVING,  States.PARSING],
-        ["_video_parsed",           States.PARSING,     States.FINALISING],
-        ["_video_subtitle_fetched", States.FINALISING,  States.COMPLETED],
+        ["_create",                 States.INITIAL,        States.COMPLETED,  "is_complete"],  # noqa: E501
+        ["_create",                 States.INITIAL,        States.CREATING],
+        ["_video_created",          States.CREATING,       States.RETRIEVING],
+        ["_video_retrieved",        States.RETRIEVING,     States.COMPLETED,  "is_stream"],  # noqa: E501
+        ["_video_retrieved",        States.RETRIEVING,     States.PARSING],
+        ["_video_parsed",           States.PARSING,        States.COMPLETED,  "subtitle_disabled"],  # noqa: E501
+        ["_video_parsed",           States.PARSING,        States.SUB_RETRIEVING],
+        ["_video_subtitle_fetched", States.SUB_RETRIEVING, States.COMPLETED],
 
-        ["_operation_error",        States.CREATING,    States.ABORTED],
-        ["_operation_error",        '*',                States.DELETING],
-        ["_video_deleted",          States.DELETING,    States.ABORTED],
+        ["_operation_error",        States.CREATING,       States.ABORTED],
+        ["_operation_error",        '*',                   States.DELETING],
+        ["_video_deleted",          States.DELETING,       States.ABORTED],
     ]
     # fmt: on
 
@@ -58,7 +59,6 @@ class VideoWorkflow(Workflow):
         logger = structlog.get_logger(__name__)
         super().__init__(
             logger,
-            self,
             id,
             app_facade,
             initial=VideoWorkflow.States.INITIAL,
@@ -90,7 +90,7 @@ class VideoWorkflow(Workflow):
             self._video.id,
         )
 
-    def on_enter_FINALISING(self, _):
+    def on_enter_SUB_RETRIEVING(self, _):
         self._observe_dispatch(
             VideoEvt.VideoSubtitleFetched,
             Cmd.FetchVideoSubtitle,
@@ -113,3 +113,6 @@ class VideoWorkflow(Workflow):
 
     def is_stream(self, _):
         return self._video_repo.get(self._video.id).streamable()
+
+    def subtitle_disabled(self, _):
+        return not config["subtitle.enabled"]

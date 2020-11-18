@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Opencast"
-version = "1.4.1"
+version = "1.4.2"
 description = "A client-server media player that transforms your Raspberry Pi into an awesome streaming device"
 authors = [
 "Luc Sinet <luc.sinet@gmail.com>"
@@ -21,14 +21,14 @@ transitions = "^0.8.5"
 structlog = "^20.1.0"
 colorama = "^0.4.4"
 python-vlc = "^3.0.9113"
-aiohttp = "^3.7.2"
+aiohttp = "^3.6.2"
 janus = "^0.6.1"
 aiohttp-middlewares = "^1.1.0"
 tinydb = "^4.3.0"
 dacite = "^1.5.1"
 marshmallow = "^3.9.1"
 marshmallow_enum = "^1.5.1"
-youtube-dlc = "^2020.11.11"
+youtube_dl = "^2020.11.18"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1"

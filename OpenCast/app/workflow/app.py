@@ -50,7 +50,6 @@ class InitWorkflow(Workflow):
         logger = structlog.get_logger(__name__)
         super().__init__(
             logger,
-            self,
             id,
             app_facade,
             initial=InitWorkflow.States.INITIAL,
@@ -80,7 +79,8 @@ class InitWorkflow(Workflow):
             self._missing_videos = [
                 video.id
                 for video in videos
-                if not (video.streamable() or Path(video.location).exists())
+                if video.location is None
+                or not (video.streamable() or Path(video.location).exists())
             ]
             if not self._missing_videos:
                 self.to_COMPLETED()

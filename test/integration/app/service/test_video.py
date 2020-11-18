@@ -31,7 +31,7 @@ class VideoServiceTest(ServiceTestCase):
             "collection_name": "album",
             "thumbnail": "thumbnail_url",
         }
-        self.downloader.pick_stream_metadata.return_value = metadata
+        self.downloader.download_metadata.return_value = metadata
 
         self.evt_expecter.expect(
             VideoEvt.VideoCreated, video_id, source, **metadata
@@ -64,9 +64,9 @@ class VideoServiceTest(ServiceTestCase):
         video_id = IdentityService.id_video(source)
 
         metadata = None
-        self.downloader.pick_stream_metadata.return_value = metadata
+        self.downloader.download_metadata.return_value = metadata
 
-        self.evt_expecter.expect(OperationError, "Can't fetch metadata").from_(
+        self.evt_expecter.expect(OperationError, "Unavailable metadata").from_(
             Cmd.CreateVideo, video_id, source
         )
 
@@ -108,7 +108,7 @@ class VideoServiceTest(ServiceTestCase):
         metadata = {
             "url": "http://stream-url.m3u8",
         }
-        self.downloader.pick_stream_metadata.return_value = metadata
+        self.downloader.download_metadata.return_value = metadata
 
         output_dir = config["downloader.output_directory"]
         self.evt_expecter.expect(
@@ -122,12 +122,12 @@ class VideoServiceTest(ServiceTestCase):
         )
 
         metadata = {}
-        self.downloader.pick_stream_metadata.return_value = metadata
+        self.downloader.download_metadata.return_value = metadata
 
         output_dir = config["downloader.output_directory"]
-        self.evt_expecter.expect(
-            OperationError, "Could not fetch the streaming URL"
-        ).from_(Cmd.RetrieveVideo, video_id, output_dir)
+        self.evt_expecter.expect(OperationError, "Unavailable stream URL").from_(
+            Cmd.RetrieveVideo, video_id, output_dir
+        )
 
     def test_retrieve_video_download_success(self):
         video_id = IdentityService.id_video("source")

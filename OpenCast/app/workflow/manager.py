@@ -26,7 +26,7 @@ class WorkflowManager:
 
         with self._lock:
             if self.is_running(workflow.id):
-                self._logger.debug("workflow already active", workflow=workflow)
+                self._logger.info("workflow already active", workflow=workflow)
                 return False
 
             self._workflow_ids.append(workflow.id)
@@ -36,6 +36,6 @@ class WorkflowManager:
                 times=1,
             )
 
-        self._logger.debug("Starting workflow", workflow=workflow)
+        self._logger.info("Starting workflow", workflow=workflow)
         workflow.start(*args, **kwargs)
         return True

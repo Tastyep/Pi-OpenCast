@@ -1,5 +1,8 @@
 from os import environ
 from test.util import TestCase
+from unittest.mock import mock_open, patch
+
+from yaml import YAMLError
 
 from OpenCast.config import Config, ConfigContentError, ConfigError
 
@@ -23,12 +26,12 @@ class ConfigTest(TestCase):
         config = Config({"a": 1}, check_env=True)
         self.assertEqual(2, config["a"])
 
-    def test_load_from_dict_override(self):
+    def test_load_from_dict(self):
         config = Config({"a": 1})
         config.load_from_dict({"a": 2})
         self.assertEqual(2, config["a"])
 
-    def test_load_from_dict_nested_override(self):
+    def test_load_from_dict_nested(self):
         config = Config({"a": {"b": 1, "c": 2}})
         config.load_from_dict({"a": {"b": 3}})
         expected = Config({"a": {"b": 3, "c": 2}})
@@ -63,12 +66,50 @@ class ConfigTest(TestCase):
             ctx.exception.errors,
         )
 
-    def test_load_from_file_is_directory(self):
-        config = Config(None)
-        with self.assertRaises(ConfigError):
-            config.load_from_file("/tmp")
+    def test_load_from_file(self):
+        config = Config({"a": 0})
 
-    def test_load_from_file_missing(self):
-        config = Config(None)
-        with self.assertRaises(ConfigError):
-            config.load_from_file("/foo/bar")
+        mock = mock_open(read_data="a: 1")
+        with patch("builtins.open", mock):
+            config.load_from_file("file")
+
+        self.assertEqual(1, config["a"])
+
+    def test_load_from_file_open_error(self):
+        config = Config({})
+
+        with self.assertRaises(ConfigError) as ctx:
+            mock = mock_open()
+            with patch("builtins.open", mock):
+                mock.side_effect = OSError
+                config.load_from_file("file")
+
+        self.assertEqual(
+            "Can't open the configuration",
+            str(ctx.exception),
+        )
+
+    @patch("OpenCast.config.yaml_safe_load")
+    def test_load_from_file_format_error(self, yaml_loader_mock):
+        config = Config({})
+
+        with self.assertRaises(ConfigError) as ctx:
+            mock = mock_open(read_data="{a = 1}")
+            with patch("builtins.open", mock):
+                yaml_loader_mock.side_effect = YAMLError
+                config.load_from_file("file")
+
+        self.assertEqual(
+            "Can't load the file's content",
+            str(ctx.exception),
+        )
+
+    def test_override_from_env_simple(self):
+        config = Config({"a": 1})
+        config.override_from_env({"TEST_A": 0}, prefix="TEST")
+        self.assertEqual(0, config["a"])
+
+    def test_override_from_env_nested(self):
+        config = Config({"a": {"b": 1}})
+        config.override_from_env({"TEST_A_B": 0}, prefix="TEST")
+        self.assertEqual(0, config["a.b"])

@@ -14,7 +14,6 @@ class Workflow(Machine):
 
     Args:
         logger: The workflow's logger.
-        derived: The instance of the derived class.
         id: The workflow's ID.
         app_facade: The application facade.
 
@@ -25,7 +24,6 @@ class Workflow(Machine):
     def __init__(
         self,
         logger,
-        derived,
         id_: Id,
         app_facade,
         *args,
@@ -33,8 +31,8 @@ class Workflow(Machine):
     ):
         super().__init__(
             model=self,
-            states=derived.States,
-            transitions=derived.transitions,
+            states=self.States,
+            transitions=self.transitions,
             *args,
             **kwargs,
         )
@@ -45,33 +43,23 @@ class Workflow(Machine):
         self._factory = app_facade.workflow_factory
         self._cmd_dispatcher = app_facade.cmd_dispatcher
         self._evt_dispatcher = app_facade.evt_dispatcher
-        self.__derived = derived
-        self._sub_workflows = []
 
     def __repr__(self):
         return f"{type(self).__name__}(id={self.id})"
 
-    def reset(self):
-        """ Reset the workflow and its sub-workflows to their initial state"""
-        # TODO: Remove as unused and incompatible with the workflow manager
-        self.set_state(self._initial)
-        for workflow in self._sub_workflows:
-            workflow.reset()
-
     def _cancel(self, *args):
         """ Cancel the workflow and dispatch the related event"""
-        self._evt_dispatcher.dispatch(self.__derived.Aborted(self.id, *args))
+        self._evt_dispatcher.dispatch(self.Aborted(self.id, *args))
 
     def _complete(self, *args):
-        self._evt_dispatcher.dispatch(self.__derived.Completed(self.id, *args))
+        self._evt_dispatcher.dispatch(self.Completed(self.id, *args))
 
     def _observe_start(self, workflow, *args, **kwargs):
         self._observe(workflow.id, [workflow.Completed, workflow.Aborted])
         self._start_workflow(workflow, *args, **kwargs)
 
     def _start_workflow(self, workflow, *args, **kwargs):
-        if self._app_facade.workflow_manager.start(workflow, *args, **kwargs):
-            self._sub_workflows.append(workflow)
+        self._app_facade.workflow_manager.start(workflow, *args, **kwargs)
 
     def _observe_dispatch(self, evt_cls, cmd_cls, model_id: Id, *args, **kwargs):
         # TODO consider using the workflow id for commands from a same workflow
@@ -89,9 +77,9 @@ class Workflow(Machine):
     def _event_handler(self, evt_cls):
         handler_name = name_handler_method(evt_cls)
         try:
-            return getattr(self.__derived, handler_name)
+            return getattr(self, handler_name)
         except AttributeError:
-            self._logger.error(
+            self._logger.critical(
                 "Missing handler", handler=handler_name, cls=evt_cls.__name__
             )
             # Raise the exception as it is a developer error

@@ -57,6 +57,9 @@ class PlayerMonitController(MonitorController):
 
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
+            if not sources:
+                return self._internal_error("Could not unfold the playlist URL")
+
             videos = [
                 Video(IdentityService.id_video(source), source) for source in sources
             ]
@@ -78,6 +81,9 @@ class PlayerMonitController(MonitorController):
 
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
+            if not sources:
+                return self._internal_error("Could not unfold the playlist URL")
+
             videos = [
                 Video(IdentityService.id_video(source), source) for source in sources
             ]

@@ -7,7 +7,34 @@ import collections.abc
 from os import environ
 
 import structlog
-import yaml
+from yaml import YAMLError
+from yaml import safe_load as yaml_safe_load
+
+# fmt: off
+DEFAULT_CONFIG = {
+    "log": {
+        "level": "INFO"
+    },
+    "server": {
+        "host": "0.0.0.0",
+        "port": 2020
+    },
+    "database": {
+        "file": "opencast.db",
+    },
+    "player": {
+        "loop_last": True,
+    },
+    "downloader": {
+        "output_directory": "/tmp",
+        "max_concurrency": 3
+    },
+    "subtitle": {
+        "enabled": True,
+        "language": "eng"
+    }
+}
+# fmt: on
 
 
 class ConfigError(Exception):
@@ -54,7 +81,7 @@ class Config:
         self._logger = structlog.get_logger(__name__)
         self._content = content
         if check_env:
-            self._override_from_env(self._content, environ, ["OpenCast"])
+            self.override_from_env(environ, prefix="OPENCAST")
 
     def __getitem__(self, key: str):
         """Access a configuration by keys
@@ -90,17 +117,18 @@ class Config:
         """
         try:
             stream = open(path, "r")
-        except OSError as e:
+        except Exception as e:
             self._logger.error("Can't open the configuration", error=e)
             raise ConfigError("Can't open the configuration") from e
 
         with stream:
             try:
-                content = yaml.safe_load(stream)
-                self.load_from_dict(content)
-            except yaml.YAMLError as e:
+                content = yaml_safe_load(stream)
+            except YAMLError as e:
                 self._logger.error("invalid file", error=e)
                 raise ConfigError("Can't load the file's content") from e
+
+        self.load_from_dict(content)
 
     def load_from_dict(self, content: dict):
         """Loads the configuration from a dict.
@@ -116,6 +144,25 @@ class Config:
             raise ConfigContentError(errors)
 
         self._update_content(self._content, content)
+
+    def override_from_env(self, env: dict, prefix: str):
+        """Override the existing configuration with values from the environment.
+
+        Args:
+            env: A dictionary representing the environment variables.
+            prefix: The prefix identifying the environment variables.
+        """
+
+        def override_content(content, prefix):
+            for k, v in content.items():
+                env_key = f"{prefix}_{k}".upper()
+                if type(v) is dict:
+                    override_content(content[k], env_key)
+                    return
+                if env_key in env:
+                    content[k] = type(content[k])(env[env_key])
+
+        override_content(self._content, prefix)
 
     def _update_content(self, content, updates):
         for k, v in updates.items():
@@ -148,40 +195,5 @@ class Config:
 
         return errors
 
-    def _override_from_env(self, content: dict, env: dict, key: list):
-        for k, v in content.items():
-            env_keys = [*key, k]
-            if type(v) is dict:
-                self._override_from_env(content[k], env, env_keys)
-                return
-            env_key = "_".join(env_keys).upper()
-            if env_key in env:
-                content[k] = type(content[k])(env[env_key])
 
-
-# fmt: off
-config = Config({
-    "log": {
-        "level": "INFO"
-    },
-    "server": {
-        "host": "0.0.0.0",
-        "port": 2020
-    },
-    "database": {
-        "file": "opencast.db",
-    },
-    "player": {
-        "hide_background": True,
-        "loop_last": True,
-        "history_size": 15
-    },
-    "downloader": {
-        "output_directory": "/tmp",
-        "max_concurrency": 3
-    },
-    "subtitle": {
-        "language": "eng"
-    }
-}, check_env=True)
-# fmt: on
+config = Config(DEFAULT_CONFIG, check_env=True)

@@ -1,7 +1,7 @@
 """ Media source operations """
 
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import structlog
 
@@ -18,14 +18,24 @@ class SourceService:
             "collection_name": ["album"],
         }
 
-    def is_playlist(self, source):
-        return "/playlist" in source
+    def is_playlist(self, source: str) -> bool:
+        data = self._downloader.download_metadata(source, process_ie_data=False)
+        if data is None:
+            return False
 
-    def unfold(self, source):
-        return self._downloader.unfold_playlist(source)
+        return data.get("_type", None) == "playlist"
 
-    def pick_stream_metadata(self, source: str):
-        data = self._downloader.pick_stream_metadata(source)
+    def unfold(self, source: str) -> List[str]:
+        self._logger.info("Unfolding playlist", url=source)
+        data = self._downloader.download_metadata(source, process_ie_data=True)
+        if data is None:
+            return []
+
+        entries = data.get("entries", [])
+        return [entry["webpage_url"] for entry in entries if "webpage_url" in entry]
+
+    def pick_stream_metadata(self, source: str) -> Optional[dict]:
+        data = self._downloader.download_metadata(source, process_ie_data=True)
         if data is None:
             return None
 
@@ -41,13 +51,16 @@ class SourceService:
 
         return metadata
 
-    def pick_file_metadata(self, source: Path):
+    def pick_file_metadata(self, source: Path) -> dict:
         metadata = {field: None for field in Video.METADATA_FIELDS}
         metadata["title"] = source.stem
         return metadata
 
-    def fetch_stream_link(self, source: str):
-        data = self._downloader.pick_stream_metadata(source)
+    def fetch_stream_link(self, source: str) -> Optional[str]:
+        data = self._downloader.download_metadata(source, process_ie_data=True)
+        if data is None:
+            return None
+
         return data.get("url", None)
 
     def list_streams(self, video) -> List[Stream]:

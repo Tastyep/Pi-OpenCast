@@ -13,7 +13,8 @@ from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
 from .app.service.module import ServiceModule
 from .app.tool.json_encoder import ModelEncoder
-from .config import ConfigError, config
+from .config import ConfigError
+from .config import config as conf
 from .domain.service.factory import ServiceFactory
 from .domain.service.identity import IdentityService
 from .infra.data.manager import DataManager, StorageType
@@ -27,7 +28,7 @@ from .infra.service.factory import ServiceFactory as InfraServiceFactory
 
 def run_server(logger, infra_facade):
     try:
-        infra_facade.server.start(config["server.host"], config["server.port"])
+        infra_facade.server.start(conf["server.host"], conf["server.port"])
     except Exception as e:
         logger.error(
             "Server exception caught", error=e, traceback=traceback.format_exc()
@@ -58,12 +59,12 @@ def main(argv=None):
     init_logging(__name__)
 
     try:
-        config.load_from_file("{}/config.yml".format(app_path))
+        conf.load_from_file("{}/config.yml".format(app_path))
     except ConfigError:
         return
 
     # Get and update the log level
-    logging.getLogger(__name__).setLevel(config["log.level"])
+    logging.getLogger(__name__).setLevel(conf["log.level"])
     logger = structlog.get_logger(__name__)
 
     # TODO: make worker count configurable
@@ -77,7 +78,7 @@ def main(argv=None):
     data_manager = DataManager(repo_factory)
     data_facade = data_manager.connect(
         StorageType.JSON,
-        path=config["database.file"],
+        path=conf["database.file"],
         indent=4,
         separators=(",", ": "),
         cls=ModelEncoder,
@@ -85,7 +86,7 @@ def main(argv=None):
 
     io_factory = IoFactory()
     media_factory = MediaFactory(
-        VlcInstance(), ThreadPoolExecutor(config["downloader.max_concurrency"])
+        VlcInstance(), ThreadPoolExecutor(conf["downloader.max_concurrency"])
     )
     infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory)
 

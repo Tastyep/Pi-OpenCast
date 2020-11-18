@@ -14,7 +14,7 @@ from .service import Service
 class VideoService(Service):
     def __init__(self, app_facade, service_factory, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
-        super().__init__(app_facade, logger, self, video_cmds)
+        super().__init__(app_facade, logger, video_cmds)
         self._video_repo = data_facade.video_repo
         self._downloader = media_factory.make_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(
@@ -34,7 +34,7 @@ class VideoService(Service):
             metadata = self._source_service.pick_stream_metadata(cmd.source)
 
         if metadata is None:
-            self._abort_operation(cmd.id, "Can't fetch metadata")
+            self._abort_operation(cmd.id, "Unavailable metadata", cmd=cmd)
             return
 
         self._start_transaction(self._video_repo, cmd.id, impl, metadata)
@@ -66,7 +66,7 @@ class VideoService(Service):
         if video.streamable():
             link = self._source_service.fetch_stream_link(video.source)
             if link is None:
-                self._abort_operation(cmd.id, "Could not fetch the streaming URL")
+                self._abort_operation(cmd.id, "Unavailable stream URL", cmd=cmd)
                 return
 
             self._start_transaction(
@@ -82,7 +82,7 @@ class VideoService(Service):
             self._start_transaction(self._video_repo, cmd.id, impl)
 
         def abort_operation(evt):
-            self._abort_operation(cmd.id, evt.error)
+            self._abort_operation(cmd.id, evt.error, cmd=cmd)
 
         video.location = str(Path(cmd.output_directory) / f"{video.title}.mp4")
         self._evt_dispatcher.observe_result(
