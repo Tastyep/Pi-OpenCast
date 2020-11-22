@@ -32,7 +32,7 @@ class MonitorController(Controller):
     def _route(self, method, route, handle):
         self._server.route(method, f"{self._base_route}{route}", handle)
 
-    def _ok(self, body=None):
+    def _ok(self, body):
         return self._make_response(200, body)
 
     def _no_content(self):

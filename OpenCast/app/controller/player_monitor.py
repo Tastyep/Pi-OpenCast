@@ -1,5 +1,7 @@
 """ Player capabilities monitoring routes """
+
 import structlog
+from aiohttp_apispec import docs
 
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
@@ -12,7 +14,7 @@ from OpenCast.app.workflow.player import (
 )
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model import Id
-from OpenCast.domain.model.player import Player
+from OpenCast.domain.model.player import Player, PlayerSchema
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.util.conversion import str_to_bool
 
@@ -47,10 +49,38 @@ class PlayerMonitController(MonitorController):
         self._route("POST", "/subtitle/seek", self.subtitle_seek)
         self._route("GET", "/events", self.stream_events)
 
+    @docs(
+        tags=["player"],
+        summary="Get player",
+        description="Querie and return the media player",
+        operationId="getPlayer",
+        responses={
+            200: {"description": "Successful operation", "schema": PlayerSchema},
+        },
+    )
     async def get(self, _):
         player = self._player_repo.get_player()
         return self._ok(player)
 
+    @docs(
+        tags=["player"],
+        summary="Stream URL",
+        description="Unpack, download and stream the media(s) referenced by the URL",
+        operationId="streamMedia",
+        parameters=[
+            {
+                "in": "query",
+                "name": "url",
+                "description": "URL of the media(s) to play",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            204: {"description": "Valid URL"},
+            500: {"description": "Can't stream the media"},
+        },
+    )
     async def stream(self, req):
         source = req.query["url"]
         video_id = IdentityService.id_video(source)
@@ -68,13 +98,32 @@ class PlayerMonitController(MonitorController):
             self._start_workflow(
                 StreamPlaylistWorkflow, workflow_id, self._data_facade, videos
             )
-            return self._ok()
+            return self._no_content()
 
         video = Video(video_id, source)
         self._start_workflow(StreamVideoWorkflow, video_id, self._data_facade, video)
 
-        return self._ok()
+        return self._no_content()
 
+    @docs(
+        tags=["player"],
+        summary="Queue URL",
+        description="Unpack, download and queue the media(s) referenced by the URL",
+        operationId="queueMedia",
+        parameters=[
+            {
+                "in": "query",
+                "name": "url",
+                "description": "URL of the media(s) to queue",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            204: {"description": "Valid URL"},
+            500: {"description": "Can't queue the media"},
+        },
+    )
     async def queue(self, req):
         source = req.query["url"]
         video_id = IdentityService.id_video(source)
@@ -92,15 +141,35 @@ class PlayerMonitController(MonitorController):
             self._start_workflow(
                 QueuePlaylistWorkflow, workflow_id, self._data_facade, videos
             )
-            return self._ok()
+            return self._no_content()
 
         video = Video(video_id, source)
         self._start_workflow(
             QueueVideoWorkflow, video_id, self._data_facade, video, queue_front=False
         )
 
-        return self._ok()
+        return self._no_content()
 
+    @docs(
+        tags=["player"],
+        summary="Play media",
+        description="Play the media selected by ID",
+        operationId="playMedia",
+        parameters=[
+            {
+                "in": "query",
+                "name": "id",
+                "description": "ID of the media",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            200: {"description": "Successful operation"},
+            404: {"description": "Video not found"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def play(self, req):
         video_id = Id(req.query["id"])
         if not self._video_repo.exists(video_id):
@@ -111,18 +180,64 @@ class PlayerMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Stop player",
+        description="Stop the media player",
+        operationId="stopPlayer",
+        responses={
+            200: {"description": "Successful operation"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def stop(self, _):
         handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStopped)
         self._observe_dispatch(handlers, Cmd.StopPlayer)
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Pause player",
+        description="Pause the media player",
+        operationId="pausePlayer",
+        responses={
+            200: {"description": "Successful operation"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def pause(self, _):
         handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateToggled)
         self._observe_dispatch(handlers, Cmd.TogglePlayerState)
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Seek media",
+        description="Seek the active media with a given step",
+        operationId="seekMedia",
+        parameters=[
+            {
+                "in": "query",
+                "name": "forward",
+                "description": "True to advance in the media, False otherwise",
+                "type": "boolean",
+                "required": True,
+            },
+            {
+                "in": "query",
+                "name": "long",
+                "description": "True to use the highest seeking step, False otherwise",
+                "type": "boolean",
+                "required": True,
+            },
+        ],
+        responses={
+            200: {"description": "Successful operation"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def seek(self, req):
         forward = str_to_bool(req.query["forward"])
         long = str_to_bool(req.query["long"])
@@ -133,6 +248,26 @@ class PlayerMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Update volume",
+        description="Update the volume of the media player",
+        operationId="updateVolume",
+        parameters=[
+            {
+                "in": "query",
+                "name": "value",
+                "description": "The value for the player's volume [0-100]",
+                "type": "integer",
+                "format": "int32",
+                "required": True,
+            },
+        ],
+        responses={
+            200: {"description": "Successful operation"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def volume(self, req):
         volume = int(req.query["value"])
         handlers, channel = self._make_default_handlers(PlayerEvt.VolumeUpdated)
@@ -140,12 +275,41 @@ class PlayerMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Toggle subtitle",
+        description="Toggle the active media subtitle state",
+        operationId="toggleMediaSubtitle",
+        responses={
+            200: {"description": "Successful operation"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def subtitle_toggle(self, _):
         handlers, channel = self._make_default_handlers(PlayerEvt.SubtitleStateUpdated)
         self._observe_dispatch(handlers, Cmd.ToggleSubtitle)
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Seek subtitle",
+        description="Seek the active media subtitle with a given step",
+        operationId="seekMediaSubtitle",
+        parameters=[
+            {
+                "in": "query",
+                "name": "forward",
+                "description": "True to advance the media subtitle, False otherwise",
+                "type": "boolean",
+                "required": True,
+            }
+        ],
+        responses={
+            200: {"description": "Successful operation"},
+            500: {"description": "Operation failure"},
+        },
+    )
     async def subtitle_seek(self, req):
         forward = str_to_bool(req.query["forward"])
         step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
@@ -154,6 +318,12 @@ class PlayerMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["player"],
+        summary="Stream player events",
+        description="Stream player events over WebSocket",
+        operationId="streamPlayerEvents",
+    )
     async def stream_events(self, request):
         return await self._stream_ws_events(request, PlayerEvt)
 
@@ -165,7 +335,7 @@ class PlayerMonitController(MonitorController):
             channel.send(self._ok(player))
 
         def on_error(error):
-            channel.send(self._bad_request())
+            channel.send(self._internal_error())
 
         evtcls_handler = {evt_cls: on_success, OperationError: on_error}
         return evtcls_handler, channel
