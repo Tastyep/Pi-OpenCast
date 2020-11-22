@@ -1,9 +1,0 @@
-Error:
-  type: object
-  properties:
-    code:
-      type: string
-      description: A uniqe identifier of error
-    message:
-      type: string
-      description: A human readable error message
