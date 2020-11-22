@@ -1,6 +1,8 @@
 """ Playlist capabilities monitoring routes """
 
 import structlog
+from aiohttp_apispec import docs, json_schema
+from marshmallow import fields
 
 from OpenCast.app.command import playlist as Cmd
 from OpenCast.app.service.error import OperationError
@@ -10,6 +12,7 @@ from OpenCast.domain.model.playlist import PlaylistSchema
 from OpenCast.domain.service.identity import IdentityService
 
 from .monitor import MonitorController
+from .monitoring_schema import Videos, schema
 
 
 class PlaylistMonitController(MonitorController):
@@ -26,12 +29,26 @@ class PlaylistMonitController(MonitorController):
         self._route("PATCH", "/{id:" + self.UUID + "}", handle=self.update)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
 
+    @docs(
+        tags=["playlist"],
+        summary="Add playlist",
+        description="Add a new playlist",
+        operationId="addPlaylist",
+        responses={
+            200: {"description": "Ok. Playlist created", "schema": PlaylistSchema},
+            422: {"description": "Validation error"},
+        },
+    )
+    @json_schema(
+        schema(
+            PlaylistMeta={
+                "name": fields.String(),
+                "ids": [fields.UUID()],
+            }
+        )
+    )
     async def create(self, req):
         data = await req.json()
-        errors = PlaylistSchema().validate(data)
-        if errors:
-            return self._bad_request("Schema validation error.", errors)
-
         channel = self._io_factory.make_janus_channel()
 
         def on_success(evt):
@@ -50,10 +67,41 @@ class PlaylistMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["playlist"],
+        summary="List playlists",
+        description="Retrieve a list of all playlists in the system",
+        operationId="listPlaylists",
+        responses={
+            200: {
+                "description": "Successful operation",
+                "schema": schema(Playlists={"playlists": [PlaylistSchema]}),
+            }
+        },
+    )
     async def list(self, req):
         playlists = self._playlist_repo.list()
         return self._ok(playlists)
 
+    @docs(
+        tags=["playlist"],
+        summary="Get playlist",
+        description="Querie and return a playlist by ID",
+        operationId="getPlaylistById",
+        parameters=[
+            {
+                "in": "path",
+                "name": "id",
+                "description": "ID of the playlist to retrieve",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            200: {"description": "Successful operation", "schema": PlaylistSchema},
+            404: {"description": "Playlist not found"},
+        },
+    )
     async def get(self, req):
         id = Id(req.match_info["id"])
         playlist = self._playlist_repo.get(id)
@@ -61,6 +109,28 @@ class PlaylistMonitController(MonitorController):
             return self._not_found()
         return self._ok(playlist)
 
+    @docs(
+        tags=["playlist", "video"],
+        summary="List playlist videos",
+        description="Retrieve the videos contained by the playlist",
+        operationId="listPlaylistVideos",
+        parameters=[
+            {
+                "in": "path",
+                "name": "id",
+                "description": "ID of the playlist to list videos from",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            200: {
+                "description": "Successful operation",
+                "schema": Videos,
+            },
+            404: {"description": "Playlist not found"},
+        },
+    )
     async def list_videos(self, req):
         id = Id(req.match_info["id"])
         playlist = self._playlist_repo.get(id)
@@ -70,16 +140,40 @@ class PlaylistMonitController(MonitorController):
         videos = self._video_repo.list(playlist.ids)
         return self._ok(videos)
 
+    @docs(
+        tags=["playlist"],
+        summary="Update playlist",
+        description="Update a playlist by ID",
+        operationId="updatePlaylist",
+        parameters=[
+            {
+                "in": "path",
+                "name": "id",
+                "description": "ID of the playlist to update",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            200: {"description": "Ok. Playlist updated", "schema": PlaylistSchema},
+            404: {"description": "Playlist not found"},
+            422: {"description": "Validation error"},
+        },
+    )
+    @json_schema(
+        schema(
+            PlaylistUpdate={
+                "name": fields.String(),
+                "ids": [fields.UUID()],
+            }
+        )
+    )
     async def update(self, req):
         id = Id(req.match_info["id"])
         if not self._playlist_repo.exists(id):
             return self._not_found()
 
         data = await req.json()
-        errors = PlaylistSchema().validate(data)
-        if errors:
-            return self._bad_request("Schema validation error.", errors)
-
         field_count = len(data)
         success_count = 0
         channel = self._io_factory.make_janus_channel()
@@ -115,6 +209,25 @@ class PlaylistMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["playlist"],
+        summary="Delete playlist",
+        description="Remove a playlist by ID",
+        operationId="deletePlaylistById",
+        parameters=[
+            {
+                "in": "path",
+                "name": "id",
+                "description": "ID of the playlist to remove",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            204: {"description": "Successful operation"},
+            404: {"description": "Playlist not found"},
+        },
+    )
     async def delete(self, req):
         id = Id(req.match_info["id"])
         if not self._playlist_repo.exists(id):
