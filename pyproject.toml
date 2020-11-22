@@ -29,6 +29,7 @@ dacite = "^1.5.1"
 marshmallow = "^3.9.1"
 marshmallow_enum = "^1.5.1"
 youtube_dl = "^2020.11.26"
+aiohttp-apispec = "^2.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1"
