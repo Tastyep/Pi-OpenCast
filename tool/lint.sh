@@ -6,7 +6,6 @@
 #   all     Run all linters.
 #   python  Run the linter on the python code.
 #   shell   Run shellcheck on scripts.
-#   spec    Run the linter on the API spec.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -23,7 +22,7 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-  python && shell && spec
+  python && shell
 }
 
 python() {
@@ -47,11 +46,6 @@ shell() {
 
   shellcheck -s bash "${sh_files[@]}"
   log_status "shellcheck" "$?"
-}
-
-spec() {
-  jenv "spectral --ruleset $ROOT/specs/.spectral.yml lint $ROOT/specs/openapi.yml"
-  log_status "spectral" "$?"
 }
 
 parse_args "$@"
