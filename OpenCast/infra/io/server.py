@@ -3,6 +3,7 @@
 import structlog
 from aiohttp import web
 from aiohttp.abc import AbstractAccessLogger
+from aiohttp_apispec import setup_aiohttp_apispec, validation_middleware
 from aiohttp_middlewares import cors_middleware
 
 
@@ -49,11 +50,18 @@ class Server:
 
 
 def make_server():
-    return Server(
-        web.Application(
-            middlewares=[
-                # Allow CORS requests for API url from all localhost urls
-                cors_middleware(allow_all=True),
-            ]
-        )
+    app = web.Application(
+        middlewares=[
+            # Allow CORS requests for API url from all localhost urls
+            cors_middleware(allow_all=True),
+            validation_middleware,
+        ]
     )
+    setup_aiohttp_apispec(
+        app=app,
+        title="OpenCast Documentation",
+        version="v1",
+        url="/api/docs/swagger.json",
+        swagger_path="/api/docs",
+    )
+    return Server(app)
