@@ -335,6 +335,7 @@ class PlayerMonitController(MonitorController):
             channel.send(self._ok(player))
 
         def on_error(error):
+            # TODO: Make error schema to report OperationErrors
             channel.send(self._internal_error())
 
         evtcls_handler = {evt_cls: on_success, OperationError: on_error}
