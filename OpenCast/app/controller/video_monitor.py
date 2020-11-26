@@ -37,7 +37,7 @@ class VideoMonitController(MonitorController):
     )
     async def list(self, req):
         videos = self._video_repo.list()
-        return self._ok(videos)
+        return self._ok({"videos": videos})
 
     @docs(
         tags=["video"],
