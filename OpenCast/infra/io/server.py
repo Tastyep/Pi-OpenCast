@@ -23,22 +23,22 @@ class AccessLogger(AbstractAccessLogger):
 
 class Server:
     def __init__(self, app):
-        self._app = app
-        self._app["websockets"] = []
-        self._app.on_shutdown.append(self._on_shutdown)
+        self.app = app
+        self.app["websockets"] = []
+        self.app.on_shutdown.append(self._on_shutdown)
         self._logger = structlog.get_logger(__name__)
 
     def route(self, method, route, handle):
-        route = self._app.router.add_route(method, route, handle)
+        route = self.app.router.add_route(method, route, handle)
 
     def start(self, host, port):
         self._logger.info("Started", host=host, port=port)
 
-        web.run_app(self._app, host=host, port=port, access_log_class=AccessLogger)
+        web.run_app(self.app, host=host, port=port, access_log_class=AccessLogger)
 
     def make_web_socket(self):
         ws = web.WebSocketResponse()
-        self._app["websockets"].append(ws)
+        self.app["websockets"].append(ws)
         return ws
 
     def make_json_response(self, status, body, dumps):
