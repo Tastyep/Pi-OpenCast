@@ -37,6 +37,7 @@ class PlaylistMonitController(MonitorController):
         responses={
             200: {"description": "Ok. Playlist created", "schema": PlaylistSchema},
             422: {"description": "Validation error"},
+            500: {"description": "Internal error"},
         },
     )
     @json_schema(
@@ -56,7 +57,7 @@ class PlaylistMonitController(MonitorController):
             channel.send(self._ok(playlist))
 
         def on_error(evt):
-            channel.send(self._bad_request(evt.error))
+            channel.send(self._internal_error(evt.error))
 
         self._observe_dispatch(
             {PlaylistEvt.PlaylistCreated: on_success, OperationError: on_error},
@@ -81,7 +82,7 @@ class PlaylistMonitController(MonitorController):
     )
     async def list(self, req):
         playlists = self._playlist_repo.list()
-        return self._ok(playlists)
+        return self._ok({"playlists": playlists})
 
     @docs(
         tags=["playlist"],
@@ -138,7 +139,7 @@ class PlaylistMonitController(MonitorController):
             return self._not_found()
 
         videos = self._video_repo.list(playlist.ids)
-        return self._ok(videos)
+        return self._ok({"videos": videos})
 
     @docs(
         tags=["playlist"],
@@ -158,6 +159,7 @@ class PlaylistMonitController(MonitorController):
             200: {"description": "Ok. Playlist updated", "schema": PlaylistSchema},
             404: {"description": "Playlist not found"},
             422: {"description": "Validation error"},
+            500: {"description": "Internal error"},
         },
     )
     @json_schema(
@@ -186,7 +188,7 @@ class PlaylistMonitController(MonitorController):
                 channel.send(self._ok(playlist))
 
         def on_error(evt):
-            channel.send(self._bad_request(evt.error))
+            channel.send(self._internal_error(evt.error))
 
         def update_field(field, cmd_cls, evt_cls):
             self._observe_dispatch(
