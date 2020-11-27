@@ -1,13 +1,13 @@
-===================
-Welcome to Opencast
-===================
-
 .. image:: https://raw.githubusercontent.com/Tastyep/Pi-OpenCast/master/assets/images/banner.png
    :scale: 80 %
    :align: center
    :alt: Banner
 
 |
+
+========
+Opencast
+========
 
 .. image:: https://github.com/Tastyep/Pi-OpenCast/workflows/Test/badge.svg
    :target: https://github.com/Tastyep/Pi-OpenCast/actions?query=workflow%3ATest
