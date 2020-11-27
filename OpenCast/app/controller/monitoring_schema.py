@@ -11,6 +11,11 @@ class Videos(Schema):
     videos = fields.List(fields.Nested(VideoSchema))
 
 
+class ErrorSchema(Schema):
+    message = fields.String()
+    details = fields.Dict(keys=fields.String(), values=fields.List(fields.String()))
+
+
 def schema(**kwargs):
     items = list(kwargs.items())
     if len(items) != 1 or not isinstance(items[0][1], dict):

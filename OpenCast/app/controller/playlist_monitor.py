@@ -12,7 +12,7 @@ from OpenCast.domain.model.playlist import PlaylistSchema
 from OpenCast.domain.service.identity import IdentityService
 
 from .monitor import MonitorController
-from .monitoring_schema import Videos, schema
+from .monitoring_schema import ErrorSchema, Videos, schema
 
 
 class PlaylistMonitController(MonitorController):
@@ -37,7 +37,7 @@ class PlaylistMonitController(MonitorController):
         responses={
             200: {"description": "Ok. Playlist created", "schema": PlaylistSchema},
             422: {"description": "Validation error"},
-            500: {"description": "Internal error"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     @json_schema(
@@ -159,7 +159,7 @@ class PlaylistMonitController(MonitorController):
             200: {"description": "Ok. Playlist updated", "schema": PlaylistSchema},
             404: {"description": "Playlist not found"},
             422: {"description": "Validation error"},
-            500: {"description": "Internal error"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     @json_schema(

@@ -84,10 +84,8 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.assertEqual(500, resp.status)
         self.assertEqual(
             {
-                "error": {
-                    "detail": None,
-                    "message": "Could not unfold the playlist URL",
-                }
+                "message": "Could not unfold the playlist URL",
+                "details": {},
             },
             body,
         )
@@ -143,10 +141,8 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.assertEqual(500, resp.status)
         self.assertEqual(
             {
-                "error": {
-                    "detail": None,
-                    "message": "Could not unfold the playlist URL",
-                }
+                "message": "Could not unfold the playlist URL",
+                "details": {},
             },
             body,
         )
@@ -178,11 +174,20 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.data_producer.video("source").populate(self.data_facade)
         video_id = IdentityService.id_video("source")
         self.expect_and_error(
-            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id), error="test_error"
+            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id),
+            error="Error message",
         )
 
         resp = await self.client.post("/api/player/play", params={"id": str(video_id)})
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_stop(self):
@@ -199,11 +204,19 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_stop_error(self):
         self.expect_and_error(
-            make_cmd(PlayerCmd.StopPlayer, self.player_id), error="test_error"
+            make_cmd(PlayerCmd.StopPlayer, self.player_id), error="Error message"
         )
 
         resp = await self.client.post("/api/player/stop")
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_pause(self):
@@ -222,11 +235,19 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_pause_error(self):
         self.expect_and_error(
-            make_cmd(PlayerCmd.TogglePlayerState, self.player_id), error="test_error"
+            make_cmd(PlayerCmd.TogglePlayerState, self.player_id), error="Error message"
         )
 
         resp = await self.client.post("/api/player/pause")
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_seek_forward_short(self):
@@ -292,13 +313,21 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_seek_error(self):
         self.expect_and_error(
             make_cmd(PlayerCmd.SeekVideo, self.player_id, -Player.SHORT_TIME_STEP),
-            error="test_error",
+            error="Error message",
         )
 
         resp = await self.client.post(
             "/api/player/seek", params={"forward": "false", "long": "false"}
         )
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_volume(self):
@@ -317,11 +346,19 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_volume_error(self):
         self.expect_and_error(
-            make_cmd(PlayerCmd.UpdateVolume, self.player_id, 80), error="test_error"
+            make_cmd(PlayerCmd.UpdateVolume, self.player_id, 80), error="Error message"
         )
 
         resp = await self.client.post("/api/player/volume", params={"value": 80})
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_subtitle_toggle(self):
@@ -339,9 +376,19 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_subtitle_toggle_error(self):
-        self.expect_and_error(make_cmd(PlayerCmd.ToggleSubtitle, self.player_id))
+        self.expect_and_error(
+            make_cmd(PlayerCmd.ToggleSubtitle, self.player_id), error="Error message"
+        )
         resp = await self.client.post("/api/player/subtitle/toggle")
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_subtitle_seek_forward(self):
@@ -390,13 +437,22 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 PlayerCmd.AdjustSubtitleDelay,
                 self.player_id,
                 Player.SUBTITLE_DELAY_STEP,
-            )
+            ),
+            error="Error message",
         )
 
         resp = await self.client.post(
             "/api/player/subtitle/seek", params={"forward": "true"}
         )
+        body = await resp.json()
         self.assertEqual(500, resp.status)
+        self.assertEqual(
+            {
+                "message": "Error message",
+                "details": {},
+            },
+            body,
+        )
 
     @unittest_run_loop
     async def test_event_listening(self):
