@@ -8,6 +8,7 @@ from OpenCast.app.command import make_cmd
 from OpenCast.app.tool.json_encoder import EventEncoder, ModelEncoder
 
 from .controller import Controller
+from .monitoring_schema import ErrorSchema
 
 
 class MonitorController(Controller):
@@ -41,10 +42,8 @@ class MonitorController(Controller):
     def _not_found(self):
         return self._make_response(404, None)
 
-    def _internal_error(self, message: str = None, details: dict = None):
-        body = None
-        if message is not None:
-            body = {"error": {"message": message, "detail": details}}
+    def _internal_error(self, message: str, details: dict = {}):
+        body = ErrorSchema().load({"message": message, "details": details})
         return self._make_response(500, body)
 
     def _make_response(self, status, body):

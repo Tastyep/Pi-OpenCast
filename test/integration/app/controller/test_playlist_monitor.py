@@ -54,16 +54,14 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_create_service_error(self):
-        self.error_on(PlaylistCmd.CreatePlaylist, "Error message.")
+        self.error_on(PlaylistCmd.CreatePlaylist, "Error message")
         resp = await self.client.post("/api/playlists/", json={"name": "test_playlist"})
         body = await resp.json()
         self.assertEqual(500, resp.status)
         self.assertEqual(
             {
-                "error": {
-                    "detail": None,
-                    "message": "Error message.",
-                }
+                "message": "Error message",
+                "details": {},
             },
             body,
         )
@@ -173,7 +171,7 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
                         PlaylistCmd.UpdatePlaylistContent, playlist.id, req_body["ids"]
                     ),
                     "evt": OperationError,
-                    "args": {"error": "Error message."},
+                    "args": {"error": "Error message"},
                 },
             ]
         )
@@ -183,10 +181,8 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
         self.assertEqual(500, resp.status)
         self.assertEqual(
             {
-                "error": {
-                    "detail": None,
-                    "message": "Error message.",
-                }
+                "message": "Error message",
+                "details": {},
             },
             body,
         )

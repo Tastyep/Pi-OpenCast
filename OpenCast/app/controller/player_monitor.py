@@ -19,6 +19,7 @@ from OpenCast.domain.service.identity import IdentityService
 from OpenCast.util.conversion import str_to_bool
 
 from .monitor import MonitorController
+from .monitoring_schema import ErrorSchema
 
 
 class PlayerMonitController(MonitorController):
@@ -78,7 +79,7 @@ class PlayerMonitController(MonitorController):
         ],
         responses={
             204: {"description": "Valid URL"},
-            500: {"description": "Can't stream the media"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def stream(self, req):
@@ -121,7 +122,7 @@ class PlayerMonitController(MonitorController):
         ],
         responses={
             204: {"description": "Valid URL"},
-            500: {"description": "Can't queue the media"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def queue(self, req):
@@ -167,7 +168,7 @@ class PlayerMonitController(MonitorController):
         responses={
             200: {"description": "Successful operation"},
             404: {"description": "Video not found"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def play(self, req):
@@ -187,7 +188,7 @@ class PlayerMonitController(MonitorController):
         operationId="stopPlayer",
         responses={
             200: {"description": "Successful operation"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def stop(self, _):
@@ -203,7 +204,7 @@ class PlayerMonitController(MonitorController):
         operationId="pausePlayer",
         responses={
             200: {"description": "Successful operation"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def pause(self, _):
@@ -235,7 +236,7 @@ class PlayerMonitController(MonitorController):
         ],
         responses={
             200: {"description": "Successful operation"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def seek(self, req):
@@ -265,7 +266,7 @@ class PlayerMonitController(MonitorController):
         ],
         responses={
             200: {"description": "Successful operation"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def volume(self, req):
@@ -282,7 +283,7 @@ class PlayerMonitController(MonitorController):
         operationId="toggleMediaSubtitle",
         responses={
             200: {"description": "Successful operation"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def subtitle_toggle(self, _):
@@ -307,7 +308,7 @@ class PlayerMonitController(MonitorController):
         ],
         responses={
             200: {"description": "Successful operation"},
-            500: {"description": "Operation failure"},
+            500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
     async def subtitle_seek(self, req):
@@ -334,9 +335,8 @@ class PlayerMonitController(MonitorController):
             player = self._player_repo.get_player()
             channel.send(self._ok(player))
 
-        def on_error(error):
-            # TODO: Make error schema to report OperationErrors
-            channel.send(self._internal_error())
+        def on_error(evt):
+            channel.send(self._internal_error(evt.error))
 
         evtcls_handler = {evt_cls: on_success, OperationError: on_error}
         return evtcls_handler, channel
