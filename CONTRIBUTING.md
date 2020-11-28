@@ -1,27 +1,56 @@
 # Contributing
+## Instructions for contributors
 
-Pull requests are always appreciated, regardless of shape and size, from everyone.
+Thank you for considering contributing to OpenCast!
 
-* To get started, fork and then clone the repo:
+In order to make a clone of the GitHub repo: open the link and press the
+"Fork" button on the upper-right menu of the web page.
 
-    `git clone git@github.com:your-username/OpenCast.git`
+I hope everybody knows how to work with git and github nowadays :)
 
-* Run the setup script:
+#### Setup and workflow
 
-    `./setup.sh`
+The workflow is pretty straightforward:
+- Clone the main repository locally.
+```
+    $ git clone https://github.com/Tastyep/Pi-OpenCast
+    $ cd Pi-OpenCast
+```
+- Setup your machine with the dev environment.
+```
+    $ ./setup.sh --dev
+``` 
+- Add your fork as a remote to push your work to.
+Replace ``{username}`` with your username. This names the remote "fork", the default OpenCast remote is "origin".
+```
+    $ git remote add fork https://github.com/{username}/Pi-OpenCast
+```
+- Branch from develop
+```
+    $ git fetch origin
+    $ git checkout -b your-branch-name origin/develop
+```
+- Make your changes, write [good commit messages](https://github.com/erlang/otp/wiki/writing-good-commit-messages).
+- Include tests and check for regressions.
+```
+    $ ./OpenCast.sh test back
+```
+- Check for format and linter errors.
+```
+    $ ./OpenCast.sh lint all
+    $ ./OpenCast.sh format all
+```
+- Push your commits to your fork on GitHub and open a pull request.
+```
+    $ git push --set-upstream fork your-branch-name
+```
 
-* Make your changes. There are no formal test requirements, but we encourage testing as much as possible.
-A few static unit tests will be completed using Travis-CI.
+#### Building the docs
 
-* Push to your fork and [submit a pull request][pr].
+```
+    $ ./OpenCast.sh generate doc
+```
 
-[pr]: https://github.com/Tastyep/OpenCast/compare/
+Open `build/html/index.html` in your browser to view the docs.
 
-At this point you've done all you can, good job! As soon as we can, we'll have a look at the code and hopefully accept it as soon as possible. If your PR is very large and/or exhaustive, we might have some questions or comments, and we might suggest some improvements or alternatives.
-
-Some things that will increase the chance that your pull request is accepted:
-
-* Clearly and concisely explain what your PR hopes to achieve.
-* Write [good commit messages][commit].
-
-[commit]: https://github.com/erlang/otp/wiki/writing-good-commit-messages
+Read more about [Sphinx](https://www.sphinx-doc.org/en/stable/).
