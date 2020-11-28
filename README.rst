@@ -6,7 +6,7 @@
 |
 
 ========
-Opencast
+OpenCast
 ========
 
 .. image:: https://github.com/Tastyep/Pi-OpenCast/workflows/Test/badge.svg

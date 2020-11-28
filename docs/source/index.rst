@@ -7,5 +7,5 @@ Table Of Contents
   :name: mastertoc
   :maxdepth: 2
 
-  API <http://0.0.0.0:2020/api/docs>
+  api
   module
