@@ -760,6 +760,17 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
 
 [[package]]
+name = "sphinxemoji"
+version = "0.1.8"
+description = "An extension to use emoji codes in your Sphinx documentation"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+sphinx = ">=1.8"
+
+[[package]]
 name = "structlog"
 version = "20.1.0"
 description = "Structured Logging for Python"
@@ -1393,6 +1404,9 @@ sphinxcontrib-qthelp = [
 sphinxcontrib-serializinghtml = [
     {file = "sphinxcontrib-serializinghtml-1.1.4.tar.gz", hash = "sha256:eaa0eccc86e982a9b939b2b82d12cc5d013385ba5eadcc7e4fed23f4405f77bc"},
     {file = "sphinxcontrib_serializinghtml-1.1.4-py2.py3-none-any.whl", hash = "sha256:f242a81d423f59617a8e5cf16f5d4d74e28ee9a66f9e5b637a18082991db5a9a"},
+]
+sphinxemoji = [
+    {file = "sphinxemoji-0.1.8.tar.gz", hash = "sha256:3da5d1e33c0bc4fa9506420f02b73234868d10a1b243ee15ae2111f118a43f72"},
 ]
 structlog = [
     {file = "structlog-20.1.0-py2.py3-none-any.whl", hash = "sha256:8a672be150547a93d90a7d74229a29e765be05bd156a35cdcc527ebf68e9af92"},
