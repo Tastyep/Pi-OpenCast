@@ -1,12 +1,15 @@
 """ Video capabilities monitoring routes """
 
 import structlog
+from aiohttp_apispec import docs
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id
+from OpenCast.domain.model.video import VideoSchema
 
 from .monitor import MonitorController
+from .monitoring_schema import Videos
 
 
 class VideoMonitController(MonitorController):
@@ -20,10 +23,41 @@ class VideoMonitController(MonitorController):
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
         self._route("GET", "/events", handle=self.stream_events)
 
+    @docs(
+        tags=["video"],
+        summary="List videos",
+        description="Retrieve a list of all videos in the system",
+        operationId="listVideos",
+        responses={
+            200: {
+                "description": "Successful operation",
+                "schema": Videos,
+            }
+        },
+    )
     async def list(self, req):
         videos = self._video_repo.list()
-        return self._ok(videos)
+        return self._ok({"videos": videos})
 
+    @docs(
+        tags=["video"],
+        summary="Get video",
+        description="Querie and return a video by ID",
+        operationId="getVideoById",
+        parameters=[
+            {
+                "in": "path",
+                "name": "id",
+                "description": "ID of the video to retrieve",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            200: {"description": "Successful operation", "schema": VideoSchema},
+            404: {"description": "Video not found"},
+        },
+    )
     async def get(self, req):
         id = Id(req.match_info["id"])
         video = self._video_repo.get(id)
@@ -31,6 +65,25 @@ class VideoMonitController(MonitorController):
             return self._not_found()
         return self._ok(video)
 
+    @docs(
+        tags=["video"],
+        summary="Delete video",
+        description="Remove a video by ID",
+        operationId="deleteVideoById",
+        parameters=[
+            {
+                "in": "path",
+                "name": "id",
+                "description": "ID of the video to remove",
+                "type": "string",
+                "required": True,
+            }
+        ],
+        responses={
+            204: {"description": "Successful operation"},
+            404: {"description": "Video not found"},
+        },
+    )
     async def delete(self, req):
         id = Id(req.match_info["id"])
         if not self._video_repo.exists(id):
@@ -45,5 +98,11 @@ class VideoMonitController(MonitorController):
 
         return await channel.receive()
 
+    @docs(
+        tags=["video"],
+        summary="Stream video events",
+        description="Stream video events over WebSocket",
+        operationId="streamVideoEvents",
+    )
     async def stream_events(self, request):
         return await self._stream_ws_events(request, VideoEvt)

@@ -37,7 +37,8 @@ extensions = [
     "sphinx_autodoc_typehints",  # Automatically document param types (less noise in class signature)
     "sphinxcontrib.openapi",  # Generate APIs docs from OpenAPI (fka Swagger) spec
     "sphinx.ext.coverage",
-    "sphinx.ext.githubpages",  # Creates .nojekyll file on generated HTML directory to publish the document on GitHub Pages.
+    "sphinx.ext.githubpages",  # Creates .nojekyll file on generated HTML directory to publish the document on GitHub Pages
+    "sphinxemoji.sphinxemoji",  # An extension to use emoji codes
 ]
 
 autosummary_generate = True

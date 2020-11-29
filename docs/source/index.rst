@@ -1,47 +1,4 @@
-===================
-Welcome to Opencast
-===================
-
-.. image:: ../../assets/images/banner.png
-   :scale: 80 %
-   :alt: Banner
-
-
-Key Features
-============
-
- - Lightweight fast media server, able to run on raspberry-pi.
- - Tons of `supported sites <https://ytdl-org.github.io/youtube-dl/supportedsites.html>`_.
- - Stream support (Youtube, Twitch ...)
- - Local library.
- - VLC under the hood.
-
-System Dependencies
-===================
-
- - Python 3.7+
- - nodejs
- - npm
- - curl
- - lsof
- - pip3
-
-Project Installation
-====================
-
-.. code-block:: bash
-
-   $ git clone https://github.com/Tastyep/Pi-OpenCast.git
-   $ cd Pi-OpenCast && ./setup.sh
-
-Source Code
-===========
-
-The project is hosted on `Github <https://github.com/Tastyep/Pi-OpenCast>`_.
-
-Please feel free to file an issue on the `bug tracker <https://github.com/Tastyep/Pi-OpenCast/issues>`_
-if you have found a bug or have some suggestion in order to improve OpenCast.
-
+.. include:: ../../README.rst
 
 Table Of Contents
 =================
@@ -50,5 +7,5 @@ Table Of Contents
   :name: mastertoc
   :maxdepth: 2
 
-  api/root
+  api
   module
