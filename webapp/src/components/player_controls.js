@@ -20,7 +20,6 @@ function PlayerControls() {
   const [pauseStatus, setPauseStatus] = useState(true);
 
   const updatePlayerState = (player) => {
-    console.log("player: ", player);
     if (player.state === "PAUSED") {
       setPauseStatus(false);
     } else {

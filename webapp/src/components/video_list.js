@@ -70,8 +70,7 @@ function VideoList() {
     playlistAPI
       .videos(playlistId)
       .then((response) => {
-        console.log("Videos: ", response.data);
-        setVideos(response.data);
+        setVideos(response.data.videos);
       })
       .catch((error) => console.log(error));
   };
