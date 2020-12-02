@@ -6,8 +6,8 @@ from .repository import Repository
 
 
 class PlayerRepo(Repository):
-    def __init__(self, database):
-        super().__init__(database, Player)
+    def __init__(self, database, db_lock):
+        super().__init__(database, db_lock, Player)
 
     def get_player(self):
         collection = self.list()
