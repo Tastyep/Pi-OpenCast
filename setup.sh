@@ -85,11 +85,11 @@ start_at_boot() {
   local service_name config
   # lowercase
   service_name="${INTERNAL_NAME,,}"
-  config="$ROOT/dist/$service_name.service"
-  sed -i "s/{ USER }/$USER/g" "$config"
-  sed -i "s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g" "$config"
-  sed -i "s#{ STOP_COMMAND }#$ROOT/$INTERNAL_NAME.sh service stop#g" "$config"
-  sudo cp "$config" "$SYSTEMD_CONFIG_DIR"
+  config="$TEMPLATE_DIR/$service_name.service"
+  sed "s#{ USER }#$USER#g
+       s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g
+       s#{ STOP_COMMAND }#$ROOT/$INTERNAL_NAME.sh service stop#g" -- "$config" |
+    sudo tee "$SYSTEMD_CONFIG_DIR/$service_name.service" >/dev/null
   sudo systemctl daemon-reload
   sudo systemctl enable "$service_name"
 }
