@@ -9,7 +9,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 USER="$(whoami)"
 PROJECT="$(basename "$ROOT")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
-SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
+SYSTEMD_CONFIG_DIR="/etc/systemd/system"
+TEMPLATE_DIR="$ROOT/template"
+DOWNLOAD_DIRECTORY="$ROOT/library"
 
 # shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
@@ -66,6 +68,16 @@ install_project_deps() {
   "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
+# Configure the service
+config_service() {
+  log_info "Configuring $INTERNAL_NAME"
+
+  mkdir -p "$DOWNLOAD_DIRECTORY"
+  sed "s#{ OUTPUT_DIRECTORY }#$DOWNLOAD_DIRECTORY#g" "$TEMPLATE_DIR/config.yml" |
+    tee "$ROOT/config.yml" >/dev/null
+  log_info "Download directory configured as '$DOWNLOAD_DIRECTORY'"
+}
+
 # Format and install the systemd config file.
 start_at_boot() {
   log_info "Setting up startup at boot"
@@ -92,6 +104,7 @@ parse_args "$@"
 
 check_system_deps
 install_project_deps
+config_service
 start_at_boot
 
 log_info "Installation successful, reboot to finish."
