@@ -18,7 +18,7 @@ player:
 
 downloader:
   # The directory used to store downloaded videos.
-  output_directory: /tmp
+  output_directory: { OUTPUT_DIRECTORY }
   # The maximum number of parallel downloads.
   max_concurrency: 3
 

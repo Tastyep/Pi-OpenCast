@@ -16,8 +16,8 @@ build
 docs/source/_autosummary
 
 #  Generated files
-OpenCast.pid
 __pycache__
-.coverage
 coverage.xml
-gen/
+/.coverage
+/library
+/config.yml
