@@ -18,7 +18,7 @@ class PlaylistService(Service):
 
         self._playlist_repo = data_facade.playlist_repo
         self._queueing_service = service_factory.make_queueing_service(
-            data_facade.player_repo, data_facade.playlist_repo
+            data_facade.player_repo, data_facade.playlist_repo, data_facade.video_repo
         )
 
     # Command handler implementation
@@ -48,9 +48,7 @@ class PlaylistService(Service):
     def _queue_video(self, cmd):
         def impl(ctx):
             playlist = self._playlist_repo.get(cmd.model_id)
-            ids = self._queueing_service.queue(
-                playlist, cmd.video_id, cmd.queue_front, cmd.prev_video_id
-            )
+            ids = self._queueing_service.queue(playlist, cmd.video_id, cmd.queue_front)
             playlist.ids = ids
             ctx.update(playlist)
 

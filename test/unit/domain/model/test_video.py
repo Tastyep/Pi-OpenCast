@@ -11,20 +11,23 @@ class VideoTest(ModelTestCase):
         self.video.release_events()
 
     def test_construction(self):
+        collection_id = IdentityService.random()
         video = Video(
             IdentityService.random(),
             "source",
-            "protocol",
-            "title",
+            collection_id,
             "album_name",
+            "title",
+            "protocol",
             "thumbnail_url",
             "/tmp/file",
             [],
             "subtitle",
         )
         self.assertEqual("source", video.source)
-        self.assertEqual("title", video.title)
+        self.assertEqual(collection_id, video.collection_id)
         self.assertEqual("album_name", video.collection_name)
+        self.assertEqual("title", video.title)
         self.assertEqual("/tmp/file", video.location)
         self.assertEqual([], video.streams)
         self.assertEqual("subtitle", video.subtitle)

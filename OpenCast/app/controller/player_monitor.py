@@ -91,8 +91,10 @@ class PlayerMonitController(MonitorController):
             if not sources:
                 return self._internal_error("Could not unfold the playlist URL")
 
+            collection_id = IdentityService.random()
             videos = [
-                Video(IdentityService.id_video(source), source) for source in sources
+                Video(IdentityService.id_video(source), source, collection_id)
+                for source in sources
             ]
 
             workflow_id = IdentityService.id_workflow(StreamPlaylistWorkflow, video_id)
@@ -101,7 +103,7 @@ class PlayerMonitController(MonitorController):
             )
             return self._no_content()
 
-        video = Video(video_id, source)
+        video = Video(video_id, source, collection_id=None)
         self._start_workflow(StreamVideoWorkflow, video_id, self._data_facade, video)
 
         return self._no_content()
@@ -134,8 +136,10 @@ class PlayerMonitController(MonitorController):
             if not sources:
                 return self._internal_error("Could not unfold the playlist URL")
 
+            collection_id = IdentityService.random()
             videos = [
-                Video(IdentityService.id_video(source), source) for source in sources
+                Video(IdentityService.id_video(source), source, collection_id)
+                for source in sources
             ]
 
             workflow_id = IdentityService.id_workflow(QueuePlaylistWorkflow, video_id)
@@ -144,7 +148,7 @@ class PlayerMonitController(MonitorController):
             )
             return self._no_content()
 
-        video = Video(video_id, source)
+        video = Video(video_id, source, collection_id=None)
         self._start_workflow(
             QueueVideoWorkflow, video_id, self._data_facade, video, queue_front=False
         )

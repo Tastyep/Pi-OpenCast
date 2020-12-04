@@ -25,7 +25,7 @@ class VideoService(Service):
     # Command handler implementation
     def _create_video(self, cmd):
         def impl(ctx, metadata):
-            video = Video(cmd.model_id, cmd.source, **metadata)
+            video = Video(cmd.model_id, cmd.source, cmd.collection_id, **metadata)
             ctx.add(video)
 
         if Path(cmd.source).is_file():

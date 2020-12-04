@@ -24,6 +24,7 @@ class VideoServiceTest(ServiceTestCase):
     def test_create_video(self):
         source = "source"
         video_id = IdentityService.id_video(source)
+        collection_id = IdentityService.random()
 
         metadata = {
             "title": "title",
@@ -34,20 +35,25 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader.download_metadata.return_value = metadata
 
         self.evt_expecter.expect(
-            VideoEvt.VideoCreated, video_id, source, **metadata
-        ).from_(Cmd.CreateVideo, video_id, source)
+            VideoEvt.VideoCreated,
+            video_id,
+            source,
+            collection_id,
+            **metadata,
+        ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     @patch("OpenCast.app.service.video.Path")
     def test_create_disk_video(self, path_cls_mock):
         path_inst = path_cls_mock.return_value
         source = "source"
         video_id = IdentityService.id_video(source)
+        collection_id = None
 
         path_inst.is_file.return_value = True
         metadata = {
-            "source_protocol": None,
-            "title": "test_title",
             "collection_name": None,
+            "title": "test_title",
+            "source_protocol": None,
             "thumbnail": None,
         }
         path_inst.stem = metadata["title"]
@@ -56,8 +62,9 @@ class VideoServiceTest(ServiceTestCase):
             VideoEvt.VideoCreated,
             video_id,
             source,
+            collection_id,
             **metadata,
-        ).from_(Cmd.CreateVideo, video_id, source)
+        ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     def test_create_video_missing_metadata(self):
         source = "source"
@@ -67,7 +74,7 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader.download_metadata.return_value = metadata
 
         self.evt_expecter.expect(OperationError, "Unavailable metadata").from_(
-            Cmd.CreateVideo, video_id, source
+            Cmd.CreateVideo, video_id, source, collection_id=None
         )
 
     def test_delete_video(self):
