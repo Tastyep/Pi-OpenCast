@@ -123,7 +123,7 @@ class QueueingServiceTest(TestCase):
         self.data_producer.player().video("source1").video("source2").populate(
             self.data_facade
         )
-        config.load_from_dict({"player": {"loop_last": False}})
+        config.load_from_dict({"player": {"loop_last": "false"}})
 
         videos = self.video_repo.list()
         self.assertEqual(
@@ -131,11 +131,11 @@ class QueueingServiceTest(TestCase):
         )
         self.assertEqual(None, self.service.next_video(self.queue_id, videos[1].id))
 
-    def test_next_loop_last(self):
+    def test_next_loop_last_track(self):
         self.data_producer.player().video("source1").video("source2").populate(
             self.data_facade
         )
-        config.load_from_dict({"player": {"loop_last": True}})
+        config.load_from_dict({"player": {"loop_last": "track"}})
 
         videos = self.video_repo.list()
         self.assertEqual(
@@ -145,11 +145,33 @@ class QueueingServiceTest(TestCase):
             videos[1].id, self.service.next_video(self.queue_id, videos[1].id)
         )
 
+    def test_next_loop_last_album(self):
+        collection_id = IdentityService.random()
+        self.data_producer.player().video("source1").video(
+            "source2", collection_id=collection_id
+        ).video("source3", collection_id=collection_id).populate(self.data_facade)
+        config.load_from_dict({"player": {"loop_last": "album"}})
+
+        videos = self.video_repo.list()
+        expected = videos[1].id
+        self.assertEqual(expected, self.service.next_video(self.queue_id, videos[2].id))
+
+    def test_next_loop_last_album_no_album(self):
+        collection_id = IdentityService.random()
+        self.data_producer.player().video("source1", collection_id=collection_id).video(
+            "source2"
+        ).video("source3").populate(self.data_facade)
+        config.load_from_dict({"player": {"loop_last": "album"}})
+
+        videos = self.video_repo.list()
+        expected = videos[2].id
+        self.assertEqual(expected, self.service.next_video(self.queue_id, videos[2].id))
+
     def test_next_invalid_video(self):
         self.data_producer.player().video("source1").video("source2").populate(
             self.data_facade
         )
-        config.load_from_dict({"player": {"loop_last": True}})
+        config.load_from_dict({"player": {"loop_last": "track"}})
 
         video_id = IdentityService.id_video("source3")
         self.assertEqual(None, self.service.next_video(self.queue_id, video_id))

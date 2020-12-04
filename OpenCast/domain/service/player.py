@@ -63,6 +63,18 @@ class QueueingService:
         if video_idx + 1 < len(playlist.ids):
             return playlist.ids[video_idx + 1]
 
-        if config["player.loop_last"] is True:
+        if config["player.loop_last"] == "false":
+            return None
+        if config["player.loop_last"] == "track":
+            return playlist.ids[video_idx]
+        if config["player.loop_last"] == "album":
+            videos = self._video_repo.list(playlist.ids)
+            while (
+                video_idx > 0
+                and videos[video_idx].collection_id is not None
+                and videos[video_idx - 1].collection_id
+                == videos[video_idx].collection_id
+            ):
+                video_idx -= 1
             return playlist.ids[video_idx]
         return None
