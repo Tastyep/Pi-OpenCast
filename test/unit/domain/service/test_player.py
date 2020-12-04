@@ -131,6 +131,13 @@ class QueueingServiceTest(TestCase):
         )
         self.assertEqual(None, self.service.next_video(self.queue_id, videos[1].id))
 
+    def test_next_no_loop(self):
+        self.data_producer.player().video("source1").populate(self.data_facade)
+        config.load_from_dict({"player": {"loop_last": "false"}})
+
+        video_id = IdentityService.id_video("source1")
+        self.assertEqual(None, self.service.next_video(self.queue_id, video_id))
+
     def test_next_loop_last_track(self):
         self.data_producer.player().video("source1").video("source2").populate(
             self.data_facade

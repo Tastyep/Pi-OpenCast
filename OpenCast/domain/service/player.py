@@ -63,8 +63,6 @@ class QueueingService:
         if video_idx + 1 < len(playlist.ids):
             return playlist.ids[video_idx + 1]
 
-        if config["player.loop_last"] == "false":
-            return None
         if config["player.loop_last"] == "track":
             return playlist.ids[video_idx]
         if config["player.loop_last"] == "album":
