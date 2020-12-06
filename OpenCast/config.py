@@ -23,7 +23,7 @@ DEFAULT_CONFIG = {
         "file": "opencast.db",
     },
     "player": {
-        "loop_last": True,
+        "loop_last": "album",
     },
     "downloader": {
         "output_directory": "/tmp",

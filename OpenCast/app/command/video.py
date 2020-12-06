@@ -1,11 +1,12 @@
 """ Video commands """
 
-from .command import Command, command
+from .command import Command, Id, command
 
 
 @command
 class CreateVideo(Command):
     source: str
+    collection_id: Id
 
 
 @command

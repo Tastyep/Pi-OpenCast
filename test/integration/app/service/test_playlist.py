@@ -55,7 +55,6 @@ class PlaylistServiceTest(ServiceTestCase):
             playlists[0].id,
             video_id,
             queue_front=False,
-            prev_video_id=None,
         )
 
     def test_update_playlist_content(self):

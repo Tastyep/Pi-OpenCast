@@ -13,8 +13,8 @@ database:
   file: opencast.db
 
 player:
-  # Loop the last video until a new one becomes available.
-  loop_last: True
+  # Loop the last element, one of ["false", "track", "album"]
+  loop_last: "album"
 
 downloader:
   # The directory used to store downloaded videos.

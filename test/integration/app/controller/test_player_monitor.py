@@ -475,9 +475,10 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 self.cmd_id,
                 video_id,
                 "source",
-                "http",
-                "title",
+                IdentityService.random(),
                 "album",
+                "title",
+                "http",
                 "thumbnail",
             )
             self.evt_dispatcher.dispatch(video_evt)

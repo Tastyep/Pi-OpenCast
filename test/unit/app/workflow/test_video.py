@@ -13,7 +13,7 @@ class VideoWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(VideoWorkflowTest, self).setUp()
         self.video_repo = self.data_facade.video_repo
-        self.video = Video(IdentityService.id_video("source"), "source")
+        self.video = Video(IdentityService.id_video("source"), "source", None)
         self.workflow = self.make_workflow(VideoWorkflow, self.video)
 
     def tearDown(self):
@@ -48,16 +48,16 @@ class VideoWorkflowTest(WorkflowTestCase):
             Evt.VideoCreated,
             cmd.id,
             *self.video.to_tuple(),
-            "http",
-            "title",
             "album",
+            "title",
+            "http",
             "thumbnail",
         )
         self.assertTrue(self.workflow.is_RETRIEVING())
 
     def test_retrieving_to_deleting(self):
         event = Evt.VideoCreated(
-            None, self.video.id, "http", "title", "source", "album", "thumbnail"
+            None, *self.video.to_tuple(), "album", "title", "http", "thumbnail"
         )
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
@@ -66,7 +66,7 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_retrieving_to_completed(self):
         event = Evt.VideoCreated(
-            None, self.video.id, "m3u8", "title", "source", "album", "thumbnail"
+            None, *self.video.to_tuple(), "album", "title", "m3u8", "thumbnail"
         )
         self.workflow.to_RETRIEVING(event)
 
@@ -88,7 +88,7 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_retrieving_to_parsing(self):
         event = Evt.VideoCreated(
-            None, self.video.id, "http", "title", "source", "album", "thumbnail"
+            None, *self.video.to_tuple(), "album", "title", "http", "thumbnail"
         )
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(Cmd.RetrieveVideo, self.video.id, "/tmp")
@@ -156,7 +156,7 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.assertTrue(self.workflow.is_COMPLETED())
 
     def test_deleting_to_aborted(self):
-        cmd = Cmd.CreateVideo(None, self.video.id, "source")
+        cmd = Cmd.CreateVideo(None, self.video.id, "source", collection_id=None)
         error = OperationError(cmd, "")
         self.workflow.to_DELETING(error)
         cmd = self.expect_dispatch(Cmd.DeleteVideo, self.video.id)

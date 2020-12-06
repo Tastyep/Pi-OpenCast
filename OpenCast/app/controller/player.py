@@ -16,7 +16,7 @@ class PlayerController(Controller):
 
         self._player_repo = data_facade.player_repo
         self._queueing_service = service_factory.make_queueing_service(
-            data_facade.player_repo, data_facade.playlist_repo
+            data_facade.player_repo, data_facade.playlist_repo, data_facade.video_repo
         )
 
         self._observe(PlayerEvt, self._default_handler_factory)

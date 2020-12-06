@@ -30,6 +30,7 @@ class VideoSchema(Schema):
     source = fields.String()
     source_protocol = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
+    collection_id = fields.UUID(allow_none=True)
     collection_name = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
     location = fields.String(allow_none=True)
@@ -40,9 +41,9 @@ class VideoSchema(Schema):
 class Video(Entity):
     Schema = VideoSchema
     METADATA_FIELDS = [
-        "source_protocol",
-        "title",
         "collection_name",
+        "title",
+        "source_protocol",
         "thumbnail",
     ]
 
@@ -50,9 +51,10 @@ class Video(Entity):
     class Data:
         id: Id
         source: str
-        source_protocol: Optional[str] = None
-        title: Optional[str] = None
+        collection_id: Optional[Id] = None
         collection_name: Optional[str] = None
+        title: Optional[str] = None
+        source_protocol: Optional[str] = None
         thumbnail: Optional[str] = None
         location: Optional[str] = None
         streams: List[Stream] = field(default_factory=list)
@@ -63,9 +65,10 @@ class Video(Entity):
         self._record(
             Evt.VideoCreated,
             self._data.source,
-            self._data.source_protocol,
-            self._data.title,
+            self._data.collection_id,
             self._data.collection_name,
+            self._data.title,
+            self._data.source_protocol,
             self._data.thumbnail,
         )
 
@@ -74,16 +77,20 @@ class Video(Entity):
         return self._data.source
 
     @property
-    def location(self):
-        return self._data.location
+    def collection_id(self):
+        return self._data.collection_id
+
+    @property
+    def collection_name(self):
+        return self._data.collection_name
 
     @property
     def title(self):
         return self._data.title
 
     @property
-    def collection_name(self):
-        return self._data.collection_name
+    def location(self):
+        return self._data.location
 
     @property
     def streams(self):

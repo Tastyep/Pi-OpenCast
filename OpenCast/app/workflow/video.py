@@ -3,6 +3,7 @@
 from collections import namedtuple
 from dataclasses import astuple, dataclass
 from enum import Enum, auto
+from typing import Optional
 
 import structlog
 
@@ -18,6 +19,7 @@ from .workflow import Workflow
 class Video:
     id: Id
     source: str
+    collection_id: Optional[Id]
 
     def to_tuple(self):
         return astuple(self)
