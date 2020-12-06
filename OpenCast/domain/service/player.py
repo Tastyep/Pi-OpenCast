@@ -4,7 +4,7 @@ from typing import List
 
 import structlog
 
-from OpenCast.config import config
+from OpenCast.config import settings
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.playlist import Playlist
@@ -63,9 +63,9 @@ class QueueingService:
         if video_idx + 1 < len(playlist.ids):
             return playlist.ids[video_idx + 1]
 
-        if config["player.loop_last"] == "track":
+        if settings["player.loop_last"] == "track":
             return playlist.ids[video_idx]
-        if config["player.loop_last"] == "album":
+        if settings["player.loop_last"] == "album":
             videos = self._video_repo.list(playlist.ids)
             while (
                 video_idx > 0
