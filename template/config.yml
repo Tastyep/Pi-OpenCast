@@ -1,29 +1,35 @@
-log:
-  # The level of the module's logger
-  level: DEBUG
+default:
+  log:
+    # The level of the module's logger
+    level: DEBUG
 
-server:
-  # The IP from where the service is accessible
-  host: 0.0.0.0
-  # The port used by the server
-  port: 2020
+  server:
+    # The IP from where the service is accessible
+    host: 0.0.0.0
+    # The port used by the server
+    port: 2020
 
-database:
-  # The database file
-  file: opencast.db
+  database:
+    # The database file
+    file: opencast.db
 
-player:
-  # Loop the last element, one of ["false", "track", "album"]
-  loop_last: "album"
+  player:
+    # Loop the last element, one of ["false", "track", "album"]
+    loop_last: "album"
 
-downloader:
-  # The directory used to store downloaded videos.
-  output_directory: { OUTPUT_DIRECTORY }
-  # The maximum number of parallel downloads.
-  max_concurrency: 3
+  downloader:
+    # The directory used to store downloaded videos.
+    output_directory: { OUTPUT_DIRECTORY }
+    # The maximum number of parallel downloads.
+    max_concurrency: 3
 
-subtitle:
-  # The flag to enable/disable subtitle retrieval
-  enabled: True
-  # The default language for subtitles.
-  language: eng
+  subtitle:
+    # The flag to enable/disable subtitle retrieval
+    enabled: True
+    # The default language for subtitles.
+    language: eng
+
+# Testing configuration overrides
+testing:
+  log:
+    level: CRITICAL

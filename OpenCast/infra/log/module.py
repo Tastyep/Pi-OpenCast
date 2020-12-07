@@ -5,7 +5,7 @@ from pathlib import Path
 
 import structlog
 
-from OpenCast.config import config
+from OpenCast.config import settings
 
 
 def init(module_name):
@@ -53,7 +53,7 @@ def init(module_name):
             "loggers": {
                 module_name: {
                     "handlers": ["default", "file"],
-                    "level": config["log.level"],
+                    "level": settings["log.level"],
                     "propagate": True,
                 },
                 "transitions": {
