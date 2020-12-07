@@ -33,7 +33,7 @@ back() {
   [[ "${ARGS["--coverage"]}" == true ]] && command=("coverage" "run")
   [[ -n "${ARGS["selector"]}" ]] && selector="${ARGS["selector"]}"
 
-  penv "${command[@]}" -m unittest "$selector" -v
+  OPENCAST_ENV=testing penv "${command[@]}" -m unittest "$selector" -v
   local status="$?"
 
   [[ "${ARGS["--coverage"]}" == true ]] && penv coverage xml

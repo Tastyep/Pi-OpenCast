@@ -28,3 +28,8 @@ default:
     enabled: True
     # The default language for subtitles.
     language: eng
+
+# Testing configuration overrides
+testing:
+  log:
+    level: CRITICAL
