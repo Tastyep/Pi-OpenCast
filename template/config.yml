@@ -14,19 +14,19 @@ default:
     file: opencast.db
 
   player:
-    # Loop the last element, one of ["false", "track", "album"]
+    # Loop the last element, one of [False, "track", "album"]
     loop_last: "album"
 
   downloader:
-    # The directory used to store downloaded videos.
+    # The directory used to store downloaded videos
     output_directory: { OUTPUT_DIRECTORY }
-    # The maximum number of parallel downloads.
+    # The maximum number of parallel downloads
     max_concurrency: 3
 
   subtitle:
     # The flag to enable/disable subtitle retrieval
     enabled: True
-    # The default language for subtitles.
+    # The default language for subtitles
     language: eng
 
 # Testing configuration overrides
