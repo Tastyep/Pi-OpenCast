@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from test.util import TestCase
+from threading import RLock
 
 from marshmallow import Schema, fields
 from tinydb import TinyDB
@@ -40,7 +41,7 @@ class TestEntity(Entity):
 class RepositoryTest(TestCase):
     def setUp(self):
         database = TinyDB(storage=MemoryStorage)
-        self.repo = Repository(database, TestEntity)
+        self.repo = Repository(database, RLock(), TestEntity)
         self.entity = TestEntity(IdentityService.random(), "test")
 
     def test_create(self):

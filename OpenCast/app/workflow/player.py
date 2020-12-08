@@ -10,7 +10,6 @@ from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import playlist as PlaylistCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
-from OpenCast.domain.model import Id
 from OpenCast.domain.service.identity import IdentityService
 
 from .video import Video, VideoWorkflow
@@ -46,7 +45,6 @@ class QueueVideoWorkflow(Workflow):
         data_facade,
         video: Video,
         queue_front: bool,
-        prev_video_id: Id = None,
     ):
         logger = structlog.get_logger(__name__)
         super().__init__(
@@ -58,7 +56,6 @@ class QueueVideoWorkflow(Workflow):
         self.video = video
         self._data_facade = data_facade
         self._queue_front = queue_front
-        self._prev_video_id = prev_video_id
         self._player_playlist_id = self._data_facade.player_repo.get_player().queue
 
     # States
@@ -76,7 +73,6 @@ class QueueVideoWorkflow(Workflow):
             self._player_playlist_id,
             self.video.id,
             self._queue_front,
-            self._prev_video_id,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -251,7 +247,6 @@ class StreamPlaylistWorkflow(Workflow):
 
         self.videos = videos[::-1]
         self._data_facade = data_facade
-        self._prev_video_id = None
 
     def start(self):
         self._play_video(None)
@@ -268,10 +263,6 @@ class StreamPlaylistWorkflow(Workflow):
         )
 
     def on_enter_QUEUEING(self, evt):
-        evt_type = type(evt)
-        if evt_type in [StreamVideoWorkflow.Completed, QueueVideoWorkflow.Completed]:
-            self._prev_video_id = evt.model_id
-
         video = self.videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(
@@ -280,7 +271,6 @@ class StreamPlaylistWorkflow(Workflow):
             self._data_facade,
             video,
             queue_front=True,
-            prev_video_id=self._prev_video_id,
         )
         self._observe_start(
             workflow,

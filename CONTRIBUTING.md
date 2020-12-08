@@ -63,7 +63,7 @@ The workflow is pretty straightforward:
 #### Building the docs
 
 ```
-    $ ./OpenCast.sh generate doc
+    $ ./OpenCast.sh build doc
 ```
 
 Open `build/html/index.html` in your browser to view the docs.

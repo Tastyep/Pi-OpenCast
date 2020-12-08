@@ -6,5 +6,5 @@ from .repository import Repository
 
 
 class VideoRepo(Repository):
-    def __init__(self, database):
-        super().__init__(database, Video)
+    def __init__(self, database, db_lock):
+        super().__init__(database, db_lock, Video)

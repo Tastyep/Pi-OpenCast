@@ -4,7 +4,7 @@
 import structlog
 
 from OpenCast.app.command import player as player_cmds
-from OpenCast.config import config
+from OpenCast.config import settings
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
@@ -44,7 +44,7 @@ class PlayerService(Service):
             self._player.play(video.location, video.streamable())
 
             if player.subtitle_state is True:
-                sub_stream = video.stream("subtitle", config["subtitle.language"])
+                sub_stream = video.stream("subtitle", settings["subtitle.language"])
                 if sub_stream is not None:
                     self._player.select_subtitle_stream(sub_stream.index)
 

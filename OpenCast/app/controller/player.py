@@ -3,6 +3,7 @@
 import structlog
 
 from OpenCast.app.command import player as Cmd
+from OpenCast.config import settings
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.event import player as PlayerEvt
 
@@ -16,7 +17,7 @@ class PlayerController(Controller):
 
         self._player_repo = data_facade.player_repo
         self._queueing_service = service_factory.make_queueing_service(
-            data_facade.player_repo, data_facade.playlist_repo
+            data_facade.player_repo, data_facade.playlist_repo, data_facade.video_repo
         )
 
         self._observe(PlayerEvt, self._default_handler_factory)
@@ -25,7 +26,9 @@ class PlayerController(Controller):
 
     def _media_end_reached(self, evt):
         player = self._player_repo.get_player()
-        video_id = self._queueing_service.next_video(player.queue, player.video_id)
+        video_id = self._queueing_service.next_video(
+            player.queue, player.video_id, settings["player.loop_last"]
+        )
         if video_id is None:
             self._dispatch(Cmd.StopPlayer)
         else:

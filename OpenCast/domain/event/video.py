@@ -5,15 +5,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from .event import Event
+from .event import Event, ModelId
 
 
 @dataclass
 class VideoCreated(Event):
     source: str
-    source_protocol: str
-    title: Optional[str]
+    collection_id: Optional[ModelId]
     collection_name: Optional[str]
+    title: Optional[str]
+    source_protocol: str
     thumbnail: Optional[str]
 
 

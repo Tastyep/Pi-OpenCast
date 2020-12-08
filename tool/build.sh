@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Usage:
-#   ./generate.sh command
+#   ./build.sh command
 #
 # Commands:
-#   doc   Generate documentation files.
+#   doc      Generate documentation files.
+#   webapp   Generate a production build of the webapp.
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -17,6 +18,10 @@ source "$ROOT/script/env.sh"
 
 doc() {
   (cd "$ROOT/docs" && penv make clean && penv make html -b coverage)
+}
+
+webapp() {
+  (cd "$ROOT/webapp" && npm run build)
 }
 
 parse_args "$@"

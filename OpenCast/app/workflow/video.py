@@ -3,11 +3,12 @@
 from collections import namedtuple
 from dataclasses import astuple, dataclass
 from enum import Enum, auto
+from typing import Optional
 
 import structlog
 
 from OpenCast.app.command import video as Cmd
-from OpenCast.config import config
+from OpenCast.config import settings
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id
 
@@ -18,6 +19,7 @@ from .workflow import Workflow
 class Video:
     id: Id
     source: str
+    collection_id: Optional[Id]
 
     def to_tuple(self):
         return astuple(self)
@@ -80,7 +82,7 @@ class VideoWorkflow(Workflow):
             VideoEvt.VideoRetrieved,
             Cmd.RetrieveVideo,
             self._video.id,
-            config["downloader.output_directory"],
+            settings["downloader.output_directory"],
         )
 
     def on_enter_PARSING(self, _):
@@ -95,7 +97,7 @@ class VideoWorkflow(Workflow):
             VideoEvt.VideoSubtitleFetched,
             Cmd.FetchVideoSubtitle,
             self._video.id,
-            config["subtitle.language"],
+            settings["subtitle.language"],
         )
 
     def on_enter_DELETING(self, _):
@@ -115,4 +117,4 @@ class VideoWorkflow(Workflow):
         return self._video_repo.get(self._video.id).streamable()
 
     def subtitle_disabled(self, _):
-        return not config["subtitle.enabled"]
+        return not settings["subtitle.enabled"]

@@ -9,7 +9,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 USER="$(whoami)"
 PROJECT="$(basename "$ROOT")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
-SYSTEMD_CONFIG_DIR="/etc/systemd/system/"
+SYSTEMD_CONFIG_DIR="/etc/systemd/system"
+TEMPLATE_DIR="$ROOT/template"
+DOWNLOAD_DIRECTORY="$ROOT/library"
 
 # shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
@@ -66,6 +68,22 @@ install_project_deps() {
   "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
+build_service() {
+  log_info "Creating a production build of the webapp..."
+
+  "$ROOT/$INTERNAL_NAME.sh" build webapp
+}
+
+# Configure the service
+config_service() {
+  log_info "Configuring $INTERNAL_NAME"
+
+  mkdir -p "$DOWNLOAD_DIRECTORY"
+  sed "s#{ OUTPUT_DIRECTORY }#$DOWNLOAD_DIRECTORY#g" "$TEMPLATE_DIR/config.yml" |
+    tee "$ROOT/config.yml" >/dev/null
+  log_info "Download directory configured as '$DOWNLOAD_DIRECTORY'"
+}
+
 # Format and install the systemd config file.
 start_at_boot() {
   log_info "Setting up startup at boot"
@@ -73,11 +91,11 @@ start_at_boot() {
   local service_name config
   # lowercase
   service_name="${INTERNAL_NAME,,}"
-  config="$ROOT/dist/$service_name.service"
-  sed -i "s/{ USER }/$USER/g" "$config"
-  sed -i "s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g" "$config"
-  sed -i "s#{ STOP_COMMAND }#$ROOT/$INTERNAL_NAME.sh service stop#g" "$config"
-  sudo cp "$config" "$SYSTEMD_CONFIG_DIR"
+  config="$TEMPLATE_DIR/$service_name.service"
+  sed "s#{ USER }#$USER#g
+       s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g
+       s#{ STOP_COMMAND }#$ROOT/$INTERNAL_NAME.sh service stop#g" -- "$config" |
+    sudo tee "$SYSTEMD_CONFIG_DIR/$service_name.service" >/dev/null
   sudo systemctl daemon-reload
   sudo systemctl enable "$service_name"
 }
@@ -92,6 +110,8 @@ parse_args "$@"
 
 check_system_deps
 install_project_deps
+build_service
+config_service
 start_at_boot
 
 log_info "Installation successful, reboot to finish."

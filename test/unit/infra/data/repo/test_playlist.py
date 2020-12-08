@@ -1,4 +1,5 @@
 from test.util import TestCase
+from threading import RLock
 
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
@@ -11,7 +12,7 @@ from OpenCast.infra.data.repo.playlist import PlaylistRepo
 class PlaylistRepositoryTest(TestCase):
     def setUp(self):
         database = TinyDB(storage=MemoryStorage)
-        self.repo = PlaylistRepo(database)
+        self.repo = PlaylistRepo(database, RLock())
         self.playlist_id = IdentityService.id_playlist()
         self.playlist = Playlist(self.playlist_id, "name")
 

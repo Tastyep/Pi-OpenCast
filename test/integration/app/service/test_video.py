@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError
-from OpenCast.config import config
+from OpenCast.config import settings
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.video import Stream
@@ -24,6 +24,7 @@ class VideoServiceTest(ServiceTestCase):
     def test_create_video(self):
         source = "source"
         video_id = IdentityService.id_video(source)
+        collection_id = IdentityService.random()
 
         metadata = {
             "title": "title",
@@ -34,20 +35,25 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader.download_metadata.return_value = metadata
 
         self.evt_expecter.expect(
-            VideoEvt.VideoCreated, video_id, source, **metadata
-        ).from_(Cmd.CreateVideo, video_id, source)
+            VideoEvt.VideoCreated,
+            video_id,
+            source,
+            collection_id,
+            **metadata,
+        ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     @patch("OpenCast.app.service.video.Path")
     def test_create_disk_video(self, path_cls_mock):
         path_inst = path_cls_mock.return_value
         source = "source"
         video_id = IdentityService.id_video(source)
+        collection_id = None
 
         path_inst.is_file.return_value = True
         metadata = {
-            "source_protocol": None,
-            "title": "test_title",
             "collection_name": None,
+            "title": "test_title",
+            "source_protocol": None,
             "thumbnail": None,
         }
         path_inst.stem = metadata["title"]
@@ -56,8 +62,9 @@ class VideoServiceTest(ServiceTestCase):
             VideoEvt.VideoCreated,
             video_id,
             source,
+            collection_id,
             **metadata,
-        ).from_(Cmd.CreateVideo, video_id, source)
+        ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     def test_create_video_missing_metadata(self):
         source = "source"
@@ -67,7 +74,7 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader.download_metadata.return_value = metadata
 
         self.evt_expecter.expect(OperationError, "Unavailable metadata").from_(
-            Cmd.CreateVideo, video_id, source
+            Cmd.CreateVideo, video_id, source, collection_id=None
         )
 
     def test_delete_video(self):
@@ -94,7 +101,7 @@ class VideoServiceTest(ServiceTestCase):
         self.data_producer.video("/tmp/video.mp4").populate(self.data_facade)
 
         path_cls_mock.return_value.is_file.return_value = True
-        output_dir = config["downloader.output_directory"]
+        output_dir = settings["downloader.output_directory"]
         self.evt_expecter.expect(
             VideoEvt.VideoRetrieved, video_id, "/tmp/video.mp4"
         ).from_(Cmd.RetrieveVideo, video_id, output_dir)
@@ -110,7 +117,7 @@ class VideoServiceTest(ServiceTestCase):
         }
         self.downloader.download_metadata.return_value = metadata
 
-        output_dir = config["downloader.output_directory"]
+        output_dir = settings["downloader.output_directory"]
         self.evt_expecter.expect(
             VideoEvt.VideoRetrieved, video_id, metadata["url"]
         ).from_(Cmd.RetrieveVideo, video_id, output_dir)
@@ -124,7 +131,7 @@ class VideoServiceTest(ServiceTestCase):
         metadata = {}
         self.downloader.download_metadata.return_value = metadata
 
-        output_dir = config["downloader.output_directory"]
+        output_dir = settings["downloader.output_directory"]
         self.evt_expecter.expect(OperationError, "Unavailable stream URL").from_(
             Cmd.RetrieveVideo, video_id, output_dir
         )
@@ -138,7 +145,7 @@ class VideoServiceTest(ServiceTestCase):
             self.app_facade.evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
         self.downloader.download_video.side_effect = dispatch_downloaded
-        output_dir = config["downloader.output_directory"]
+        output_dir = settings["downloader.output_directory"]
         location = str(Path(output_dir) / f"{video_title}.mp4")
         self.evt_expecter.expect(VideoEvt.VideoRetrieved, video_id, location).from_(
             Cmd.RetrieveVideo, video_id, output_dir
@@ -155,7 +162,7 @@ class VideoServiceTest(ServiceTestCase):
             )
 
         self.downloader.download_video.side_effect = dispatch_error
-        output_dir = config["downloader.output_directory"]
+        output_dir = settings["downloader.output_directory"]
         self.evt_expecter.expect(OperationError, "Download error").from_(
             Cmd.RetrieveVideo, video_id, output_dir
         )
@@ -191,7 +198,7 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader.download_subtitle.return_value = source_subtitle
 
         video_id = IdentityService.id_video("source")
-        subtitle_language = config["subtitle.language"]
+        subtitle_language = settings["subtitle.language"]
         self.evt_expecter.expect(
             VideoEvt.VideoSubtitleFetched, video_id, Path(source_subtitle)
         ).from_(Cmd.FetchVideoSubtitle, video_id, subtitle_language)

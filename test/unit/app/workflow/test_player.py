@@ -33,6 +33,7 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         self.video = Video(
             IdentityService.id_video("source"),
             "source",
+            collection_id=None,
         )
         self.workflow = self.make_workflow(
             QueueVideoWorkflow,
@@ -74,7 +75,6 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
             self.player_playlist_id,
             self.video.id,
             queue_front=False,
-            prev_video_id=None,
         )
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_ABORTED())
@@ -87,7 +87,6 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
             self.player_playlist_id,
             self.video.id,
             queue_front=False,
-            prev_video_id=None,
         )
         self.raise_event(
             PlaylistEvt.PlaylistContentUpdated,
@@ -105,8 +104,12 @@ class QueuePlaylistWorkflowTest(WorkflowTestCase):
         self.video_repo.exists.return_value = True
 
     def make_test_workflow(self, video_count=2):
+        collection_id = IdentityService.random()
         sources = [f"src{i}" for i in range(video_count)]
-        videos = [Video(IdentityService.id_video(source), source) for source in sources]
+        videos = [
+            Video(IdentityService.id_video(source), source, collection_id)
+            for source in sources
+        ]
         return self.make_workflow(QueuePlaylistWorkflow, videos)
 
     def test_initial(self):
@@ -162,6 +165,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
         self.video = Video(
             IdentityService.id_video("source"),
             "source",
+            collection_id=None,
         )
         self.workflow = self.make_workflow(
             StreamVideoWorkflow,
@@ -221,8 +225,12 @@ class StreamPlaylistWorkflowTest(WorkflowTestCase):
         self.video_repo.exists.return_value = True
 
     def make_test_workflow(self, video_count=2):
+        collection_id = IdentityService.random()
         sources = [f"src{i}" for i in range(video_count)]
-        videos = [Video(IdentityService.id_video(source), source) for source in sources]
+        videos = [
+            Video(IdentityService.id_video(source), source, collection_id)
+            for source in sources
+        ]
         return self.make_workflow(StreamPlaylistWorkflow, videos)
 
     def test_initial(self):

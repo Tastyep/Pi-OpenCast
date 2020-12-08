@@ -1,7 +1,5 @@
 """ OpenCast application's backend """
 
-import logging
-import os
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from queue import SimpleQueue
@@ -13,8 +11,7 @@ from .app.controller.module import ControllerModule
 from .app.facade import AppFacade
 from .app.service.module import ServiceModule
 from .app.tool.json_encoder import ModelEncoder
-from .config import ConfigError
-from .config import config as conf
+from .config import settings
 from .domain.service.factory import ServiceFactory
 from .domain.service.identity import IdentityService
 from .infra.data.manager import DataManager, StorageType
@@ -28,7 +25,7 @@ from .infra.service.factory import ServiceFactory as InfraServiceFactory
 
 def run_server(logger, infra_facade):
     try:
-        infra_facade.server.start(conf["server.host"], conf["server.port"])
+        infra_facade.server.start(settings["server.host"], settings["server.port"])
     except Exception as e:
         logger.error(
             "Server exception caught", error=e, traceback=traceback.format_exc()
@@ -54,18 +51,15 @@ def run_init_workflow(app_facade, data_facade):
 
 
 def main(argv=None):
-    app_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-
-    init_logging(__name__)
+    logger = structlog.get_logger(__name__)
 
     try:
-        conf.load_from_file("{}/config.yml".format(app_path))
-    except ConfigError:
+        settings.validators.validate()
+    except Exception as error:
+        logger.error("configuration error", error=str(error))
         return
 
-    # Get and update the log level
-    logging.getLogger(__name__).setLevel(conf["log.level"])
-    logger = structlog.get_logger(__name__)
+    init_logging(__name__)
 
     # TODO: make worker count configurable
     app_executor = ThreadPoolExecutor(max_workers=1)
@@ -78,7 +72,7 @@ def main(argv=None):
     data_manager = DataManager(repo_factory)
     data_facade = data_manager.connect(
         StorageType.JSON,
-        path=conf["database.file"],
+        path=settings["database.file"],
         indent=4,
         separators=(",", ": "),
         cls=ModelEncoder,
@@ -86,7 +80,7 @@ def main(argv=None):
 
     io_factory = IoFactory()
     media_factory = MediaFactory(
-        VlcInstance(), ThreadPoolExecutor(conf["downloader.max_concurrency"])
+        VlcInstance(), ThreadPoolExecutor(settings["downloader.max_concurrency"])
     )
     infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory)
 

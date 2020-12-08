@@ -57,8 +57,16 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
     async def test_event_listening(self):
         async with self.client.ws_connect("/api/videos/events") as ws:
             cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video_id)
+            collection_id = IdentityService.random()
             created_evt = VideoEvt.VideoCreated(
-                cmd_id, self.video_id, "source", "http", "title", "album", "thumbnail"
+                cmd_id,
+                self.video_id,
+                "source",
+                collection_id,
+                "album",
+                "title",
+                "http",
+                "thumbnail",
             )
             self.evt_dispatcher.dispatch(created_evt)
             await self.expect_ws_events(ws, [created_evt])

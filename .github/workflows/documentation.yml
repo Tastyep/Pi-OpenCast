@@ -19,7 +19,7 @@ jobs:
         run: ./setup.sh --ci
       #
       - name: Generate documentation
-        run: ./OpenCast.sh generate doc
+        run: ./OpenCast.sh build doc
       #
       - name: Deploy to GitHub Pages
         if: success()
