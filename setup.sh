@@ -68,6 +68,12 @@ install_project_deps() {
   "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
+build_service() {
+  log_info "Creating a production build of the webapp..."
+
+  "$ROOT/$INTERNAL_NAME.sh" build webapp
+}
+
 # Configure the service
 config_service() {
   log_info "Configuring $INTERNAL_NAME"
@@ -104,6 +110,7 @@ parse_args "$@"
 
 check_system_deps
 install_project_deps
+build_service
 config_service
 start_at_boot
 

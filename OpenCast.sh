@@ -5,7 +5,7 @@
 # Commands:
 #   deps     Interact with dependencies.
 #   format   Run formatters on the source code.
-#   generate Generate content.
+#   build    Build artefacts.
 #   lint     Lint the source code.
 #   service  Operate services.
 #   test     Run the tests.
