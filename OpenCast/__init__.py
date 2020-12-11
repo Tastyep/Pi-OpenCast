@@ -25,7 +25,9 @@ from .infra.service.factory import ServiceFactory as InfraServiceFactory
 
 def run_server(logger, infra_facade):
     try:
-        infra_facade.server.start(settings["server.host"], settings["server.port"])
+        infra_facade.server.start(
+            settings["server.host"], settings["server.port"], settings["log.api_trafic"]
+        )
     except Exception as e:
         logger.error(
             "Server exception caught", error=e, traceback=traceback.format_exc()

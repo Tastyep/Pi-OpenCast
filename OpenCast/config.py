@@ -19,6 +19,7 @@ settings.validators.register(
         default="INFO",
         is_in=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
     ),
+    Validator("LOG.API_TRAFIC", default=False, is_in=[True, False]),
     Validator("SERVER.HOST", default="0.0.0.0"),
     Validator("SERVER.PORT", default=2020),
     Validator("DATABASE.FILE", default="opencast.db"),
