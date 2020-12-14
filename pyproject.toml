@@ -26,7 +26,7 @@ tinydb = "^4.3.0"
 dacite = "^1.5.1"
 marshmallow = "^3.9.1"
 marshmallow_enum = "^1.5.1"
-youtube_dl = "^2020.12.7"
+youtube_dl = "^2020.12.14"
 aiohttp-apispec = "^2.2.1"
 dynaconf = "^3.1.2"
 
