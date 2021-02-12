@@ -33,7 +33,7 @@ dynaconf = "^3.1.2"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
 pytest-cov = "^2.11"
-sphinx_rtd_theme = "^0.5.0"
+sphinx_rtd_theme = "^0.5.1"
 sphinx = "^3.4.3"
 mypy = "^0.800"
 sphinx-autodoc-typehints = "^1.11.1"
