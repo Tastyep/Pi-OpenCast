@@ -805,7 +805,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest-asyncio", "pytest
 
 [[package]]
 name = "tinydb"
-version = "4.3.0"
+version = "4.4.0"
 description = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
 category = "main"
 optional = false
@@ -918,7 +918,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "e0376666551142c80d23039808138e91f311a59d16e90e45bc6d57828d4e7fcb"
+content-hash = "41494bb96e7f477cc6dcf6069a1b41079e3dd2d9a5a573625479d7e312044ca8"
 
 [metadata.files]
 aiohttp = [
@@ -1452,8 +1452,8 @@ structlog = [
     {file = "structlog-20.2.0.tar.gz", hash = "sha256:af79dfa547d104af8d60f86eac12fb54825f54a46bc998e4504ef66177103174"},
 ]
 tinydb = [
-    {file = "tinydb-4.3.0-py3-none-any.whl", hash = "sha256:c8a8887269927e077f3aa16fddbf4debd176c10edc4ac8a5ce48ced0b10adf8c"},
-    {file = "tinydb-4.3.0.tar.gz", hash = "sha256:1d102d06f9bb22d739d8061b490c64d420de70dca5f95ebd43a492c43c7bd303"},
+    {file = "tinydb-4.4.0-py3-none-any.whl", hash = "sha256:30b0f718ebb288e42d2f69f3e1b18928739f25153e6b5308a234e95c1673de71"},
+    {file = "tinydb-4.4.0.tar.gz", hash = "sha256:d57c29524ecacc081ebc24f96e0d787bba11dc20d52634a32a709b878be3545a"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
