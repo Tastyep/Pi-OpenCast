@@ -183,7 +183,7 @@ toml = ["toml"]
 
 [[package]]
 name = "dacite"
-version = "1.5.1"
+version = "1.6.0"
 description = "Simple creation of data classes from dictionaries."
 category = "main"
 optional = false
@@ -917,7 +917,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "48225733797961f8757923bf35d650da345a5bf214e9714d5b806a8800592d39"
+content-hash = "7aa9be61810f74902349ef266a6afcfbbb900187393672ec5c38085c8d8b0725"
 
 [metadata.files]
 aiohttp = [
@@ -1065,8 +1065,8 @@ coverage = [
     {file = "coverage-5.4.tar.gz", hash = "sha256:6d2e262e5e8da6fa56e774fb8e2643417351427604c2b177f8e8c5f75fc928ca"},
 ]
 dacite = [
-    {file = "dacite-1.5.1-py3-none-any.whl", hash = "sha256:f7f269647ede90f8702728eb7dcb972051511c81b853a93c962fbd31f1753b9f"},
-    {file = "dacite-1.5.1.tar.gz", hash = "sha256:764c96e0304cb189628686689a163a6a3a8ce7bf3465f0a2d882a8b42f88108f"},
+    {file = "dacite-1.6.0-py3-none-any.whl", hash = "sha256:4331535f7aabb505c732fa4c3c094313fc0a1d5ea19907bf4726a7819a68b93f"},
+    {file = "dacite-1.6.0.tar.gz", hash = "sha256:d48125ed0a0352d3de9f493bf980038088f45f3f9d7498f090b50a847daaa6df"},
 ]
 docutils = [
     {file = "docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af"},
