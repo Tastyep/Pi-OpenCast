@@ -31,10 +31,13 @@ class Server:
     def route(self, method, route, handle):
         route = self.app.router.add_route(method, route, handle)
 
-    def start(self, host, port):
+    def start(self, host, port, log_trafic: bool):
         self._logger.info("Started", host=host, port=port)
 
-        web.run_app(self.app, host=host, port=port, access_log_class=AccessLogger)
+        options = {}
+        if log_trafic is True:
+            options["access_log_class"] = AccessLogger
+        web.run_app(self.app, host=host, port=port, **options)
 
     def make_web_socket(self):
         ws = web.WebSocketResponse()

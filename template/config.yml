@@ -1,7 +1,10 @@
 default:
   log:
     # The level of the module's logger
+    # One of [CRITICAL, ERROR, WARNING, INFO, DEBUG]
     level: DEBUG
+    # Log requests/responses from the API
+    api_trafic: False
 
   server:
     # The IP from where the service is accessible
@@ -33,3 +36,4 @@ default:
 testing:
   log:
     level: CRITICAL
+    api_trafic: False

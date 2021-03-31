@@ -185,7 +185,7 @@ class StreamVideoWorkflow(Workflow):
             self._app_facade,
             self._data_facade,
             self.video,
-            queue_front=False,
+            queue_front=True,
         )
         self._observe_start(workflow)
 

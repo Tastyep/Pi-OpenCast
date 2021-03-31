@@ -21,3 +21,5 @@ coverage.xml
 /.coverage
 /library
 /config.yml
+.vim/
+tags
