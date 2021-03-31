@@ -28,6 +28,8 @@ jobs:
         run: ./setup.sh --ci
       #
       - name: Test
+        env:
+          OPENCAST_LOG__LEVEL: DEBUG
         run: ./OpenCast.sh test all --coverage
       #
       - name: Coverage upload
