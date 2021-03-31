@@ -2,6 +2,7 @@ from test.shared.app.facade_mock import AppFacadeMock
 from test.shared.infra.facade_mock import InfraFacadeMock
 from test.util import TestCase
 from unittest.mock import Mock
+
 import structlog
 
 from OpenCast import run_init_workflow, run_server

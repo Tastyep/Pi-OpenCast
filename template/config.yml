@@ -36,3 +36,4 @@ default:
 testing:
   log:
     level: CRITICAL
+    api_trafic: False
