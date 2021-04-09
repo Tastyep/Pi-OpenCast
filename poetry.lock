@@ -545,7 +545,7 @@ testing = ["fields", "hunter", "process-tests (==2.0.2)", "six", "pytest-xdist",
 
 [[package]]
 name = "python-vlc"
-version = "3.0.11115"
+version = "3.0.12117"
 description = "VLC bindings for python."
 category = "main"
 optional = false
@@ -917,7 +917,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "8791fbcabad944f707a8317bc2a567a3ba7a33d6590b9d51b2178aa91b55cf2c"
+content-hash = "01b854e6fa19d385908c628f580de5fde34c3c68dfd4708cda0d7b3d20c3d3fe"
 
 [metadata.files]
 aiohttp = [
@@ -1302,8 +1302,8 @@ pytest-cov = [
     {file = "pytest_cov-2.11.1-py2.py3-none-any.whl", hash = "sha256:bdb9fdb0b85a7cc825269a4c56b48ccaa5c7e365054b6038772c32ddcdc969da"},
 ]
 python-vlc = [
-    {file = "python-vlc-3.0.11115.tar.gz", hash = "sha256:a4d3bdddfce84a8fb1b2d5447193a0239c55c16ca246e5194d48efd59c4e236b"},
-    {file = "python_vlc-3.0.11115-py3-none-any.whl", hash = "sha256:508bc5b4b4fd72b4e23c926795bdcd38c7c1c08a4dd6b8cc87b0abd1d7118aa1"},
+    {file = "python-vlc-3.0.12117.tar.gz", hash = "sha256:dd512f8438c1bba032fe9d22a7f8f98423a537992141ce2d1b28e29aff30381d"},
+    {file = "python_vlc-3.0.12117-py3-none-any.whl", hash = "sha256:d6150ac2e5ff363faa792545e57fa084fe4931fca7fcd035b58985fc0805a2be"},
 ]
 pytz = [
     {file = "pytz-2021.1-py2.py3-none-any.whl", hash = "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"},
