@@ -71,8 +71,8 @@ class QueueingService:
             while (
                 video_idx > 0
                 and videos[video_idx].collection_id is not None
-                and videos[video_idx - 1].collection_id
-                == videos[video_idx].collection_id
+                and videos[video_idx].collection_id
+                == videos[video_idx - 1].collection_id
             ):
                 video_idx -= 1
             return playlist.ids[video_idx]
