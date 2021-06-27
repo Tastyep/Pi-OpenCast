@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { IconButton, ButtonGroup, Grid } from "@material-ui/core";
 
 import PauseIcon from "@material-ui/icons/Pause";
@@ -15,8 +15,9 @@ import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import playerAPI from "services/api/player";
 
 import "./player_control.css";
+import { observer } from "mobx-react-lite";
 
-function PlayerControls() {
+const PlayerControls = observer(() => {
   const [pauseStatus, setPauseStatus] = useState(true);
 
   const updatePlayerState = (player) => {
@@ -27,17 +28,17 @@ function PlayerControls() {
     }
   };
 
-  const updatePlayer = (update, ...args) => {
+  const updatePlayer = useCallback((update, ...args) => {
     update(...args)
       .then((response) => {
         updatePlayerState(response.data);
       })
       .catch((error) => console.log(error));
-  };
+  }, []);
 
   useEffect(() => {
     updatePlayer(playerAPI.get);
-  }, []);
+  }, [updatePlayer]);
 
   // Highlight subtitle button when on
   return (
@@ -95,6 +96,6 @@ function PlayerControls() {
       </Grid>
     </Grid>
   );
-}
+})
 
 export default PlayerControls;

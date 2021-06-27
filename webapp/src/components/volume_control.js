@@ -1,39 +1,24 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Grid, Typography, Slider } from "@material-ui/core";
 
 import VolumeDown from "@material-ui/icons/VolumeDown";
 import VolumeUp from "@material-ui/icons/VolumeUp";
 
 import playerAPI from "services/api/player";
+import { useAppStore } from "./app_context";
+import { observer } from "mobx-react-lite";
 
-function VolumeControl() {
-  const [value, setValue] = React.useState(30);
+const VolumeControl = observer(() => {
+  const store = useAppStore()
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleCommit = (_, value) => {
+    playerAPI.updateVolume(value);
   };
-
-  const setPlayerVolume = (player) => {
-    setValue(player.volume);
-  };
-
-  const handleCommit = (event, newValue) => {
-    playerAPI.updateVolume(newValue);
-  };
-
-  useEffect(() => {
-    playerAPI
-      .get()
-      .then((response) => {
-        setPlayerVolume(response.data);
-      })
-      .catch((error) => console.log(error));
-  }, []);
 
   return (
     <div>
       <Typography id="continuous-slider" gutterBottom>
-        Volume {value} %
+        Volume {store.player.volume} %
       </Typography>
       <Grid container spacing={2}>
         <Grid item>
@@ -41,8 +26,8 @@ function VolumeControl() {
         </Grid>
         <Grid item xs>
           <Slider
-            value={value}
-            onChange={handleChange}
+            value={store.player.volume ? store.player.volume : 50}
+            onChange={(_, value) => { store.player.volume = value}}
             onChangeCommitted={handleCommit}
             aria-labelledby="continuous-slider"
           />
@@ -53,6 +38,6 @@ function VolumeControl() {
       </Grid>
     </div>
   );
-}
+})
 
 export default VolumeControl;

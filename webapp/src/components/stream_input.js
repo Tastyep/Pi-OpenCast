@@ -3,14 +3,17 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
 import playerAPI from "services/api/player";
+import { useAppStore } from "./app_context";
 
 import "./stream_input.css";
 
-function StreamInput() {
+const StreamInput = () => {
   const [url, setUrl] = useState("");
   const [action, setAction] = useState(() => playerAPI.streamMedia);
   const [castVariant, setCastVariant] = useState("contained");
   const [queueVariant, setQueueVariant] = useState("outlined");
+
+  const store = useAppStore()
 
   const handleSubmit = (event) => {
     if (event) {
@@ -19,7 +22,12 @@ function StreamInput() {
     if (url === "") {
       return;
     }
-    action(url).catch((error) => console.log(error));
+    action(url)
+      .then(() => {
+        // TODO: Remove this  once sockets are implemented
+        this.store.loadVideos()
+      })
+      .catch((error) => console.log(error));
     setUrl("");
   };
 
@@ -43,10 +51,10 @@ function StreamInput() {
     }
   };
 
-  useEffect(() => {
-    handleSubmit(undefined);
-  }, [action]);
-
+//   useEffect(() => {
+//     handleSubmit(undefined);
+//   }, [handleSubmit]);
+// 
   return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">
       <Grid container spacing={1}>
