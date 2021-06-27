@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import {
   GridList,
   GridListTile,
@@ -11,13 +11,15 @@ import DeleteIcon from "@material-ui/icons/Delete";
 
 import videoAPI from "services/api/video";
 import playerAPI from "services/api/player";
-import playlistAPI from "services/api/playlist";
 
 import noPreview from "images/no-preview.png";
 
 import "./stream_input.css";
+import { useAppStore } from "./app_context";
+import { observer } from "mobx-react-lite";
+import { computed } from "mobx";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
       display: "flex",
@@ -41,18 +43,21 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function VideoList() {
+const VideoList = observer(() => {
   const classes = useStyles();
-  const [videos, setVideos] = useState([]);
-  const [timer, setTimer] = useState(0);
   const [videoId, setVideoId] = useState(null);
-  const [playlistId, setPlaylistId] = useState(null);
+
+  const store = useAppStore()
+  const videos = computed(() => {
+    let playlist = store.playlists.find(playlist => playlist.id === store.player.queue)
+    return playlist ? store.videos.filter(video => playlist.ids.includes(video.id)) : []
+  }).get()
 
   const deleteVideo = (video) => {
     videoAPI
       .delete_(video.id)
-      .then((response) => {
-        listVideos();
+      .then((_) => {
+        store.removeVideo(video.id)
       })
       .catch((error) => console.log(error));
   };
@@ -60,70 +65,42 @@ function VideoList() {
   const playMedia = (video) => {
     playerAPI
       .playMedia(video.id)
-      .then((response) => {
+      .then((_) => {
         setVideoId(video.id);
       })
       .catch((error) => console.log(error));
   };
 
-  const listVideos = () => {
-    playlistAPI
-      .videos(playlistId)
-      .then((response) => {
-        setVideos(response.data.videos);
-      })
-      .catch((error) => console.log(error));
-  };
-
-  useEffect(() => {
-    let interval;
-    interval = setInterval(() => setTimer(timer + 1), 10000);
-
-    if (playlistId === null) {
-      playerAPI
-        .get()
-        .then((response) => {
-          setPlaylistId(response.data.queue);
-        })
-        .catch((error) => console.log(error));
-    } else {
-      listVideos();
-    }
-
-    return () => clearInterval(interval);
-  }, [timer, playlistId]);
-
   return (
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
-        {videos.map((tile) => (
-          <GridListTile key={tile.thumbnail}>
+        {videos.map((video) => (
+          <GridListTile key={video.thumbnail}>
             <img
-              src={tile.thumbnail === null ? noPreview : tile.thumbnail}
-              alt={tile.title}
-              onClick={() => playMedia(tile)}
+              src={video.thumbnail === null ? noPreview : video.thumbnail}
+              alt={video.title}
+              onClick={() => playMedia(video)}
             />
             <GridListTileBar
-              title={tile.title}
+              title={video.title}
               classes={{
                 root: classes.titleBar,
                 title: classes.title,
               }}
               actionIcon={
                 <IconButton
-                  aria-label={`delete ${tile.title}`}
-                  onClick={() => deleteVideo(tile)}
+                  aria-label={`delete ${video.title}`}
+                  onClick={() => deleteVideo(video)}
                 >
                   <DeleteIcon className={classes.title} />
                 </IconButton>
               }
             />
-            )}
           </GridListTile>
         ))}
       </GridList>
     </div>
   );
-}
+})
 
 export default VideoList;
