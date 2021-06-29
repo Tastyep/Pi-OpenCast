@@ -255,4 +255,3 @@ class PlaylistMonitController(MonitorController):
     )
     async def stream_events(self, request):
         return await self._stream_ws_events(request, PlaylistEvt)
-
