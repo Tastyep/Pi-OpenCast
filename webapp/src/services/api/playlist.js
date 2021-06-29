@@ -1,4 +1,4 @@
-import API from "./api";
+import { API, makeEventListener } from "./api";
 
 async function create(data) {
   return await API.post("/playlists/", data);
@@ -24,6 +24,10 @@ async function videos(playlist_id) {
   return await API.get("/playlists/" + playlist_id + "/videos");
 }
 
+function listen(eventsToCallback) {
+  return makeEventListener("/playlists/events", eventsToCallback)
+}
+
 export default {
   create,
   list,
@@ -31,4 +35,5 @@ export default {
   update,
   delete_,
   videos,
+  listen,
 };

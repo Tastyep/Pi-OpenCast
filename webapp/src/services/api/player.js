@@ -1,4 +1,4 @@
-import API from "./api";
+import { API, makeEventListener } from "./api";
 
 async function get() {
   return await API.get("/player/");
@@ -44,6 +44,10 @@ async function seekSubtitle(forward) {
   });
 }
 
+function listen(eventsToCallback) {
+  return makeEventListener("/player/events", eventsToCallback)
+}
+
 export default {
   get,
   streamMedia,
@@ -55,4 +59,5 @@ export default {
   updateVolume,
   toggleSubtitle,
   seekSubtitle,
+  listen,
 };
