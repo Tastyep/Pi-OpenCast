@@ -9,7 +9,7 @@ export class AppStore {
   playlists = [];
   videos = [];
 
-  constructor() {
+  constructor(eventDispatcher) {
     makeObservable(this, {
       player: observable,
       playlists: observable,
@@ -22,10 +22,9 @@ export class AppStore {
 
       onPlaylistUpdated: action
     })
-    this.videows = videoAPI.listen({
+
+    eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
-    })
-    this.playlistws = playlistAPI.listen({
       PlaylistContentUpdated: (e) => this.onPlaylistUpdated(e), 
     })
   }

@@ -1,4 +1,4 @@
-import { API, makeEventListener } from "./api";
+import { API, makeWebSocket } from "./api";
 
 async function create(data) {
   return await API.post("/playlists/", data);
@@ -24,8 +24,8 @@ async function videos(playlist_id) {
   return await API.get("/playlists/" + playlist_id + "/videos");
 }
 
-function listen(eventsToCallback) {
-  return makeEventListener("/playlists/events", eventsToCallback)
+function listen() {
+  return makeWebSocket("/playlists/events")
 }
 
 export default {
@@ -35,5 +35,7 @@ export default {
   update,
   delete_,
   videos,
-  listen,
 };
+
+export { listen }
+
