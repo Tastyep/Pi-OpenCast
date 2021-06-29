@@ -25,6 +25,7 @@ export class AppStore {
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
+      VideoDeleted: (e) => this.removeVideo(e.model_id),
       PlaylistContentUpdated: (e) => this.onPlaylistUpdated(e), 
     })
   }
