@@ -10,6 +10,7 @@
     "mobx-react-lite": "^3.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "robust-websocket": "^1.0.0",
     "serve": "^11.3.2"
   },
   "scripts": {
