@@ -24,6 +24,7 @@ class QueueVideoWorkflow(Workflow):
     class States(Enum):
         INITIAL = auto()
         COLLECTING = auto()
+        REMOVING = auto()
         QUEUEING = auto()
         COMPLETED = auto()
         ABORTED = auto()
@@ -31,7 +32,9 @@ class QueueVideoWorkflow(Workflow):
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
         ["start",                     States.INITIAL,    States.COLLECTING],
+        ["_video_workflow_completed", States.COLLECTING, States.REMOVING, "is_queued"],
         ["_video_workflow_completed", States.COLLECTING, States.QUEUEING],
+        ["_playlist_content_updated", States.REMOVING,   States.QUEUEING],
         ["_video_workflow_aborted",   States.COLLECTING, States.ABORTED],
         ["_playlist_content_updated", States.QUEUEING,   States.COMPLETED],
         ["_operation_error",          States.QUEUEING,   States.ABORTED],
@@ -66,6 +69,16 @@ class QueueVideoWorkflow(Workflow):
         )
         self._observe_start(workflow)
 
+    def on_enter_REMOVING(self, _):
+        playlist = self._data_facade.playlist_repo.get(self._player_playlist_id)
+        playlist.ids.remove(self.video.id)
+        self._observe_dispatch(
+            PlaylistEvt.PlaylistContentUpdated,
+            PlaylistCmd.UpdatePlaylistContent,
+            self._player_playlist_id,
+            playlist.ids,
+        )
+
     def on_enter_QUEUEING(self, evt):
         self._observe_dispatch(
             PlaylistEvt.PlaylistContentUpdated,
@@ -80,6 +93,11 @@ class QueueVideoWorkflow(Workflow):
 
     def on_enter_ABORTED(self, _):
         self._cancel(self.video.id)
+
+    # Conditions
+    def is_queued(self, _):
+        playlist = self._data_facade.playlist_repo.get(self._player_playlist_id)
+        return self.video.id in playlist.ids
 
 
 class QueuePlaylistWorkflow(Workflow):
