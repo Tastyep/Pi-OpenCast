@@ -2,11 +2,13 @@ from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import make_cmd
 from OpenCast.app.command import playlist as PlaylistCmd
+from OpenCast.app.command import video as VideoCmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.event import playlist as PlaylistEvt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .util import MonitorControllerTestCase
+from .util import MonitorControllerTestCase, asyncio
 
 
 class PlaylistMonitorControllerTest(MonitorControllerTestCase):
@@ -203,3 +205,47 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
         playlist_id = IdentityService.id_playlist()
         resp = await self.client.delete(f"/api/playlists/{playlist_id}")
         self.assertEqual(404, resp.status)
+
+    @unittest_run_loop
+    async def test_event_listening(self):
+        async with self.client.ws_connect("/api/playlists/events") as ws:
+            cmd_id = IdentityService.id_command(
+                PlaylistCmd.CreatePlaylist, self.playlists[0].id
+            )
+            created_evt = PlaylistEvt.PlaylistCreated(
+                cmd_id,
+                self.playlists[0].id,
+                "name",
+                [],
+            )
+            self.evt_dispatcher.dispatch(created_evt)
+            await self.expect_ws_events(ws, [created_evt])
+
+            cmd_id = IdentityService.id_command(
+                PlaylistCmd.UpdatePlaylistContent, self.playlists[0].id
+            )
+            second_evt = PlaylistEvt.PlaylistContentUpdated(
+                cmd_id, self.playlists[0].id, []
+            )
+            self.evt_dispatcher.dispatch(created_evt)
+            self.evt_dispatcher.dispatch(second_evt)
+            await self.expect_ws_events(ws, [created_evt, second_evt])
+
+    @unittest_run_loop
+    async def test_invalid_event_listening(self):
+        async with self.client.ws_connect("/api/player/events") as ws:
+            video_id = IdentityService.id_video("source")
+            cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, video_id)
+            video_evt = VideoEvt.VideoCreated(
+                cmd_id,
+                video_id,
+                "source",
+                IdentityService.random(),
+                "album",
+                "title",
+                "http",
+                "thumbnail",
+            )
+            self.evt_dispatcher.dispatch(video_evt)
+            with self.assertRaises(asyncio.TimeoutError):
+                await self.expect_ws_events(ws, [video_evt])
