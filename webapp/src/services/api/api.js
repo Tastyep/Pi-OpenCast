@@ -7,15 +7,8 @@ const API = axios.create({
   baseURL: API_URL,
 })
 
-const makeEventListener = (endpoint, eventsToCallback) => {
-  let ws = new RobustWebSocket(API_URL.replace("http", "ws") + endpoint)
-  ws.addEventListener('message', (event) => {
-    const data = JSON.parse(event.data)
-    console.log("Received Event", data.name, eventsToCallback.hasOwnProperty(data.name))
-    if (eventsToCallback.hasOwnProperty(data.name)) {
-      eventsToCallback[data.name](data.event)
-    }
-  })
+const makeWebSocket = (endpoint) => {
+  return new RobustWebSocket(API_URL.replace("http", "ws") + endpoint)
 }
 
-export {API, API_URL, makeEventListener}
+export {API, API_URL, makeWebSocket}

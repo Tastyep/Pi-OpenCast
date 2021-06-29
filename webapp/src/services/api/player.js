@@ -1,4 +1,4 @@
-import { API, makeEventListener } from "./api";
+import { API, makeWebSocket } from "./api";
 
 async function get() {
   return await API.get("/player/");
@@ -44,8 +44,8 @@ async function seekSubtitle(forward) {
   });
 }
 
-function listen(eventsToCallback) {
-  return makeEventListener("/player/events", eventsToCallback)
+function listen() {
+  return makeWebSocket("/player/events")
 }
 
 export default {
@@ -59,5 +59,6 @@ export default {
   updateVolume,
   toggleSubtitle,
   seekSubtitle,
-  listen,
 };
+
+export { listen }
