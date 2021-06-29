@@ -1,6 +1,6 @@
 class SocketEventDispatcher {
   constructor(websockets) {
-    this.eventsToCallbacks = new Map()
+    this.eventsToCallbacks = {}
   
     for (const i in websockets) {
       websockets[i].addEventListener('message', (evt) => this.onEvent(evt))
@@ -9,9 +9,9 @@ class SocketEventDispatcher {
 
   onEvent(event) {
     const data = JSON.parse(event.data)
-    console.log("Received Event", data.name, this.eventsToCallbacks.has(data.name))
-    if (this.eventsToCallbacks.has(data.name)) {
-      const callbacks = this.eventsToCallback[data.name] 
+    console.log("Received Event", data.name, this.eventsToCallbacks.hasOwnProperty(data.name))
+    if (this.eventsToCallbacks.hasOwnProperty(data.name)) {
+      const callbacks = this.eventsToCallbacks[data.name] 
       for (const i in callbacks) {
         callbacks[i](data.event)
       }
@@ -20,12 +20,13 @@ class SocketEventDispatcher {
 
   observe(eventsToCallback) {
     for (const evt in eventsToCallback) {
-      if (this.eventsToCallbacks.has(evt)) {
+      if (this.eventsToCallbacks.hasOwnProperty(evt)) {
         this.eventsToCallbacks[evt].push(eventsToCallback[evt])
       } else {
         this.eventsToCallbacks[evt] = [ eventsToCallback[evt] ]
       }
     }
+    console.log("PASS:", this.eventsToCallbacks)
   }
 }
 
