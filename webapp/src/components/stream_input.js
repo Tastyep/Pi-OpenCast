@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
 import playerAPI from "services/api/player";
-import { useAppStore } from "./app_context";
 
 import "./stream_input.css";
 
@@ -13,8 +12,6 @@ const StreamInput = () => {
   const [castVariant, setCastVariant] = useState("contained");
   const [queueVariant, setQueueVariant] = useState("outlined");
 
-  const store = useAppStore()
-
   const handleSubmit = (event) => {
     if (event) {
       event.preventDefault();
@@ -23,10 +20,6 @@ const StreamInput = () => {
       return;
     }
     action(url)
-      .then(() => {
-        // TODO: Remove this  once sockets are implemented
-        this.store.loadVideos()
-      })
       .catch((error) => console.log(error));
     setUrl("");
   };
@@ -51,11 +44,7 @@ const StreamInput = () => {
     }
   };
 
-//   useEffect(() => {
-//     handleSubmit(undefined);
-//   }, [handleSubmit]);
-// 
-  return (
+ return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">
       <Grid container spacing={1}>
         <Grid item xs={6} sm={7} md={8}>

@@ -11,7 +11,7 @@ const makeEventListener = (endpoint, eventsToCallback) => {
   let ws = new RobustWebSocket(API_URL.replace("http", "ws") + endpoint)
   ws.addEventListener('message', (event) => {
     const data = JSON.parse(event.data)
-    console.log("HAS CALLBACK", data.name, eventsToCallback.hasOwnProperty(data.name))
+    console.log("Received Event", data.name, eventsToCallback.hasOwnProperty(data.name))
     if (eventsToCallback.hasOwnProperty(data.name)) {
       eventsToCallback[data.name](data.event)
     }
