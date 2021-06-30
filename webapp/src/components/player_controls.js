@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { IconButton, ButtonGroup, Grid } from "@material-ui/core";
+import React from 'react'
+import { Button, ButtonGroup, Grid } from "@material-ui/core";
 
 import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
@@ -15,83 +15,72 @@ import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import playerAPI from "services/api/player";
 
 import "./player_control.css";
+import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
 const PlayerControls = observer(() => {
-  const [pauseStatus, setPauseStatus] = useState(true);
+  const store = useAppStore() 
 
-  const updatePlayerState = (player) => {
-    if (player.state === "PAUSED") {
-      setPauseStatus(false);
-    } else {
-      setPauseStatus(true);
-    }
-  };
-
-  const updatePlayer = useCallback((update, ...args) => {
+  const updatePlayer = (update, ...args) => {
     update(...args)
       .then((response) => {
-        updatePlayerState(response.data);
+        store.loadPlayer()
       })
       .catch((error) => console.log(error));
-  }, []);
-
-  useEffect(() => {
-    updatePlayer(playerAPI.get);
-  }, [updatePlayer]);
+  }
 
   // Highlight subtitle button when on
   return (
     <Grid container spacing={1}>
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
-          <IconButton onClick={() => updatePlayer(playerAPI.pauseMedia)}>
-            {pauseStatus ? <PauseIcon /> : <PlayArrowIcon />}
-          </IconButton>
-          <IconButton onClick={() => updatePlayer(playerAPI.stopMedia)}>
+          <Button onClick={() => updatePlayer(playerAPI.pauseMedia)}>
+            {store.player.state !== "PAUSED" ? <PauseIcon /> : <PlayArrowIcon />}
+          </Button>
+          <Button onClick={() => updatePlayer(playerAPI.stopMedia)}>
             <StopIcon />
-          </IconButton>
+          </Button>
         </ButtonGroup>
       </Grid>
       <Grid item xs={6} md={4} className="SeekButtons">
         <ButtonGroup size="small" variant="text">
-          <IconButton
+          <Button
             onClick={() => updatePlayer(playerAPI.seekMedia, false, true)}
           >
             <FastRewindIcon />
-          </IconButton>
-          <IconButton
+          </Button>
+          <Button
             onClick={() => updatePlayer(playerAPI.seekMedia, false, false)}
           >
             <ArrowLeftIcon />
-          </IconButton>
-          <IconButton
+          </Button>
+          <Button
             onClick={() => updatePlayer(playerAPI.seekMedia, true, false)}
           >
             <ArrowRightIcon />
-          </IconButton>
-          <IconButton
+          </Button>
+          <Button
             onClick={() => updatePlayer(playerAPI.seekMedia, true, true)}
           >
             <FastForwardIcon />
-          </IconButton>
+          </Button>
         </ButtonGroup>
       </Grid>
       <Grid item xs={12} md={4} className="SubtitleButtons">
         <ButtonGroup size="small" variant="text">
-          <IconButton
+          <Button
             onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}
           >
             <RemoveCircleOutlineIcon />
-          </IconButton>
-          <IconButton onClick={() => updatePlayer(playerAPI.toggleSubtitle)}>
+          </Button>
+          <Button onClick={() => updatePlayer(playerAPI.toggleSubtitle)}>
             <ClosedCaptionIcon />
-          </IconButton>
-          <IconButton
+          </Button>
+          <Button
             onClick={() => updatePlayer(playerAPI.seekSubtitle, true)}
           >
             <AddCircleOutlineIcon />
-          </IconButton>
+          </Button>
         </ButtonGroup>
       </Grid>
     </Grid>

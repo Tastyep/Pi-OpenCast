@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import {
@@ -45,8 +45,6 @@ const useStyles = makeStyles((theme) =>
 
 const VideoList = observer(() => {
   const classes = useStyles();
-  const [videoId, setVideoId] = useState(null);
-
   const store = useAppStore()
   const videos = computed(() => {
     let playlist = store.playlists.find(playlist => playlist.id === store.player.queue)
@@ -66,7 +64,6 @@ const VideoList = observer(() => {
     playerAPI
       .playMedia(video.id)
       .then((_) => {
-        setVideoId(video.id);
       })
       .catch((error) => console.log(error));
   };

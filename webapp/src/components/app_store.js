@@ -9,7 +9,7 @@ export class AppStore {
   playlists = [];
   videos = [];
 
-  constructor() {
+  constructor(eventDispatcher) {
     makeObservable(this, {
       player: observable,
       playlists: observable,
@@ -17,7 +17,16 @@ export class AppStore {
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
-      removeVideo: action
+      removeVideo: action,
+      addVideo: action,
+
+      onPlaylistUpdated: action
+    })
+
+    eventDispatcher.observe({
+      VideoCreated: (e) => this.onVideoCreated(e),
+      VideoDeleted: (e) => this.removeVideo(e.model_id),
+      PlaylistContentUpdated: (e) => this.onPlaylistUpdated(e), 
     })
   }
 
@@ -52,6 +61,22 @@ export class AppStore {
       .catch((error) => console.log(error));
   }
 
+  onVideoCreated(evt) {
+    videoAPI
+      .get(evt.model_id)
+      .then((response) => {
+        this.addVideo(response.data)
+      })
+      .catch((error) => console.log(error)); 
+  }
+  
+  onPlaylistUpdated(evt) {
+    let playlist = this.playlists.find(playlist => playlist.id === evt.model_id)
+    if (playlist) {
+      playlist.ids = evt.ids
+    }
+ }
+
   setPlayer(player) {
     this.player = player
   }
@@ -64,13 +89,10 @@ export class AppStore {
     this.videos = videos
   }
 
-  playlistVideos(playlistId) {
-    let playlist = this.playlists.find(playlist => playlist.id === playlistId)
-    return playlist ? this.videos.filter(video => video.id in playlist.ids) : []
+  addVideo(video) {
+    this.videos.push(video)
   }
-
- removeVideo(id) {
+  removeVideo(id) {
     this.videos = this.videos.filter(video => video.id !== id)
   }
 }
-
