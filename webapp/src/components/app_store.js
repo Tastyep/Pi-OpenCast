@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from "mobx"
+import { action, makeObservable, observable, computed } from "mobx"
 
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
@@ -14,6 +14,7 @@ export class AppStore {
       player: observable,
       playlists: observable,
       videos: observable,
+
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
@@ -83,6 +84,15 @@ export class AppStore {
 
   setPlaylists(playlists) {
     this.playlists = playlists
+  }
+  playlistVideos(id) {
+    return computed(() => {
+      const playlist = this.playlists.find(playlist => playlist.id === id)
+      if (!playlist) {
+        return []
+      }
+      return this.videos.filter(video => playlist.ids.includes(video.id))
+    }).get()
   }
 
   setVideos(videos) {

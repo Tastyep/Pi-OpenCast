@@ -26,7 +26,6 @@ class SocketEventDispatcher {
         this.eventsToCallbacks[evt] = [ eventsToCallback[evt] ]
       }
     }
-    console.log("PASS:", this.eventsToCallbacks)
   }
 }
 

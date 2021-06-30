@@ -17,7 +17,6 @@ import noPreview from "images/no-preview.png";
 import "./stream_input.css";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
-import { computed } from "mobx";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -44,12 +43,9 @@ const useStyles = makeStyles((theme) =>
 );
 
 const VideoList = observer(() => {
-  const classes = useStyles();
+  const classes = useStyles()
   const store = useAppStore()
-  const videos = computed(() => {
-    let playlist = store.playlists.find(playlist => playlist.id === store.player.queue)
-    return playlist ? store.videos.filter(video => playlist.ids.includes(video.id)) : []
-  }).get()
+  const videos = store.playlistVideos(store.player.queue)
 
   const deleteVideo = (video) => {
     videoAPI
@@ -71,7 +67,7 @@ const VideoList = observer(() => {
   return (
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
-        {videos.map((video) => (
+        { videos.map((video) => (
           <GridListTile key={video.thumbnail}>
             <img
               src={video.thumbnail === null ? noPreview : video.thumbnail}
