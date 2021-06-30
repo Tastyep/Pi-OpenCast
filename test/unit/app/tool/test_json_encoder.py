@@ -1,12 +1,34 @@
+from enum import Enum
 import json
 from test.util import TestCase
 
 from OpenCast.app.command.video import CreateVideo
-from OpenCast.app.tool.json_encoder import EventEncoder, ModelEncoder
+from OpenCast.app.tool.json_encoder import (
+    EnhancedJSONEncoder,
+    EventEncoder,
+    ModelEncoder,
+)
 from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.video import Path, Stream, Video
 from OpenCast.domain.service.identity import IdentityService
+
+
+class EnhancedEncoderTest(TestCase):
+    def test_encode_id(self):
+        id = IdentityService.random()
+        json.dumps({"id": id}, cls=EnhancedJSONEncoder)
+
+    def test_encode_path(self):
+        path = Path(".")
+        json.dumps({"path": path}, cls=EnhancedJSONEncoder)
+
+    def test_encode_enum(self):
+        class Color(Enum):
+            RED = 1
+
+        color = Color.RED
+        json.dumps({"color": color}, cls=EnhancedJSONEncoder)
 
 
 class ModelEncoderTest(TestCase):
