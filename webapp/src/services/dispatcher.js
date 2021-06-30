@@ -9,7 +9,7 @@ class SocketEventDispatcher {
 
   onEvent(event) {
     const data = JSON.parse(event.data)
-    console.log("Received Event", data.name, this.eventsToCallbacks.hasOwnProperty(data.name))
+    console.log("Received Event", data.name, this.eventsToCallbacks.hasOwnProperty(data.name), event.data)
     if (this.eventsToCallbacks.hasOwnProperty(data.name)) {
       const callbacks = this.eventsToCallbacks[data.name] 
       for (const i in callbacks) {
