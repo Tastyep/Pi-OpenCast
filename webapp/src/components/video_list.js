@@ -50,9 +50,6 @@ const VideoList = observer(() => {
   const deleteVideo = (video) => {
     videoAPI
       .delete_(video.id)
-      .then((_) => {
-        store.removeVideo(video.id)
-      })
       .catch((error) => console.log(error));
   };
 
