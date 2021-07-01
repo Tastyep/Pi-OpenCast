@@ -18,16 +18,21 @@ export class AppStore {
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
+
       removeVideo: action,
       addVideo: action,
 
+      addPlaylist: action,
+      removePlaylist: action,
       onPlaylistUpdated: action
     })
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
       VideoDeleted: (e) => this.removeVideo(e.model_id),
-      PlaylistContentUpdated: (e) => this.onPlaylistUpdated(e), 
+      PlaylistCreated: (e) => this.onPlaylistCreated(e),
+      PlaylistContentUpdated: (e) => this.onPlaylistUpdated(e),
+      PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
     })
   }
 
@@ -70,7 +75,16 @@ export class AppStore {
       })
       .catch((error) => console.log(error)); 
   }
-  
+ 
+  onPlaylistCreated(evt) {
+    playlistAPI 
+      .get(evt.model_id)
+      .then((response) => {
+        this.addPlaylist(response.data)
+      })
+      .catch((error) => console.log(error)); 
+  }
+
   onPlaylistUpdated(evt) {
     let playlist = this.playlists.find(playlist => playlist.id === evt.model_id)
     if (playlist) {
@@ -85,6 +99,16 @@ export class AppStore {
   setPlaylists(playlists) {
     this.playlists = playlists
   }
+
+  addPlaylist(playlist) {
+    console.log("ADD: ", playlist)
+    this.playlists.push(playlist)
+  }
+
+  removePlaylist(id) {
+    this.playlists = this.playlists.filter(playlist => playlist.id !== id)
+  }
+
   playlistVideos(id) {
     return computed(() => {
       const playlist = this.playlists.find(playlist => playlist.id === id)
