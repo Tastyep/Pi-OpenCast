@@ -11,14 +11,14 @@ import VolumeControl from "./volume_control";
 import Playlists from "./playlists";
 import { useAppStore } from "./app_context";
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       width: '100%',
       backgroundColor: '#F5F5F5'
     },
   }),
-);
+)
 
 function App() {
   const store = useAppStore();
