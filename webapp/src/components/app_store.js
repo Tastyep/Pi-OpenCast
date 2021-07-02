@@ -7,7 +7,7 @@ import videoAPI from "services/api/video";
 export class AppStore {
   player = {};
   playlists = [];
-  videos = [];
+  videos = {};
 
   constructor(eventDispatcher) {
     makeObservable(this, {
@@ -18,6 +18,8 @@ export class AppStore {
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
+      insertPlaylistVideo: action,
+      removePlaylistVideo: action,
 
       removeVideo: action,
       addVideo: action,
@@ -101,12 +103,29 @@ export class AppStore {
   }
 
   addPlaylist(playlist) {
-    console.log("ADD: ", playlist)
     this.playlists.push(playlist)
   }
 
   removePlaylist(id) {
     this.playlists = this.playlists.filter(playlist => playlist.id !== id)
+  }
+
+  insertPlaylistVideo(playlistId, videoId, index) {
+    let playlist = this.playlists.find(playlist => playlist.id === playlistId)
+    if (playlist) {
+      playlist.ids.splice(index, 0, videoId)
+    }
+  }
+
+  removePlaylistVideo(playlistId, videoId) {
+    let playlist = this.playlists.find(playlist => playlist.id === playlistId)
+    if (playlist) {
+      playlist.ids = playlist.ids.filter(id => id !== videoId)
+    }
+  }
+
+  playlist(id) {
+   return this.playlists.find(playlist => playlist.id === id) 
   }
 
   playlistVideos(id) {
@@ -115,18 +134,24 @@ export class AppStore {
       if (!playlist) {
         return []
       }
-      return this.videos.filter(video => playlist.ids.includes(video.id))
+      let videos = []
+      for (const id of playlist.ids) {
+        videos.push(this.videos[id])
+      }
+      return videos
     }).get()
   }
 
   setVideos(videos) {
-    this.videos = videos
+    for (const video of videos) {
+      this.videos[video.id] = video
+    }
   }
 
   addVideo(video) {
-    this.videos.push(video)
+    this.videos[video.id] = video
   }
   removeVideo(id) {
-    this.videos = this.videos.filter(video => video.id !== id)
+    delete this.videos[id]
   }
 }
