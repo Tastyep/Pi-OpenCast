@@ -13,7 +13,7 @@ async function get(id) {
 }
 
 async function update(id, data) {
-  return await API.get("/playlists/" + id, data);
+  return await API.patch("/playlists/" + id, data);
 }
 
 async function delete_(id) {
