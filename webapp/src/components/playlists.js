@@ -1,27 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
-import { Grid, IconButton, TextField, Divider, List, ListItem, ListItemText, ListSubheader} from "@material-ui/core";
+import { Grid, IconButton, TextField, Divider, } from "@material-ui/core";
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import DeleteIcon from '@material-ui/icons/Delete';
 
 import { observer } from "mobx-react-lite";
 
+import { DragDropContext } from 'react-beautiful-dnd';
+
 import { useAppStore } from "./app_context";
 import playlistAPI from "services/api/playlist"
+import Playlist from './playlist'
 
 const Playlists = observer(() => {
   const store = useAppStore()
 
+  const onDragEnd = useCallback((result) => {
+    const { destination, source, draggableId } = result
+    
+    if (!destination ||
+        (destination.droppableId === source.droppableId && destination.index === source.index)) {
+      return;
+    }
+
+    store.removePlaylistVideo(source.droppableId, draggableId)
+    store.insertPlaylistVideo(destination.droppableId, draggableId, destination.index)
+ 
+    const destPlaylist = store.playlist(destination.droppableId)
+    const srcPlaylist = store.playlist(source.droppableId)
+    playlistAPI.update(destination.droppableId, {ids: destPlaylist.ids})
+    if (destination.dropppableId !== source.droppableId) {
+      playlistAPI.update(source.droppableId, {ids: srcPlaylist.ids})
+    }
+  }, [store]);
+
   return (
     <div>
       <PlaylistInput />
-      <Grid container spacing={2}>
-      { store.playlists.map((playlist) => (
-        <Grid item key={playlist.id}>
-          <Playlist playlist={playlist} />
+      <DragDropContext
+        onDragEnd={onDragEnd}
+      >
+        <Grid container spacing={2}>
+        { store.playlists.map((playlist) => (
+          <Grid item key={playlist.id} xs={12} sm={6} md={6} lg={4} xl={3}>
+            <Playlist playlist={playlist} />
+          </Grid>
+        ))}
         </Grid>
-      ))}
-      </Grid>
+      </DragDropContext>
     </div>
   )
 })
@@ -55,41 +80,6 @@ const PlaylistInput = () => {
         </IconButton>
       </Grid>
     </Grid>
-  )
-}
-
-const Playlist = ({playlist}) => {
-  const store = useAppStore()
-  const videos = store.playlistVideos(playlist.id)
-
-  const removePlaylist = () => {
-    playlistAPI
-      .delete_(playlist.id)
-      .catch((error) => console.log(error));
-  }
-
-  return (
-    <>
-      <List subheader={
-        <ListSubheader>
-          {playlist.name}
-          <IconButton
-            onClick={() => removePlaylist()}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </ListSubheader>
-      }>
-      { videos.map((video) => (
-        <div key={video.id}>
-          <ListItem>
-            <ListItemText primary={video.title} />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-        </div>
-       ))}
-      </List>
-    </>
   )
 }
 
