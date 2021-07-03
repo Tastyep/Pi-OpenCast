@@ -9,7 +9,7 @@ export class AppStore {
   playlists = [];
   videos = {};
 
-  constructor(eventDispatcher) {
+  constructor(eventDispatcher, modelFactory) {
     makeObservable(this, {
       player: observable,
       playlists: observable,
@@ -25,15 +25,15 @@ export class AppStore {
       addVideo: action,
 
       addPlaylist: action,
-      removePlaylist: action,
-      onPlaylistUpdated: action
+      removePlaylist: action
     })
+
+    this.modelFactory = modelFactory
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
       VideoDeleted: (e) => this.removeVideo(e.model_id),
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
-      PlaylistContentUpdated: (e) => this.onPlaylistUpdated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
     })
   }
@@ -87,23 +87,18 @@ export class AppStore {
       .catch((error) => console.log(error)); 
   }
 
-  onPlaylistUpdated(evt) {
-    let playlist = this.playlists.find(playlist => playlist.id === evt.model_id)
-    if (playlist) {
-      playlist.ids = evt.ids
-    }
- }
-
   setPlayer(player) {
-    this.player = player
+    this.player = this.modelFactory.makePlayer(player)
   }
 
   setPlaylists(playlists) {
-    this.playlists = playlists
+    for (const playlist of playlists) {
+      this.playlists.push(this.modelFactory.makePlaylist(playlist))
+    }
   }
 
   addPlaylist(playlist) {
-    this.playlists.push(playlist)
+    this.playlists.push(this.modelFactory.makePlaylist(playlist))
   }
 
   removePlaylist(id) {
@@ -144,12 +139,12 @@ export class AppStore {
 
   setVideos(videos) {
     for (const video of videos) {
-      this.videos[video.id] = video
+      this.videos[video.id] = this.modelFactory.makeVideo(video)
     }
   }
 
   addVideo(video) {
-    this.videos[video.id] = video
+    this.videos[video.id] = this.modelFactory.makeVideo(video)
   }
   removeVideo(id) {
     delete this.videos[id]
