@@ -35,7 +35,7 @@ class PlayerTest(ModelTestCase):
         self.player.play(video_id)
         self.player.stop()
         self.assertEqual(PlayerState.STOPPED, self.player.state)
-        self.assertEqual(video_id, self.player.video_id)
+        self.assertEqual(None, self.player.video_id)
         self.expect_events(self.player, Evt.PlayerStarted, Evt.PlayerStopped)
 
     def test_stop_not_started(self):
