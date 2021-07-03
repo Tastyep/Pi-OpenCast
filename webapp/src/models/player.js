@@ -29,13 +29,13 @@ export default class Player {
   }
 
   onPlayerStarted(e) {
-    this.setState("STARTED")
+    this.setState(e.state)
     this.setVideoId(e.video_id)
   }
 
-  onPlayerStopped(_) {
-    this.setState("STOPPED")
-    this.setVideoId(null)
+  onPlayerStopped(e) {
+    this.setState(e.state)
+    this.setVideoId(e.video_id)
   }
 
   setState(state) {

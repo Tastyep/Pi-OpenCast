@@ -1,3 +1,4 @@
+from OpenCast.domain.model.player import State as PlayerState
 from unittest.mock import Mock
 
 import OpenCast.app.command.player as PlayerCmd
@@ -244,6 +245,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
             PlayerEvt.PlayerStarted,
             cmd.id,
             self.player_id,
+            PlayerState.PLAYING,
             self.video.id,
         )
         self.assertTrue(self.workflow.is_COMPLETED())
