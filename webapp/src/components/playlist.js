@@ -47,6 +47,7 @@ const subheaderStyle = {
 const Playlist = observer(({playlist}) => {
   const store = useAppStore()
   const videos = store.playlistVideos(playlist.id)
+  const playerVideoId = store.player.video_id
 
   const removePlaylist = () => {
     playlistAPI
@@ -96,7 +97,7 @@ const Playlist = observer(({playlist}) => {
                 disableRipple
                 onClick={() => { playVideo(video) }}
               >
-                { video.id == store.player.video_id &&
+                { video.id === playerVideoId &&
                   <ListItemIcon>
                     <PlayArrowIcon />
                   </ListItemIcon>
