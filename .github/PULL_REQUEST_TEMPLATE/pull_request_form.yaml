@@ -1,0 +1,56 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: [bug, triage]
+assignees:
+  - Tastyep
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us improve !
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem description
+      description: Also tell us, what did you expect to happen?
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: OpenCast version
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+    validations:
+      required: true
+  - type: input
+    id: bash-version
+    attributes:
+      label: Bash version
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Logs are available in the log/ directory 
+      placeholder: This will be automatically formatted into code
+      render: shell
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem
+    validations:
+      required: false
