@@ -15,11 +15,17 @@ const VolumeControl = observer(() => {
     playerAPI.updateVolume(value);
   };
 
+  const generateMarks = () => {
+    return [
+      {
+        value: store.player.volume,
+        label: store.player.volume + "%",
+      },
+    ];
+  };
+
   return (
     <div>
-      <Typography id="continuous-slider" gutterBottom>
-        Volume {store.player.volume} %
-      </Typography>
       <Grid container spacing={2}>
         <Grid item>
           <VolumeDown />
@@ -28,9 +34,10 @@ const VolumeControl = observer(() => {
           <Slider
             value={store.player.volume ? store.player.volume : 50}
             onChange={(_, value) => {
-              store.player.volume = value;
+              store.player.setVolume(value);
             }}
             onChangeCommitted={handleCommit}
+            marks={generateMarks()}
             aria-labelledby="continuous-slider"
           />
         </Grid>
