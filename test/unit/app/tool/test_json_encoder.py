@@ -1,5 +1,5 @@
-from enum import Enum
 import json
+from enum import Enum
 from test.util import TestCase
 
 from OpenCast.app.command.video import CreateVideo

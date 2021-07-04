@@ -1,8 +1,8 @@
 """ Custom JSON encoder definitions """
 
+from enum import Enum
 from json import JSONEncoder
 from pathlib import PosixPath
-from enum import Enum
 
 from OpenCast.domain.event.event import Event
 from OpenCast.domain.model.entity import Entity

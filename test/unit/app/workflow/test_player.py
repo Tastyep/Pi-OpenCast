@@ -1,4 +1,3 @@
-from OpenCast.domain.model.player import State as PlayerState
 from unittest.mock import Mock
 
 import OpenCast.app.command.player as PlayerCmd
@@ -13,6 +12,7 @@ from OpenCast.app.workflow.player import (
     Video,
     VideoWorkflow,
 )
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import WorkflowTestCase
