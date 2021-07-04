@@ -58,33 +58,39 @@ const VideoList = observer(() => {
       .catch((error) => console.log(error));
   };
 
+  const renderMedia = (video) => {
+    if (video) {
+      return (
+        <GridListTile key={video.id}>
+          <img
+            src={video.thumbnail === null ? noPreview : video.thumbnail}
+            alt={video.title}
+            onClick={() => playMedia(video)}
+          />
+          <GridListTileBar
+            title={video.title}
+            classes={{
+              root: classes.titleBar,
+              title: classes.title,
+            }}
+            actionIcon={
+              <IconButton
+                aria-label={`delete ${video.title}`}
+                onClick={() => deleteVideo(video)}
+              >
+                <DeleteIcon className={classes.title} />
+              </IconButton>
+            }
+          />
+        </GridListTile>
+      );
+    }
+  };
+
   return (
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
-        {videos.map((video) => (
-          <GridListTile key={video.id}>
-            <img
-              src={video.thumbnail === null ? noPreview : video.thumbnail}
-              alt={video.title}
-              onClick={() => playMedia(video)}
-            />
-            <GridListTileBar
-              title={video.title}
-              classes={{
-                root: classes.titleBar,
-                title: classes.title,
-              }}
-              actionIcon={
-                <IconButton
-                  aria-label={`delete ${video.title}`}
-                  onClick={() => deleteVideo(video)}
-                >
-                  <DeleteIcon className={classes.title} />
-                </IconButton>
-              }
-            />
-          </GridListTile>
-        ))}
+        {videos.map((video) => renderMedia(video))}
       </GridList>
     </div>
   );
