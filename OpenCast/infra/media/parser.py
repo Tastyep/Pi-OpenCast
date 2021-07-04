@@ -55,7 +55,9 @@ class VideoParser:
             (
                 stream.id,
                 type_to_code.get(stream.type, "unknown"),
-                None if stream.language is None else stream.language.decode("UTF-8"),
+                None
+                # None if stream.language is None else stream.language.decode("UTF-8"),
+                # For some reason the language attribute might not be available
             )
             for stream in streams
         ]
