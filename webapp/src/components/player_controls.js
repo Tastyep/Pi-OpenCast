@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { Button, ButtonGroup, Grid } from "@material-ui/core";
 
 import PauseIcon from "@material-ui/icons/Pause";
@@ -19,15 +19,15 @@ import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
 const PlayerControls = observer(() => {
-  const store = useAppStore() 
+  const store = useAppStore();
 
   const updatePlayer = (update, ...args) => {
     update(...args)
       .then((response) => {
-        store.loadPlayer()
+        store.loadPlayer();
       })
       .catch((error) => console.log(error));
-  }
+  };
 
   // Highlight subtitle button when on
   return (
@@ -35,7 +35,11 @@ const PlayerControls = observer(() => {
       <Grid item xs={6} md={4}>
         <ButtonGroup size="small" variant="text">
           <Button onClick={() => updatePlayer(playerAPI.pauseMedia)}>
-            {store.player.state !== "PAUSED" ? <PauseIcon /> : <PlayArrowIcon />}
+            {store.player.state !== "PAUSED" ? (
+              <PauseIcon />
+            ) : (
+              <PlayArrowIcon />
+            )}
           </Button>
           <Button onClick={() => updatePlayer(playerAPI.stopMedia)}>
             <StopIcon />
@@ -59,32 +63,26 @@ const PlayerControls = observer(() => {
           >
             <ArrowRightIcon />
           </Button>
-          <Button
-            onClick={() => updatePlayer(playerAPI.seekMedia, true, true)}
-          >
+          <Button onClick={() => updatePlayer(playerAPI.seekMedia, true, true)}>
             <FastForwardIcon />
           </Button>
         </ButtonGroup>
       </Grid>
       <Grid item xs={12} md={4} className="SubtitleButtons">
         <ButtonGroup size="small" variant="text">
-          <Button
-            onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}
-          >
+          <Button onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}>
             <RemoveCircleOutlineIcon />
           </Button>
           <Button onClick={() => updatePlayer(playerAPI.toggleSubtitle)}>
             <ClosedCaptionIcon />
           </Button>
-          <Button
-            onClick={() => updatePlayer(playerAPI.seekSubtitle, true)}
-          >
+          <Button onClick={() => updatePlayer(playerAPI.seekSubtitle, true)}>
             <AddCircleOutlineIcon />
           </Button>
         </ButtonGroup>
       </Grid>
     </Grid>
   );
-})
+});
 
 export default PlayerControls;

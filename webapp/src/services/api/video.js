@@ -1,4 +1,3 @@
-
 import { API, makeWebSocket } from "./api";
 
 async function list() {
@@ -14,7 +13,7 @@ async function delete_(id) {
 }
 
 function listen() {
-  return makeWebSocket("/videos/events")
+  return makeWebSocket("/videos/events");
 }
 
 export default {
@@ -23,5 +22,4 @@ export default {
   delete_,
 };
 
-export { listen }
-
+export { listen };

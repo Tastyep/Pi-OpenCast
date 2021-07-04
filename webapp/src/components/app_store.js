@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, computed } from "mobx"
+import { action, makeObservable, observable, computed } from "mobx";
 
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
@@ -25,46 +25,46 @@ export class AppStore {
       addVideo: action,
 
       addPlaylist: action,
-      removePlaylist: action
-    })
+      removePlaylist: action,
+    });
 
-    this.modelFactory = modelFactory
+    this.modelFactory = modelFactory;
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
       VideoDeleted: (e) => this.removeVideo(e.model_id),
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
-    })
+    });
   }
 
   load() {
-    this.loadPlayer()
-    this.loadVideos()
-    this.loadPlaylists()
+    this.loadPlayer();
+    this.loadVideos();
+    this.loadPlaylists();
   }
 
   loadPlayer() {
     playerAPI
       .get()
       .then((response) => {
-        this.setPlayer(response.data)
+        this.setPlayer(response.data);
       })
-      .catch((error) => console.log(error)); 
+      .catch((error) => console.log(error));
   }
   loadVideos() {
-   videoAPI
+    videoAPI
       .list()
       .then((response) => {
-        this.setVideos(response.data.videos)
+        this.setVideos(response.data.videos);
       })
-      .catch((error) => console.log(error)); 
-      }
+      .catch((error) => console.log(error));
+  }
   loadPlaylists() {
-   playlistAPI
+    playlistAPI
       .list()
       .then((response) => {
-        this.setPlaylists(response.data.playlists)
+        this.setPlaylists(response.data.playlists);
       })
       .catch((error) => console.log(error));
   }
@@ -73,80 +73,84 @@ export class AppStore {
     videoAPI
       .get(evt.model_id)
       .then((response) => {
-        this.addVideo(response.data)
+        this.addVideo(response.data);
       })
-      .catch((error) => console.log(error)); 
+      .catch((error) => console.log(error));
   }
- 
+
   onPlaylistCreated(evt) {
-    playlistAPI 
+    playlistAPI
       .get(evt.model_id)
       .then((response) => {
-        this.addPlaylist(response.data)
+        this.addPlaylist(response.data);
       })
-      .catch((error) => console.log(error)); 
+      .catch((error) => console.log(error));
   }
 
   setPlayer(player) {
-    this.player = this.modelFactory.makePlayer(player)
+    this.player = this.modelFactory.makePlayer(player);
   }
 
   setPlaylists(playlists) {
     for (const playlist of playlists) {
-      this.playlists.push(this.modelFactory.makePlaylist(playlist))
+      this.playlists.push(this.modelFactory.makePlaylist(playlist));
     }
   }
 
   addPlaylist(playlist) {
-    this.playlists.push(this.modelFactory.makePlaylist(playlist))
+    this.playlists.push(this.modelFactory.makePlaylist(playlist));
   }
 
   removePlaylist(id) {
-    this.playlists = this.playlists.filter(playlist => playlist.id !== id)
+    this.playlists = this.playlists.filter((playlist) => playlist.id !== id);
   }
 
   insertPlaylistVideo(playlistId, videoId, index) {
-    let playlist = this.playlists.find(playlist => playlist.id === playlistId)
+    let playlist = this.playlists.find(
+      (playlist) => playlist.id === playlistId
+    );
     if (playlist) {
-      playlist.ids.splice(index, 0, videoId)
+      playlist.ids.splice(index, 0, videoId);
     }
   }
 
   removePlaylistVideo(playlistId, videoId) {
-    let playlist = this.playlists.find(playlist => playlist.id === playlistId)
+    let playlist = this.playlists.find(
+      (playlist) => playlist.id === playlistId
+    );
     if (playlist) {
-      playlist.ids = playlist.ids.filter(id => id !== videoId)
+      playlist.ids = playlist.ids.filter((id) => id !== videoId);
     }
   }
 
   playlist(id) {
-   return this.playlists.find(playlist => playlist.id === id) 
+    return this.playlists.find((playlist) => playlist.id === id);
   }
 
   playlistVideos(id) {
     return computed(() => {
-      const playlist = this.playlists.find(playlist => playlist.id === id)
+      const playlist = this.playlists.find((playlist) => playlist.id === id);
       if (!playlist) {
-        return []
+        return [];
       }
-      let videos = []
+      let videos = [];
       for (const id of playlist.ids) {
-        videos.push(this.videos[id])
+        videos.push(this.videos[id]);
       }
-      return videos
-    }).get()
+      return videos;
+    }).get();
   }
 
   setVideos(videos) {
     for (const video of videos) {
-      this.videos[video.id] = this.modelFactory.makeVideo(video)
+      this.videos[video.id] = this.modelFactory.makeVideo(video);
     }
   }
 
   addVideo(video) {
-    this.videos[video.id] = this.modelFactory.makeVideo(video)
+    this.videos[video.id] = this.modelFactory.makeVideo(video);
   }
   removeVideo(id) {
-    delete this.videos[id]
+    delete this.videos[id];
   }
 }
