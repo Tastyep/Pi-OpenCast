@@ -76,6 +76,36 @@ const Playlist = observer(({ playlist }) => {
     }
   };
 
+  const renderMediaItem = (provided, snapshot, video, index) => {
+    if (video) {
+      return (
+        <Draggable draggableId={video.id} index={index} key={video.id}>
+          {(provided, snapshot) => (
+            <>
+              <ListItem
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                style={getItemStyle(
+                  snapshot.isDragging,
+                  provided.draggableProps.style
+                )}
+                button
+                disableRipple
+                // autoFocus={video.id === activeVideoId}
+                onClick={() => onMediaClicked(video)}
+              >
+                {renderButtonState(video)}
+                <ListItemText primary={video.title} />
+              </ListItem>
+              {index < videos.length - 1 && <Divider />}
+            </>
+          )}
+        </Draggable>
+      );
+    }
+  };
+
   return (
     <Droppable droppableId={playlist.id}>
       {(provided, snapshot) => (
@@ -93,31 +123,9 @@ const Playlist = observer(({ playlist }) => {
           style={getListStyle(snapshot.isDraggingOver)}
           ref={provided.innerRef}
         >
-          {videos.map((video, index) => (
-            <Draggable draggableId={video.id} index={index} key={video.id}>
-              {(provided, snapshot) => (
-                <>
-                  <ListItem
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={getItemStyle(
-                      snapshot.isDragging,
-                      provided.draggableProps.style
-                    )}
-                    button
-                    disableRipple
-                    // autoFocus={video.id === activeVideoId}
-                    onClick={() => onMediaClicked(video)}
-                  >
-                    {renderButtonState(video)}
-                    <ListItemText primary={video.title} />
-                  </ListItem>
-                  {index < videos.length - 1 && <Divider />}
-                </>
-              )}
-            </Draggable>
-          ))}
+          {videos.map((video, index) =>
+            renderMediaItem(provided, snapshot, video, index)
+          )}
           {provided.placeholder}
         </List>
       )}
