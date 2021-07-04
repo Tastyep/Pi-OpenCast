@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Typography, Slider } from "@material-ui/core";
+import { Grid, Slider } from "@material-ui/core";
 
 import VolumeDown from "@material-ui/icons/VolumeDown";
 import VolumeUp from "@material-ui/icons/VolumeUp";
