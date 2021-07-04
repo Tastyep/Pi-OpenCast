@@ -5,8 +5,8 @@ from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import video as VideoCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
-from OpenCast.domain.service.identity import IdentityService
 from OpenCast.domain.model.player import State as PlayerState
+from OpenCast.domain.service.identity import IdentityService
 
 from .util import MonitorControllerTestCase, asyncio
 

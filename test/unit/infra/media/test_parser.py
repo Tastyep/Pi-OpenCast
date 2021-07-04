@@ -24,9 +24,12 @@ class VideoParserTest(TestCase):
 
         # input_languages = [b"eng", None, b"\xE2\x82\xAC"]
         # output_languages = ["eng", None, "€"]
-        # TODO: update this once I understand why the language attribute might not be present
+        # TODO: update this once I understand why the language
+        # attribute might not be present
         input_languages = [None, None, None]
         output_languages = [None, None, None]
+        input_languages = [b"eng", None, None]
+        output_languages = ["eng", None, None]
         input_types = [TrackType.audio, TrackType.video, TrackType.ext]
         output_types = ["audio", "video", "subtitle"]
 
