@@ -154,6 +154,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.expect_and_raise(
             make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id),
             PlayerEvt.PlayerStarted,
+            PlayerState.PLAYING,
             video_id,
         )
 
@@ -192,7 +193,10 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_stop(self):
         self.expect_and_raise(
-            make_cmd(PlayerCmd.StopPlayer, self.player_id), PlayerEvt.PlayerStopped
+            make_cmd(PlayerCmd.StopPlayer, self.player_id),
+            PlayerEvt.PlayerStopped,
+            PlayerState.STOPPED,
+            video_id=None,
         )
 
         resp = await self.client.post("/api/player/stop")
@@ -457,12 +461,19 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_event_listening(self):
         async with self.client.ws_connect("/api/player/events") as ws:
-            stop_evt = PlayerEvt.PlayerStopped(self.cmd_id, self.player_id)
+            stop_evt = PlayerEvt.PlayerStopped(
+                self.cmd_id,
+                self.player_id,
+                PlayerState.STOPPED,
+                video_id=None,
+            )
             self.evt_dispatcher.dispatch(stop_evt)
             await self.expect_ws_events(ws, [stop_evt])
 
             video_id = IdentityService.id_video("source")
-            start_evt = PlayerEvt.PlayerStarted(self.cmd_id, self.player_id, video_id)
+            start_evt = PlayerEvt.PlayerStarted(
+                self.cmd_id, self.player_id, PlayerState.PLAYING, video_id
+            )
             self.evt_dispatcher.dispatch(start_evt)
             self.evt_dispatcher.dispatch(stop_evt)
             await self.expect_ws_events(ws, [start_evt, stop_evt])

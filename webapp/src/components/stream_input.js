@@ -19,8 +19,7 @@ const StreamInput = () => {
     if (url === "") {
       return;
     }
-    action(url)
-      .catch((error) => console.log(error));
+    action(url).catch((error) => console.log(error));
     setUrl("");
   };
 
@@ -44,7 +43,7 @@ const StreamInput = () => {
     }
   };
 
- return (
+  return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">
       <Grid container spacing={1}>
         <Grid item xs={6} sm={7} md={8}>
@@ -80,6 +79,6 @@ const StreamInput = () => {
       </Grid>
     </form>
   );
-}
+};
 
 export default StreamInput;

@@ -12,6 +12,7 @@ from OpenCast.app.workflow.player import (
     Video,
     VideoWorkflow,
 )
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import WorkflowTestCase
@@ -244,6 +245,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
             PlayerEvt.PlayerStarted,
             cmd.id,
             self.player_id,
+            PlayerState.PLAYING,
             self.video.id,
         )
         self.assertTrue(self.workflow.is_COMPLETED())

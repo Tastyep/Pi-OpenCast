@@ -1,6 +1,6 @@
 class SocketEventDispatcher {
   constructor(websockets) {
-    this.eventsToCallbacks = {}
+    this.eventsToHandlers = {}
   
     for (const i in websockets) {
       websockets[i].addEventListener('message', (evt) => this.onEvent(evt))
@@ -9,24 +9,25 @@ class SocketEventDispatcher {
 
   onEvent(event) {
     const data = JSON.parse(event.data)
-    console.log("Received Event", data.name, this.eventsToCallbacks.hasOwnProperty(data.name), event.data)
-    if (this.eventsToCallbacks.hasOwnProperty(data.name)) {
-      const callbacks = this.eventsToCallbacks[data.name] 
-      for (const i in callbacks) {
-        callbacks[i](data.event)
+    console.log("Received Event", data.name, this.eventsToHandlers.hasOwnProperty(data.name), event.data)
+    if (this.eventsToHandlers.hasOwnProperty(data.name)) {
+      const handlers = this.eventsToHandlers[data.name] 
+      for (const handler of handlers) {
+        if (!handler.modelId || data.event.model_id === handler.modelId) {
+          handler.func(data.event)
+        }
       }
     }
   }
 
-  observe(eventsToCallback) {
-    for (const evt in eventsToCallback) {
-      if (this.eventsToCallbacks.hasOwnProperty(evt)) {
-        this.eventsToCallbacks[evt].push(eventsToCallback[evt])
+  observe(eventsToHandler, modelId) {
+    for (const evt in eventsToHandler) {
+      if (this.eventsToHandlers.hasOwnProperty(evt)) {
+        this.eventsToHandlers[evt].push({modelId: modelId, func: eventsToHandler[evt]})
       } else {
-        this.eventsToCallbacks[evt] = [ eventsToCallback[evt] ]
+        this.eventsToHandlers[evt] = [ {modelId: modelId, func: eventsToHandler[evt]} ]
       }
     }
-    console.log("PASS:", this.eventsToCallbacks)
   }
 }
 

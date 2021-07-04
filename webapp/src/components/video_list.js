@@ -17,7 +17,6 @@ import noPreview from "images/no-preview.png";
 import "./stream_input.css";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
-import { computed } from "mobx";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -26,7 +25,7 @@ const useStyles = makeStyles((theme) =>
       flexWrap: "wrap",
       justifyContent: "center",
       overflow: "hidden",
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: "#F5F5F5",
     },
     gridList: {
       flexWrap: "nowrap",
@@ -34,7 +33,7 @@ const useStyles = makeStyles((theme) =>
       transform: "translateZ(0)",
     },
     title: {
-      color: theme.palette.primary.light,
+      color: "#F5F5F5",
     },
     titleBar: {
       background:
@@ -45,26 +44,17 @@ const useStyles = makeStyles((theme) =>
 
 const VideoList = observer(() => {
   const classes = useStyles();
-  const store = useAppStore()
-  const videos = computed(() => {
-    let playlist = store.playlists.find(playlist => playlist.id === store.player.queue)
-    return playlist ? store.videos.filter(video => playlist.ids.includes(video.id)) : []
-  }).get()
+  const store = useAppStore();
+  const videos = store.playlistVideos(store.player.queue);
 
   const deleteVideo = (video) => {
-    videoAPI
-      .delete_(video.id)
-      .then((_) => {
-        store.removeVideo(video.id)
-      })
-      .catch((error) => console.log(error));
+    videoAPI.delete_(video.id).catch((error) => console.log(error));
   };
 
   const playMedia = (video) => {
     playerAPI
       .playMedia(video.id)
-      .then((_) => {
-      })
+      .then((_) => {})
       .catch((error) => console.log(error));
   };
 
@@ -72,7 +62,7 @@ const VideoList = observer(() => {
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
         {videos.map((video) => (
-          <GridListTile key={video.thumbnail}>
+          <GridListTile key={video.id}>
             <img
               src={video.thumbnail === null ? noPreview : video.thumbnail}
               alt={video.title}
@@ -98,6 +88,6 @@ const VideoList = observer(() => {
       </GridList>
     </div>
   );
-})
+});
 
 export default VideoList;

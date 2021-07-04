@@ -13,7 +13,7 @@ async function get(id) {
 }
 
 async function update(id, data) {
-  return await API.get("/playlists/" + id, data);
+  return await API.patch("/playlists/" + id, data);
 }
 
 async function delete_(id) {
@@ -25,7 +25,7 @@ async function videos(playlist_id) {
 }
 
 function listen() {
-  return makeWebSocket("/playlists/events")
+  return makeWebSocket("/playlists/events");
 }
 
 export default {
@@ -37,5 +37,4 @@ export default {
   videos,
 };
 
-export { listen }
-
+export { listen };
