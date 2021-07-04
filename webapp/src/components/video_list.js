@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) =>
       flexWrap: "wrap",
       justifyContent: "center",
       overflow: "hidden",
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: "#F5F5F5",
     },
     gridList: {
       flexWrap: "nowrap",
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) =>
       transform: "translateZ(0)",
     },
     title: {
-      color: theme.palette.primary.light,
+      color: "#F5F5F5",
     },
     titleBar: {
       background:
@@ -62,7 +62,7 @@ const VideoList = observer(() => {
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
         {videos.map((video) => (
-          <GridListTile key={video.thumbnail}>
+          <GridListTile key={video.id}>
             <img
               src={video.thumbnail === null ? noPreview : video.thumbnail}
               alt={video.title}
