@@ -9,7 +9,7 @@ import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
 const VolumeControl = observer(() => {
-  const store = useAppStore()
+  const store = useAppStore();
 
   const handleCommit = (_, value) => {
     playerAPI.updateVolume(value);
@@ -27,7 +27,9 @@ const VolumeControl = observer(() => {
         <Grid item xs>
           <Slider
             value={store.player.volume ? store.player.volume : 50}
-            onChange={(_, value) => { store.player.volume = value}}
+            onChange={(_, value) => {
+              store.player.volume = value;
+            }}
             onChangeCommitted={handleCommit}
             aria-labelledby="continuous-slider"
           />
@@ -38,6 +40,6 @@ const VolumeControl = observer(() => {
       </Grid>
     </div>
   );
-})
+});
 
 export default VolumeControl;

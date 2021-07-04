@@ -45,7 +45,7 @@ async function seekSubtitle(forward) {
 }
 
 function listen() {
-  return makeWebSocket("/player/events")
+  return makeWebSocket("/player/events");
 }
 
 export default {
@@ -61,4 +61,4 @@ export default {
   seekSubtitle,
 };
 
-export { listen }
+export { listen };

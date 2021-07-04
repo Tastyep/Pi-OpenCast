@@ -43,28 +43,25 @@ const useStyles = makeStyles((theme) =>
 );
 
 const VideoList = observer(() => {
-  const classes = useStyles()
-  const store = useAppStore()
-  const videos = store.playlistVideos(store.player.queue)
+  const classes = useStyles();
+  const store = useAppStore();
+  const videos = store.playlistVideos(store.player.queue);
 
   const deleteVideo = (video) => {
-    videoAPI
-      .delete_(video.id)
-      .catch((error) => console.log(error));
+    videoAPI.delete_(video.id).catch((error) => console.log(error));
   };
 
   const playMedia = (video) => {
     playerAPI
       .playMedia(video.id)
-      .then((_) => {
-      })
+      .then((_) => {})
       .catch((error) => console.log(error));
   };
 
   return (
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
-        { videos.map((video) => (
+        {videos.map((video) => (
           <GridListTile key={video.thumbnail}>
             <img
               src={video.thumbnail === null ? noPreview : video.thumbnail}
@@ -91,6 +88,6 @@ const VideoList = observer(() => {
       </GridList>
     </div>
   );
-})
+});
 
 export default VideoList;
