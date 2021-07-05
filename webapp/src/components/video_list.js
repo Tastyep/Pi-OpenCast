@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme) =>
       // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
       transform: "translateZ(0)",
     },
+    gridItem: {
+      minWidth: "160px",
+    },
     title: {
       color: "#F5F5F5",
     },
@@ -61,7 +64,7 @@ const VideoList = observer(() => {
   const renderMedia = (video) => {
     if (video) {
       return (
-        <GridListTile key={video.id}>
+        <GridListTile key={video.id} className={classes.gridItem}>
           <img
             src={video.thumbnail === null ? noPreview : video.thumbnail}
             alt={video.title}
