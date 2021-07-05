@@ -76,7 +76,7 @@ const Playlist = observer(({ playlist }) => {
     }
   };
 
-  const renderMediaItem = (provided, snapshot, video, index) => {
+  const renderMediaItem = (video, index) => {
     if (video) {
       return (
         <Draggable draggableId={video.id} index={index} key={video.id}>
@@ -123,9 +123,7 @@ const Playlist = observer(({ playlist }) => {
           style={getListStyle(snapshot.isDraggingOver)}
           ref={provided.innerRef}
         >
-          {videos.map((video, index) =>
-            renderMediaItem(provided, snapshot, video, index)
-          )}
+          {videos.map((video, index) => renderMediaItem(video, index))}
           {provided.placeholder}
         </List>
       )}
