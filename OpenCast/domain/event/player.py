@@ -17,6 +17,11 @@ class PlayerCreated(Event):
 
 
 @dataclass
+class PlayerQueueUpdated(Event):
+    queue: ModelId
+
+
+@dataclass
 class PlayerStarted(Event):
     state: State
     video_id: ModelId

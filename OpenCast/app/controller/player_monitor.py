@@ -36,6 +36,7 @@ class PlayerMonitController(MonitorController):
         )
         self._data_facade = data_facade
         self._player_repo = data_facade.player_repo
+        self._playlist_repo = data_facade.playlist_repo
         self._video_repo = data_facade.video_repo
 
         self._route("GET", "/", self.get)
@@ -85,6 +86,7 @@ class PlayerMonitController(MonitorController):
     async def stream(self, req):
         source = req.query["url"]
         video_id = IdentityService.id_video(source)
+        playlist_id = self._player_repo.get_player().queue
 
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
@@ -99,12 +101,18 @@ class PlayerMonitController(MonitorController):
 
             workflow_id = IdentityService.id_workflow(StreamPlaylistWorkflow, video_id)
             self._start_workflow(
-                StreamPlaylistWorkflow, workflow_id, self._data_facade, videos
+                StreamPlaylistWorkflow,
+                workflow_id,
+                self._data_facade,
+                videos,
+                playlist_id,
             )
             return self._no_content()
 
         video = Video(video_id, source, collection_id=None)
-        self._start_workflow(StreamVideoWorkflow, video_id, self._data_facade, video)
+        self._start_workflow(
+            StreamVideoWorkflow, video_id, self._data_facade, video, playlist_id
+        )
 
         return self._no_content()
 
@@ -130,6 +138,7 @@ class PlayerMonitController(MonitorController):
     async def queue(self, req):
         source = req.query["url"]
         video_id = IdentityService.id_video(source)
+        playlist_id = self._player_repo.get_player().queue
 
         if self._source_service.is_playlist(source):
             sources = self._source_service.unfold(source)
@@ -144,13 +153,22 @@ class PlayerMonitController(MonitorController):
 
             workflow_id = IdentityService.id_workflow(QueuePlaylistWorkflow, video_id)
             self._start_workflow(
-                QueuePlaylistWorkflow, workflow_id, self._data_facade, videos
+                QueuePlaylistWorkflow,
+                workflow_id,
+                self._data_facade,
+                videos,
+                playlist_id,
             )
             return self._no_content()
 
         video = Video(video_id, source, collection_id=None)
         self._start_workflow(
-            QueueVideoWorkflow, video_id, self._data_facade, video, queue_front=False
+            QueueVideoWorkflow,
+            video_id,
+            self._data_facade,
+            video,
+            playlist_id,
+            queue_front=False,
         )
 
         return self._no_content()
@@ -163,11 +181,18 @@ class PlayerMonitController(MonitorController):
         parameters=[
             {
                 "in": "query",
+                "name": "playlist_id",
+                "description": "ID of the playlist",
+                "type": "string",
+                "required": True,
+            },
+            {
+                "in": "query",
                 "name": "id",
                 "description": "ID of the media",
                 "type": "string",
                 "required": True,
-            }
+            },
         ],
         responses={
             200: {"description": "Successful operation"},
@@ -176,12 +201,15 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def play(self, req):
+        playlist_id = Id(req.query["playlist_id"])
         video_id = Id(req.query["id"])
-        if not self._video_repo.exists(video_id):
+        if not self._playlist_repo.exists(playlist_id) or not self._video_repo.exists(
+            video_id
+        ):
             return self._not_found()
 
         handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStarted)
-        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id)
+        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id, playlist_id)
 
         return await channel.receive()
 
