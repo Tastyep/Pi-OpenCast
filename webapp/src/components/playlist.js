@@ -26,6 +26,8 @@ import { useAppStore } from "./app_context";
 // });
 const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? "lightblue" : "#F5F5F5",
+  maxHeight: "320px",
+  overflow: "auto",
 });
 const getItemStyle = (isDragging, draggableStyle) => ({
   // styles we need to apply on draggables
@@ -34,16 +36,6 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...(isDragging && {
     backgroundColor: "#C5C5C5",
   }),
-  parent: {
-    backgroundColor: "yellow",
-    "&:hover $child": {
-      color: "red",
-    },
-  },
-  child: {
-    fontSize: "2em",
-    padding: 24,
-  },
 });
 
 const subheaderStyle = {
