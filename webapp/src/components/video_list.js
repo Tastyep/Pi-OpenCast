@@ -56,7 +56,7 @@ const VideoList = observer(() => {
 
   const playMedia = (video) => {
     playerAPI
-      .playMedia(video.id)
+      .playMedia(video.id, store.player.queue)
       .then((_) => {})
       .catch((error) => console.log(error));
   };

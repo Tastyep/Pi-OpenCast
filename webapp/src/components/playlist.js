@@ -53,9 +53,9 @@ const Playlist = observer(({ playlist }) => {
     playlistAPI.delete_(playlist.id).catch((error) => console.log(error));
   };
 
-  const onMediaClicked = (media) => {
+  const onMediaClicked = (media, playlist) => {
     if (media.id !== activeVideoId) {
-      playerAPI.playMedia(media.id).catch((error) => console.log(error));
+      playerAPI.playMedia(media.id, playlist.id).catch((error) => console.log(error));
       return;
     }
     playerAPI.pauseMedia().catch((error) => console.log(error));
@@ -68,7 +68,7 @@ const Playlist = observer(({ playlist }) => {
     }
   };
 
-  const renderMediaItem = (video, index) => {
+  const renderMediaItem = (video, playlist, index) => {
     if (video) {
       return (
         <Draggable draggableId={video.id} index={index} key={video.id}>
@@ -85,7 +85,7 @@ const Playlist = observer(({ playlist }) => {
                 button
                 disableRipple
                 autoFocus={video.id === activeVideoId}
-                onClick={() => onMediaClicked(video)}
+                onClick={() => onMediaClicked(video, playlist)}
               >
                 {renderButtonState(video)}
                 <ListItemText primary={video.title} />
@@ -115,7 +115,7 @@ const Playlist = observer(({ playlist }) => {
           style={getListStyle(snapshot.isDraggingOver)}
           ref={provided.innerRef}
         >
-          {videos.map((video, index) => renderMediaItem(video, index))}
+          {videos.map((video, index) => renderMediaItem(video, playlist, index))}
           {provided.placeholder}
         </List>
       )}
