@@ -15,7 +15,7 @@ class PlayerServiceTest(ServiceTestCase):
         self.video_repo = self.data_facade.video_repo
 
         self.player_id = IdentityService.id_player()
-        self.player_playlist_id = IdentityService.id_player()
+        self.player_playlist_id = IdentityService.id_playlist()
 
     def test_create(self):
         self.evt_expecter.expect(
@@ -36,8 +36,12 @@ class PlayerServiceTest(ServiceTestCase):
 
         video_id = IdentityService.id_video("source2")
         self.evt_expecter.expect(
+            Evt.PlayerQueueUpdated, self.player_id, self.player_playlist_id
+        ).expect(
             Evt.PlayerStarted, self.player_id, PlayerState.PLAYING, video_id
-        ).from_(Cmd.PlayVideo, self.player_id, video_id)
+        ).from_(
+            Cmd.PlayVideo, self.player_id, video_id, self.player_playlist_id
+        )
 
     def test_stop_player(self):
         self.data_producer.player().video("source").play("source").populate(
@@ -77,7 +81,7 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
     def test_change_video_volume(self):
-        self.data_producer.player().video("source").play("source").populate(
+        self.data_producer.player().video("source").play("source", None).populate(
             self.data_facade
         )
 

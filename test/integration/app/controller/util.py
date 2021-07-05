@@ -78,12 +78,13 @@ class MonitorControllerTestCase(AioHTTPTestCase):
 
         self.hook_cmd(cmd_cls, raise_error)
 
-    def expect_and_raise(self, cmd, evt_cls, *args, **kwargs):
+    def expect_and_raise(self, cmd, events):
         def respond_to_cmd(command):
             self.assertEqual(command, cmd)
-            self.app_facade.evt_dispatcher.dispatch(
-                evt_cls(cmd.id, cmd.model_id, *args, **kwargs)
-            )
+            for evt in events:
+                self.app_facade.evt_dispatcher.dispatch(
+                    evt["type"](cmd.id, cmd.model_id, **evt["args"])
+                )
 
         self.app_facade.cmd_dispatcher.dispatch.side_effect = respond_to_cmd
 
