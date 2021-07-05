@@ -43,7 +43,8 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_delete(self):
         self.expect_and_raise(
-            make_cmd(VideoCmd.DeleteVideo, self.video_id), VideoEvt.VideoDeleted
+            make_cmd(VideoCmd.DeleteVideo, self.video_id),
+            [{"type": VideoEvt.VideoDeleted, "args": {}}],
         )
         resp = await self.client.delete(f"/api/videos/{self.video_id}")
         self.assertEqual(204, resp.status)

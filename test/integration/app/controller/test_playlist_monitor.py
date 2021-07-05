@@ -194,7 +194,12 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
         playlist = self.playlists[0]
         self.expect_and_raise(
             make_cmd(PlaylistCmd.DeletePlaylist, playlist.id),
-            PlaylistEvt.PlaylistDeleted,
+            [
+                {
+                    "type": PlaylistEvt.PlaylistDeleted,
+                    "args": {},
+                }
+            ],
         )
 
         resp = await self.client.delete(f"/api/playlists/{playlist.id}")

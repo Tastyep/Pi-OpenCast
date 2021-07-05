@@ -149,37 +149,72 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play(self):
-        self.data_producer.video("source").populate(self.data_facade)
+        self.data_producer.playlist("test", []).video("source").populate(
+            self.data_facade
+        )
         video_id = IdentityService.id_video("source")
+        playlist_id = self.data_facade.playlist_repo.list()[0].id
         self.expect_and_raise(
-            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id),
-            PlayerEvt.PlayerStarted,
-            PlayerState.PLAYING,
-            video_id,
+            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
+            [
+                {
+                    "type": PlayerEvt.PlayerQueueUpdated,
+                    "args": {"queue": playlist_id},
+                },
+                {
+                    "type": PlayerEvt.PlayerStarted,
+                    "args": {"state": PlayerState.PLAYING, "video_id": video_id},
+                },
+            ],
         )
 
-        resp = await self.client.post("/api/player/play", params={"id": str(video_id)})
+        resp = await self.client.post(
+            "/api/player/play",
+            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+        )
         body = await resp.json()
         player = self.data_facade.player_repo.get_player()
         self.assertEqual(200, resp.status)
         self.assertEqual(player.to_dict(), body)
 
     @unittest_run_loop
-    async def test_play_not_found(self):
+    async def test_play_video_not_found(self):
         video_id = IdentityService.id_video("source")
-        resp = await self.client.post("/api/player/play", params={"id": str(video_id)})
+        self.data_producer.playlist("test", []).populate(self.data_facade)
+        playlist_id = self.data_facade.playlist_repo.list()[0].id
+
+        resp = await self.client.post(
+            "/api/player/play",
+            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+        )
+        self.assertEqual(404, resp.status)
+
+    @unittest_run_loop
+    async def test_play_playlist_not_found(self):
+        video_id = IdentityService.id_video("source")
+        self.data_producer.video("source").populate(self.data_facade)
+        playlist_id = IdentityService.id_playlist()
+
+        resp = await self.client.post(
+            "/api/player/play",
+            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+        )
         self.assertEqual(404, resp.status)
 
     @unittest_run_loop
     async def test_play_error(self):
-        self.data_producer.video("source").populate(self.data_facade)
+        self.data_producer.playlist("test").video("source").populate(self.data_facade)
         video_id = IdentityService.id_video("source")
+        playlist_id = self.data_facade.playlist_repo.list()[0].id
         self.expect_and_error(
-            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id),
+            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
             error="Error message",
         )
 
-        resp = await self.client.post("/api/player/play", params={"id": str(video_id)})
+        resp = await self.client.post(
+            "/api/player/play",
+            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+        )
         body = await resp.json()
         self.assertEqual(500, resp.status)
         self.assertEqual(
@@ -194,9 +229,15 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_stop(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.StopPlayer, self.player_id),
-            PlayerEvt.PlayerStopped,
-            PlayerState.STOPPED,
-            video_id=None,
+            [
+                {
+                    "type": PlayerEvt.PlayerStopped,
+                    "args": {
+                        "state": PlayerState.STOPPED,
+                        "video_id": None,
+                    },
+                }
+            ],
         )
 
         resp = await self.client.post("/api/player/stop")
@@ -226,8 +267,12 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_pause(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.TogglePlayerState, self.player_id),
-            PlayerEvt.PlayerStateToggled,
-            PlayerState.PAUSED,
+            [
+                {
+                    "type": PlayerEvt.PlayerStateToggled,
+                    "args": {"state": PlayerState.PAUSED},
+                }
+            ],
         )
 
         resp = await self.client.post("/api/player/pause")
@@ -257,7 +302,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_seek_forward_short(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.SeekVideo, self.player_id, Player.SHORT_TIME_STEP),
-            PlayerEvt.VideoSeeked,
+            [{"type": PlayerEvt.VideoSeeked, "args": {}}],
         )
 
         resp = await self.client.post(
@@ -272,7 +317,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_seek_forward_long(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.SeekVideo, self.player_id, Player.LONG_TIME_STEP),
-            PlayerEvt.VideoSeeked,
+            [{"type": PlayerEvt.VideoSeeked, "args": {}}],
         )
 
         resp = await self.client.post(
@@ -287,7 +332,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_seek_backward_short(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.SeekVideo, self.player_id, -Player.SHORT_TIME_STEP),
-            PlayerEvt.VideoSeeked,
+            [{"type": PlayerEvt.VideoSeeked, "args": {}}],
         )
 
         resp = await self.client.post(
@@ -302,7 +347,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_seek_backward_long(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.SeekVideo, self.player_id, -Player.LONG_TIME_STEP),
-            PlayerEvt.VideoSeeked,
+            [{"type": PlayerEvt.VideoSeeked, "args": {}}],
         )
 
         resp = await self.client.post(
@@ -337,8 +382,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_volume(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.UpdateVolume, self.player_id, 80),
-            PlayerEvt.VolumeUpdated,
-            80,
+            [{"type": PlayerEvt.VolumeUpdated, "args": {"volume": 80}}],
         )
 
         resp = await self.client.post("/api/player/volume", params={"value": 80})
@@ -368,8 +412,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_subtitle_toggle(self):
         self.expect_and_raise(
             make_cmd(PlayerCmd.ToggleSubtitle, self.player_id),
-            PlayerEvt.SubtitleStateUpdated,
-            False,
+            [{"type": PlayerEvt.SubtitleStateUpdated, "args": {"state": False}}],
         )
 
         resp = await self.client.post("/api/player/subtitle/toggle")
@@ -402,8 +445,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 self.player_id,
                 Player.SUBTITLE_DELAY_STEP,
             ),
-            PlayerEvt.SubtitleDelayUpdated,
-            Player.SUBTITLE_DELAY_STEP,
+            [
+                {
+                    "type": PlayerEvt.SubtitleDelayUpdated,
+                    "args": {
+                        "delay": Player.SUBTITLE_DELAY_STEP,
+                    },
+                }
+            ],
         )
 
         resp = await self.client.post(
@@ -422,8 +471,14 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 self.player_id,
                 -Player.SUBTITLE_DELAY_STEP,
             ),
-            PlayerEvt.SubtitleDelayUpdated,
-            -Player.SUBTITLE_DELAY_STEP,
+            [
+                {
+                    "type": PlayerEvt.SubtitleDelayUpdated,
+                    "args": {
+                        "delay": -Player.SUBTITLE_DELAY_STEP,
+                    },
+                }
+            ],
         )
 
         resp = await self.client.post(

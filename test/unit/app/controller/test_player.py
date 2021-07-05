@@ -13,6 +13,7 @@ class PlayerControllerTest(ControllerTestCase):
         super(PlayerControllerTest, self).setUp()
 
         self.data_producer.player().populate(self.data_facade)
+        self.player = self.data_facade.player_repo.get_player()
         self.service_factory = Mock()
         self.queueing_service = Mock()
         self.service_factory.make_queueing_service.return_value = self.queueing_service
@@ -31,6 +32,7 @@ class PlayerControllerTest(ControllerTestCase):
         self.raise_event(self.controller, Evt.MediaEndReached, None)
         self.expect_dispatch(
             Cmd.PlayVideo,
-            IdentityService.id_player(),
+            self.player.id,
             next_video_id,
+            self.player.queue,
         )
