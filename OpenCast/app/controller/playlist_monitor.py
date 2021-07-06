@@ -10,6 +10,7 @@ from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.playlist import PlaylistSchema
 from OpenCast.domain.service.identity import IdentityService
+from OpenCast.domain.constant import HOME_PLAYLIST
 
 from .monitor import MonitorController
 from .monitoring_schema import ErrorSchema, Videos, schema
@@ -235,6 +236,9 @@ class PlaylistMonitController(MonitorController):
         id = Id(req.match_info["id"])
         if not self._playlist_repo.exists(id):
             return self._not_found()
+
+        if id == HOME_PLAYLIST.id:
+            return self._forbidden(f"{HOME_PLAYLIST.name} playlist can't be deleted")
 
         channel = self._io_factory.make_janus_channel()
 
