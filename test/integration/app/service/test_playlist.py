@@ -1,6 +1,7 @@
 from OpenCast.app.command import playlist as Cmd
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as Evt
+from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ServiceTestCase
@@ -24,9 +25,13 @@ class PlaylistServiceTest(ServiceTestCase):
 
     def test_delete_playlist(self):
         playlist_id = IdentityService.id_playlist()
-        self.data_producer.playlist(playlist_id, "name").video("source").playlist(
+        self.data_producer.select(Playlist, HOME_PLAYLIST.id).video("source").playlist(
+            playlist_id, "name"
+        ).video("source").video("other").playlist(
             IdentityService.id_playlist(), "other"
-        ).populate(self.data_facade)
+        ).populate(
+            self.data_facade
+        )
 
         playlist = self.playlist_repo.get(playlist_id)
         home_playlist = self.playlist_repo.get(HOME_PLAYLIST.id)
@@ -35,7 +40,7 @@ class PlaylistServiceTest(ServiceTestCase):
         ).expect(
             Evt.PlaylistContentUpdated,
             home_playlist.id,
-            home_playlist.ids + playlist.ids,
+            home_playlist.ids + [IdentityService.id_video("other")],
         ).from_(
             Cmd.DeletePlaylist, playlist.id
         )
