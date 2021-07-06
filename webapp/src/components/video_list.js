@@ -1,67 +1,65 @@
-import React from "react";
+import "./stream_input.css";
 
-import { createStyles, makeStyles } from "@material-ui/core/styles";
 import {
   GridList,
   GridListTile,
   GridListTileBar,
   IconButton,
 } from "@material-ui/core";
+import {createStyles, makeStyles} from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
-
-import videoAPI from "services/api/video";
-import playerAPI from "services/api/player";
-
 import noPreview from "images/no-preview.png";
+import {observer} from "mobx-react-lite";
+import React from "react";
+import playerAPI from "services/api/player";
+import videoAPI from "services/api/video";
 
-import "./stream_input.css";
-import { useAppStore } from "./app_context";
-import { observer } from "mobx-react-lite";
+import {useAppStore} from "./app_context";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    root: {
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "center",
-      overflow: "hidden",
-      backgroundColor: "#F5F5F5",
-    },
-    gridList: {
-      flexWrap: "nowrap",
-      // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-      transform: "translateZ(0)",
-    },
-    gridItem: {
-      minWidth: "160px",
-    },
-    title: {
-      color: "#F5F5F5",
-    },
-    titleBar: {
-      background:
-        "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
-    },
-  })
-);
+const useStyles = makeStyles(
+    (theme) => createStyles({
+      root : {
+        display : "flex",
+        flexWrap : "wrap",
+        justifyContent : "center",
+        overflow : "hidden",
+        backgroundColor : "#F5F5F5",
+      },
+      gridList : {
+        flexWrap : "nowrap",
+        // Promote the list into his own layer on Chrome. This cost memory but
+        // helps keeping high FPS.
+        transform : "translateZ(0)",
+      },
+      gridItem : {
+        minWidth : "160px",
+      },
+      title : {
+        color : "#F5F5F5",
+      },
+      titleBar : {
+        background :
+            "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
+      },
+    }));
 
 const VideoList = observer(() => {
   const classes = useStyles();
   const store = useAppStore();
-  const videos = store.playlistVideos(store.player.queue);
+  const playlist_id = store.player.queue
+  const videos = store.playlistVideos(playlist_id);
 
   const deleteVideo = (video) => {
     videoAPI.delete_(video.id).catch((error) => console.log(error));
   };
 
   const playMedia = (video) => {
-    playerAPI
-      .playMedia(video.id, store.player.queue)
-      .then((_) => {})
-      .catch((error) => console.log(error));
+    playerAPI.playMedia(video.id, store.player.queue)
+        .then((_) => {})
+        .catch((error) => console.log(error));
   };
 
-  const renderMedia = (video) => {
+const renderMedia = (video) => {
     if (video) {
       return (
         <GridListTile key={video.id} className={classes.gridItem}>
