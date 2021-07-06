@@ -11,5 +11,8 @@ class PlaylistRepo(Repository):
         super().__init__(database, db_lock, Playlist)
 
     def list_containing(self, video_id: Id):
-        results = self._collection.search(lambda entity: str(video_id) in entity["ids"])
+        with self._lock:
+            results = self._collection.search(
+                lambda entity: str(video_id) in entity["ids"]
+            )
         return [self._entity.from_dict(result) for result in results]

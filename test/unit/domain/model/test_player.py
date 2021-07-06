@@ -25,14 +25,16 @@ class PlayerTest(ModelTestCase):
 
     def test_play(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id)
+        playlist_id = IdentityService.id_playlist()
+        self.player.play(video_id, playlist_id)
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.assertEqual(video_id, self.player.video_id)
-        self.expect_events(self.player, Evt.PlayerStarted)
+        self.assertEqual(playlist_id, self.player.queue)
+        self.expect_events(self.player, Evt.PlayerQueueUpdated, Evt.PlayerStarted)
 
     def test_stop(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id)
+        self.player.play(video_id, self.player.queue)
         self.player.stop()
         self.assertEqual(PlayerState.STOPPED, self.player.state)
         self.assertEqual(None, self.player.video_id)
@@ -45,7 +47,7 @@ class PlayerTest(ModelTestCase):
 
     def test_toggle_pause(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id)
+        self.player.play(video_id, self.player.queue)
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PAUSED, self.player.state)
         self.expect_events(self.player, Evt.PlayerStarted, Evt.PlayerStateToggled)
@@ -57,7 +59,7 @@ class PlayerTest(ModelTestCase):
 
     def test_toggle_pause_twice(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id)
+        self.player.play(video_id, self.player.queue)
         self.player.toggle_pause()
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PLAYING, self.player.state)
@@ -83,7 +85,7 @@ class PlayerTest(ModelTestCase):
 
     def test_seek_video(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id)
+        self.player.play(video_id, self.player.queue)
         self.player.seek_video()
         self.expect_events(self.player, Evt.PlayerStarted, Evt.VideoSeeked)
 

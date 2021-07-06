@@ -24,6 +24,7 @@ export default class Player {
       videoId: observable,
       volume: observable,
 
+      setQueue: action,
       setState: action,
       setSubState: action,
       setSubDelay: action,
@@ -35,6 +36,7 @@ export default class Player {
 
     eventDispatcher.observe(
       {
+        PlayerQueueUpdated: (e) => this.setQueue(e.queue),
         PlayerStarted: (e) => this.onPlayerStarted(e),
         PlayerStopped: (e) => this.onPlayerStopped(e),
         PlayerStateToggled: (e) => this.setState(e.state),
@@ -56,6 +58,9 @@ export default class Player {
     this.setVideoId(e.video_id);
   }
 
+  setQueue(playlist_id) {
+    this.queue = playlist_id
+  }
   setState(state) {
     this.state = state;
   }

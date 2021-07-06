@@ -12,8 +12,8 @@ async function queueMedia(url) {
   return await API.post("/player/queue", null, { params: { url: url } });
 }
 
-async function playMedia(id) {
-  return await API.post("/player/play", null, { params: { id: id } });
+async function playMedia(id, playlist_id) {
+  return await API.post("/player/play", null, { params: { id: id, playlist_id: playlist_id } });
 }
 
 async function stopMedia() {

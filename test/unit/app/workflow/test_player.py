@@ -45,6 +45,7 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         self.workflow = self.make_workflow(
             QueueVideoWorkflow,
             self.video,
+            self.player_playlist_id,
             queue_front=False,
         )
 
@@ -134,6 +135,7 @@ class QueuePlaylistWorkflowTest(WorkflowTestCase):
         super(QueuePlaylistWorkflowTest, self).setUp()
         self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
+        self.player_playlist_id = IdentityService.id_playlist()
 
     def make_test_workflow(self, video_count=2):
         collection_id = IdentityService.random()
@@ -142,7 +144,9 @@ class QueuePlaylistWorkflowTest(WorkflowTestCase):
             Video(IdentityService.id_video(source), source, collection_id)
             for source in sources
         ]
-        return self.make_workflow(QueuePlaylistWorkflow, videos)
+        return self.make_workflow(
+            QueuePlaylistWorkflow, videos, self.player_playlist_id
+        )
 
     def test_initial(self):
         workflow = self.make_test_workflow()
@@ -192,6 +196,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
         super(StreamVideoWorkflowTest, self).setUp()
         self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
+        self.player_playlist_id = IdentityService.id_playlist()
 
         self.player_id = IdentityService.id_player()
         self.video = Video(
@@ -202,6 +207,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
         self.workflow = self.make_workflow(
             StreamVideoWorkflow,
             self.video,
+            self.player_playlist_id,
         )
 
     def test_initial(self):
@@ -233,14 +239,18 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
     def test_starting_to_aborted(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id, self.workflow.video.id)
         self.workflow.to_STARTING(event)
-        cmd = self.expect_dispatch(PlayerCmd.PlayVideo, self.player_id, self.video.id)
+        cmd = self.expect_dispatch(
+            PlayerCmd.PlayVideo, self.player_id, self.video.id, self.player_playlist_id
+        )
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_ABORTED())
 
     def test_queueing_to_completed(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id, self.workflow.video.id)
         self.workflow.to_STARTING(event)
-        cmd = self.expect_dispatch(PlayerCmd.PlayVideo, self.player_id, self.video.id)
+        cmd = self.expect_dispatch(
+            PlayerCmd.PlayVideo, self.player_id, self.video.id, self.player_playlist_id
+        )
         self.raise_event(
             PlayerEvt.PlayerStarted,
             cmd.id,
@@ -256,6 +266,7 @@ class StreamPlaylistWorkflowTest(WorkflowTestCase):
         super(StreamPlaylistWorkflowTest, self).setUp()
         self.video_repo = self.data_facade.video_repo
         self.video_repo.exists.return_value = True
+        self.player_playlist_id = IdentityService.id_playlist()
 
     def make_test_workflow(self, video_count=2):
         collection_id = IdentityService.random()
@@ -264,7 +275,9 @@ class StreamPlaylistWorkflowTest(WorkflowTestCase):
             Video(IdentityService.id_video(source), source, collection_id)
             for source in sources
         ]
-        return self.make_workflow(StreamPlaylistWorkflow, videos)
+        return self.make_workflow(
+            StreamPlaylistWorkflow, videos, self.player_playlist_id
+        )
 
     def test_initial(self):
         workflow = self.make_test_workflow()
