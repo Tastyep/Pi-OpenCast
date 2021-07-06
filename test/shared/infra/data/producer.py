@@ -1,7 +1,9 @@
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.model.video import Video
+from OpenCast.domain.model import Id
 from OpenCast.domain.service.identity import IdentityService
+from OpenCast.domain.constant import HOME_PLAYLIST
 
 
 class Population:
@@ -30,7 +32,10 @@ class Population:
         return self._entities[cls][entity_id]
 
     def find(self, cls, id):
-        return self._entities[cls][id]
+        collection = self._entities.get(cls, None)
+        if collection is None:
+            return None
+        return collection.get(id, None)
 
     def register(self, data_facade):
         def register(repo, entities):
@@ -44,6 +49,7 @@ class Population:
         register(data_facade.player_repo, self._entities.get(Player, {}))
         register(data_facade.video_repo, self._entities.get(Video, {}))
         register(data_facade.playlist_repo, self._entities.get(Playlist, {}))
+        self._entities.clear()
 
     def _update_attrs(self, entity, attrs):
         for attr, value in attrs.items():
@@ -76,8 +82,10 @@ class DataProducer:
 
 class PlayerProducer(DataProducer):
     def player(self, *args, **attrs):
-        PlaylistProducer(self._population).playlist("queue", [])
-        playlist = self._population.last(Playlist)
+        playlist = self._population.find(Playlist, HOME_PLAYLIST.id)
+        if playlist is None:
+            PlaylistProducer(self._population).playlist(HOME_PLAYLIST.id, "queue", [])
+            playlist = self._population.find(Playlist, HOME_PLAYLIST.id)
         player_id = IdentityService.id_player()
         self._population.add(Player, player_id, playlist.id, *args, **attrs)
         return self
@@ -114,9 +122,8 @@ class VideoProducer(DataProducer):
 
 
 class PlaylistProducer(DataProducer):
-    def playlist(self, *args, **attrs):
-        playlist_id = IdentityService.id_playlist()
-        self._population.add(Playlist, playlist_id, *args, **attrs)
+    def playlist(self, id: Id, *args, **attrs):
+        self._population.add(Playlist, id, *args, **attrs)
         return self
 
     def video(self, *args, **attrs):

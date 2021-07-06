@@ -33,10 +33,13 @@ class MonitorControllerTestCase(AioHTTPTestCase):
         data_manager = DataManager(repo_factory)
         self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
+        self.data_producer.player().populate(self.data_facade)
 
         self.service_factory = Mock()
         self.source_service = Mock()
+        self.queueing_service = Mock()
         self.service_factory.make_source_service.return_value = self.source_service
+        self.service_factory.make_queueing_service.return_value = self.queueing_service
 
         self.downloader = Mock()
         self.video_parser = Mock()
