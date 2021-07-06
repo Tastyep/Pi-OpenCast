@@ -149,11 +149,11 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play(self):
-        self.data_producer.playlist("test", []).video("source").populate(
+        playlist_id = IdentityService.id_playlist()
+        video_id = IdentityService.id_video("source")
+        self.data_producer.playlist(playlist_id, "test", []).video("source").populate(
             self.data_facade
         )
-        video_id = IdentityService.id_video("source")
-        playlist_id = self.data_facade.playlist_repo.list()[0].id
         self.expect_and_raise(
             make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
             [
@@ -179,9 +179,9 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play_video_not_found(self):
+        playlist_id = IdentityService.id_playlist()
         video_id = IdentityService.id_video("source")
-        self.data_producer.playlist("test", []).populate(self.data_facade)
-        playlist_id = self.data_facade.playlist_repo.list()[0].id
+        self.data_producer.playlist(playlist_id, "test", []).populate(self.data_facade)
 
         resp = await self.client.post(
             "/api/player/play",
@@ -191,6 +191,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play_playlist_not_found(self):
+        playlist_id = IdentityService.id_playlist()
         video_id = IdentityService.id_video("source")
         self.data_producer.video("source").populate(self.data_facade)
         playlist_id = IdentityService.id_playlist()
@@ -203,9 +204,11 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play_error(self):
-        self.data_producer.playlist("test").video("source").populate(self.data_facade)
+        playlist_id = IdentityService.id_playlist()
+        self.data_producer.playlist(playlist_id, "test").video("source").populate(
+            self.data_facade
+        )
         video_id = IdentityService.id_video("source")
-        playlist_id = self.data_facade.playlist_repo.list()[0].id
         self.expect_and_error(
             make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
             error="Error message",
