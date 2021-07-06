@@ -4,8 +4,8 @@ import structlog
 
 from OpenCast.app.command import playlist as playlist_cmds
 from OpenCast.domain.constant import HOME_PLAYLIST
-from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.playlist import Playlist
 
 from .service import Service

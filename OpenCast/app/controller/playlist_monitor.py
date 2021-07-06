@@ -6,11 +6,11 @@ from marshmallow import fields
 
 from OpenCast.app.command import playlist as Cmd
 from OpenCast.app.service.error import OperationError
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.playlist import PlaylistSchema
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.domain.constant import HOME_PLAYLIST
 
 from .monitor import MonitorController
 from .monitoring_schema import ErrorSchema, Videos, schema

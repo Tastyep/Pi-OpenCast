@@ -1,7 +1,7 @@
 from OpenCast.app.command import playlist as Cmd
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as Evt
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.domain.constant import HOME_PLAYLIST
 
 from .util import ServiceTestCase
 

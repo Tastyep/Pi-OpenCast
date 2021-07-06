@@ -1,9 +1,9 @@
+from OpenCast.domain.constant import HOME_PLAYLIST
+from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.model.video import Video
-from OpenCast.domain.model import Id
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.domain.constant import HOME_PLAYLIST
 
 
 class Population:

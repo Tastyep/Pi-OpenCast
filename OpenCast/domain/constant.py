@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass
 
-from OpenCast.domain.service.identity import IdentityService
 from OpenCast.domain.model import Id
+from OpenCast.domain.service.identity import IdentityService
 
 
 @dataclass
