@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Divider,
   IconButton,
@@ -10,36 +8,35 @@ import {
   ListSubheader,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
-
-import { Droppable, Draggable } from "react-beautiful-dnd";
-
-import { observer } from "mobx-react-lite";
-
-import playlistAPI from "services/api/playlist";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import {observer} from "mobx-react-lite";
+import React from "react";
+import {Draggable, Droppable} from "react-beautiful-dnd";
 import playerAPI from "services/api/player";
-import { useAppStore } from "./app_context";
+import playlistAPI from "services/api/playlist";
+
+import {useAppStore} from "./app_context";
 
 // const getListStyle = isDraggingOver => ({
 //   backgorund: isDraggingOver ? 'lightblue' : '#F5F5F5',
 // });
 const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? "lightblue" : "#F5F5F5",
-  maxHeight: "320px",
-  overflow: "auto",
+  background : isDraggingOver ? "lightblue" : "#F5F5F5",
+  maxHeight : "320px",
+  overflow : "auto",
 });
 const getItemStyle = (isDragging, draggableStyle) => ({
   // styles we need to apply on draggables
   ...draggableStyle,
 
   ...(isDragging && {
-    backgroundColor: "#C5C5C5",
+    backgroundColor : "#C5C5C5",
   }),
 });
 
 const subheaderStyle = {
-  backgroundColor: "#FFFFFF",
+  backgroundColor : "#FFFFFF",
 };
 
 const Playlist = observer(({ playlist }) => {
@@ -55,7 +52,8 @@ const Playlist = observer(({ playlist }) => {
 
   const onMediaClicked = (media, playlist) => {
     if (media.id !== activeVideoId) {
-      playerAPI.playMedia(media.id, playlist.id).catch((error) => console.log(error));
+      playerAPI.playMedia(media.id, playlist.id)
+          .catch((error) => console.log(error));
       return;
     }
     playerAPI.pauseMedia().catch((error) => console.log(error));
@@ -63,8 +61,9 @@ const Playlist = observer(({ playlist }) => {
 
   const renderButtonState = (video) => {
     if (video.id === activeVideoId) {
-      const icon = isPlayerPlaying ? <PauseIcon /> : <PlayArrowIcon />;
-      return <ListItemIcon>{icon}</ListItemIcon>;
+      const icon = isPlayerPlaying ? <PauseIcon />: <PlayArrowIcon />;
+      return <ListItemIcon>{icon}<
+          /ListItemIcon>;
     }
   };
 
@@ -89,13 +88,14 @@ const Playlist = observer(({ playlist }) => {
               >
                 {renderButtonState(video)}
                 <ListItemText primary={video.title} />
-              </ListItem>
-              {index < videos.length - 1 && <Divider />}
+          </ListItem>
+              {index < videos.length - 1 && <Divider />
+    }
             </>
           )}
         </Draggable>
       );
-    }
+  }
   };
 
   return (
@@ -105,7 +105,7 @@ const Playlist = observer(({ playlist }) => {
           subheader={
             <ListSubheader style={subheaderStyle}>
               <b>{playlist.name}</b>
-              {playlist.id !== store.player.queue && (
+              {playlist.id !== store.playlists[0].id && (
                 <IconButton onClick={() => removePlaylist()}>
                   <DeleteIcon />
                 </IconButton>
