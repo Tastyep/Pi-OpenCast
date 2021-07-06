@@ -31,11 +31,14 @@ class Population:
         entity_id = self._last_entity[cls]
         return self._entities[cls][entity_id]
 
-    def find(self, cls, id):
+    def find(self, cls, id: Id):
         collection = self._entities.get(cls, None)
         if collection is None:
             return None
         return collection.get(id, None)
+
+    def select(self, cls, id: Id):
+        self._last_entity[cls] = id
 
     def register(self, data_facade):
         def register(repo, entities):
@@ -49,7 +52,6 @@ class Population:
         register(data_facade.player_repo, self._entities.get(Player, {}))
         register(data_facade.video_repo, self._entities.get(Video, {}))
         register(data_facade.playlist_repo, self._entities.get(Playlist, {}))
-        self._entities.clear()
 
     def _update_attrs(self, entity, attrs):
         for attr, value in attrs.items():
@@ -76,18 +78,28 @@ class DataProducer:
     def playlist(self, *args, **attrs):
         return PlaylistProducer(self._population).playlist(*args, **attrs)
 
+    def select(self, cls, id: Id):
+        self._population.select(cls, id)
+        if cls is Player:
+            return PlayerProducer(self._population)
+        if cls is Video:
+            return VideoProducer(self._population)
+        if cls is Playlist:
+            return PlaylistProducer(self._population)
+        return None
+
     def populate(self, data_facade):
         self._population.register(data_facade)
 
 
 class PlayerProducer(DataProducer):
     def player(self, *args, **attrs):
-        playlist = self._population.find(Playlist, HOME_PLAYLIST.id)
-        if playlist is None:
-            PlaylistProducer(self._population).playlist(HOME_PLAYLIST.id, "queue", [])
-            playlist = self._population.find(Playlist, HOME_PLAYLIST.id)
+        if self._population.find(Playlist, HOME_PLAYLIST.id) is None:
+            PlaylistProducer(self._population).playlist(
+                HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
+            )
         player_id = IdentityService.id_player()
-        self._population.add(Player, player_id, playlist.id, *args, **attrs)
+        self._population.add(Player, player_id, HOME_PLAYLIST.id, *args, **attrs)
         return self
 
     def video(self, *args, **attrs):
