@@ -1,0 +1,32 @@
+OpenCast.domain.model.video
+===========================
+
+.. automodule:: OpenCast.domain.model.video
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Stream
+      StreamSchema
+      Video
+      VideoSchema
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,35 @@
+OpenCast.app.command.command
+============================
+
+.. automodule:: OpenCast.app.command.command
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      command
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Command
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,29 @@
+OpenCast.domain.service.identity
+================================
+
+.. automodule:: OpenCast.domain.service.identity
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      IdentityService
+   
+   
+
+   
+   
+   
+
+
+

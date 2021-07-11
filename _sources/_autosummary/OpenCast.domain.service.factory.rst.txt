@@ -1,0 +1,29 @@
+OpenCast.domain.service.factory
+===============================
+
+.. automodule:: OpenCast.domain.service.factory
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ServiceFactory
+   
+   
+
+   
+   
+   
+
+
+

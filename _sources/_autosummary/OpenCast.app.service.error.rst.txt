@@ -1,0 +1,29 @@
+OpenCast.app.service.error
+==========================
+
+.. automodule:: OpenCast.app.service.error
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      OperationError
+   
+   
+
+   
+   
+   
+
+
+

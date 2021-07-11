@@ -1,0 +1,32 @@
+OpenCast.infra.service
+======================
+
+.. automodule:: OpenCast.infra.service
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.infra.service.factory
+   OpenCast.infra.service.file
+

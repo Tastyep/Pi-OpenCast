@@ -1,0 +1,29 @@
+OpenCast.util.conversion
+========================
+
+.. automodule:: OpenCast.util.conversion
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      str_to_bool
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,29 @@
+OpenCast.infra.event.player
+===========================
+
+.. automodule:: OpenCast.infra.event.player
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      MediaEndReached
+   
+   
+
+   
+   
+   
+
+
+

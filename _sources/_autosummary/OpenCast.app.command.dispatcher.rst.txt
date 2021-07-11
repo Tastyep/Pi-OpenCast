@@ -1,0 +1,29 @@
+OpenCast.app.command.dispatcher
+===============================
+
+.. automodule:: OpenCast.app.command.dispatcher
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CommandDispatcher
+   
+   
+
+   
+   
+   
+
+
+

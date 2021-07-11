@@ -1,0 +1,29 @@
+OpenCast.app.facade
+===================
+
+.. automodule:: OpenCast.app.facade
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AppFacade
+   
+   
+
+   
+   
+   
+
+
+
