@@ -26,64 +26,64 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-	python "$@" && shell "$@" && js "$@"
+  python "$@" && shell "$@" && js "$@"
 }
 
 python() {
-	local black_opts isort_opts=()
-	if [[ "${ARGS["--check"]}" == true ]]; then
-		black_opts+=("--check" "--diff")
-		isort_opts+=("--check-only" "--stdout")
-	fi
-	# Collect python files
-	local py_files
-	local -a py_dirs
+  local black_opts isort_opts=()
+  if [[ "${ARGS["--check"]}" == true ]]; then
+    black_opts+=("--check" "--diff")
+    isort_opts+=("--check-only" "--stdout")
+  fi
+  # Collect python files
+  local py_files
+  local -a py_dirs
 
-	py_files=()
-	py_dirs=("OpenCast" "test")
-	for py_dir in "${py_dirs[@]}"; do
-		while IFS= read -r -d $'\0'; do
-			py_files+=("$REPLY")
-		done < <(find "$ROOT/$py_dir" -name "*.py" -print0)
-	done
+  py_files=()
+  py_dirs=("OpenCast" "test")
+  for py_dir in "${py_dirs[@]}"; do
+    while IFS= read -r -d $'\0'; do
+      py_files+=("$REPLY")
+    done < <(find "$ROOT/$py_dir" -name "*.py" -print0)
+  done
 
-	local black_status isort_status
-	penv black "${black_opts[@]}" "${py_files[@]}"
-	black_status="$?"
-	log_status "black" "$black_status"
-	penv isort "${isort_opts[@]}" "${py_files[@]}"
-	isort_status="$?"
-	log_status "isort" "$isort_status"
-	return "$((black_status | isort_status))"
+  local black_status isort_status
+  penv black "${black_opts[@]}" "${py_files[@]}"
+  black_status="$?"
+  log_status "black" "$black_status"
+  penv isort "${isort_opts[@]}" "${py_files[@]}"
+  isort_status="$?"
+  log_status "isort" "$isort_status"
+  return "$((black_status | isort_status))"
 }
 
 shell() {
-	require_shfmt
+  require_shfmt
 
-	local shfmt_opts=("-l" "-d" "-i" "2")
-	[[ -z "${ARGS["--check"]}" ]] && shfmt_opts+=("-w")
+  local shfmt_opts=("-l" "-d" "-i" "2")
+  [[ -z "${ARGS["--check"]}" ]] && shfmt_opts+=("-w")
 
-	sh_files=()
-	sh_dirs=("." "tool" "script")
-	for sh_dir in "${sh_dirs[@]}"; do
-		local find_opts=()
+  sh_files=()
+  sh_dirs=("." "tool" "script")
+  for sh_dir in "${sh_dirs[@]}"; do
+    local find_opts=()
 
-		[[ "$sh_dir" == "." ]] && find_opts+=("-maxdepth" "1")
-		while IFS= read -r -d $'\0'; do
-			sh_files+=("$REPLY")
-		done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
-	done
+    [[ "$sh_dir" == "." ]] && find_opts+=("-maxdepth" "1")
+    while IFS= read -r -d $'\0'; do
+      sh_files+=("$REPLY")
+    done < <(find "$ROOT/$sh_dir" "${find_opts[@]}" -name "*.sh" -print0)
+  done
 
-	shfmt "${shfmt_opts[@]}" "${sh_files[@]}"
-	log_status "shfmt" "$?"
+  shfmt "${shfmt_opts[@]}" "${sh_files[@]}"
+  log_status "shfmt" "$?"
 }
 
 js() {
-	[[ -z "${ARGS["--check"]}" ]] && prettier_opts=("--write") || prettier_opts=("--check")
+  [[ -z "${ARGS["--check"]}" ]] && prettier_opts=("--write") || prettier_opts=("--check")
 
-	jenv prettier "${prettier_opts[@]}" "webapp/src"
-	prettier_status="$?"
-	log_status "prettier" "$prettier_status"
+  jenv prettier "${prettier_opts[@]}" "webapp/src"
+  prettier_status="$?"
+  log_status "prettier" "$prettier_status"
 }
 
 parse_args "$@"
