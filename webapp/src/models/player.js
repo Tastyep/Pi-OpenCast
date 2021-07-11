@@ -59,7 +59,7 @@ export default class Player {
   }
 
   setQueue(playlist_id) {
-    this.queue = playlist_id
+    this.queue = playlist_id;
   }
   setState(state) {
     this.state = state;

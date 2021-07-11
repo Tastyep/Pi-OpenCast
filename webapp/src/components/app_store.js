@@ -102,25 +102,25 @@ export class AppStore {
   }
 
   removePlaylist(id) {
-    delete this.playlists[id]
+    delete this.playlists[id];
   }
 
   insertPlaylistVideo(playlistId, videoId, index) {
-    let playlist = this.playlists[playlistId]
+    let playlist = this.playlists[playlistId];
     playlist.ids.splice(index, 0, videoId);
   }
 
   removePlaylistVideo(playlistId, videoId) {
-    let playlist = this.playlists[playlistId]
+    let playlist = this.playlists[playlistId];
     playlist.ids = playlist.ids.filter((id) => id !== videoId);
   }
 
   playlistVideos(id, origin) {
     return computed(() => {
       if (!Object.keys(this.playlists).includes(id)) {
-        return []
+        return [];
       }
-      const playlist = this.playlists[id]
+      const playlist = this.playlists[id];
       let videos = [];
       for (const id of playlist.ids) {
         videos.push(this.videos[id]);
@@ -131,7 +131,7 @@ export class AppStore {
 
   setVideos(videos) {
     for (const video of videos) {
-      this.addVideo(video)
+      this.addVideo(video);
     }
   }
 

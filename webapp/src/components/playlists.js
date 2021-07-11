@@ -3,7 +3,7 @@ import React, { useState, useCallback } from "react";
 import { Grid, IconButton, TextField } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
-import { observer} from "mobx-react-lite";
+import { observer } from "mobx-react-lite";
 
 import { DragDropContext } from "react-beautiful-dnd";
 
