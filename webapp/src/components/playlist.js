@@ -132,10 +132,14 @@ const Playlist = observer(({ playlistId }) => {
               >
                 <Grid container>
                   <Grid item xs={11}>
-                    <TextField
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
+                    {(store.playlists[playlistId].name === "Home" && (
+                      <b>{name}</b>
+                    )) || (
+                      <TextField
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    )}
                   </Grid>
                   {store.playlists[playlistId].name !== "Home" && (
                     <Grid item xs={1}>
