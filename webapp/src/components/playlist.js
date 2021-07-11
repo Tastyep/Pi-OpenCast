@@ -1,4 +1,7 @@
+import React, { useEffect, useState } from "react";
+
 import {
+  Grid,
   Divider,
   IconButton,
   List,
@@ -6,16 +9,18 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  TextField
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+
 import {observer} from "mobx-react-lite";
-import React from "react";
+
 import {Draggable, Droppable} from "react-beautiful-dnd";
+
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
-
 import {useAppStore} from "./app_context";
 
 // const getListStyle = isDraggingOver => ({
@@ -39,20 +44,35 @@ const subheaderStyle = {
   backgroundColor : "#FFFFFF",
 };
 
-const Playlist = observer(({ playlist }) => {
+const Playlist = observer(({ playlistId }) => {
   const store = useAppStore();
-  const videos = store.playlistVideos(playlist.id);
-  const player = store.player;
+  const videos = store.playlistVideos(playlistId);
+  const playlist = store.playlists[playlistId]
   const activeVideoId = store.player.videoId;
-  const isPlayerPlaying = player.isPlaying;
+  const isPlayerPlaying = store.player.isPlaying;
+  const [name, setName] = useState("")
+
+  useEffect(() => {
+    setName(playlist.name)
+  }, [playlist.name])
+
+  const renamePlaylist = (event) => {
+    if (!event) {
+      return
+    }
+    event.preventDefault();
+    playlistAPI.update(playlistId, {name: name})
+      .catch((error) => console.log(error));
+    return
+  }
 
   const removePlaylist = () => {
-    playlistAPI.delete_(playlist.id).catch((error) => console.log(error));
+    playlistAPI.delete_(playlistId).catch((error) => console.log(error));
   };
 
-  const onMediaClicked = (media, playlist) => {
+  const onMediaClicked = (media) => {
     if (media.id !== activeVideoId) {
-      playerAPI.playMedia(media.id, playlist.id)
+      playerAPI.playMedia(media.id, playlistId)
           .catch((error) => console.log(error));
       return;
     }
@@ -62,60 +82,70 @@ const Playlist = observer(({ playlist }) => {
   const renderButtonState = (video) => {
     if (video.id === activeVideoId) {
       const icon = isPlayerPlaying ? <PauseIcon />: <PlayArrowIcon />;
-      return <ListItemIcon>{icon}<
-          /ListItemIcon>;
+      return <ListItemIcon>{icon}</ListItemIcon>;
     }
   };
 
-  const renderMediaItem = (video, playlist, index) => {
-    if (video) {
-      return (
-        <Draggable draggableId={video.id} index={index} key={video.id}>
-          {(provided, snapshot) => (
-            <>
-              <ListItem
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                style={getItemStyle(
-                  snapshot.isDragging,
-                  provided.draggableProps.style
-                )}
-                button
-                disableRipple
-                autoFocus={video.id === activeVideoId}
-                onClick={() => onMediaClicked(video, playlist)}
-              >
-                {renderButtonState(video)}
-                <ListItemText primary={video.title} />
-          </ListItem>
-              {index < videos.length - 1 && <Divider />
+  const renderMediaItem = (video, index) => {
+    if (!video) {
+      return
     }
-            </>
-          )}
-        </Draggable>
-      );
-  }
+    return (
+      <Draggable draggableId={video.id} index={index} key={video.id}>
+        {(provided, snapshot) => (
+          <>
+            <ListItem
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              style={getItemStyle(
+                snapshot.isDragging,
+                provided.draggableProps.style
+              )}
+              button
+              disableRipple
+              autoFocus={video.id === activeVideoId}
+              onClick={() => onMediaClicked(video)}
+            >
+              {renderButtonState(video)}
+              <ListItemText primary={video.title} />
+            </ListItem>
+            {index < videos.length - 1 && <Divider />}
+          </>
+        )}
+      </Draggable>
+    );
   };
 
   return (
-    <Droppable droppableId={playlist.id}>
+    <Droppable droppableId={playlistId}>
       {(provided, snapshot) => (
         <List
           subheader={
             <ListSubheader style={subheaderStyle}>
-              <b>{playlist.name}</b>
-              {playlist.id !== store.playlists[0].id && (
-                <IconButton onClick={() => removePlaylist()}>
-                  <DeleteIcon />
-                </IconButton>
+              <form onSubmit={(e) => renamePlaylist(e)} noValidate autoComplete="off">
+              <Grid container>
+                <Grid item xs={11}>
+                  <TextField
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                  </Grid>
+                  { store.playlists[playlistId].name !== 'Home' && (
+                <Grid item xs={1}>
+                  <IconButton onClick={() => removePlaylist()}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Grid>
               )}
+              </Grid>
+              </form>
             </ListSubheader>
           }
           style={getListStyle(snapshot.isDraggingOver)}
           ref={provided.innerRef}
         >
-          {videos.map((video, index) => renderMediaItem(video, playlist, index))}
+          {videos.map((video, index) => renderMediaItem(video, index))}
           {provided.placeholder}
         </List>
       )}

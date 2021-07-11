@@ -3,7 +3,7 @@ import React, { useState, useCallback } from "react";
 import { Grid, IconButton, TextField } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
-import { observer } from "mobx-react-lite";
+import { observer} from "mobx-react-lite";
 
 import { DragDropContext } from "react-beautiful-dnd";
 
@@ -33,8 +33,8 @@ const Playlists = observer(() => {
         destination.index
       );
 
-      const destPlaylist = store.playlist(destination.droppableId);
-      const srcPlaylist = store.playlist(source.droppableId);
+      const destPlaylist = store.playlist[destination.droppableId];
+      const srcPlaylist = store.playlist[source.droppableId];
       playlistAPI.update(destination.droppableId, { ids: destPlaylist.ids });
       if (destination.dropppableId !== source.droppableId) {
         playlistAPI.update(source.droppableId, { ids: srcPlaylist.ids });
@@ -48,9 +48,9 @@ const Playlists = observer(() => {
       <PlaylistInput />
       <DragDropContext onDragEnd={onDragEnd}>
         <Grid container spacing={2}>
-          {store.playlists.map((playlist) => (
-            <Grid item key={playlist.id} xs={12} sm={6} md={6} lg={4} xl={3}>
-              <Playlist playlist={playlist} />
+          {Object.keys(store.playlists).map((playlistId, _) => (
+            <Grid item key={playlistId} xs={12} sm={6} md={6} lg={4} xl={3}>
+              <Playlist playlistId={playlistId} />
             </Grid>
           ))}
         </Grid>

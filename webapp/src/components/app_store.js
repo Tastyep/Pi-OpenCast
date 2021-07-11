@@ -6,7 +6,7 @@ import videoAPI from "services/api/video";
 
 export class AppStore {
   player = {};
-  playlists = [];
+  playlists = {};
   videos = {};
 
   constructor(eventDispatcher, modelFactory) {
@@ -93,46 +93,34 @@ export class AppStore {
 
   setPlaylists(playlists) {
     for (const playlist of playlists) {
-      this.playlists.push(this.modelFactory.makePlaylist(playlist));
+      this.addPlaylist(playlist);
     }
   }
 
   addPlaylist(playlist) {
-    this.playlists.push(this.modelFactory.makePlaylist(playlist));
+    this.playlists[playlist.id] = this.modelFactory.makePlaylist(playlist);
   }
 
   removePlaylist(id) {
-    this.playlists = this.playlists.filter((playlist) => playlist.id !== id);
+    delete this.playlists[id]
   }
 
   insertPlaylistVideo(playlistId, videoId, index) {
-    let playlist = this.playlists.find(
-      (playlist) => playlist.id === playlistId
-    );
-    if (playlist) {
-      playlist.ids.splice(index, 0, videoId);
-    }
+    let playlist = this.playlists[playlistId]
+    playlist.ids.splice(index, 0, videoId);
   }
 
   removePlaylistVideo(playlistId, videoId) {
-    let playlist = this.playlists.find(
-      (playlist) => playlist.id === playlistId
-    );
-    if (playlist) {
-      playlist.ids = playlist.ids.filter((id) => id !== videoId);
-    }
+    let playlist = this.playlists[playlistId]
+    playlist.ids = playlist.ids.filter((id) => id !== videoId);
   }
 
-  playlist(id) {
-    return this.playlists.find((playlist) => playlist.id === id);
-  }
-
-  playlistVideos(id) {
+  playlistVideos(id, origin) {
     return computed(() => {
-      const playlist = this.playlists.find((playlist) => playlist.id === id);
-      if (!playlist) {
-        return [];
+      if (!Object.keys(this.playlists).includes(id)) {
+        return []
       }
+      const playlist = this.playlists[id]
       let videos = [];
       for (const id of playlist.ids) {
         videos.push(this.videos[id]);
@@ -143,7 +131,7 @@ export class AppStore {
 
   setVideos(videos) {
     for (const video of videos) {
-      this.videos[video.id] = this.modelFactory.makeVideo(video);
+      this.addVideo(video)
     }
   }
 
