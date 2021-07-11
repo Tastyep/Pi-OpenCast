@@ -17,7 +17,7 @@ import videoAPI from "services/api/video";
 import {useAppStore} from "./app_context";
 
 const useStyles = makeStyles(
-    (theme) => createStyles({
+    () => createStyles({
       root : {
         display : "flex",
         flexWrap : "wrap",
@@ -46,8 +46,8 @@ const useStyles = makeStyles(
 const VideoList = observer(() => {
   const classes = useStyles();
   const store = useAppStore();
-  const playlist_id = store.player.queue
-  const videos = store.playlistVideos(playlist_id);
+  const playlistId = store.player.queue
+  const videos = store.playlistVideos(playlistId);
 
   const deleteVideo = (video) => {
     videoAPI.delete_(video.id).catch((error) => console.log(error));
