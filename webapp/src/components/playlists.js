@@ -33,8 +33,8 @@ const Playlists = observer(() => {
         destination.index
       );
 
-      const destPlaylist = store.playlist[destination.droppableId];
-      const srcPlaylist = store.playlist[source.droppableId];
+      const destPlaylist = store.playlists[destination.droppableId];
+      const srcPlaylist = store.playlists[source.droppableId];
       playlistAPI.update(destination.droppableId, { ids: destPlaylist.ids });
       if (destination.dropppableId !== source.droppableId) {
         playlistAPI.update(source.droppableId, { ids: srcPlaylist.ids });
