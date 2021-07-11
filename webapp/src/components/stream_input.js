@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
@@ -6,7 +6,7 @@ import playerAPI from "services/api/player";
 
 import "./stream_input.css";
 
-function StreamInput() {
+const StreamInput = () => {
   const [url, setUrl] = useState("");
   const [action, setAction] = useState(() => playerAPI.streamMedia);
   const [castVariant, setCastVariant] = useState("contained");
@@ -42,10 +42,6 @@ function StreamInput() {
       setAction(() => playerAPI.queueMedia);
     }
   };
-
-  useEffect(() => {
-    handleSubmit(undefined);
-  }, [action]);
 
   return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">
@@ -83,6 +79,6 @@ function StreamInput() {
       </Grid>
     </form>
   );
-}
+};
 
 export default StreamInput;

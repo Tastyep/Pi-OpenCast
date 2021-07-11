@@ -39,7 +39,7 @@ class PlayerService(Service):
     def _play_video(self, cmd):
         def impl(player):
             video = self._video_repo.get(cmd.video_id)
-            player.play(video.id)
+            player.play(video.id, cmd.playlist_id)
 
             self._player.play(video.location, video.streamable())
 

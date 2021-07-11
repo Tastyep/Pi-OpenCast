@@ -57,4 +57,4 @@ class Playlist(Entity):
         self._record(Evt.PlaylistContentUpdated, self._data.ids)
 
     def delete(self):
-        self._record(Evt.PlaylistDeleted)
+        self._record(Evt.PlaylistDeleted, self._data.name, self._data.ids)

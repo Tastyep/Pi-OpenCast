@@ -39,6 +39,10 @@ class MonitorController(Controller):
     def _no_content(self):
         return self._make_response(204, None)
 
+    def _forbidden(self, message: str, details: dict = {}):
+        body = ErrorSchema().load({"message": message, "details": details})
+        return self._make_response(403, body)
+
     def _not_found(self):
         return self._make_response(404, None)
 

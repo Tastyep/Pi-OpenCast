@@ -15,7 +15,8 @@ class PlaylistCreated(Event):
 
 @dataclass
 class PlaylistDeleted(Event):
-    pass
+    name: str
+    ids: List[ModelId]
 
 
 @dataclass

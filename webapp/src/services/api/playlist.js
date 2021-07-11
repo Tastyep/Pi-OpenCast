@@ -1,4 +1,4 @@
-import API from "./api";
+import { API, makeWebSocket } from "./api";
 
 async function create(data) {
   return await API.post("/playlists/", data);
@@ -13,7 +13,7 @@ async function get(id) {
 }
 
 async function update(id, data) {
-  return await API.get("/playlists/" + id, data);
+  return await API.patch("/playlists/" + id, data);
 }
 
 async function delete_(id) {
@@ -24,6 +24,10 @@ async function videos(playlist_id) {
   return await API.get("/playlists/" + playlist_id + "/videos");
 }
 
+function listen() {
+  return makeWebSocket("/playlists/events");
+}
+
 export default {
   create,
   list,
@@ -32,3 +36,5 @@ export default {
   delete_,
   videos,
 };
+
+export { listen };

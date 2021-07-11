@@ -4,7 +4,7 @@ from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import playlist as PlaylistCmd
 from OpenCast.app.command import video as VideoCmd
 from OpenCast.app.workflow.app import InitWorkflow
-from OpenCast.domain.constant import PLAYER_PLAYLIST_NAME
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import State as PlayerState
@@ -42,21 +42,19 @@ class InitWorkflowTest(WorkflowTestCase):
 
     @patch("OpenCast.app.workflow.app.IdentityService")
     def test_creating_player_to_aborted(self, identityMock):
-        playlist_id = IdentityService.id_playlist()
         player_id = IdentityService.id_player()
-        identityMock.id_playlist.return_value = playlist_id
         identityMock.id_player.return_value = player_id
 
         self.workflow.to_CREATING_PLAYER()
         createPlaylistId = IdentityService.id_command(
-            PlaylistCmd.CreatePlaylist, playlist_id
+            PlaylistCmd.CreatePlaylist, HOME_PLAYLIST.id
         )
         createPlayerId = IdentityService.id_command(PlayerCmd.CreatePlayer, player_id)
         expected_cmds = [
             PlaylistCmd.CreatePlaylist(
-                createPlaylistId, playlist_id, PLAYER_PLAYLIST_NAME, []
+                createPlaylistId, HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
             ),
-            PlayerCmd.CreatePlayer(createPlayerId, player_id, playlist_id),
+            PlayerCmd.CreatePlayer(createPlayerId, player_id, HOME_PLAYLIST.id),
         ]
         self.expect_dispatch_l(expected_cmds)
         self.raise_error(expected_cmds[-1])
@@ -64,30 +62,28 @@ class InitWorkflowTest(WorkflowTestCase):
 
     @patch("OpenCast.app.workflow.app.IdentityService")
     def test_creating_player_to_purging_videos(self, identityMock):
-        playlist_id = IdentityService.id_playlist()
         player_id = IdentityService.id_player()
-        identityMock.id_playlist.return_value = playlist_id
         identityMock.id_player.return_value = player_id
         video = Video(IdentityService.id_video("source"), "source", location="unknown")
         self.video_repo.list.return_value = [video]
 
         self.workflow.to_CREATING_PLAYER()
         createPlaylistId = IdentityService.id_command(
-            PlaylistCmd.CreatePlaylist, playlist_id
+            PlaylistCmd.CreatePlaylist, HOME_PLAYLIST.id
         )
         createPlayerId = IdentityService.id_command(PlayerCmd.CreatePlayer, player_id)
         expected_cmds = [
             PlaylistCmd.CreatePlaylist(
-                createPlaylistId, playlist_id, PLAYER_PLAYLIST_NAME, []
+                createPlaylistId, HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
             ),
-            PlayerCmd.CreatePlayer(createPlayerId, player_id, playlist_id),
+            PlayerCmd.CreatePlayer(createPlayerId, player_id, HOME_PLAYLIST.id),
         ]
         self.expect_dispatch_l(expected_cmds)
         self.raise_event(
             PlayerEvt.PlayerCreated,
             createPlayerId,
             player_id,
-            playlist_id,
+            HOME_PLAYLIST.id,
             PlayerState.STOPPED,
             True,
             0,

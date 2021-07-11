@@ -9,7 +9,7 @@ import structlog
 from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import playlist as PlaylistCmd
 from OpenCast.app.command import video as VideoCmd
-from OpenCast.domain.constant import PLAYER_PLAYLIST_NAME
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
@@ -63,14 +63,13 @@ class InitWorkflow(Workflow):
 
     # States
     def on_enter_CREATING_PLAYER(self):
-        playlist_id = IdentityService.id_playlist()
-        cmd = make_cmd(PlaylistCmd.CreatePlaylist, playlist_id, PLAYER_PLAYLIST_NAME)
+        cmd = make_cmd(PlaylistCmd.CreatePlaylist, HOME_PLAYLIST.id, HOME_PLAYLIST.name)
         self._cmd_dispatcher.dispatch(cmd)
         self._observe_dispatch(
             PlayerEvt.PlayerCreated,
             PlayerCmd.CreatePlayer,
             IdentityService.id_player(),
-            playlist_id,
+            HOME_PLAYLIST.id,
         )
 
     def on_enter_PURGING_VIDEOS(self, *_):

@@ -33,10 +33,13 @@ class MonitorControllerTestCase(AioHTTPTestCase):
         data_manager = DataManager(repo_factory)
         self.data_facade = data_manager.connect(StorageType.MEMORY)
         self.data_producer = DataProducer.make()
+        self.data_producer.player().populate(self.data_facade)
 
         self.service_factory = Mock()
         self.source_service = Mock()
+        self.queueing_service = Mock()
         self.service_factory.make_source_service.return_value = self.source_service
+        self.service_factory.make_queueing_service.return_value = self.queueing_service
 
         self.downloader = Mock()
         self.video_parser = Mock()
@@ -78,12 +81,13 @@ class MonitorControllerTestCase(AioHTTPTestCase):
 
         self.hook_cmd(cmd_cls, raise_error)
 
-    def expect_and_raise(self, cmd, evt_cls, *args, **kwargs):
+    def expect_and_raise(self, cmd, events):
         def respond_to_cmd(command):
             self.assertEqual(command, cmd)
-            self.app_facade.evt_dispatcher.dispatch(
-                evt_cls(cmd.id, cmd.model_id, *args, **kwargs)
-            )
+            for evt in events:
+                self.app_facade.evt_dispatcher.dispatch(
+                    evt["type"](cmd.id, cmd.model_id, **evt["args"])
+                )
 
         self.app_facade.cmd_dispatcher.dispatch.side_effect = respond_to_cmd
 

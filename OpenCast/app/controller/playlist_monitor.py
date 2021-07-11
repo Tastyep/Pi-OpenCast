@@ -6,6 +6,7 @@ from marshmallow import fields
 
 from OpenCast.app.command import playlist as Cmd
 from OpenCast.app.service.error import OperationError
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.playlist import PlaylistSchema
@@ -28,6 +29,7 @@ class PlaylistMonitController(MonitorController):
         self._route("GET", "/{id:" + self.UUID + "}/videos", handle=self.list_videos)
         self._route("PATCH", "/{id:" + self.UUID + "}", handle=self.update)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
+        self._route("GET", "/events", handle=self.stream_events)
 
     @docs(
         tags=["playlist"],
@@ -235,6 +237,9 @@ class PlaylistMonitController(MonitorController):
         if not self._playlist_repo.exists(id):
             return self._not_found()
 
+        if id == HOME_PLAYLIST.id:
+            return self._forbidden(f"{HOME_PLAYLIST.name} playlist can't be deleted")
+
         channel = self._io_factory.make_janus_channel()
 
         def on_success(evt):
@@ -245,3 +250,12 @@ class PlaylistMonitController(MonitorController):
         )
 
         return await channel.receive()
+
+    @docs(
+        tags=["playlist"],
+        summary="Stream playlist events",
+        description="Stream playlist events over WebSocket",
+        operationId="streamPlaylistEvents",
+    )
+    async def stream_events(self, request):
+        return await self._stream_ws_events(request, PlaylistEvt)

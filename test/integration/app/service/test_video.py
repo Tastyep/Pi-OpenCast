@@ -17,6 +17,7 @@ class VideoServiceTest(ServiceTestCase):
     def setUp(self):
         super(VideoServiceTest, self).setUp()
 
+        self.data_producer.player().populate(self.data_facade)
         self.video_repo = self.data_facade.video_repo
         self.player_repo = self.data_facade.player_repo
         self.player_id = IdentityService.id_player()

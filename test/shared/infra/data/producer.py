@@ -1,3 +1,5 @@
+from OpenCast.domain.constant import HOME_PLAYLIST
+from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.model.video import Video
@@ -29,8 +31,14 @@ class Population:
         entity_id = self._last_entity[cls]
         return self._entities[cls][entity_id]
 
-    def find(self, cls, id):
-        return self._entities[cls][id]
+    def find(self, cls, id: Id):
+        collection = self._entities.get(cls, None)
+        if collection is None:
+            return None
+        return collection.get(id, None)
+
+    def select(self, cls, id: Id):
+        self._last_entity[cls] = id
 
     def register(self, data_facade):
         def register(repo, entities):
@@ -70,16 +78,28 @@ class DataProducer:
     def playlist(self, *args, **attrs):
         return PlaylistProducer(self._population).playlist(*args, **attrs)
 
+    def select(self, cls, id: Id):
+        self._population.select(cls, id)
+        if cls is Player:
+            return PlayerProducer(self._population)
+        if cls is Video:
+            return VideoProducer(self._population)
+        if cls is Playlist:
+            return PlaylistProducer(self._population)
+        return None
+
     def populate(self, data_facade):
         self._population.register(data_facade)
 
 
 class PlayerProducer(DataProducer):
     def player(self, *args, **attrs):
-        PlaylistProducer(self._population).playlist("queue", [])
-        playlist = self._population.last(Playlist)
+        if self._population.find(Playlist, HOME_PLAYLIST.id) is None:
+            PlaylistProducer(self._population).playlist(
+                HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
+            )
         player_id = IdentityService.id_player()
-        self._population.add(Player, player_id, playlist.id, *args, **attrs)
+        self._population.add(Player, player_id, HOME_PLAYLIST.id, *args, **attrs)
         return self
 
     def video(self, *args, **attrs):
@@ -93,9 +113,12 @@ class PlayerProducer(DataProducer):
     def parent_producer(self):
         return super()
 
-    def play(self, source: str):
+    def play(self, source: str, playlist_id=None):
         video_id = IdentityService.id_video(source)
-        self._population.last(Player).play(video_id)
+        player = self._population.last(Player)
+        if playlist_id is None:
+            playlist_id = player.queue
+        player.play(video_id, playlist_id)
         return self
 
     def pause(self):
@@ -111,9 +134,8 @@ class VideoProducer(DataProducer):
 
 
 class PlaylistProducer(DataProducer):
-    def playlist(self, *args, **attrs):
-        playlist_id = IdentityService.id_playlist()
-        self._population.add(Playlist, playlist_id, *args, **attrs)
+    def playlist(self, id: Id, *args, **attrs):
+        self._population.add(Playlist, id, *args, **attrs)
         return self
 
     def video(self, *args, **attrs):

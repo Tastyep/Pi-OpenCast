@@ -61,12 +61,12 @@ class Player(Entity):
         )
 
     @property
-    def state(self):
-        return self._data.state
-
-    @property
     def queue(self):
         return self._data.queue
+
+    @property
+    def state(self):
+        return self._data.state
 
     @property
     def video_id(self):
@@ -84,6 +84,11 @@ class Player(Entity):
     def volume(self):
         return self._data.volume
 
+    @queue.setter
+    def queue(self, playlist_id: Id):
+        self._data.queue = playlist_id
+        self._record(Evt.PlayerQueueUpdated, self._data.queue)
+
     @subtitle_state.setter
     def subtitle_state(self, state):
         self._data.sub_state = state
@@ -99,17 +104,20 @@ class Player(Entity):
         self._data.volume = max(min(200, v), 0)
         self._record(Evt.VolumeUpdated, self._data.volume)
 
-    def play(self, video_id: Id):
+    def play(self, video_id: Id, playlist_id: Id):
         self._data.state = State.PLAYING
         self._data.video_id = video_id
-        self._record(Evt.PlayerStarted, video_id)
+        if self._data.queue != playlist_id:
+            self.queue = playlist_id
+        self._record(Evt.PlayerStarted, State.PLAYING, video_id)
 
     def stop(self):
         if self._data.state is State.STOPPED:
             raise DomainError("the player is already stopped")
         self._data.state = State.STOPPED
+        self._data.video_id = None
         self._data.sub_delay = 0
-        self._record(Evt.PlayerStopped)
+        self._record(Evt.PlayerStopped, State.STOPPED, None)
 
     def toggle_pause(self):
         if self._data.state is State.PLAYING:
