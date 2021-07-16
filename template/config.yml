@@ -17,8 +17,8 @@ default:
     file: opencast.db
 
   player:
-    # Loop the last element, one of [False, "track", "album"]
-    loop_last: "album"
+    # Loop the last element, one of [False, "track", "album", "playlist"]
+    loop_last: "playlist"
 
   downloader:
     # The directory used to store downloaded videos

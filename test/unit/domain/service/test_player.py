@@ -181,6 +181,18 @@ class QueueingServiceTest(TestCase):
             self.service.next_video(self.queue_id, videos[2].id, loop_last="album"),
         )
 
+    def test_next_loop_last_playlist(self):
+        self.data_producer.player().video("source1").video("source2").video(
+            "source3"
+        ).populate(self.data_facade)
+
+        videos = self.video_repo.list()
+        expected = videos[0].id
+        self.assertEqual(
+            expected,
+            self.service.next_video(self.queue_id, videos[2].id, loop_last="playlist"),
+        )
+
     def test_next_invalid_video(self):
         self.data_producer.player().video("source1").video("source2").populate(
             self.data_facade

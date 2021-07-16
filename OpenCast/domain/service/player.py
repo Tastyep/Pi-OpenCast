@@ -76,5 +76,7 @@ class QueueingService:
             ):
                 video_idx -= 1
             return playlist.ids[video_idx]
-        # else: loop_last is False
+        if loop_last == "playlist":
+            return playlist.ids[0]
+
         return None
