@@ -23,7 +23,9 @@ settings.validators.register(
     Validator("SERVER.HOST", default="0.0.0.0"),
     Validator("SERVER.PORT", default=2020),
     Validator("DATABASE.FILE", default="opencast.db"),
-    Validator("PLAYER.LOOP_LAST", default="album", is_in=[False, "track", "album", "playlist"]),
+    Validator(
+        "PLAYER.LOOP_LAST", default="album", is_in=[False, "track", "album", "playlist"]
+    ),
     Validator("DOWNLOADER.OUTPUT_DIRECTORY", must_exist=True),
     Validator("DOWNLOADER.MAX_CONCURRENCY", default=3, gt=0, lt=10),
     Validator("SUBTITLE.ENABLED", default=True, is_in=[True, False]),
