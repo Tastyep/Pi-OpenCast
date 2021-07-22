@@ -1,38 +1,41 @@
-import React, { useState, useEffect } from "react";
+import "./stream_input.css";
 
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
 import {
   GridList,
   GridListTile,
   GridListTileBar,
   IconButton,
 } from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
-
-import videoAPI from "services/api/video";
-import playerAPI from "services/api/player";
-import playlistAPI from "services/api/playlist";
-
 import noPreview from "images/no-preview.png";
+import { observer } from "mobx-react-lite";
+import React from "react";
+import playerAPI from "services/api/player";
+import videoAPI from "services/api/video";
 
-import "./stream_input.css";
+import { useAppStore } from "./app_context";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
       overflow: "hidden",
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: "#F5F5F5",
     },
     gridList: {
       flexWrap: "nowrap",
-      // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
+      // Promote the list into his own layer on Chrome. This cost memory but
+      // helps keeping high FPS.
       transform: "translateZ(0)",
     },
+    gridItem: {
+      minWidth: "160px",
+    },
     title: {
-      color: theme.palette.primary.light,
+      color: "#F5F5F5",
     },
     titleBar: {
       background:
@@ -41,89 +44,59 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function VideoList() {
+const VideoList = observer(() => {
   const classes = useStyles();
-  const [videos, setVideos] = useState([]);
-  const [timer, setTimer] = useState(0);
-  const [videoId, setVideoId] = useState(null);
-  const [playlistId, setPlaylistId] = useState(null);
+  const store = useAppStore();
+  const playlistId = store.player.queue;
+  const videos = store.playlistVideos(playlistId);
 
   const deleteVideo = (video) => {
-    videoAPI
-      .delete_(video.id)
-      .then((response) => {
-        listVideos();
-      })
-      .catch((error) => console.log(error));
+    videoAPI.delete_(video.id).catch((error) => console.log(error));
   };
 
   const playMedia = (video) => {
     playerAPI
-      .playMedia(video.id)
-      .then((response) => {
-        setVideoId(video.id);
-      })
+      .playMedia(video.id, store.player.queue)
+      .then((_) => {})
       .catch((error) => console.log(error));
   };
 
-  const listVideos = () => {
-    playlistAPI
-      .videos(playlistId)
-      .then((response) => {
-        setVideos(response.data.videos);
-      })
-      .catch((error) => console.log(error));
-  };
-
-  useEffect(() => {
-    let interval;
-    interval = setInterval(() => setTimer(timer + 1), 10000);
-
-    if (playlistId === null) {
-      playerAPI
-        .get()
-        .then((response) => {
-          setPlaylistId(response.data.queue);
-        })
-        .catch((error) => console.log(error));
-    } else {
-      listVideos();
+  const renderMedia = (video) => {
+    if (video) {
+      return (
+        <GridListTile key={video.id} className={classes.gridItem}>
+          <img
+            src={video.thumbnail === null ? noPreview : video.thumbnail}
+            alt={video.title}
+            onClick={() => playMedia(video)}
+          />
+          <GridListTileBar
+            title={video.title}
+            classes={{
+              root: classes.titleBar,
+              title: classes.title,
+            }}
+            actionIcon={
+              <IconButton
+                aria-label={`delete ${video.title}`}
+                onClick={() => deleteVideo(video)}
+              >
+                <DeleteIcon className={classes.title} />
+              </IconButton>
+            }
+          />
+        </GridListTile>
+      );
     }
-
-    return () => clearInterval(interval);
-  }, [timer, playlistId]);
+  };
 
   return (
     <div className={classes.root}>
       <GridList className={classes.gridList} cols={4} spacing={2}>
-        {videos.map((tile) => (
-          <GridListTile key={tile.thumbnail}>
-            <img
-              src={tile.thumbnail === null ? noPreview : tile.thumbnail}
-              alt={tile.title}
-              onClick={() => playMedia(tile)}
-            />
-            <GridListTileBar
-              title={tile.title}
-              classes={{
-                root: classes.titleBar,
-                title: classes.title,
-              }}
-              actionIcon={
-                <IconButton
-                  aria-label={`delete ${tile.title}`}
-                  onClick={() => deleteVideo(tile)}
-                >
-                  <DeleteIcon className={classes.title} />
-                </IconButton>
-              }
-            />
-            )}
-          </GridListTile>
-        ))}
+        {videos.map((video) => renderMedia(video))}
       </GridList>
     </div>
   );
-}
+});
 
 export default VideoList;

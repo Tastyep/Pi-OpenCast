@@ -6,6 +6,7 @@
 #   all     Run all formatters.
 #   python  Run formatters on python code.
 #   shell   Run formatters on shell code.
+#   js      Run formatters on js code.
 #
 # Options:
 #   --check  Don't edit files in place.
@@ -25,7 +26,7 @@ source "$ROOT/script/deps.sh"
 #### CLI handlers
 
 all() {
-  python "$@" && shell "$@"
+  python "$@" && shell "$@" && js "$@"
 }
 
 python() {
@@ -75,6 +76,14 @@ shell() {
 
   shfmt "${shfmt_opts[@]}" "${sh_files[@]}"
   log_status "shfmt" "$?"
+}
+
+js() {
+  [[ -z "${ARGS["--check"]}" ]] && prettier_opts=("--write") || prettier_opts=("--check")
+
+  jenv prettier "${prettier_opts[@]}" "webapp/src"
+  prettier_status="$?"
+  log_status "prettier" "$prettier_status"
 }
 
 parse_args "$@"

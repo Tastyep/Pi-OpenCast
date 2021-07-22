@@ -5,6 +5,7 @@ from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import video as VideoCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import MonitorControllerTestCase, asyncio
@@ -42,7 +43,8 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
     @unittest_run_loop
     async def test_delete(self):
         self.expect_and_raise(
-            make_cmd(VideoCmd.DeleteVideo, self.video_id), VideoEvt.VideoDeleted
+            make_cmd(VideoCmd.DeleteVideo, self.video_id),
+            [{"type": VideoEvt.VideoDeleted, "args": {}}],
         )
         resp = await self.client.delete(f"/api/videos/{self.video_id}")
         self.assertEqual(204, resp.status)
@@ -81,7 +83,9 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
     async def test_invalid_event_listening(self):
         async with self.client.ws_connect("/api/videos/events") as ws:
             cmd_id = IdentityService.id_command(PlayerCmd.PlayVideo, self.player_id)
-            player_evt = PlayerEvt.PlayerStarted(cmd_id, self.player_id, self.video_id)
+            player_evt = PlayerEvt.PlayerStarted(
+                cmd_id, self.player_id, PlayerState.PLAYING, self.video_id
+            )
             self.evt_dispatcher.dispatch(player_evt)
             with self.assertRaises(asyncio.TimeoutError):
                 await self.expect_ws_events(ws, [player_evt])

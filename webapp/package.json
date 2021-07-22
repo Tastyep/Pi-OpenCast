@@ -6,8 +6,12 @@
     "@material-ui/core": "^4.10.1",
     "@material-ui/icons": "^4.9.1",
     "axios": "^0.21.1",
+    "mobx": "^6.3.2",
+    "mobx-react-lite": "^3.2.0",
     "react": "^16.13.1",
+    "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^16.13.1",
+    "robust-websocket": "^1.0.0",
     "serve": "^11.3.2"
   },
   "scripts": {
@@ -35,7 +39,7 @@
   },
   "devDependencies": {
     "@testing-library/react": "^9.5.0",
-    "prettier": "^2.0.5",
+    "prettier": "^2.2.1",
     "react-scripts": "^3.4.3"
   }
 }

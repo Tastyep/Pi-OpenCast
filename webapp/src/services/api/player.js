@@ -1,4 +1,4 @@
-import API from "./api";
+import { API, makeWebSocket } from "./api";
 
 async function get() {
   return await API.get("/player/");
@@ -12,8 +12,10 @@ async function queueMedia(url) {
   return await API.post("/player/queue", null, { params: { url: url } });
 }
 
-async function playMedia(id) {
-  return await API.post("/player/play", null, { params: { id: id } });
+async function playMedia(id, playlist_id) {
+  return await API.post("/player/play", null, {
+    params: { id: id, playlist_id: playlist_id },
+  });
 }
 
 async function stopMedia() {
@@ -44,6 +46,10 @@ async function seekSubtitle(forward) {
   });
 }
 
+function listen() {
+  return makeWebSocket("/player/events");
+}
+
 export default {
   get,
   streamMedia,
@@ -56,3 +62,5 @@ export default {
   toggleSubtitle,
   seekSubtitle,
 };
+
+export { listen };

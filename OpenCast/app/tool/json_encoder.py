@@ -1,6 +1,8 @@
 """ Custom JSON encoder definitions """
 
+from enum import Enum
 from json import JSONEncoder
+from pathlib import PosixPath
 
 from OpenCast.domain.event.event import Event
 from OpenCast.domain.model.entity import Entity
@@ -9,8 +11,10 @@ from OpenCast.infra import Id
 
 class EnhancedJSONEncoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, Id):
+        if isinstance(obj, Id) or isinstance(obj, PosixPath):
             return str(obj)
+        if isinstance(obj, Enum):
+            return obj.name
         return super().default(obj)
 
 
