@@ -115,7 +115,7 @@ export class AppStore {
     playlist.ids = playlist.ids.filter((id) => id !== videoId);
   }
 
-  playlistVideos(id, origin) {
+  playlistVideos(id) {
     return computed(() => {
       if (!Object.keys(this.playlists).includes(id)) {
         return [];
