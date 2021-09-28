@@ -3,11 +3,13 @@
 from .player import PlayerController
 from .player_monitor import PlayerMonitController
 from .playlist_monitor import PlaylistMonitController
+from .root_monitor import RootMonitController
 from .video_monitor import VideoMonitController
 
 
 class ControllerModule:
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
+        self._root_monitor = RootMonitController(app_facade, infra_facade)
         self._player_monitor = PlayerMonitController(
             app_facade, infra_facade, data_facade, service_factory
         )
