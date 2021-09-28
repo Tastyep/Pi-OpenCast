@@ -14,6 +14,7 @@ class VideoCreated(Event):
     collection_id: Optional[ModelId]
     collection_name: Optional[str]
     title: Optional[str]
+    duration: Optional[int]
     source_protocol: str
     thumbnail: Optional[str]
 

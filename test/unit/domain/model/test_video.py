@@ -18,6 +18,7 @@ class VideoTest(ModelTestCase):
             collection_id,
             "album_name",
             "title",
+            300,
             "protocol",
             "thumbnail_url",
             "/tmp/file",
@@ -28,6 +29,7 @@ class VideoTest(ModelTestCase):
         self.assertEqual(collection_id, video.collection_id)
         self.assertEqual("album_name", video.collection_name)
         self.assertEqual("title", video.title)
+        self.assertEqual(300, video.duration)
         self.assertEqual("/tmp/file", video.location)
         self.assertEqual([], video.streams)
         self.assertEqual("subtitle", video.subtitle)

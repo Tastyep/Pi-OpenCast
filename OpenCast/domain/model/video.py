@@ -30,6 +30,7 @@ class VideoSchema(Schema):
     source = fields.String()
     source_protocol = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
+    duration = fields.Integer(allow_none=True)
     collection_id = fields.UUID(allow_none=True)
     collection_name = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
@@ -43,6 +44,7 @@ class Video(Entity):
     METADATA_FIELDS = [
         "collection_name",
         "title",
+        "duration",
         "source_protocol",
         "thumbnail",
     ]
@@ -54,6 +56,7 @@ class Video(Entity):
         collection_id: Optional[Id] = None
         collection_name: Optional[str] = None
         title: Optional[str] = None
+        duration: Optional[int] = None
         source_protocol: Optional[str] = None
         thumbnail: Optional[str] = None
         location: Optional[str] = None
@@ -68,6 +71,7 @@ class Video(Entity):
             self._data.collection_id,
             self._data.collection_name,
             self._data.title,
+            self._data.duration,
             self._data.source_protocol,
             self._data.thumbnail,
         )
@@ -87,6 +91,10 @@ class Video(Entity):
     @property
     def title(self):
         return self._data.title
+
+    @property
+    def duration(self):
+        return self._data.duration
 
     @property
     def location(self):

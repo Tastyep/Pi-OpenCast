@@ -29,6 +29,7 @@ class VideoServiceTest(ServiceTestCase):
 
         metadata = {
             "title": "title",
+            "duration": 300,
             "source_protocol": "http",
             "collection_name": "album",
             "thumbnail": "thumbnail_url",
@@ -54,6 +55,7 @@ class VideoServiceTest(ServiceTestCase):
         metadata = {
             "collection_name": None,
             "title": "test_title",
+            "duration": 300,
             "source_protocol": None,
             "thumbnail": None,
         }

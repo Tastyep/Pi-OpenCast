@@ -40,7 +40,17 @@ class ModelEncoderTest(TestCase):
 
     def test_encode_video(self):
         video_id = IdentityService.id_video("source")
-        video = Video(video_id, "source", "protocol", "title", "album", "thumbnail")
+        playlist_id = IdentityService.id_playlist()
+        video = Video(
+            video_id,
+            "source",
+            playlist_id,
+            "album",
+            "title",
+            300,
+            "protocol",
+            "thumbnail",
+        )
         video.location = "/tmp/video.mp4"
         video.streams = [Stream(0, "audio", "en")]
         video.subtitle = Path("/tmp/video.srt")
@@ -59,6 +69,7 @@ class EventEncoderTest(TestCase):
             collection_id,
             "album",
             "title",
+            300,
             "protocol",
             "thumbnail",
         )

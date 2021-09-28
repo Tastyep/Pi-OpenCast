@@ -76,6 +76,7 @@ class SourceServiceTest(TestCase):
         self.downloader.download_metadata.return_value = {
             "source_protocol": "http",
             "title": "test",
+            "duration": 300,
             "collection_name": "collection",
             "thumbnail": "url",
         }
@@ -83,6 +84,7 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": "http",
             "title": "test",
+            "duration": 300,
             "collection_name": "collection",
             "thumbnail": "url",
         }
@@ -96,6 +98,7 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": None,
             "title": "test",
+            "duration": None,
             "collection_name": None,
             "thumbnail": None,
         }
@@ -105,6 +108,7 @@ class SourceServiceTest(TestCase):
         self.downloader.download_metadata.return_value = {
             "protocol": "http",
             "title": "test",
+            "duration": 300,
             "album": "album_name",
             "thumbnail": "url",
         }
@@ -112,6 +116,7 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": "http",
             "title": "test",
+            "duration": 300,
             "collection_name": "album_name",
             "thumbnail": "url",
         }
@@ -127,6 +132,7 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": None,
             "title": "video",
+            "duration": None,
             "collection_name": None,
             "thumbnail": None,
         }
