@@ -49,7 +49,6 @@ class PlayerMonitController(MonitorController):
         self._route("POST", "/volume", self.volume)
         self._route("POST", "/subtitle/toggle", self.subtitle_toggle)
         self._route("POST", "/subtitle/seek", self.subtitle_seek)
-        self._route("GET", "/events", self.stream_events)
 
     @docs(
         tags=["player"],
@@ -350,15 +349,6 @@ class PlayerMonitController(MonitorController):
         self._observe_dispatch(handlers, Cmd.AdjustSubtitleDelay, step)
 
         return await channel.receive()
-
-    @docs(
-        tags=["player"],
-        summary="Stream player events",
-        description="Stream player events over WebSocket",
-        operationId="streamPlayerEvents",
-    )
-    async def stream_events(self, request):
-        return await self._stream_ws_events(request, PlayerEvt)
 
     def _make_default_handlers(self, evt_cls):
         channel = self._io_factory.make_janus_channel()

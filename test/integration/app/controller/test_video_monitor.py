@@ -54,38 +54,3 @@ class VideoMonitorControllerTest(MonitorControllerTestCase):
         video_id = IdentityService.id_video("unknown")
         resp = await self.client.delete(f"/api/videos/{video_id}")
         self.assertEqual(404, resp.status)
-
-    @unittest_run_loop
-    async def test_event_listening(self):
-        async with self.client.ws_connect("/api/videos/events") as ws:
-            cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video_id)
-            collection_id = IdentityService.random()
-            created_evt = VideoEvt.VideoCreated(
-                cmd_id,
-                self.video_id,
-                "source",
-                collection_id,
-                "album",
-                "title",
-                "http",
-                "thumbnail",
-            )
-            self.evt_dispatcher.dispatch(created_evt)
-            await self.expect_ws_events(ws, [created_evt])
-
-            cmd_id = IdentityService.id_command(VideoCmd.RetrieveVideo, self.video_id)
-            dl_evt = VideoEvt.VideoRetrieved(cmd_id, self.video_id, "path")
-            self.evt_dispatcher.dispatch(created_evt)
-            self.evt_dispatcher.dispatch(dl_evt)
-            await self.expect_ws_events(ws, [created_evt, dl_evt])
-
-    @unittest_run_loop
-    async def test_invalid_event_listening(self):
-        async with self.client.ws_connect("/api/videos/events") as ws:
-            cmd_id = IdentityService.id_command(PlayerCmd.PlayVideo, self.player_id)
-            player_evt = PlayerEvt.PlayerStarted(
-                cmd_id, self.player_id, PlayerState.PLAYING, self.video_id
-            )
-            self.evt_dispatcher.dispatch(player_evt)
-            with self.assertRaises(asyncio.TimeoutError):
-                await self.expect_ws_events(ws, [player_evt])

@@ -12,3 +12,6 @@ class JanusChannel:
 
     async def receive(self):
         return await self._queue.async_q.get()
+
+    def task_done(self):
+        self._queue.async_q.task_done()

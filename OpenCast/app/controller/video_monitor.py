@@ -21,7 +21,6 @@ class VideoMonitController(MonitorController):
         self._route("GET", "/", handle=self.list)
         self._route("GET", "/{id:" + self.UUID + "}", handle=self.get)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
-        self._route("GET", "/events", handle=self.stream_events)
 
     @docs(
         tags=["video"],
@@ -97,12 +96,3 @@ class VideoMonitController(MonitorController):
         self._observe_dispatch({VideoEvt.VideoDeleted: on_success}, Cmd.DeleteVideo, id)
 
         return await channel.receive()
-
-    @docs(
-        tags=["video"],
-        summary="Stream video events",
-        description="Stream video events over WebSocket",
-        operationId="streamVideoEvents",
-    )
-    async def stream_events(self, request):
-        return await self._stream_ws_events(request, VideoEvt)

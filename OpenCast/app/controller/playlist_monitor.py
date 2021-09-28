@@ -29,7 +29,6 @@ class PlaylistMonitController(MonitorController):
         self._route("GET", "/{id:" + self.UUID + "}/videos", handle=self.list_videos)
         self._route("PATCH", "/{id:" + self.UUID + "}", handle=self.update)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
-        self._route("GET", "/events", handle=self.stream_events)
 
     @docs(
         tags=["playlist"],
@@ -250,12 +249,3 @@ class PlaylistMonitController(MonitorController):
         )
 
         return await channel.receive()
-
-    @docs(
-        tags=["playlist"],
-        summary="Stream playlist events",
-        description="Stream playlist events over WebSocket",
-        operationId="streamPlaylistEvents",
-    )
-    async def stream_events(self, request):
-        return await self._stream_ws_events(request, PlaylistEvt)
