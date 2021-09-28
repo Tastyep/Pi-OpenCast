@@ -2,16 +2,12 @@ import React from "react";
 import { useLocalObservable } from "mobx-react-lite";
 import { AppStore } from "./app_store";
 import { SocketEventDispatcher } from "services/dispatcher";
-import { listen as listenPlayerEvents } from "services/api/player";
-import { listen as listenVideoEvents } from "services/api/video";
-import { listen as listenPlaylistEvents } from "services/api/playlist";
+import { listen as listenAppEvents } from "services/api/api";
 import ModelFactory from "models/factory";
 
 const AppContext = React.createContext(null);
 const eventDispatcher = new SocketEventDispatcher([
-  listenPlayerEvents(),
-  listenVideoEvents(),
-  listenPlaylistEvents(),
+  listenAppEvents(),
 ]);
 const modelFactory = new ModelFactory(eventDispatcher);
 

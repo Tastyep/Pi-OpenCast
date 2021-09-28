@@ -1,4 +1,4 @@
-import { API, makeWebSocket } from "./api";
+import { API } from "./api";
 
 async function get() {
   return await API.get("/player/");
@@ -46,11 +46,7 @@ async function seekSubtitle(forward) {
   });
 }
 
-function listen() {
-  return makeWebSocket("/player/events");
-}
-
-export default {
+const playerAPI = {
   get,
   streamMedia,
   queueMedia,
@@ -61,6 +57,6 @@ export default {
   updateVolume,
   toggleSubtitle,
   seekSubtitle,
-};
+}
 
-export { listen };
+export default playerAPI;

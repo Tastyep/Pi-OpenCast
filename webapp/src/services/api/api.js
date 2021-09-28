@@ -11,4 +11,8 @@ const makeWebSocket = (endpoint) => {
   return new RobustWebSocket(API_URL.replace("http", "ws") + endpoint);
 };
 
-export { API, API_URL, makeWebSocket };
+const listen = () => {
+  return makeWebSocket("/events");
+}
+
+export { API, API_URL, listen };
