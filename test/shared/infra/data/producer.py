@@ -119,6 +119,8 @@ class PlayerProducer(DataProducer):
         if playlist_id is None:
             playlist_id = player.queue
         player.play(video_id, playlist_id)
+        video = self._population.find(Video, video_id)
+        video.start()
         return self
 
     def pause(self):

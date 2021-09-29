@@ -19,6 +19,8 @@ class VideoTest(ModelTestCase):
             "album_name",
             "title",
             timedelta(seconds=300),
+            timedelta(),
+            None,
             "protocol",
             "thumbnail_url",
             "/tmp/file",
@@ -51,6 +53,11 @@ class VideoTest(ModelTestCase):
         self.assertFalse(self.video.streamable())
         video = Video(IdentityService.random(), "source", source_protocol="m3u8")
         self.assertTrue(video.streamable())
+
+    def test_start_stop(self):
+        self.video.start()
+        self.video.stop()
+        self.expect_events(self.video, Evt.VideoStarted, Evt.VideoStopped)
 
     def test_delete(self):
         self.video.delete()

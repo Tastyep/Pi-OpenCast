@@ -5,6 +5,8 @@ from pathlib import Path
 import structlog
 
 from OpenCast.app.command import video as video_cmds
+from OpenCast.domain.event import player as PlayerEvt
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import Video, timedelta
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
@@ -15,6 +17,9 @@ class VideoService(Service):
     def __init__(self, app_facade, service_factory, data_facade, media_factory):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, video_cmds)
+
+        self._observe_event(PlayerEvt.PlayerStateUpdated)
+
         self._video_repo = data_facade.video_repo
         self._downloader = media_factory.make_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(
@@ -111,3 +116,27 @@ class VideoService(Service):
             ctx.update(video)
 
         self._start_transaction(self._video_repo, cmd.id, impl)
+
+    # Event handler implementation
+
+    def start_video(self, ctx, video_id):
+        video = self._video_repo.get(video_id)
+        video.start()
+        ctx.update(video)
+
+    def stop_video(self, ctx, video_id):
+        video = self._video_repo.get(video_id)
+        video.stop()
+        ctx.update(video)
+
+    def _player_state_updated(self, evt):
+        if evt.new == PlayerState.PLAYING:
+            self._start_transaction(
+                self._video_repo,
+                evt.id,
+                lambda ctx: self.start_video(ctx, evt.video_id),
+            )
+        elif evt.old == PlayerState.PLAYING:
+            self._start_transaction(
+                self._video_repo, evt.id, lambda ctx: self.stop_video(ctx, evt.video_id)
+            )

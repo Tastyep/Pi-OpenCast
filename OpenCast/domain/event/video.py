@@ -37,3 +37,13 @@ class VideoParsed(Event):
 @dataclass
 class VideoSubtitleFetched(Event):
     subtitle: Path
+
+
+@dataclass
+class VideoStarted(Event):
+    timestamp: int
+
+
+@dataclass
+class VideoStopped(Event):
+    playing_duration: int

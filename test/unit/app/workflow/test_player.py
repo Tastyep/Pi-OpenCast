@@ -257,7 +257,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
             self.player_id,
             PlayerState.STOPPED,
             PlayerState.PLAYING,
-            self.video.id
+            self.video.id,
         )
         self.assertTrue(self.workflow.is_COMPLETED())
 

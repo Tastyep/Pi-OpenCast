@@ -48,6 +48,8 @@ class ModelEncoderTest(TestCase):
             "album",
             "title",
             timedelta(seconds=300),
+            timedelta(minutes=10),
+            datetime(2020, 10, 5),
             "protocol",
             "thumbnail",
         )

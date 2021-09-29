@@ -32,6 +32,8 @@ class VideoSchema(Schema):
     source_protocol = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
     duration = fields.TimeDelta(allow_none=True)
+    total_playing_duration = fields.TimeDelta()
+    last_play = fields.DateTime(allow_none=True)
     collection_id = fields.UUID(allow_none=True)
     collection_name = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
@@ -58,6 +60,8 @@ class Video(Entity):
         collection_name: Optional[str] = None
         title: Optional[str] = None
         duration: Optional[timedelta] = None
+        total_playing_duration: timedelta = timedelta()
+        last_play: Optional[datetime] = None
         source_protocol: Optional[str] = None
         thumbnail: Optional[str] = None
         location: Optional[str] = None
@@ -142,6 +146,16 @@ class Video(Entity):
                 if stream.type == type and stream.language == language
             ),
             None,
+        )
+
+    def start(self):
+        self._data.last_play = datetime.now()
+        self._record(Evt.VideoStarted, self._data.last_play.timestamp())
+
+    def stop(self):
+        self._data.total_playing_duration += datetime.now() - self._data.last_play
+        self._record(
+            Evt.VideoStopped, int(self._data.total_playing_duration.total_seconds())
         )
 
     def delete(self):
