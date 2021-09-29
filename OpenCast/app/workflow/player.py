@@ -183,7 +183,7 @@ class StreamVideoWorkflow(Workflow):
         ["start",                           States.INITIAL,    States.QUEUEING],
         ["_queue_video_workflow_completed", States.QUEUEING,   States.STARTING],
         ["_queue_video_workflow_aborted",   States.QUEUEING,   States.ABORTED],
-        ["_player_started",                 States.STARTING,   States.COMPLETED],
+        ["_player_state_updated",           States.STARTING,   States.COMPLETED],
         ["_operation_error",                States.STARTING,   States.ABORTED],
     ]
     # fmt: on
@@ -216,7 +216,7 @@ class StreamVideoWorkflow(Workflow):
 
     def on_enter_STARTING(self, evt):
         self._observe_dispatch(
-            PlayerEvt.PlayerStarted,
+            PlayerEvt.PlayerStateUpdated,
             PlayerCmd.PlayVideo,
             IdentityService.id_player(),
             self.video.id,

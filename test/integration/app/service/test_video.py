@@ -55,7 +55,7 @@ class VideoServiceTest(ServiceTestCase):
         metadata = {
             "collection_name": None,
             "title": "test_title",
-            "duration": 300,
+            "duration": None,
             "source_protocol": None,
             "thumbnail": None,
         }

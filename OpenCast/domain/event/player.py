@@ -22,20 +22,10 @@ class PlayerQueueUpdated(Event):
 
 
 @dataclass
-class PlayerStarted(Event):
-    state: State
+class PlayerStateUpdated(Event):
+    old: State
+    new: State
     video_id: ModelId
-
-
-@dataclass
-class PlayerStopped(Event):
-    state: State
-    video_id: ModelId
-
-
-@dataclass
-class PlayerStateToggled(Event):
-    state: State
 
 
 @dataclass

@@ -252,11 +252,12 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
             PlayerCmd.PlayVideo, self.player_id, self.video.id, self.player_playlist_id
         )
         self.raise_event(
-            PlayerEvt.PlayerStarted,
+            PlayerEvt.PlayerStateUpdated,
             cmd.id,
             self.player_id,
+            PlayerState.STOPPED,
             PlayerState.PLAYING,
-            self.video.id,
+            self.video.id
         )
         self.assertTrue(self.workflow.is_COMPLETED())
 

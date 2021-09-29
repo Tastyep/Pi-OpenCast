@@ -23,7 +23,7 @@ from .monitoring_schema import ErrorSchema
 
 
 class PlayerMonitController(MonitorController):
-    """ The controller in charge of player related requests """
+    """The controller in charge of player related requests"""
 
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
         logger = structlog.get_logger(__name__)
@@ -207,7 +207,7 @@ class PlayerMonitController(MonitorController):
         ):
             return self._not_found()
 
-        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStarted)
+        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
         self._observe_dispatch(handlers, Cmd.PlayVideo, video_id, playlist_id)
 
         return await channel.receive()
@@ -223,7 +223,7 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def stop(self, _):
-        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStopped)
+        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
         self._observe_dispatch(handlers, Cmd.StopPlayer)
 
         return await channel.receive()
@@ -239,7 +239,7 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def pause(self, _):
-        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateToggled)
+        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
         self._observe_dispatch(handlers, Cmd.TogglePlayerState)
 
         return await channel.receive()

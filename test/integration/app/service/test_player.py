@@ -38,7 +38,11 @@ class PlayerServiceTest(ServiceTestCase):
         self.evt_expecter.expect(
             Evt.PlayerQueueUpdated, self.player_id, self.player_playlist_id
         ).expect(
-            Evt.PlayerStarted, self.player_id, PlayerState.PLAYING, video_id
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.STOPPED,
+            PlayerState.PLAYING,
+            video_id,
         ).from_(
             Cmd.PlayVideo, self.player_id, video_id, self.player_playlist_id
         )
@@ -48,8 +52,13 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
+        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
-            Evt.PlayerStopped, self.player_id, PlayerState.STOPPED, video_id=None
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.PLAYING,
+            PlayerState.STOPPED,
+            video_id,
         ).from_(Cmd.StopPlayer, self.player_id)
 
     def test_toggle_player_state(self):
@@ -57,11 +66,20 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
+        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
-            Evt.PlayerStateToggled, self.player_id, PlayerState.PAUSED
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.PLAYING,
+            PlayerState.PAUSED,
+            video_id,
         ).from_(Cmd.TogglePlayerState, self.player_id)
         self.evt_expecter.expect(
-            Evt.PlayerStateToggled, self.player_id, PlayerState.PLAYING
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.PAUSED,
+            PlayerState.PLAYING,
+            video_id,
         ).from_(Cmd.TogglePlayerState, self.player_id)
 
     def test_seek_video(self):

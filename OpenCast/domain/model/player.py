@@ -105,28 +105,36 @@ class Player(Entity):
         self._record(Evt.VolumeUpdated, self._data.volume)
 
     def play(self, video_id: Id, playlist_id: Id):
+        state = self._data.state
         self._data.state = State.PLAYING
         self._data.video_id = video_id
         if self._data.queue != playlist_id:
             self.queue = playlist_id
-        self._record(Evt.PlayerStarted, State.PLAYING, video_id)
+        self._record(
+            Evt.PlayerStateUpdated, state, self._data.state, self._data.video_id
+        )
 
     def stop(self):
         if self._data.state is State.STOPPED:
             raise DomainError("the player is already stopped")
+        state = self._data.state
+        video_id = self._data.video_id
         self._data.state = State.STOPPED
         self._data.video_id = None
         self._data.sub_delay = 0
-        self._record(Evt.PlayerStopped, State.STOPPED, None)
+        self._record(Evt.PlayerStateUpdated, state, self._data.state, video_id)
 
     def toggle_pause(self):
+        state = self._data.state
         if self._data.state is State.PLAYING:
             self._data.state = State.PAUSED
         elif self._data.state is State.PAUSED:
             self._data.state = State.PLAYING
         else:
             raise DomainError("the player is not started")
-        self._record(Evt.PlayerStateToggled, self._data.state)
+        self._record(
+            Evt.PlayerStateUpdated, state, self._data.state, self._data.video_id
+        )
 
     def seek_video(self):
         if self._data.state is State.STOPPED:

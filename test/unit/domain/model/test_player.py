@@ -30,7 +30,7 @@ class PlayerTest(ModelTestCase):
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.assertEqual(video_id, self.player.video_id)
         self.assertEqual(playlist_id, self.player.queue)
-        self.expect_events(self.player, Evt.PlayerQueueUpdated, Evt.PlayerStarted)
+        self.expect_events(self.player, Evt.PlayerQueueUpdated, Evt.PlayerStateUpdated)
 
     def test_stop(self):
         video_id = IdentityService.id_video("source")
@@ -38,7 +38,7 @@ class PlayerTest(ModelTestCase):
         self.player.stop()
         self.assertEqual(PlayerState.STOPPED, self.player.state)
         self.assertEqual(None, self.player.video_id)
-        self.expect_events(self.player, Evt.PlayerStarted, Evt.PlayerStopped)
+        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerStateUpdated)
 
     def test_stop_not_started(self):
         with self.assertRaises(DomainError) as ctx:
@@ -50,7 +50,7 @@ class PlayerTest(ModelTestCase):
         self.player.play(video_id, self.player.queue)
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PAUSED, self.player.state)
-        self.expect_events(self.player, Evt.PlayerStarted, Evt.PlayerStateToggled)
+        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerStateUpdated)
 
     def test_toggle_pause_not_started(self):
         with self.assertRaises(DomainError) as ctx:
@@ -65,9 +65,9 @@ class PlayerTest(ModelTestCase):
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.expect_events(
             self.player,
-            Evt.PlayerStarted,
-            Evt.PlayerStateToggled,
-            Evt.PlayerStateToggled,
+            Evt.PlayerStateUpdated,
+            Evt.PlayerStateUpdated,
+            Evt.PlayerStateUpdated,
         )
 
     def test_volume(self):
@@ -87,7 +87,7 @@ class PlayerTest(ModelTestCase):
         video_id = IdentityService.id_video("source")
         self.player.play(video_id, self.player.queue)
         self.player.seek_video()
-        self.expect_events(self.player, Evt.PlayerStarted, Evt.VideoSeeked)
+        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.VideoSeeked)
 
     def test_seek_video_not_started(self):
         with self.assertRaises(DomainError) as ctx:

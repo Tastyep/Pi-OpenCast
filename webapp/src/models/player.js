@@ -37,9 +37,7 @@ export default class Player {
     eventDispatcher.observe(
       {
         PlayerQueueUpdated: (e) => this.setQueue(e.queue),
-        PlayerStarted: (e) => this.onPlayerStarted(e),
-        PlayerStopped: (e) => this.onPlayerStopped(e),
-        PlayerStateToggled: (e) => this.setState(e.state),
+        PlayerStateUpdated: (e) => this.onPlayerStateUpdated(e),
         VolumeUpdated: (e) => this.setVolume(e.volume),
         SubtitleStateUpdated: (e) => this.setSubState(e.state),
         SubtitleDelayUpdated: (e) => this.setSubDelay(e.delay),
@@ -48,16 +46,10 @@ export default class Player {
     );
   }
 
-  onPlayerStarted(e) {
-    this.setState(e.state);
+  onPlayerStateUpdated(e) {
+    this.setState(e.new);
     this.setVideoId(e.video_id);
   }
-
-  onPlayerStopped(e) {
-    this.setState(e.state);
-    this.setVideoId(e.video_id);
-  }
-
   setQueue(playlist_id) {
     this.queue = playlist_id;
   }

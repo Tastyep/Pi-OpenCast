@@ -162,8 +162,12 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                     "args": {"queue": playlist_id},
                 },
                 {
-                    "type": PlayerEvt.PlayerStarted,
-                    "args": {"state": PlayerState.PLAYING, "video_id": video_id},
+                    "type": PlayerEvt.PlayerStateUpdated,
+                    "args": {
+                        "old": PlayerState.STOPPED,
+                        "new": PlayerState.PLAYING,
+                        "video_id": video_id,
+                    },
                 },
             ],
         )
@@ -230,14 +234,16 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_stop(self):
+        video_id = IdentityService.id_video("source")
         self.expect_and_raise(
             make_cmd(PlayerCmd.StopPlayer, self.player_id),
             [
                 {
-                    "type": PlayerEvt.PlayerStopped,
+                    "type": PlayerEvt.PlayerStateUpdated,
                     "args": {
-                        "state": PlayerState.STOPPED,
-                        "video_id": None,
+                        "old": PlayerState.PLAYING,
+                        "new": PlayerState.STOPPED,
+                        "video_id": video_id,
                     },
                 }
             ],
@@ -268,12 +274,17 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_pause(self):
+        video_id = IdentityService.id_video("source")
         self.expect_and_raise(
             make_cmd(PlayerCmd.TogglePlayerState, self.player_id),
             [
                 {
-                    "type": PlayerEvt.PlayerStateToggled,
-                    "args": {"state": PlayerState.PAUSED},
+                    "type": PlayerEvt.PlayerStateUpdated,
+                    "args": {
+                        "old": PlayerState.PLAYING,
+                        "new": PlayerState.PAUSED,
+                        "video_id": video_id,
+                    },
                 }
             ],
         )
