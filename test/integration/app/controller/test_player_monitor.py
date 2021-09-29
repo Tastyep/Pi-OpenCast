@@ -234,6 +234,9 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_stop(self):
+        self.data_producer.player().video("source").play("source").populate(
+            self.data_facade
+        )
         video_id = IdentityService.id_video("source")
         self.expect_and_raise(
             make_cmd(PlayerCmd.StopPlayer, self.player_id),
@@ -274,6 +277,9 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_pause(self):
+        self.data_producer.player().video("source").play("source").populate(
+            self.data_facade
+        )
         video_id = IdentityService.id_video("source")
         self.expect_and_raise(
             make_cmd(PlayerCmd.TogglePlayerState, self.player_id),
