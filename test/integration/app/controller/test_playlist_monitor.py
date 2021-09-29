@@ -40,7 +40,9 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
                 id=playlist_id, name=cmd.name, ids=cmd.ids
             ).populate(self.data_facade)
             self.app_facade.evt_dispatcher.dispatch(
-                PlaylistEvt.PlaylistCreated(cmd.id, playlist_id, cmd.name, cmd.ids)
+                PlaylistEvt.PlaylistCreated(
+                    cmd.id, playlist_id, cmd.name, cmd.ids, cmd.generated
+                )
             )
 
         self.hook_cmd(PlaylistCmd.CreatePlaylist, make_and_respond)
@@ -220,13 +222,17 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_delete_forbidden(self):
+        self.expect_and_error(
+            make_cmd(PlaylistCmd.DeletePlaylist, HOME_PLAYLIST.id),
+            error="cannot delete generated playlists",
+        )
         resp = await self.client.delete(f"/api/playlists/{HOME_PLAYLIST.id}")
         body = await resp.json()
 
         self.assertEqual(403, resp.status)
         self.assertEqual(
             {
-                "message": f"{HOME_PLAYLIST.name} playlist can't be deleted",
+                "message": f"cannot delete generated playlists",
                 "details": {},
             },
             body,

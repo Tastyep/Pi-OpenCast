@@ -63,7 +63,12 @@ class InitWorkflow(Workflow):
 
     # States
     def on_enter_CREATING_PLAYER(self):
-        cmd = make_cmd(PlaylistCmd.CreatePlaylist, HOME_PLAYLIST.id, HOME_PLAYLIST.name)
+        cmd = make_cmd(
+            PlaylistCmd.CreatePlaylist,
+            HOME_PLAYLIST.id,
+            HOME_PLAYLIST.name,
+            generated=True,
+        )
         self._cmd_dispatcher.dispatch(cmd)
         self._observe_dispatch(
             PlayerEvt.PlayerCreated,

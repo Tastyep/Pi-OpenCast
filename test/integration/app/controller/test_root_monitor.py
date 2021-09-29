@@ -25,6 +25,7 @@ class RootMonitorControllerTest(MonitorControllerTestCase):
                 playlist_id,
                 "name",
                 [],
+                False,
             )
             self.evt_dispatcher.dispatch(created_evt)
             await self.expect_ws_events(ws, [created_evt])

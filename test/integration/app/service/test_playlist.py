@@ -18,10 +18,11 @@ class PlaylistServiceTest(ServiceTestCase):
         name = "name"
         content = [IdentityService.id_video("source")]
         playlist_id = IdentityService.id_playlist()
+        generated = False
 
-        self.evt_expecter.expect(Evt.PlaylistCreated, playlist_id, name, content).from_(
-            Cmd.CreatePlaylist, playlist_id, name, content
-        )
+        self.evt_expecter.expect(
+            Evt.PlaylistCreated, playlist_id, name, content, generated
+        ).from_(Cmd.CreatePlaylist, playlist_id, name, content, generated)
 
     def test_delete_playlist(self):
         playlist_id = IdentityService.id_playlist()

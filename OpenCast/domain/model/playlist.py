@@ -16,6 +16,7 @@ class PlaylistSchema(Schema):
     id = fields.UUID()
     name = fields.String()
     ids = fields.List(fields.UUID())
+    generated = fields.Boolean()
 
 
 class Playlist(Entity):
@@ -26,10 +27,13 @@ class Playlist(Entity):
         id: Id
         name: str
         ids: List[Id] = field(default_factory=list)
+        generated: bool = False
 
     def __init__(self, *attrs, **kattrs):
         super().__init__(self.Data, *attrs, **kattrs)
-        self._record(Evt.PlaylistCreated, self._data.name, self._data.ids)
+        self._record(
+            Evt.PlaylistCreated, self._data.name, self._data.ids, self._data.generated
+        )
 
     @property
     def name(self):
@@ -38,6 +42,10 @@ class Playlist(Entity):
     @property
     def ids(self):
         return self._data.ids
+
+    @property
+    def generated(self):
+        return self._data.generated
 
     @name.setter
     def name(self, value: str):
@@ -57,4 +65,6 @@ class Playlist(Entity):
         self._record(Evt.PlaylistContentUpdated, self._data.ids)
 
     def delete(self):
+        if self.generated:
+            raise DomainError("cannot delete generated playlists")
         self._record(Evt.PlaylistDeleted, self._data.name, self._data.ids)

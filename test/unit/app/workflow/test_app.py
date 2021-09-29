@@ -52,7 +52,11 @@ class InitWorkflowTest(WorkflowTestCase):
         createPlayerId = IdentityService.id_command(PlayerCmd.CreatePlayer, player_id)
         expected_cmds = [
             PlaylistCmd.CreatePlaylist(
-                createPlaylistId, HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
+                createPlaylistId,
+                HOME_PLAYLIST.id,
+                HOME_PLAYLIST.name,
+                [],
+                True,
             ),
             PlayerCmd.CreatePlayer(createPlayerId, player_id, HOME_PLAYLIST.id),
         ]
@@ -74,7 +78,7 @@ class InitWorkflowTest(WorkflowTestCase):
         createPlayerId = IdentityService.id_command(PlayerCmd.CreatePlayer, player_id)
         expected_cmds = [
             PlaylistCmd.CreatePlaylist(
-                createPlaylistId, HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
+                createPlaylistId, HOME_PLAYLIST.id, HOME_PLAYLIST.name, [], True
             ),
             PlayerCmd.CreatePlayer(createPlayerId, player_id, HOME_PLAYLIST.id),
         ]

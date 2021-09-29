@@ -236,16 +236,19 @@ class PlaylistMonitController(MonitorController):
         if not self._playlist_repo.exists(id):
             return self._not_found()
 
-        if id == HOME_PLAYLIST.id:
-            return self._forbidden(f"{HOME_PLAYLIST.name} playlist can't be deleted")
-
         channel = self._io_factory.make_janus_channel()
 
-        def on_success(evt):
+        def on_success(_):
             channel.send(self._no_content())
 
+        def on_error(evt):
+            print(f"EVT: {evt}")
+            channel.send(self._forbidden(evt.error))
+
         self._observe_dispatch(
-            {PlaylistEvt.PlaylistDeleted: on_success}, Cmd.DeletePlaylist, id
+            {PlaylistEvt.PlaylistDeleted: on_success, OperationError: on_error},
+            Cmd.DeletePlaylist,
+            id,
         )
 
         return await channel.receive()

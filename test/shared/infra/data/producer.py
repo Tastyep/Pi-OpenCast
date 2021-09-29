@@ -96,7 +96,7 @@ class PlayerProducer(DataProducer):
     def player(self, *args, **attrs):
         if self._population.find(Playlist, HOME_PLAYLIST.id) is None:
             PlaylistProducer(self._population).playlist(
-                HOME_PLAYLIST.id, HOME_PLAYLIST.name, []
+                HOME_PLAYLIST.id, HOME_PLAYLIST.name, [], generated=True
             )
         player_id = IdentityService.id_player()
         self._population.add(Player, player_id, HOME_PLAYLIST.id, *args, **attrs)
