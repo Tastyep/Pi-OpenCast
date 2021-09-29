@@ -5,7 +5,7 @@ from pathlib import Path
 import structlog
 
 from OpenCast.app.command import video as video_cmds
-from OpenCast.domain.model.video import Video
+from OpenCast.domain.model.video import Video, timedelta
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
 from .service import Service
@@ -36,6 +36,9 @@ class VideoService(Service):
         if metadata is None:
             self._abort_operation(cmd.id, "Unavailable metadata", cmd=cmd)
             return
+
+        if metadata["duration"]:
+            metadata["duration"] = timedelta(seconds=metadata["duration"])
 
         self._start_transaction(self._video_repo, cmd.id, impl, metadata)
 

@@ -1,5 +1,5 @@
 import OpenCast.domain.event.video as Evt
-from OpenCast.domain.model.video import Video
+from OpenCast.domain.model.video import Video, timedelta
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
@@ -18,7 +18,7 @@ class VideoTest(ModelTestCase):
             collection_id,
             "album_name",
             "title",
-            300,
+            timedelta(seconds=300),
             "protocol",
             "thumbnail_url",
             "/tmp/file",

@@ -10,7 +10,7 @@ from OpenCast.app.tool.json_encoder import (
 )
 from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.model.player import Player
-from OpenCast.domain.model.video import Path, Stream, Video
+from OpenCast.domain.model.video import Path, Stream, Video, datetime, timedelta
 from OpenCast.domain.service.identity import IdentityService
 
 
@@ -47,7 +47,7 @@ class ModelEncoderTest(TestCase):
             playlist_id,
             "album",
             "title",
-            300,
+            timedelta(seconds=300),
             "protocol",
             "thumbnail",
         )

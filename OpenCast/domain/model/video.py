@@ -1,6 +1,7 @@
 """ Conceptual representation of a media """
 
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional
 
@@ -30,7 +31,7 @@ class VideoSchema(Schema):
     source = fields.String()
     source_protocol = fields.String(allow_none=True)
     title = fields.String(allow_none=True)
-    duration = fields.Integer(allow_none=True)
+    duration = fields.TimeDelta(allow_none=True)
     collection_id = fields.UUID(allow_none=True)
     collection_name = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
@@ -56,7 +57,7 @@ class Video(Entity):
         collection_id: Optional[Id] = None
         collection_name: Optional[str] = None
         title: Optional[str] = None
-        duration: Optional[int] = None
+        duration: Optional[timedelta] = None
         source_protocol: Optional[str] = None
         thumbnail: Optional[str] = None
         location: Optional[str] = None
@@ -71,7 +72,7 @@ class Video(Entity):
             self._data.collection_id,
             self._data.collection_name,
             self._data.title,
-            self._data.duration,
+            self.duration,
             self._data.source_protocol,
             self._data.thumbnail,
         )
@@ -94,7 +95,11 @@ class Video(Entity):
 
     @property
     def duration(self):
-        return self._data.duration
+        return (
+            self._data.duration.total_seconds()
+            if self._data.duration is not None
+            else None
+        )
 
     @property
     def location(self):
