@@ -18,7 +18,7 @@ class PlaylistServiceTest(ServiceTestCase):
         name = "name"
         content = [IdentityService.id_video("source")]
         playlist_id = IdentityService.id_playlist()
-        generated = False
+        generated = True
 
         self.evt_expecter.expect(
             Evt.PlaylistCreated, playlist_id, name, content, generated

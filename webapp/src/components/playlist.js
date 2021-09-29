@@ -141,7 +141,7 @@ const Playlist = observer(({ playlistId }) => {
                       />
                     )}
                   </Grid>
-                  {store.playlists[playlistId].name !== "Home" && (
+                  {! store.playlists[playlistId].generated && (
                     <Grid item xs={1}>
                       <IconButton onClick={() => removePlaylist()}>
                         <DeleteIcon />

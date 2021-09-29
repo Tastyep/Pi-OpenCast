@@ -5,6 +5,7 @@ export default class Playlist {
     this.id = state.id;
     this.name = state.name;
     this.ids = state.ids;
+    this.generated = state.generated;
 
     makeObservable(this, {
       name: observable,
