@@ -4,9 +4,10 @@ from enum import Enum
 from json import JSONEncoder
 from pathlib import PosixPath
 
-from OpenCast.domain.event.event import Event
+from OpenCast.domain.event.event import Event as DomainEvent
 from OpenCast.domain.model.entity import Entity
 from OpenCast.infra import Id
+from OpenCast.infra.event.event import Event as InfraEvent
 
 
 class EnhancedJSONEncoder(JSONEncoder):
@@ -27,6 +28,6 @@ class ModelEncoder(EnhancedJSONEncoder):
 
 class EventEncoder(EnhancedJSONEncoder):
     def default(self, obj):
-        if isinstance(obj, Event):
+        if isinstance(obj, DomainEvent) or isinstance(obj, InfraEvent):
             return obj.to_dict()
         return super().default(obj)

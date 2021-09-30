@@ -98,7 +98,7 @@ class VideoService(Service):
             {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
             times=1,
         )
-        self._downloader.download_video(cmd.id, video.source, video.location)
+        self._downloader.download_video(cmd.id, video.id, video.source, video.location)
 
     def _parse_video(self, cmd):
         def impl(ctx):

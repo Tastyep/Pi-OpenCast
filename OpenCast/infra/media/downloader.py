@@ -10,7 +10,7 @@ from youtube_dl import YoutubeDL
 from youtube_dl.utils import ISO639Utils
 
 from OpenCast.infra import Id
-from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
+from OpenCast.infra.event.downloader import DownloadError, DownloadInfo, DownloadSuccess
 
 
 class Logger:
@@ -68,8 +68,21 @@ class Downloader:
         self._logger = structlog.get_logger(__name__)
         self._dl_logger = Logger(self._logger)
 
-    def download_video(self, op_id: Id, source: str, dest: str):
+    def download_video(self, op_id: Id, video_id: Id, source: str, dest: str):
         def impl():
+            def dispatch_dl_events(data):
+                status = data.get("status")
+                total = data.get("total_bytes")
+                downloaded = data.get("downloaded_bytes")
+                if (
+                    status == "downloading"
+                    and downloaded is not None
+                    and total is not None
+                ):
+                    self._evt_dispatcher.dispatch(
+                        DownloadInfo(op_id, video_id, total, downloaded)
+                    )
+
             self._logger.info("Downloading", video=dest)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
@@ -78,7 +91,10 @@ class Downloader:
                 "merge_output_format": "mp4",
                 "outtmpl": dest,
                 "quiet": True,
-                "progress_hooks": [self._dl_logger.log_download_progress],
+                "progress_hooks": [
+                    self._dl_logger.log_download_progress,
+                    dispatch_dl_events,
+                ],
             }
             ydl = YoutubeDL(options)
             with ydl:  # Download the video

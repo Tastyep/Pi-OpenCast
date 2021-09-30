@@ -9,6 +9,7 @@ from OpenCast.app.controller.monitor import MonitorController
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.infra.event.downloader import DownloadInfo
 
 
 class RootMonitController(MonitorController):
@@ -39,6 +40,7 @@ class RootMonitController(MonitorController):
         self._observe(PlayerEvt, handler_factory)
         self._observe(PlaylistEvt, handler_factory)
         self._observe(VideoEvt, handler_factory)
+        self._evt_dispatcher.observe({DownloadInfo: channel.send})
 
         while True:
             event = await channel.receive()
