@@ -106,7 +106,7 @@ const Playlist = observer(({ playlistId }) => {
               )}
               button
               disableRipple
-              autoFocus={video.id === activeVideoId}
+              // autoFocus={video.id === activeVideoId}
               onClick={() => onMediaClicked(video)}
             >
               {renderButtonState(video)}

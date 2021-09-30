@@ -29,6 +29,7 @@ export class AppStore {
     });
 
     this.modelFactory = modelFactory;
+    this.eventDispatcher = eventDispatcher
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
@@ -140,5 +141,11 @@ export class AppStore {
   }
   removeVideo(id) {
     delete this.videos[id];
+  }
+  playingVideo() {
+    if (!this.player.videoId) {
+      return null
+    }
+    return this.videos[this.player.videoId]
   }
 }

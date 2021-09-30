@@ -1,20 +1,29 @@
-import "./stream_input.css";
+import React, { useCallback } from "react";
 
 import {
-  GridList,
-  GridListTile,
-  GridListTileBar,
-  IconButton,
+  Grid,
+  List,
+  Divider,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
 } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import DeleteIcon from "@material-ui/icons/Delete";
-import noPreview from "images/no-preview.png";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+
 import { observer } from "mobx-react-lite";
-import React from "react";
+
+import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
 import videoAPI from "services/api/video";
+import playlistAPI from "services/api/playlist";
 
 import { useAppStore } from "./app_context";
+import "./stream_input.css";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -41,61 +50,179 @@ const useStyles = makeStyles(() =>
       background:
         "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
     },
+    playingVideoContainer: {
+      textAlign: "center",
+    },
+    playingVideoThumbnail: {
+      maxWidth: "75%",
+    },
+    videoDuration: {
+      textAlign: "right",
+    }
   })
 );
+
+const getListStyle = (isDraggingOver) => ({
+  background: isDraggingOver ? "lightblue" : "#F5F5F5",
+  maxHeight: "320px",
+  overflow: "auto",
+});
+const getItemStyle = (isDragging, draggableStyle) => ({
+  // styles we need to apply on draggables
+  ...draggableStyle,
+
+  ...(isDragging && {
+    backgroundColor: "#C5C5C5",
+  }),
+});
+
+const subheaderStyle = {
+  backgroundColor: "#FFFFFF",
+};
 
 const VideoList = observer(() => {
   const classes = useStyles();
   const store = useAppStore();
   const playlistId = store.player.queue;
   const videos = store.playlistVideos(playlistId);
+  const playingVideo = store.playingVideo()
+  const isPlayerPlaying = store.player.isPlaying
 
-  const deleteVideo = (video) => {
-    videoAPI.delete_(video.id).catch((error) => console.log(error));
-  };
-
-  const playMedia = (video) => {
-    playerAPI
-      .playMedia(video.id, store.player.queue)
-      .then((_) => {})
-      .catch((error) => console.log(error));
-  };
-
-  const renderMedia = (video) => {
-    if (video) {
-      return (
-        <GridListTile key={video.id} className={classes.gridItem}>
-          <img
-            src={video.thumbnail === null ? noPreview : video.thumbnail}
-            alt={video.title}
-            onClick={() => playMedia(video)}
-          />
-          <GridListTileBar
-            title={video.title}
-            classes={{
-              root: classes.titleBar,
-              title: classes.title,
-            }}
-            actionIcon={
-              <IconButton
-                aria-label={`delete ${video.title}`}
-                onClick={() => deleteVideo(video)}
-              >
-                <DeleteIcon className={classes.title} />
-              </IconButton>
-            }
-          />
-        </GridListTile>
-      );
+  const onMediaClicked = (media) => {
+    if (!playingVideo || media.id !== playingVideo.id) {
+      playerAPI
+        .playMedia(media.id, playlistId)
+        .catch((error) => console.log(error));
+      return;
     }
+    playerAPI.pauseMedia().catch((error) => console.log(error));
+  };
+
+  const onDragEnd = useCallback(
+    (result) => {
+      const { destination, source, draggableId } = result;
+
+      if (
+        !destination ||
+        (destination.droppableId === source.droppableId &&
+          destination.index === source.index)
+      ) {
+        return;
+      }
+
+      store.removePlaylistVideo(source.droppableId, draggableId);
+      store.insertPlaylistVideo(
+        destination.droppableId,
+        draggableId,
+        destination.index
+      );
+
+      const destPlaylist = store.playlists[destination.droppableId];
+      const srcPlaylist = store.playlists[source.droppableId];
+      playlistAPI.update(destination.droppableId, { ids: destPlaylist.ids });
+      if (destination.dropppableId !== source.droppableId) {
+        playlistAPI.update(source.droppableId, { ids: srcPlaylist.ids });
+      }
+    },
+    [store]
+  );
+
+  const renderAvatarState = (video) => {
+    if (!playingVideo || video.id !== playingVideo.id) {
+      return <Avatar
+        alt={video.title}
+        src={video.thumbnail}
+      />
+    }
+    const icon = isPlayerPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />;
+    return <Avatar>{icon}</Avatar>;
+  };
+
+  const renderVideoDuration = (duration) => {
+    const date = new Date(duration * 1000)
+    const parts = [date.getUTCHours(), date.getUTCMinutes(), date.getSeconds()]
+    let formatted_duration = ""
+
+    parts.forEach((part) => {
+      console.log(part)
+      if (part === 0) {
+        return
+      }
+      if (formatted_duration === "") {
+        formatted_duration = part.toString()
+      } else {
+        formatted_duration = formatted_duration + ':' + part.toString().padStart(2, '0')
+      }
+    })
+    return <ListItemText primary={formatted_duration} className={classes.videoDuration} />
+  };
+
+  const renderMediaItem = (video, index) => {
+    if (!video) {
+      return;
+    }
+    return (
+      <Draggable draggableId={video.id} index={index} key={video.id}>
+        {(provided, snapshot) => (
+          <>
+            <ListItem
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              style={getItemStyle(
+                snapshot.isDragging,
+                provided.draggableProps.style
+              )}
+              button
+              disableRipple
+              // autoFocus={video.id === playingVideo.id}
+              onClick={() => onMediaClicked(video)}
+            >
+              <ListItemAvatar>
+                {renderAvatarState(video)}
+              </ListItemAvatar>
+              <ListItemText primary={video.title} />
+              {renderVideoDuration(video.duration)}
+            </ListItem>
+            {index < videos.length - 1 && <Divider />}
+          </>
+        )}
+      </Draggable>
+    );
   };
 
   return (
-    <div className={classes.root}>
-      <GridList className={classes.gridList} cols={4} spacing={2}>
-        {videos.map((video) => renderMedia(video))}
-      </GridList>
-    </div>
+    <Grid container spacing={2}>
+      <Grid item xs={12} md={6}
+        className={classes.playingVideoContainer}
+      >
+        {
+          playingVideo &&
+          <img
+            className={classes.playingVideoThumbnail}
+            src={playingVideo.thumbnail === null ? noPreview : playingVideo.thumbnail}
+            alt={playingVideo.title}
+          />
+        }
+      </Grid>
+      <Grid item xs={12} md={6}>
+        {playlistId &&
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId={playlistId}>
+              {(provided, snapshot) => (
+                <List
+                  style={getListStyle(snapshot.isDraggingOver)}
+                  ref={provided.innerRef}
+                >
+                  {videos.map((video, index) => renderMediaItem(video, index))}
+                  {provided.placeholder}
+                </List>
+              )}
+            </Droppable>
+          </DragDropContext>
+        }
+      </Grid>
+    </Grid>
   );
 });
 
