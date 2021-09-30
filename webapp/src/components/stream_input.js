@@ -4,8 +4,6 @@ import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
 
 import playerAPI from "services/api/player";
 
-import "./stream_input.css";
-
 const StreamInput = () => {
   const [url, setUrl] = useState("");
   const [action, setAction] = useState(() => playerAPI.streamMedia);

@@ -19,11 +19,9 @@ import { observer } from "mobx-react-lite";
 
 import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
-import videoAPI from "services/api/video";
 import playlistAPI from "services/api/playlist";
 
-import { useAppStore } from "./app_context";
-import "./stream_input.css";
+import { useAppStore } from "components/app_context";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -80,7 +78,7 @@ const subheaderStyle = {
   backgroundColor: "#FFFFFF",
 };
 
-const VideoList = observer(() => {
+const HomePage = observer(() => {
   const classes = useStyles();
   const store = useAppStore();
   const playlistId = store.player.queue;
@@ -226,4 +224,5 @@ const VideoList = observer(() => {
   );
 });
 
-export default VideoList;
+export default HomePage;
+

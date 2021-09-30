@@ -3,13 +3,14 @@ import React, { useEffect } from "react";
 import { Grid, Paper } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 
-import Header from "./header";
-import StreamInput from "./stream_input";
-import VideoList from "./video_list";
-import PlayerControls from "./player_controls";
-import VolumeControl from "./volume_control";
-import Playlists from "./playlists";
-import { useAppStore } from "./app_context";
+import HomePage from "views/home"
+
+import Header from "components/header";
+import StreamInput from "components/stream_input";
+import PlayerControls from "components/player_controls";
+import VolumeControl from "components/volume_control";
+import Playlists from "components/playlists";
+import { useAppStore } from "components/app_context";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -46,7 +47,7 @@ function App() {
                 <StreamInput />
               </Grid>
               <Grid item>
-                <VideoList />
+                <HomePage />
               </Grid>
               <Grid item>
                 <PlayerControls />
@@ -67,3 +68,4 @@ function App() {
 }
 
 export default App;
+
