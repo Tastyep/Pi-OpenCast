@@ -124,7 +124,10 @@ export class AppStore {
       const playlist = this.playlists[id];
       let videos = [];
       for (const id of playlist.ids) {
-        videos.push(this.videos[id]);
+        const video = this.videos[id]
+        if (video) {
+          videos.push(this.videos[id]);
+        }
       }
       return videos;
     }).get();
