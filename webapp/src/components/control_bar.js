@@ -18,7 +18,7 @@ import "./player_control.css";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
-const PlayerControls = observer(() => {
+const ControlBar = observer(() => {
   const store = useAppStore();
 
   const updatePlayer = (update, ...args) => {
@@ -85,4 +85,4 @@ const PlayerControls = observer(() => {
   );
 });
 
-export default PlayerControls;
+export default ControlBar;
