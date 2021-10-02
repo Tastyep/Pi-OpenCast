@@ -12,6 +12,8 @@
     "react": "^16.13.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^16.13.1",
+    "react-router": "^5.2.1",
+    "react-router-dom": "^5.3.0",
     "robust-websocket": "^1.0.0",
     "serve": "^11.3.2"
   },
