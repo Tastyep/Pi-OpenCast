@@ -72,4 +72,7 @@ export default class Player {
   get isPlaying() {
     return this.state === PlayerState.PLAYING;
   }
+  get isStopped() {
+    return this.state === PlayerState.STOPPED;
+  }
 }

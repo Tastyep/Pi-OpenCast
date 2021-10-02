@@ -23,6 +23,8 @@ import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 
+import StreamInput from "components/stream_input";
+
 import { useAppStore } from "components/app_context";
 
 const useStyles = makeStyles(() =>
@@ -201,6 +203,9 @@ const HomePage = observer(() => {
 
   return (
     <Grid container spacing={1}>
+      <Grid item xs={12}>
+        <StreamInput />
+      </Grid>
       <Grid item xs={12} md={8} className={classes.playingVideoContainer}>
         {playingVideo && (
           <img
