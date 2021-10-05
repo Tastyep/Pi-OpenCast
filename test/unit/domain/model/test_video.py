@@ -1,4 +1,6 @@
 import OpenCast.domain.event.video as Evt
+from OpenCast.domain.error import DomainError
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Video, timedelta
 from OpenCast.domain.service.identity import IdentityService
 
@@ -43,7 +45,7 @@ class VideoTest(ModelTestCase):
 
     def test_parse(self):
         self.video.streams = {}
-        self.expect_events(self.video, Evt.VideoParsed)
+        self.expect_events(self.video, Evt.VideoParsed, Evt.VideoStateUpdated)
 
     def test_set_subtitles(self):
         self.video.subtitle = "/tmp/toto.srt"
@@ -54,10 +56,30 @@ class VideoTest(ModelTestCase):
         video = Video(IdentityService.random(), "source", source_protocol="m3u8")
         self.assertTrue(video.streamable())
 
+    def test_start(self):
+        self.video.state = VideoState.READY
+        self.video.release_events()
+
+        self.video.start()
+        self.expect_events(self.video, Evt.VideoStateUpdated)
+
+    def test_start_not_ready(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.video.start()
+        self.assertEqual("the video can't be started", str(ctx.exception))
+
     def test_start_stop(self):
+        self.video.state = VideoState.READY
+        self.video.release_events()
+
         self.video.start()
         self.video.stop()
-        self.expect_events(self.video, Evt.VideoStarted, Evt.VideoStopped)
+        self.expect_events(self.video, Evt.VideoStateUpdated, Evt.VideoStateUpdated)
+
+    def test_stop_not_started(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.video.stop()
+        self.assertEqual("the video is not playing", str(ctx.exception))
 
     def test_delete(self):
         self.video.delete()

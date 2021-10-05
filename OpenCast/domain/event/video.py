@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from OpenCast.domain.model.video import State
+
 from .event import Event, ModelId
 
 
@@ -17,6 +19,7 @@ class VideoCreated(Event):
     duration: Optional[int]
     source_protocol: str
     thumbnail: Optional[str]
+    state: State
 
 
 @dataclass
@@ -40,10 +43,6 @@ class VideoSubtitleFetched(Event):
 
 
 @dataclass
-class VideoStarted(Event):
-    timestamp: int
-
-
-@dataclass
-class VideoStopped(Event):
-    playing_duration: int
+class VideoStateUpdated(Event):
+    old: State
+    new: State

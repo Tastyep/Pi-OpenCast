@@ -10,7 +10,9 @@ from OpenCast.app.tool.json_encoder import (
 )
 from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.model.player import Player
-from OpenCast.domain.model.video import Path, Stream, Video, datetime, timedelta
+from OpenCast.domain.model.video import Path
+from OpenCast.domain.model.video import State as VideoState
+from OpenCast.domain.model.video import Stream, Video, datetime, timedelta
 from OpenCast.domain.service.identity import IdentityService
 
 
@@ -74,5 +76,6 @@ class EventEncoderTest(TestCase):
             300,
             "protocol",
             "thumbnail",
+            VideoState.CREATED,
         )
         json.dumps({"id": IdentityService.random(), "event": event}, cls=EventEncoder)

@@ -104,37 +104,41 @@ class Player(Entity):
         self._data.volume = max(min(200, v), 0)
         self._record(Evt.VolumeUpdated, self._data.volume)
 
+    @state.setter
+    def state(self, state):
+        if state == self._data.state:
+            return
+
+        old_state = self._data.state
+        self._data.state = state
+        self._record(
+            Evt.PlayerStateUpdated, old_state, self._data.state, self._data.video_id
+        )
+
     def play(self, video_id: Id, playlist_id: Id):
-        state = self._data.state
-        self._data.state = State.PLAYING
+        if self._data.state is not State.STOPPED:
+            raise DomainError("the player is already started")
+
         self._data.video_id = video_id
         if self._data.queue != playlist_id:
             self.queue = playlist_id
-        self._record(
-            Evt.PlayerStateUpdated, state, self._data.state, self._data.video_id
-        )
+        self.state = State.PLAYING
 
     def stop(self):
         if self._data.state is State.STOPPED:
-            raise DomainError("the player is already stopped")
-        state = self._data.state
-        video_id = self._data.video_id
-        self._data.state = State.STOPPED
+            raise DomainError("the player is not started")
+
+        self.state = State.STOPPED
         self._data.video_id = None
         self._data.sub_delay = 0
-        self._record(Evt.PlayerStateUpdated, state, self._data.state, video_id)
 
     def toggle_pause(self):
-        state = self._data.state
         if self._data.state is State.PLAYING:
-            self._data.state = State.PAUSED
+            self.state = State.PAUSED
         elif self._data.state is State.PAUSED:
-            self._data.state = State.PLAYING
+            self.state = State.PLAYING
         else:
             raise DomainError("the player is not started")
-        self._record(
-            Evt.PlayerStateUpdated, state, self._data.state, self._data.video_id
-        )
 
     def seek_video(self):
         if self._data.state is State.STOPPED:

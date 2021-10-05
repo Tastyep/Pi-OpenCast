@@ -242,7 +242,6 @@ class PlaylistMonitController(MonitorController):
             channel.send(self._no_content())
 
         def on_error(evt):
-            print(f"EVT: {evt}")
             channel.send(self._forbidden(evt.error))
 
         self._observe_dispatch(

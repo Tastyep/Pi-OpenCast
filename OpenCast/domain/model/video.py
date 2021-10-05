@@ -2,15 +2,25 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
 from marshmallow import Schema, fields
+from marshmallow_enum import EnumField
 
+from OpenCast.domain.error import DomainError
 from OpenCast.domain.event import video as Evt
 
 from . import Id
 from .entity import Entity
+
+
+class State(Enum):
+    CREATED = 1
+    COLLECTING = 2
+    READY = 3
+    PLAYING = 4
 
 
 @dataclass
@@ -40,6 +50,7 @@ class VideoSchema(Schema):
     location = fields.String(allow_none=True)
     streams = fields.Nested(StreamSchema(many=True))
     subtitle = fields.String(allow_none=True)
+    state = EnumField(State)
 
 
 class Video(Entity):
@@ -67,6 +78,7 @@ class Video(Entity):
         location: Optional[str] = None
         streams: List[Stream] = field(default_factory=list)
         subtitle: Optional[str] = None
+        state: State = State.CREATED
 
     def __init__(self, *attrs, **kattrs):
         super().__init__(self.Data, *attrs, **kattrs)
@@ -79,6 +91,7 @@ class Video(Entity):
             self.duration,
             self._data.source_protocol,
             self._data.thumbnail,
+            self._data.state,
         )
 
     @property
@@ -117,6 +130,10 @@ class Video(Entity):
     def subtitle(self):
         return self._data.subtitle
 
+    @property
+    def state(self):
+        return self._data.state
+
     @location.setter
     def location(self, location: str):
         self._data.location = location
@@ -126,11 +143,22 @@ class Video(Entity):
     def streams(self, streams: List[Stream]):
         self._data.streams = streams
         self._record(Evt.VideoParsed, self._data.streams)
+        # TODO: This should probably be set by the workflow on completion
+        self.state = State.READY
 
     @subtitle.setter
     def subtitle(self, subtitle: str):
         self._data.subtitle = subtitle
         self._record(Evt.VideoSubtitleFetched, self._data.subtitle)
+
+    @state.setter
+    def state(self, state: State):
+        if state == self._data.state:
+            return
+
+        old = self._data.state
+        self._data.state = state
+        self._record(Evt.VideoStateUpdated, old, self._data.state)
 
     def streamable(self):
         return self._data.source_protocol in ["m3u8"]
@@ -149,14 +177,16 @@ class Video(Entity):
         )
 
     def start(self):
+        if self.state is not State.READY:
+            raise DomainError(f"the video can't be started")
         self._data.last_play = datetime.now()
-        self._record(Evt.VideoStarted, self._data.last_play.timestamp())
+        self.state = State.PLAYING
 
     def stop(self):
+        if self.state is not State.PLAYING:
+            raise DomainError(f"the video is not playing")
         self._data.total_playing_duration += datetime.now() - self._data.last_play
-        self._record(
-            Evt.VideoStopped, int(self._data.total_playing_duration.total_seconds())
-        )
+        self.state = State.READY
 
     def delete(self):
         self._record(Evt.VideoDeleted)

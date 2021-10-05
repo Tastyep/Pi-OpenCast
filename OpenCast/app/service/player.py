@@ -1,6 +1,5 @@
 """ Handlers for player commands """
 
-
 import structlog
 
 from OpenCast.app.command import player as player_cmds
@@ -39,7 +38,11 @@ class PlayerService(Service):
     def _play_video(self, cmd):
         def impl(player):
             video = self._video_repo.get(cmd.video_id)
+            # Stop the player so that it triggers observers of PlayerStateUpdated
+            if player.state != PlayerState.STOPPED:
+                player.stop()
             player.play(video.id, cmd.playlist_id)
+            video.start()
 
             self._player.play(video.location, video.streamable())
 

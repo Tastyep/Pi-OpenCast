@@ -6,6 +6,7 @@ from OpenCast.app.service.error import OperationError
 from OpenCast.config import settings
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Stream
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
@@ -42,6 +43,7 @@ class VideoServiceTest(ServiceTestCase):
             source,
             collection_id,
             **metadata,
+            state=VideoState.CREATED,
         ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     @patch("OpenCast.app.service.video.Path")
@@ -67,6 +69,7 @@ class VideoServiceTest(ServiceTestCase):
             source,
             collection_id,
             **metadata,
+            state=VideoState.CREATED,
         ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     def test_create_video_missing_metadata(self):

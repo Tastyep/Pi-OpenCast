@@ -12,6 +12,7 @@ from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import MonitorControllerTestCase, asyncio
@@ -151,9 +152,9 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_play(self):
         playlist_id = IdentityService.id_playlist()
         video_id = IdentityService.id_video("source")
-        self.data_producer.playlist(playlist_id, "test", []).video("source").populate(
-            self.data_facade
-        )
+        self.data_producer.playlist(playlist_id, "test", []).video(
+            "source", state=VideoState.READY
+        ).populate(self.data_facade)
         self.expect_and_raise(
             make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
             [
@@ -167,6 +168,13 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                         "old": PlayerState.STOPPED,
                         "new": PlayerState.PLAYING,
                         "video_id": video_id,
+                    },
+                },
+                {
+                    "type": VideoEvt.VideoStateUpdated,
+                    "args": {
+                        "old": VideoState.READY,
+                        "new": VideoState.PLAYING,
                     },
                 },
             ],
