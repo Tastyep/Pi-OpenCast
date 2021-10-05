@@ -18,6 +18,6 @@ class DownloadError(Event):
 
 @dataclass
 class DownloadInfo(Event):
-    video_id: Id
+    model_id: Id
     total_bytes: int
     downloaded_bytes: int

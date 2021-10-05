@@ -120,7 +120,7 @@ class Downloader:
 
             self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
-        self._logger.debug("Queing", video=dest)
+        self._logger.debug("Queuing", video=dest)
         self._executor.submit(impl)
 
     def download_subtitle(self, url: str, dest: str, lang: str, exts: List[str]):

@@ -2,8 +2,10 @@ from unittest.mock import Mock
 
 import OpenCast.app.command.player as PlayerCmd
 import OpenCast.app.command.playlist as PlaylistCmd
+import OpenCast.app.command.video as VideoCmd
 import OpenCast.domain.event.player as PlayerEvt
 import OpenCast.domain.event.playlist as PlaylistEvt
+import OpenCast.domain.event.video as VideoEvt
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
@@ -13,6 +15,7 @@ from OpenCast.app.workflow.player import (
     VideoWorkflow,
 )
 from OpenCast.domain.model.player import State as PlayerState
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import WorkflowTestCase
@@ -61,17 +64,40 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         (video_workflow,) = self.expect_workflow_creation(VideoWorkflow)
         self.workflow.to_COLLECTING()
         video_workflow.start.assert_called_once()
+        video_workflow_id = IdentityService.id_workflow(VideoWorkflow, self.video.id)
         self.raise_event(
-            video_workflow.Aborted, video_workflow.id, video_workflow.video.id
+            video_workflow.Aborted, video_workflow_id, video_workflow.video.id
         )
         self.assertTrue(self.workflow.is_ABORTED())
 
-    def test_collecting_to_queueing(self):
+    def test_collecting_to_queueing_with_workflow_completed(self):
         (video_workflow,) = self.expect_workflow_creation(VideoWorkflow)
         self.workflow.to_COLLECTING()
         video_workflow.start.assert_called_once()
+        video_workflow_id = IdentityService.id_workflow(VideoWorkflow, self.video.id)
         self.raise_event(
-            video_workflow.Completed, video_workflow.id, self.workflow.video.id
+            video_workflow.Completed, video_workflow_id, self.workflow.video.id
+        )
+        self.assertTrue(self.workflow.is_QUEUEING())
+
+    def test_collecting_to_queueing_with_video_created(self):
+        (video_workflow,) = self.expect_workflow_creation(VideoWorkflow)
+        self.workflow.to_COLLECTING()
+        video_workflow.start.assert_called_once()
+
+        cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video.id)
+        self.raise_event(
+            VideoEvt.VideoCreated,
+            cmd_id,
+            self.video.id,
+            self.video.source,
+            self.video.collection_id,
+            "collection_name",
+            "title",
+            300,
+            "m3u8",
+            "thumbnail",
+            VideoState.CREATED,
         )
         self.assertTrue(self.workflow.is_QUEUEING())
 
@@ -80,8 +106,9 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_COLLECTING()
         video_workflow.start.assert_called_once()
         self.player_playlist.ids = [self.video.id]
+        video_workflow_id = IdentityService.id_workflow(VideoWorkflow, self.video.id)
         self.raise_event(
-            video_workflow.Completed, video_workflow.id, self.workflow.video.id
+            video_workflow.Completed, video_workflow_id, self.workflow.video.id
         )
         self.assertTrue(self.workflow.is_REMOVING())
 
@@ -227,14 +254,22 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
         )
         self.assertTrue(self.workflow.is_ABORTED())
 
-    def test_queueing_to_starting(self):
+    def test_queueing_to_synchronizing_with_queue_workflow_completed(self):
         (queue_workflow,) = self.expect_workflow_creation(QueueVideoWorkflow)
         self.workflow.to_QUEUEING()
         queue_workflow.start.assert_called_once()
         self.raise_event(
             queue_workflow.Completed, queue_workflow.id, self.workflow.video.id
         )
-        self.assertTrue(self.workflow.is_STARTING())
+        self.assertTrue(self.workflow.is_SYNCHRONIZING())
+
+    def test_queueing_to_synchronizing_with_video_workflow_completed(self):
+        (queue_workflow,) = self.expect_workflow_creation(QueueVideoWorkflow)
+        self.workflow.to_QUEUEING()
+        queue_workflow.start.assert_called_once()
+        video_workflow_id = IdentityService.id_workflow(VideoWorkflow, self.video.id)
+        self.raise_event(VideoWorkflow.Completed, video_workflow_id, self.video.id)
+        self.assertTrue(self.workflow.is_SYNCHRONIZING())
 
     def test_starting_to_aborted(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id, self.workflow.video.id)
