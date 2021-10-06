@@ -72,7 +72,7 @@ class Workflow(Machine):
         }
         self._evt_dispatcher.observe_result(cmd_id, evtcls_to_handler, times=1)
 
-    def _observe_group(self, cmd_ids_to_evt_clss: dict[Id, list]):
+    def _observe_group(self, cmd_ids_to_evt_clss: dict):
         cmd_ids_to_evt_cls_to_handler = {
             cmd_id: {evt_cls: self._event_handler(evt_cls) for evt_cls in evt_clss}
             for cmd_id, evt_clss in cmd_ids_to_evt_clss.items()

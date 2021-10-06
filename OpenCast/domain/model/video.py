@@ -178,13 +178,13 @@ class Video(Entity):
 
     def start(self):
         if self.state is not State.READY:
-            raise DomainError(f"the video can't be started")
+            raise DomainError("the video can't be started")
         self._data.last_play = datetime.now()
         self.state = State.PLAYING
 
     def stop(self):
         if self.state is not State.PLAYING:
-            raise DomainError(f"the video is not playing")
+            raise DomainError("the video is not playing")
         self._data.total_playing_duration += datetime.now() - self._data.last_play
         self.state = State.READY
 

@@ -4,7 +4,6 @@ from test.util import TestCase
 from unittest.mock import call
 
 from OpenCast.app.command import make_cmd
-from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.data.manager import DataManager, StorageType
 from OpenCast.infra.data.repo.factory import RepoFactory
 from OpenCast.util.naming import name_handler_method

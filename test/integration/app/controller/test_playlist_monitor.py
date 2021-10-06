@@ -2,14 +2,12 @@ from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import make_cmd
 from OpenCast.app.command import playlist as PlaylistCmd
-from OpenCast.app.command import video as VideoCmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
-from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .util import MonitorControllerTestCase, asyncio
+from .util import MonitorControllerTestCase
 
 
 class PlaylistMonitorControllerTest(MonitorControllerTestCase):
@@ -232,7 +230,7 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
         self.assertEqual(403, resp.status)
         self.assertEqual(
             {
-                "message": f"cannot delete generated playlists",
+                "message": "cannot delete generated playlists",
                 "details": {},
             },
             body,

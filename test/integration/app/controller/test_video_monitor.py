@@ -1,14 +1,11 @@
 from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import make_cmd
-from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import video as VideoCmd
-from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import video as VideoEvt
-from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.service.identity import IdentityService
 
-from .util import MonitorControllerTestCase, asyncio
+from .util import MonitorControllerTestCase
 
 
 class VideoMonitorControllerTest(MonitorControllerTestCase):

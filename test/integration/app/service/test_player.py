@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.event import player as Evt

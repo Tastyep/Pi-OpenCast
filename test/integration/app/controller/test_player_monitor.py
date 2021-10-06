@@ -15,7 +15,7 @@ from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.service.identity import IdentityService
 
-from .util import MonitorControllerTestCase, asyncio
+from .util import MonitorControllerTestCase
 
 
 class PlayerMonitorControllerTest(MonitorControllerTestCase):

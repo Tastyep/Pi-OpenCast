@@ -54,7 +54,7 @@ def run_init_workflow(app_facade, data_facade):
     return workflow.is_COMPLETED()
 
 
-def main(argv=None):
+def main(_):
     logger = structlog.get_logger(__name__)
 
     try:

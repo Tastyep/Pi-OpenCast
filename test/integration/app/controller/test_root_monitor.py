@@ -1,14 +1,10 @@
 from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import playlist as PlaylistCmd
-from OpenCast.app.command import video as VideoCmd
-from OpenCast.app.service.error import OperationError
-from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
-from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .util import MonitorControllerTestCase, asyncio
+from .util import MonitorControllerTestCase
 
 
 class RootMonitorControllerTest(MonitorControllerTestCase):

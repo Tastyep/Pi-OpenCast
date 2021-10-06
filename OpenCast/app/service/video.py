@@ -79,6 +79,7 @@ class VideoService(Service):
 
             ctx.update(video)
             video_location = str(Path(cmd.output_directory) / f"{video.title}.mp4")
+
             # Video source points downloadable media
             def video_downloaded(_):
                 def impl(ctx):

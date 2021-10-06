@@ -40,9 +40,9 @@ class QueueVideoWorkflow(Workflow):
         ["_video_workflow_completed", States.COLLECTING, States.REMOVING, "is_queued"],
         ["_video_workflow_completed", States.COLLECTING, States.QUEUEING],
         ["_video_workflow_aborted",   States.COLLECTING, States.ABORTED],
-        
+
         ["_playlist_content_updated", States.REMOVING,   States.QUEUEING],
-        
+
         ["_playlist_content_updated", States.QUEUEING,   States.COMPLETED],
         ["_operation_error",          States.QUEUEING,   States.ABORTED],
     ]
@@ -95,7 +95,7 @@ class QueueVideoWorkflow(Workflow):
             playlist.ids,
         )
 
-    def on_enter_QUEUEING(self, evt):
+    def on_enter_QUEUEING(self, _):
         self._observe_dispatch(
             PlaylistEvt.PlaylistContentUpdated,
             PlaylistCmd.QueueVideo,
@@ -129,7 +129,7 @@ class QueuePlaylistWorkflow(Workflow):
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
         ["_queue_videos",                      States.INITIAL,    States.QUEUEING],
-       
+
         ["_queue_video_workflow_completed",    States.QUEUEING,   States.COMPLETED, "_is_last_video"],  # noqa: E501
         ["_queue_video_workflow_completed",    States.QUEUEING,   "="],
         ["_queue_video_workflow_aborted",      States.QUEUEING,   States.COMPLETED, "_is_last_video"],  # noqa: E501
@@ -177,7 +177,7 @@ class QueuePlaylistWorkflow(Workflow):
         self._complete()
 
     # Conditions
-    def _is_last_video(self, evt):
+    def _is_last_video(self, _):
         return len(self.videos) == 0
 
 
@@ -198,10 +198,10 @@ class StreamVideoWorkflow(Workflow):
     transitions = [
         ["start",                           States.INITIAL,         States.QUEUEING],
 
-        ["_video_workflow_completed",       States.QUEUEING,        States.SYNCHRONIZING,],
-        ["_queue_video_workflow_completed", States.QUEUEING,        States.SYNCHRONIZING],
+        ["_video_workflow_completed",       States.QUEUEING,        States.SYNCHRONIZING],   # noqa: E501
+        ["_queue_video_workflow_completed", States.QUEUEING,        States.SYNCHRONIZING],   # noqa: E501
         ["_queue_video_workflow_aborted",   States.QUEUEING,        States.ABORTED],
-        
+
         ["_video_workflow_completed",       States.SYNCHRONIZING,   States.STARTING],
         ["_queue_video_workflow_completed", States.SYNCHRONIZING,   States.STARTING],
         ["_queue_video_workflow_aborted",   States.SYNCHRONIZING,   States.ABORTED],
@@ -248,7 +248,7 @@ class StreamVideoWorkflow(Workflow):
     def on_enter_SYNCHRONIZING(self, _):
         pass
 
-    def on_enter_STARTING(self, evt):
+    def on_enter_STARTING(self, _):
         self._observe_dispatch(
             PlayerEvt.PlayerStateUpdated,
             PlayerCmd.PlayVideo,
@@ -278,7 +278,7 @@ class StreamPlaylistWorkflow(Workflow):
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
         ["_play_video",                      States.INITIAL,  States.STARTING],
-        
+
         ["_stream_video_workflow_completed", States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
         ["_stream_video_workflow_completed", States.STARTING, States.QUEUEING],
         ["_stream_video_workflow_aborted",   States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
@@ -325,7 +325,7 @@ class StreamPlaylistWorkflow(Workflow):
             workflow,
         )
 
-    def on_enter_QUEUEING(self, evt):
+    def on_enter_QUEUEING(self, _):
         video = self.videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(
