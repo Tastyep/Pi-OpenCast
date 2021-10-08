@@ -5,18 +5,18 @@
   "dependencies": {
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
-    "axios": "^0.21.1",
-    "mobx": "^6.3.2",
-    "mobx-react-lite": "^3.2.0",
-    "npm": "^7.24.1",
-    "react": "^16.13.1",
+    "axios": "^0.22.0",
+    "mobx": "^6.3.3",
+    "mobx-react-lite": "^3.2.1",
+    "npm": "^8.0.0",
+    "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
-    "react-dom": "^16.13.1",
+    "react-dom": "^17.0.2",
     "react-media": "^1.10.0",
     "react-router": "^5.2.1",
     "react-router-dom": "^5.3.0",
     "robust-websocket": "^1.0.0",
-    "serve": "^11.3.2"
+    "serve": "^12.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,8 +42,8 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/react": "^9.5.0",
-    "prettier": "^2.2.1",
+    "@testing-library/react": "^12.1.2",
+    "prettier": "^2.4.1",
     "react-scripts": "^4.0.3"
   }
 }
