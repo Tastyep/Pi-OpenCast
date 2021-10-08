@@ -8,8 +8,8 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar,
-  MobileStepper,
   ListSubheader,
+  LinearProgress,
 } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
@@ -19,13 +19,15 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import { observer } from "mobx-react-lite";
 
+import Media from "react-media";
+import { SIZES } from "constants.js";
+
 import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 
-import StreamInput from "components/stream_input";
-
 import { useAppStore } from "components/app_context";
+import StreamInput from "components/stream_input";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -36,27 +38,34 @@ const useStyles = makeStyles(() =>
       overflow: "hidden",
       backgroundColor: "#F5F5F5",
     },
-    gridList: {
-      flexWrap: "nowrap",
-      // Promote the list into his own layer on Chrome. This cost memory but
-      // helps keeping high FPS.
-      transform: "translateZ(0)",
+    pageContainer: {
+      height: "100%",
     },
-    gridItem: {
-      minWidth: "160px",
+    streamInput: {
+      marginTop: "8px",
+      marginBottom: "16px",
     },
-    title: {
-      color: "#F5F5F5",
-    },
-    titleBar: {
-      background:
-        "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
+    playerContainer: {
+      height: `calc(100% - 72px)`,
     },
     playingVideoContainer: {
-      textAlign: "center",
+      height: "100%",
+      position: "relative",
     },
     playingVideoThumbnail: {
-      maxWidth: "75%",
+      width: "90%",
+      height: "auto",
+      maxHeight: "100%",
+      objectFit: "contain",
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+    },
+    playlistContainer: {
+      background: "#F5F5F5",
+      height: "100%",
+      overflow: "auto",
     },
     videoDuration: {
       textAlign: "right",
@@ -64,11 +73,6 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? "lightblue" : "#F5F5F5",
-  maxHeight: "320px",
-  overflow: "auto",
-});
 const getItemStyle = (isDragging, draggableStyle) => ({
   // styles we need to apply on draggables
   ...draggableStyle,
@@ -129,7 +133,7 @@ const MediaItem = observer(({ children, video, index }) => {
 
   const downloadRatio = video.downloadRatio;
   return (
-    <Draggable key={video.id} draggableId={video.id} index={index}>
+    <Draggable draggableId={video.id} index={index}>
       {(provided, snapshot) => (
         <>
           <ListItem
@@ -142,22 +146,37 @@ const MediaItem = observer(({ children, video, index }) => {
             )}
             button
             disableRipple
-            // autoFocus={video.id === playingVideo.id}
             onClick={() => onMediaClicked(video)}
           >
-            <ListItemAvatar>{renderAvatarState(video)}</ListItemAvatar>
-            <ListItemText primary={video.title} />
-            {renderVideoDuration(video.duration)}
+            <Grid
+              container
+              style={{ width: "100%", height: "100%", overflow: "hidden" }}
+              direction="column"
+              spacing={1}
+            >
+              <Grid item container direction="row" xs={12}>
+                <Grid item style={{ alignSelf: "flex-start" }}>
+                  <ListItemAvatar>{renderAvatarState(video)}</ListItemAvatar>
+                </Grid>
+                <Grid>
+                  <ListItemText primary={video.title} />
+                </Grid>
+                <Grid item style={{ marginLeft: "auto" }}>
+                  {renderVideoDuration(video.duration)}
+                </Grid>
+              </Grid>
+              <Grid item container>
+                <Grid item xs={12}>
+                  {downloadRatio > 0 && downloadRatio < 1 && (
+                    <LinearProgress
+                      value={downloadRatio * 100}
+                      variant="determinate"
+                    />
+                  )}
+                </Grid>
+              </Grid>
+            </Grid>
           </ListItem>
-          {downloadRatio > 0 && downloadRatio < 1 && (
-            <MobileStepper
-              variant="progress"
-              steps={100}
-              position="static"
-              activeStep={downloadRatio * 100}
-              sx={{ flexGrow: 1 }}
-            />
-          )}
           {children}
         </>
       )}
@@ -202,46 +221,65 @@ const HomePage = observer(() => {
   );
 
   return (
-    <Grid container spacing={1}>
-      <Grid item xs={12}>
+    <div className={classes.pageContainer}>
+      <div className={classes.streamInput}>
         <StreamInput />
-      </Grid>
-      <Grid item xs={12} md={8} className={classes.playingVideoContainer}>
-        {playingVideo && (
-          <img
-            className={classes.playingVideoThumbnail}
-            src={
-              playingVideo.thumbnail === null
-                ? noPreview
-                : playingVideo.thumbnail
-            }
-            alt={playingVideo.title}
-          />
-        )}
-      </Grid>
-      <Grid item xs={12} md={4}>
-        {playlistId && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId={playlistId}>
-              {(provided, snapshot) => (
-                <List
-                  style={getListStyle(snapshot.isDraggingOver)}
-                  ref={provided.innerRef}
-                  subheader={<ListSubheader>Lecture automatique</ListSubheader>}
-                >
-                  {videos.map((video, index) => (
-                    <MediaItem video={video} index={index}>
-                      {index < videos.length - 1 && <Divider />}
-                    </MediaItem>
-                  ))}
-                  {provided.placeholder}
-                </List>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </Grid>
-    </Grid>
+      </div>
+      <Media queries={{ large: { minWidth: SIZES.large.min } }}>
+        {(matches) =>
+          matches.large ? (
+            <Grid
+              container
+              justifyContent="center"
+              className={classes.playerContainer}
+            >
+              <Grid item xs={8} className={classes.playingVideoContainer}>
+                {playingVideo && (
+                  <img
+                    className={classes.playingVideoThumbnail}
+                    src={
+                      playingVideo.thumbnail === null
+                        ? noPreview
+                        : playingVideo.thumbnail
+                    }
+                    alt={playingVideo.title}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={4} className={classes.playlistContainer}>
+                {playlistId && (
+                  <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId={playlistId}>
+                      {(provided, snapshot) => (
+                        <List
+                          ref={provided.innerRef}
+                          subheader={
+                            <ListSubheader>Lecture automatique</ListSubheader>
+                          }
+                        >
+                          {videos.map((video, index) => (
+                            <MediaItem
+                              video={video}
+                              index={index}
+                              key={video.id}
+                            >
+                              {index < videos.length - 1 && <Divider />}
+                            </MediaItem>
+                          ))}
+                          {provided.placeholder}
+                        </List>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                )}
+              </Grid>
+            </Grid>
+          ) : (
+            <p>SMALL</p>
+          )
+        }
+      </Media>
+    </div>
   );
 });
 
