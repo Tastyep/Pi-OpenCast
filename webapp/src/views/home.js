@@ -70,6 +70,22 @@ const useStyles = makeStyles(() =>
     videoDuration: {
       textAlign: "right",
     },
+    smallPlayingVideoContainer: {
+      maxHeight: "50%",
+      width: "100%",
+      textAlign: "center",
+    },
+    smallPlayingVideoThumbnail: {
+      width: "90%",
+      height: "auto",
+      maxHeight: "100%",
+      objectFit: "contain",
+    },
+    smallPlaylistContainer: {
+      background: "#F5F5F5",
+      height: "auto",
+      overflow: "auto",
+    },
   })
 );
 
@@ -275,7 +291,52 @@ const HomePage = observer(() => {
               </Grid>
             </Grid>
           ) : (
-            <p>SMALL</p>
+            <Grid
+              container
+              direction="column"
+              className={classes.playerContainer}
+            >
+              <Grid item className={classes.smallPlayingVideoContainer}>
+                {playingVideo && (
+                  <img
+                    className={classes.smallPlayingVideoThumbnail}
+                    src={
+                      playingVideo.thumbnail === null
+                        ? noPreview
+                        : playingVideo.thumbnail
+                    }
+                    alt={playingVideo.title}
+                  />
+                )}
+              </Grid>
+              <Grid item className={classes.smallPlaylistContainer}>
+                {playlistId && (
+                  <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId={playlistId}>
+                      {(provided, snapshot) => (
+                        <List
+                          ref={provided.innerRef}
+                          subheader={
+                            <ListSubheader>Lecture automatique</ListSubheader>
+                          }
+                        >
+                          {videos.map((video, index) => (
+                            <MediaItem
+                              video={video}
+                              index={index}
+                              key={video.id}
+                            >
+                              {index < videos.length - 1 && <Divider />}
+                            </MediaItem>
+                          ))}
+                          {provided.placeholder}
+                        </List>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                )}
+              </Grid>
+            </Grid>
           )
         }
       </Media>

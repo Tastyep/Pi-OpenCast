@@ -86,7 +86,7 @@ const VideoList = observer(({ videos }) => {
 
   return (
     <div className={classes.root}>
-      <ImageList className={classes.gridList} cols={4} gap={2}>
+      <ImageList className={classes.gridList} cols={6} gap={2}>
         {videos.map((video) => renderMedia(video))}
       </ImageList>
     </div>

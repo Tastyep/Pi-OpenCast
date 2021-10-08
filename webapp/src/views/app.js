@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Container } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 
 import { Tabs, Tab } from "@material-ui/core";
@@ -16,13 +16,22 @@ import { useAppStore } from "components/app_context";
 
 const useStyles = makeStyles(() =>
   createStyles({
-    page: {
+    fullLayout: {
+      backgroundColor: "#FFFFFF",
+      height: `calc(100vh - 56px)`,
+    },
+    layout: {
       backgroundColor: "#F5F5F5",
-      minHeight: "90vh",
-      maxHeight: "100vh",
+      height: `calc(100vh - (56px + 80px))`,
+    },
+    columns: {
+      backgroundColor: "#F2F2F2",
+    },
+    pageContainer: {
+      height: "100%",
     },
     tabs: {
-      backgroundColor: "#C5C5C5",
+      backgroundColor: "#888888",
     },
   })
 );
@@ -30,17 +39,13 @@ const useStyles = makeStyles(() =>
 const App = observer(() => {
   const store = useAppStore();
   const classes = useStyles();
+  const [value, setValue] = React.useState(0);
+  const isPlayerActive = store.player && !store.player.isStopped;
 
   useEffect(() => {
     store.load();
   }, [store]);
 
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    console.log(event);
-    setValue(newValue);
-  };
   return (
     <Router>
       <Tabs
@@ -54,17 +59,24 @@ const App = observer(() => {
         <Tab label="Home" to="/" component={Link} />
         <Tab label="Library" to="/library" component={Link} />
       </Tabs>
-      <Container className={classes.page}>
-        <Switch>
-          <Route exact path="/">
-            <HomePage />
-          </Route>
-          <Route path="/library">
-            <LibraryPage />
-          </Route>
-        </Switch>
-      </Container>
-      {store.player && !store.player.isStopped && <ControlBar />}
+      <Grid
+        container
+        className={isPlayerActive ? classes.layout : classes.fullLayout}
+      >
+        <Grid item xs={false} sm={1} className={classes.columns}></Grid>
+        <Grid item xs={12} sm={10} className={classes.pageContainer}>
+          <Switch>
+            <Route exact path="/">
+              <HomePage />
+            </Route>
+            <Route path="/library">
+              <LibraryPage />
+            </Route>
+          </Switch>
+        </Grid>
+        <Grid item xs={false} sm={1} className={classes.columns}></Grid>
+      </Grid>
+      {isPlayerActive && <ControlBar />}
     </Router>
   );
 });

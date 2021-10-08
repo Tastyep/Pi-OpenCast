@@ -56,7 +56,7 @@ const VolumeControl = observer(() => {
       }}
       className={classes.container}
     >
-      <Grid item xs={10}>
+      <Grid item xs={11}>
         {sliderDisplay && (
           <Slider
             value={store.player.volume}
@@ -69,7 +69,7 @@ const VolumeControl = observer(() => {
           />
         )}
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={1}>
         <Button onClick={handleClick}>
           {(store.player.volume === 0 && <VolumeOff />) || <VolumeUp />}
         </Button>

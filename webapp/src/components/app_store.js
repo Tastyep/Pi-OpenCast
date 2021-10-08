@@ -29,7 +29,7 @@ export class AppStore {
     });
 
     this.modelFactory = modelFactory;
-    this.eventDispatcher = eventDispatcher
+    this.eventDispatcher = eventDispatcher;
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
@@ -124,7 +124,7 @@ export class AppStore {
       const playlist = this.playlists[id];
       let videos = [];
       for (const id of playlist.ids) {
-        const video = this.videos[id]
+        const video = this.videos[id];
         if (video) {
           videos.push(this.videos[id]);
         }
@@ -147,8 +147,8 @@ export class AppStore {
   }
   playingVideo() {
     if (!this.player.videoId) {
-      return null
+      return null;
     }
-    return this.videos[this.player.videoId]
+    return this.videos[this.player.videoId];
   }
 }
