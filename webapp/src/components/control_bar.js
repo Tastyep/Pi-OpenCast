@@ -1,17 +1,17 @@
 import React from "react";
-import { ButtonGroup, Grid, IconButton } from "@material-ui/core";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
+import { ButtonGroup, Grid, IconButton } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-import PauseIcon from "@material-ui/icons/Pause";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import StopIcon from "@material-ui/icons/Stop";
-import ClosedCaptionIcon from "@material-ui/icons/ClosedCaption";
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
-import FastRewindIcon from "@material-ui/icons/FastRewind";
-import FastForwardIcon from "@material-ui/icons/FastForward";
-import ArrowLeftIcon from "@material-ui/icons/ArrowLeft";
-import ArrowRightIcon from "@material-ui/icons/ArrowRight";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import StopIcon from "@mui/icons-material/Stop";
+import ClosedCaptionIcon from "@mui/icons-material/ClosedCaption";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import FastRewindIcon from "@mui/icons-material/FastRewind";
+import FastForwardIcon from "@mui/icons-material/FastForward";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 import VolumeControl from "components/volume_control";
 
@@ -21,26 +21,34 @@ import "./player_control.css";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    bar: {
-      display: "flex",
-      background: "#858585",
-      alignItems: "center",
-      height: "80px",
-    },
-    videoThumbnail: {
-      maxHeight: "80%",
-    },
-    videoInfo: {
-      marginLeft: "8px",
-    },
-  })
-);
+const PREFIX = "ControlBar";
+
+const classes = {
+  bar: `${PREFIX}-bar`,
+  videoThumbnail: `${PREFIX}-videoThumbnail`,
+  videoInfo: `${PREFIX}-videoInfo`,
+};
+
+const Root = styled("div")(() => ({
+  [`&.${classes.bar}`]: {
+    display: "flex",
+    background: "#858585",
+    alignItems: "center",
+    height: "80px",
+  },
+
+  [`& .${classes.videoThumbnail}`]: {
+    maxHeight: "80%",
+  },
+
+  [`& .${classes.videoInfo}`]: {
+    marginLeft: "9px",
+  },
+}));
 
 const ControlBar = observer(() => {
   const store = useAppStore();
-  const classes = useStyles();
+
   const activeVideo = store.videos[store.player.videoId];
 
   if (!activeVideo) {
@@ -57,7 +65,7 @@ const ControlBar = observer(() => {
 
   // Highlight subtitle button when on
   return (
-    <div className={classes.bar}>
+    <Root className={classes.bar}>
       <IconButton
         size="medium"
         onClick={() => updatePlayer(playerAPI.pauseMedia)}
@@ -118,7 +126,7 @@ const ControlBar = observer(() => {
           <AddCircleOutlineIcon />
         </IconButton>
       </ButtonGroup>
-    </div>
+    </Root>
   );
 });
 

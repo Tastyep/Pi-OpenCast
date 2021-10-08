@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
 
-import { Grid } from "@material-ui/core";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
+import { Grid, Tabs, Tab } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-import { Tabs, Tab } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
@@ -14,31 +13,43 @@ import LibraryPage from "views/library";
 
 import { useAppStore } from "components/app_context";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    fullLayout: {
-      backgroundColor: "#FFFFFF",
-      height: `calc(100vh - 56px)`,
-    },
-    layout: {
-      backgroundColor: "#F5F5F5",
-      height: `calc(100vh - (56px + 80px))`,
-    },
-    columns: {
-      backgroundColor: "#F2F2F2",
-    },
-    pageContainer: {
-      height: "100%",
-    },
-    tabs: {
-      backgroundColor: "#888888",
-    },
-  })
-);
+const PREFIX = "App";
+
+const classes = {
+  fullLayout: `${PREFIX}-fullLayout`,
+  layout: `${PREFIX}-layout`,
+  columns: `${PREFIX}-columns`,
+  pageContainer: `${PREFIX}-pageContainer`,
+  tabs: `${PREFIX}-tabs`,
+};
+
+const StyledRouter = styled(Router)(() => ({
+  [`& .${classes.fullLayout}`]: {
+    backgroundColor: "#FFFFFF",
+    height: `calc(100vh - 56px)`,
+  },
+
+  [`& .${classes.layout}`]: {
+    backgroundColor: "#F5F5F5",
+    height: `calc(100vh - (56px + 80px))`,
+  },
+
+  [`& .${classes.columns}`]: {
+    backgroundColor: "#F2F2F2",
+  },
+
+  [`& .${classes.pageContainer}`]: {
+    height: "100%",
+  },
+
+  [`& .${classes.tabs}`]: {
+    backgroundColor: "#888888",
+  },
+}));
 
 const App = observer(() => {
   const store = useAppStore();
-  const classes = useStyles();
+
   const [value, setValue] = React.useState(0);
   const isPlayerActive = store.player && !store.player.isStopped;
 
@@ -47,7 +58,7 @@ const App = observer(() => {
   }, [store]);
 
   return (
-    <Router>
+    <StyledRouter>
       <Tabs
         value={value}
         onChange={(_, newValue) => {
@@ -67,6 +78,7 @@ const App = observer(() => {
         <Grid item xs={12} sm={10} className={classes.pageContainer}>
           <Switch>
             <Route exact path="/">
+              {" "}
               <HomePage />
             </Route>
             <Route path="/library">
@@ -77,7 +89,7 @@ const App = observer(() => {
         <Grid item xs={false} sm={1} className={classes.columns}></Grid>
       </Grid>
       {isPlayerActive && <ControlBar />}
-    </Router>
+    </StyledRouter>
   );
 });
 

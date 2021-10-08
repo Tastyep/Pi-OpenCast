@@ -3,9 +3,10 @@ import {
   ImageListItem,
   ImageListItemBar,
   IconButton,
-} from "@material-ui/core";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
-import DeleteIcon from "@material-ui/icons/Delete";
+} from "@mui/material";
+import { styled } from '@mui/material/styles';
+import { createStyles, makeStyles } from "@mui/material/styles";
+import DeleteIcon from "@mui/icons-material/Delete";
 import noPreview from "images/no-preview.png";
 import { observer } from "mobx-react-lite";
 import React from "react";
@@ -14,36 +15,49 @@ import videoAPI from "services/api/video";
 
 import { useAppStore } from "./app_context";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    root: {
+const PREFIX = 'VideoList';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  gridList: `${PREFIX}-gridList`,
+  gridItem: `${PREFIX}-gridItem`,
+  title: `${PREFIX}-title`,
+  titleBar: `${PREFIX}-titleBar`
+};
+
+const Root = styled('div')(() =>
+  ({
+    [`&.${classes.root}`]: {
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
       overflow: "hidden",
       backgroundColor: "#F5F5F5",
     },
-    gridList: {
+
+    [`& .${classes.gridList}`]: {
       flexWrap: "nowrap",
       // Promote the list into his own layer on Chrome. This cost memory but
       // helps keeping high FPS.
       transform: "translateZ(0)",
     },
-    gridItem: {
+
+    [`& .${classes.gridItem}`]: {
       minWidth: "160px",
     },
-    title: {
+
+    [`& .${classes.title}`]: {
       color: "#F5F5F5",
     },
-    titleBar: {
+
+    [`& .${classes.titleBar}`]: {
       background:
         "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
-    },
-  })
-);
+    }
+  }));
 
 const VideoList = observer(({ videos }) => {
-  const classes = useStyles();
+
   const store = useAppStore();
 
   const deleteVideo = (video) => {
@@ -85,11 +99,11 @@ const VideoList = observer(({ videos }) => {
   };
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <ImageList className={classes.gridList} cols={6} gap={2}>
         {videos.map((video) => renderMedia(video))}
       </ImageList>
-    </div>
+    </Root>
   );
 });
 

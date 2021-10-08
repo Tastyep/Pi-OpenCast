@@ -1,5 +1,7 @@
 import React, { useCallback } from "react";
 
+import { styled } from '@mui/material/styles';
+
 import {
   Grid,
   List,
@@ -10,10 +12,10 @@ import {
   Avatar,
   ListSubheader,
   LinearProgress,
-} from "@material-ui/core";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import VolumeUpIcon from "@material-ui/icons/VolumeUp";
+} from "@mui/material";
+import { createStyles, makeStyles } from "@mui/material/styles";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -29,30 +31,51 @@ import playlistAPI from "services/api/playlist";
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    root: {
+const PREFIX = 'HomePage';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  pageContainer: `${PREFIX}-pageContainer`,
+  streamInput: `${PREFIX}-streamInput`,
+  playerContainer: `${PREFIX}-playerContainer`,
+  playingVideoContainer: `${PREFIX}-playingVideoContainer`,
+  playingVideoThumbnail: `${PREFIX}-playingVideoThumbnail`,
+  playlistContainer: `${PREFIX}-playlistContainer`,
+  videoDuration: `${PREFIX}-videoDuration`,
+  smallPlayingVideoContainer: `${PREFIX}-smallPlayingVideoContainer`,
+  smallPlayingVideoThumbnail: `${PREFIX}-smallPlayingVideoThumbnail`,
+  smallPlaylistContainer: `${PREFIX}-smallPlaylistContainer`
+};
+
+const Root = styled('div')(() =>
+  ({
+    [`& .${classes.root}`]: {
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
       overflow: "hidden",
       backgroundColor: "#F5F5F5",
     },
-    pageContainer: {
+
+    [`&.${classes.pageContainer}`]: {
       height: "100%",
     },
-    streamInput: {
+
+    [`& .${classes.streamInput}`]: {
       marginTop: "8px",
       marginBottom: "16px",
     },
-    playerContainer: {
+
+    [`& .${classes.playerContainer}`]: {
       height: `calc(100% - 72px)`,
     },
-    playingVideoContainer: {
+
+    [`& .${classes.playingVideoContainer}`]: {
       height: "100%",
       position: "relative",
     },
-    playingVideoThumbnail: {
+
+    [`& .${classes.playingVideoThumbnail}`]: {
       width: "90%",
       height: "auto",
       maxHeight: "100%",
@@ -62,32 +85,36 @@ const useStyles = makeStyles(() =>
       left: "50%",
       transform: "translate(-50%, -50%)",
     },
-    playlistContainer: {
+
+    [`& .${classes.playlistContainer}`]: {
       background: "#F5F5F5",
       height: "100%",
       overflow: "auto",
     },
-    videoDuration: {
+
+    [`& .${classes.videoDuration}`]: {
       textAlign: "right",
     },
-    smallPlayingVideoContainer: {
+
+    [`& .${classes.smallPlayingVideoContainer}`]: {
       maxHeight: "50%",
       width: "100%",
       textAlign: "center",
     },
-    smallPlayingVideoThumbnail: {
+
+    [`& .${classes.smallPlayingVideoThumbnail}`]: {
       width: "90%",
       height: "auto",
       maxHeight: "100%",
       objectFit: "contain",
     },
-    smallPlaylistContainer: {
+
+    [`& .${classes.smallPlaylistContainer}`]: {
       background: "#F5F5F5",
       height: "auto",
       overflow: "auto",
-    },
-  })
-);
+    }
+  }));
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   // styles we need to apply on draggables
@@ -99,7 +126,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 const MediaItem = observer(({ children, video, index }) => {
-  const classes = useStyles();
+
   const store = useAppStore();
   const isPlayerPlaying = store.player.isPlaying;
   const playingVideo = store.playingVideo();
@@ -201,7 +228,7 @@ const MediaItem = observer(({ children, video, index }) => {
 });
 
 const HomePage = observer(() => {
-  const classes = useStyles();
+
   const store = useAppStore();
   const playlistId = store.player.queue;
   const videos = store.playlistVideos(playlistId);
@@ -237,7 +264,7 @@ const HomePage = observer(() => {
   );
 
   return (
-    <div className={classes.pageContainer}>
+    <Root className={classes.pageContainer}>
       <div className={classes.streamInput}>
         <StreamInput />
       </div>
@@ -340,7 +367,7 @@ const HomePage = observer(() => {
           )
         }
       </Media>
-    </div>
+    </Root>
   );
 });
 

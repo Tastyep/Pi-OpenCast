@@ -1,18 +1,22 @@
 import React, { useState } from "react";
-import { Grid, Slider, Tooltip, Button } from "@material-ui/core";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
-import VolumeUp from "@material-ui/icons/VolumeUp";
-import VolumeOff from "@material-ui/icons/VolumeOff";
+import { Grid, Slider, Tooltip, Button } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import VolumeUp from "@mui/icons-material/VolumeUp";
+import VolumeOff from "@mui/icons-material/VolumeOff";
 
 import playerAPI from "services/api/player";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    container: {},
-  })
-);
+const PREFIX = "VolumeControl";
+
+const classes = {
+  container: `${PREFIX}-container`,
+};
+
+const StyledGrid = styled(Grid)(() => ({
+  [`&.${classes.container}`]: {},
+}));
 
 function ValueLabelComponent(props) {
   const { children, open, value } = props;
@@ -28,7 +32,6 @@ const VolumeControl = observer(() => {
   const store = useAppStore();
   const [sliderDisplay, setSliderDisplay] = useState(false);
   const [oldVolume, setOldVolume] = useState(store.player.volume);
-  const classes = useStyles();
 
   const handleCommit = (_, value) => {
     playerAPI.updateVolume(value);
@@ -46,7 +49,7 @@ const VolumeControl = observer(() => {
   };
 
   return (
-    <Grid
+    <StyledGrid
       container
       onMouseEnter={() => {
         setSliderDisplay(true);
@@ -74,7 +77,7 @@ const VolumeControl = observer(() => {
           {(store.player.volume === 0 && <VolumeOff />) || <VolumeUp />}
         </Button>
       </Grid>
-    </Grid>
+    </StyledGrid>
   );
 });
 

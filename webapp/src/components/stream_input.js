@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { TextField, Button, ButtonGroup, Grid } from "@material-ui/core";
+import { TextField, Button, ButtonGroup, Grid } from "@mui/material";
 
 import playerAPI from "services/api/player";
 

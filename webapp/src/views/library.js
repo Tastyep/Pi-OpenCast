@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-import { observer } from "mobx-react-lite";
-
-import { Divider, Grid, Tabs, Tab, Typography } from "@material-ui/core";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
+import { Divider, Grid, Tabs, Tab, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 import { Switch, Route, Link, useRouteMatch } from "react-router-dom";
+
+import { observer } from "mobx-react-lite";
 
 import AlbumsPage from "views/library/albums";
 import ArtistsPage from "views/library/artists";
@@ -15,22 +15,31 @@ import PlaylistsPage from "views/library/playlists";
 import { useAppStore } from "components/app_context";
 import VideoList from "components/video_list";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    subPageContainer: {
-      height: `calc(100% - 50px)`,
-      overflow: "auto",
-    },
-    listTitle: {
-      marginTop: "40px",
-      marginBottom: "20px",
-    },
-    listDivider: {
-      marginTop: "40px",
-      marginBottom: "20px",
-    },
-  })
-);
+const PREFIX = "LibraryPage";
+
+const classes = {
+  subPageContainer: `${PREFIX}-subPageContainer`,
+  listTitle: `${PREFIX}-listTitle`,
+  listDivider: `${PREFIX}-listDivider`,
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled("div")(() => ({
+  [`& .${classes.subPageContainer}`]: {
+    height: `calc(100% - 50px)`,
+    overflow: "auto",
+  },
+
+  [`& .${classes.listTitle}`]: {
+    marginTop: "40px",
+    marginBottom: "20px",
+  },
+
+  [`& .${classes.listDivider}`]: {
+    marginTop: "40px",
+    marginBottom: "20px",
+  },
+}));
 
 const listLastPlayedVideos = (storeVideos) => {
   const videos = Object.values(storeVideos)
@@ -52,12 +61,12 @@ const listPopularVideos = (storeVideos) => {
 
 const LibraryPage = observer(() => {
   const store = useAppStore();
-  const classes = useStyles();
+
   let { path, url } = useRouteMatch();
   const [value, setValue] = useState(0);
 
   return (
-    <>
+    <Root>
       <Tabs
         value={value}
         onChange={(_, newValue) => {
@@ -99,7 +108,7 @@ const LibraryPage = observer(() => {
           </Route>
         </Switch>
       </div>
-    </>
+    </Root>
   );
 });
 

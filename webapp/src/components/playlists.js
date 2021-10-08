@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 
-import { Grid, IconButton, TextField } from "@material-ui/core";
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import { Grid, IconButton, TextField } from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { observer } from "mobx-react-lite";
 

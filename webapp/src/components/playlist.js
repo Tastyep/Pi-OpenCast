@@ -10,10 +10,10 @@ import {
   ListItemText,
   ListSubheader,
   TextField,
-} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import PauseIcon from "@material-ui/icons/Pause";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import { observer } from "mobx-react-lite";
 

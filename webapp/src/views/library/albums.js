@@ -1,4 +1,4 @@
-import {} from "@material-ui/core";
+import {} from "@mui/material";
 
 import { observer } from "mobx-react-lite";
 
