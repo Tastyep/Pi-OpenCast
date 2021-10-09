@@ -12,6 +12,7 @@ import {
   Avatar,
   ListSubheader,
   LinearProgress,
+  Stack,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
@@ -39,7 +40,7 @@ const PageContainer = styled("div")({
   backgroundColor: "#F5F5F5",
 });
 
-const Thumbnail = styled("img")({
+const LargeThumbnail = styled("img")({
   width: "90%",
   height: "auto",
   maxHeight: "100%",
@@ -207,7 +208,7 @@ const HomePage = observer(() => {
             >
               <Grid item xs={8} sx={{ height: "100%", position: "relative" }}>
                 {playingVideo && (
-                  <Thumbnail
+                  <LargeThumbnail
                     src={
                       playingVideo.thumbnail === null
                         ? noPreview
@@ -245,7 +246,48 @@ const HomePage = observer(() => {
                 )}
               </Grid>
             </Grid>
-          ) : null
+          ) : (
+            <Stack spacing={2} sx={{ height: "100%" }}>
+              {playingVideo && (
+                <img
+                  src={
+                    playingVideo.thumbnail === null
+                      ? noPreview
+                      : playingVideo.thumbnail
+                  }
+                  alt={playingVideo.title}
+                  style={{ maxHeight: "40%", objectFit: "contain" }}
+                />
+              )}
+              <div style={{ maxHeight: "60%", overflow: "auto" }}>
+                {playlistId && (
+                  <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId={playlistId}>
+                      {(provided, snapshot) => (
+                        <List
+                          ref={provided.innerRef}
+                          subheader={
+                            <ListSubheader>Lecture automatique</ListSubheader>
+                          }
+                        >
+                          {videos.map((video, index) => (
+                            <MediaItem
+                              video={video}
+                              index={index}
+                              key={video.id}
+                            >
+                              {index < videos.length - 1 && <Divider />}
+                            </MediaItem>
+                          ))}
+                          {provided.placeholder}
+                        </List>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                )}
+              </div>
+            </Stack>
+          )
         }
       </Media>
     </PageContainer>
