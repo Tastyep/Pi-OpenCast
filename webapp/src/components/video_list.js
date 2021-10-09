@@ -1,63 +1,32 @@
+import React from "react";
+
 import {
   ImageList,
   ImageListItem,
   ImageListItemBar,
   IconButton,
 } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import { createStyles, makeStyles } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
+
 import DeleteIcon from "@mui/icons-material/Delete";
+
 import noPreview from "images/no-preview.png";
+
 import { observer } from "mobx-react-lite";
-import React from "react";
+
 import playerAPI from "services/api/player";
 import videoAPI from "services/api/video";
 
 import { useAppStore } from "./app_context";
 
-const PREFIX = 'VideoList';
-
-const classes = {
-  root: `${PREFIX}-root`,
-  gridList: `${PREFIX}-gridList`,
-  gridItem: `${PREFIX}-gridItem`,
-  title: `${PREFIX}-title`,
-  titleBar: `${PREFIX}-titleBar`
-};
-
-const Root = styled('div')(() =>
-  ({
-    [`&.${classes.root}`]: {
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "center",
-      overflow: "hidden",
-      backgroundColor: "#F5F5F5",
-    },
-
-    [`& .${classes.gridList}`]: {
-      flexWrap: "nowrap",
-      // Promote the list into his own layer on Chrome. This cost memory but
-      // helps keeping high FPS.
-      transform: "translateZ(0)",
-    },
-
-    [`& .${classes.gridItem}`]: {
-      minWidth: "160px",
-    },
-
-    [`& .${classes.title}`]: {
-      color: "#F5F5F5",
-    },
-
-    [`& .${classes.titleBar}`]: {
-      background:
-        "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
-    }
-  }));
+const ImageListContainer = styled("div")({
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  overflow: "hidden",
+});
 
 const VideoList = observer(({ videos }) => {
-
   const store = useAppStore();
 
   const deleteVideo = (video) => {
@@ -73,7 +42,7 @@ const VideoList = observer(({ videos }) => {
 
   const renderMedia = (video) => {
     return (
-      <ImageListItem key={video.id} className={classes.gridItem}>
+      <ImageListItem key={video.id} sx={{ minWidth: "160px" }}>
         <img
           src={video.thumbnail === null ? noPreview : video.thumbnail}
           alt={video.title}
@@ -81,16 +50,13 @@ const VideoList = observer(({ videos }) => {
         />
         <ImageListItemBar
           title={video.title}
-          classes={{
-            root: classes.titleBar,
-            title: classes.title,
-          }}
           actionIcon={
             <IconButton
               aria-label={`delete ${video.title}`}
+              sx={{ color: "rgba(255, 255, 255, 0.54)" }}
               onClick={() => deleteVideo(video)}
             >
-              <DeleteIcon className={classes.title} />
+              <DeleteIcon />
             </IconButton>
           }
         />
@@ -99,11 +65,15 @@ const VideoList = observer(({ videos }) => {
   };
 
   return (
-    <Root className={classes.root}>
-      <ImageList className={classes.gridList} cols={6} gap={2}>
+    <ImageListContainer>
+      <ImageList
+        cols={6}
+        gap={2}
+        sx={{ flexWrap: "nowrap", transform: "translateZ(0)" }}
+      >
         {videos.map((video) => renderMedia(video))}
       </ImageList>
-    </Root>
+    </ImageListContainer>
   );
 });
 

@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 
 import {
   Grid,
@@ -13,7 +13,6 @@ import {
   ListSubheader,
   LinearProgress,
 } from "@mui/material";
-import { createStyles, makeStyles } from "@mui/material/styles";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
@@ -31,90 +30,25 @@ import playlistAPI from "services/api/playlist";
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
 
-const PREFIX = 'HomePage';
+const PageContainer = styled("div")({
+  display: "flex",
+  flexWrap: "wrap",
+  height: "100%",
+  justifyContent: "center",
+  overflow: "hidden",
+  backgroundColor: "#F5F5F5",
+});
 
-const classes = {
-  root: `${PREFIX}-root`,
-  pageContainer: `${PREFIX}-pageContainer`,
-  streamInput: `${PREFIX}-streamInput`,
-  playerContainer: `${PREFIX}-playerContainer`,
-  playingVideoContainer: `${PREFIX}-playingVideoContainer`,
-  playingVideoThumbnail: `${PREFIX}-playingVideoThumbnail`,
-  playlistContainer: `${PREFIX}-playlistContainer`,
-  videoDuration: `${PREFIX}-videoDuration`,
-  smallPlayingVideoContainer: `${PREFIX}-smallPlayingVideoContainer`,
-  smallPlayingVideoThumbnail: `${PREFIX}-smallPlayingVideoThumbnail`,
-  smallPlaylistContainer: `${PREFIX}-smallPlaylistContainer`
-};
-
-const Root = styled('div')(() =>
-  ({
-    [`& .${classes.root}`]: {
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "center",
-      overflow: "hidden",
-      backgroundColor: "#F5F5F5",
-    },
-
-    [`&.${classes.pageContainer}`]: {
-      height: "100%",
-    },
-
-    [`& .${classes.streamInput}`]: {
-      marginTop: "8px",
-      marginBottom: "16px",
-    },
-
-    [`& .${classes.playerContainer}`]: {
-      height: `calc(100% - 72px)`,
-    },
-
-    [`& .${classes.playingVideoContainer}`]: {
-      height: "100%",
-      position: "relative",
-    },
-
-    [`& .${classes.playingVideoThumbnail}`]: {
-      width: "90%",
-      height: "auto",
-      maxHeight: "100%",
-      objectFit: "contain",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-    },
-
-    [`& .${classes.playlistContainer}`]: {
-      background: "#F5F5F5",
-      height: "100%",
-      overflow: "auto",
-    },
-
-    [`& .${classes.videoDuration}`]: {
-      textAlign: "right",
-    },
-
-    [`& .${classes.smallPlayingVideoContainer}`]: {
-      maxHeight: "50%",
-      width: "100%",
-      textAlign: "center",
-    },
-
-    [`& .${classes.smallPlayingVideoThumbnail}`]: {
-      width: "90%",
-      height: "auto",
-      maxHeight: "100%",
-      objectFit: "contain",
-    },
-
-    [`& .${classes.smallPlaylistContainer}`]: {
-      background: "#F5F5F5",
-      height: "auto",
-      overflow: "auto",
-    }
-  }));
+const Thumbnail = styled("img")({
+  width: "90%",
+  height: "auto",
+  maxHeight: "100%",
+  objectFit: "contain",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+});
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   // styles we need to apply on draggables
@@ -126,7 +60,6 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 const MediaItem = observer(({ children, video, index }) => {
-
   const store = useAppStore();
   const isPlayerPlaying = store.player.isPlaying;
   const playingVideo = store.playingVideo();
@@ -167,10 +100,7 @@ const MediaItem = observer(({ children, video, index }) => {
       }
     });
     return (
-      <ListItemText
-        primary={formatted_duration}
-        className={classes.videoDuration}
-      />
+      <ListItemText primary={formatted_duration} sx={{ textAlign: "right" }} />
     );
   };
 
@@ -228,7 +158,6 @@ const MediaItem = observer(({ children, video, index }) => {
 });
 
 const HomePage = observer(() => {
-
   const store = useAppStore();
   const playlistId = store.player.queue;
   const videos = store.playlistVideos(playlistId);
@@ -264,8 +193,8 @@ const HomePage = observer(() => {
   );
 
   return (
-    <Root className={classes.pageContainer}>
-      <div className={classes.streamInput}>
+    <PageContainer>
+      <div style={{ marginTop: "8px", marginBottom: "16px", width: "80%" }}>
         <StreamInput />
       </div>
       <Media queries={{ large: { minWidth: SIZES.large.min } }}>
@@ -274,12 +203,11 @@ const HomePage = observer(() => {
             <Grid
               container
               justifyContent="center"
-              className={classes.playerContainer}
+              sx={{ height: `calc(100% - 72px)` }}
             >
-              <Grid item xs={8} className={classes.playingVideoContainer}>
+              <Grid item xs={8} sx={{ height: "100%", position: "relative" }}>
                 {playingVideo && (
-                  <img
-                    className={classes.playingVideoThumbnail}
+                  <Thumbnail
                     src={
                       playingVideo.thumbnail === null
                         ? noPreview
@@ -289,7 +217,7 @@ const HomePage = observer(() => {
                   />
                 )}
               </Grid>
-              <Grid item xs={4} className={classes.playlistContainer}>
+              <Grid item xs={4} sx={{ height: "100%", overflow: "auto" }}>
                 {playlistId && (
                   <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId={playlistId}>
@@ -317,57 +245,10 @@ const HomePage = observer(() => {
                 )}
               </Grid>
             </Grid>
-          ) : (
-            <Grid
-              container
-              direction="column"
-              className={classes.playerContainer}
-            >
-              <Grid item className={classes.smallPlayingVideoContainer}>
-                {playingVideo && (
-                  <img
-                    className={classes.smallPlayingVideoThumbnail}
-                    src={
-                      playingVideo.thumbnail === null
-                        ? noPreview
-                        : playingVideo.thumbnail
-                    }
-                    alt={playingVideo.title}
-                  />
-                )}
-              </Grid>
-              <Grid item className={classes.smallPlaylistContainer}>
-                {playlistId && (
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId={playlistId}>
-                      {(provided, snapshot) => (
-                        <List
-                          ref={provided.innerRef}
-                          subheader={
-                            <ListSubheader>Lecture automatique</ListSubheader>
-                          }
-                        >
-                          {videos.map((video, index) => (
-                            <MediaItem
-                              video={video}
-                              index={index}
-                              key={video.id}
-                            >
-                              {index < videos.length - 1 && <Divider />}
-                            </MediaItem>
-                          ))}
-                          {provided.placeholder}
-                        </List>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                )}
-              </Grid>
-            </Grid>
-          )
+          ) : null
         }
       </Media>
-    </Root>
+    </PageContainer>
   );
 });
 

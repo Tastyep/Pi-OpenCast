@@ -15,31 +15,25 @@ import PlaylistsPage from "views/library/playlists";
 import { useAppStore } from "components/app_context";
 import VideoList from "components/video_list";
 
-const PREFIX = "LibraryPage";
+const PageContainer = styled("div")({
+  height: "100%",
+  overflow: "auto",
+});
 
-const classes = {
-  subPageContainer: `${PREFIX}-subPageContainer`,
-  listTitle: `${PREFIX}-listTitle`,
-  listDivider: `${PREFIX}-listDivider`,
-};
+const ListDivider = styled(Divider)({
+  marginTop: "40px",
+  marginBottom: "20px",
+});
 
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled("div")(() => ({
-  [`& .${classes.subPageContainer}`]: {
-    height: `calc(100% - 50px)`,
-    overflow: "auto",
-  },
+const SubPageContainer = styled("div")({
+  height: `calc(100% - 50px)`,
+  overflow: "auto",
+});
 
-  [`& .${classes.listTitle}`]: {
-    marginTop: "40px",
-    marginBottom: "20px",
-  },
-
-  [`& .${classes.listDivider}`]: {
-    marginTop: "40px",
-    marginBottom: "20px",
-  },
-}));
+const ListTitle = styled(Typography)({
+  marginTop: "40px",
+  marginBottom: "20px",
+});
 
 const listLastPlayedVideos = (storeVideos) => {
   const videos = Object.values(storeVideos)
@@ -66,7 +60,7 @@ const LibraryPage = observer(() => {
   const [value, setValue] = useState(0);
 
   return (
-    <Root>
+    <PageContainer>
       <Tabs
         value={value}
         onChange={(_, newValue) => {
@@ -80,19 +74,14 @@ const LibraryPage = observer(() => {
         <Tab label="Titles" to={`${url}/medias`} component={Link} />
       </Tabs>
       <Divider />
-      <div className={classes.subPageContainer}>
+      <SubPageContainer>
         <Switch>
           <Route exact path={path}>
-            <Typography variant="h6" className={classes.listTitle}>
-              Recent activity
-            </Typography>
+            <ListTitle variant="h6">Recent activity</ListTitle>
             <VideoList videos={listLastPlayedVideos(store.videos)} />
-            <Divider className={classes.listDivider} />
-            <Typography variant="h6" className={classes.listTitle}>
-              Most played
-            </Typography>
+            <ListDivider />
+            <ListTitle variant="h6">Most played</ListTitle>
             <VideoList videos={listPopularVideos(store.videos)} />
-            <Divider className={classes.listDivider} />{" "}
           </Route>
           <Route path={`${path}/playlists`}>
             <PlaylistsPage />
@@ -107,8 +96,8 @@ const LibraryPage = observer(() => {
             <MediasPage />
           </Route>
         </Switch>
-      </div>
-    </Root>
+      </SubPageContainer>
+    </PageContainer>
   );
 });
 

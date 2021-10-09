@@ -21,30 +21,12 @@ import "./player_control.css";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
-const PREFIX = "ControlBar";
-
-const classes = {
-  bar: `${PREFIX}-bar`,
-  videoThumbnail: `${PREFIX}-videoThumbnail`,
-  videoInfo: `${PREFIX}-videoInfo`,
-};
-
-const Root = styled("div")(() => ({
-  [`&.${classes.bar}`]: {
-    display: "flex",
-    background: "#858585",
-    alignItems: "center",
-    height: "80px",
-  },
-
-  [`& .${classes.videoThumbnail}`]: {
-    maxHeight: "80%",
-  },
-
-  [`& .${classes.videoInfo}`]: {
-    marginLeft: "9px",
-  },
-}));
+const BarContainer = styled("div")({
+  display: "flex",
+  background: "#858585",
+  alignItems: "center",
+  height: "80px",
+});
 
 const ControlBar = observer(() => {
   const store = useAppStore();
@@ -65,7 +47,7 @@ const ControlBar = observer(() => {
 
   // Highlight subtitle button when on
   return (
-    <Root className={classes.bar}>
+    <BarContainer>
       <IconButton
         size="medium"
         onClick={() => updatePlayer(playerAPI.pauseMedia)}
@@ -106,9 +88,9 @@ const ControlBar = observer(() => {
       <img
         src={activeVideo.thumbnail}
         alt={activeVideo.title}
-        className={classes.videoThumbnail}
+        style={{ maxHeight: "80%" }}
       />
-      <div className={classes.videoInfo}>
+      <div style={{ marginLeft: "8px" }}>
         {activeVideo.title}
         <br />
         {activeVideo.title}
@@ -126,7 +108,7 @@ const ControlBar = observer(() => {
           <AddCircleOutlineIcon />
         </IconButton>
       </ButtonGroup>
-    </Root>
+    </BarContainer>
   );
 });
 
