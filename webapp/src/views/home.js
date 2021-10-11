@@ -39,7 +39,7 @@ const PageContainer = styled("div")({
   height: `calc(100% - 16px)`,
   justifyContent: "center",
   paddingTop: "16px",
-  backgroundColor: "#F5F5F5",
+  width: "100%",
 });
 
 const LargeThumbnail = styled("img")({
@@ -196,38 +196,46 @@ const HomePage = observer(() => {
                 </Container>
               </Grid>
               <Grid item xs={4} sx={{ height: "100%", overflow: "auto" }}>
-                {playlistId && (
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId={playlistId}>
-                      {(provided, snapshot) => (
-                        <List
-                          ref={provided.innerRef}
-                          subheader={
-                            <ListSubheader>Lecture automatique</ListSubheader>
-                          }
-                        >
-                          {videos.map((video, index) => (
-                            <MediaItem
-                              video={video}
-                              index={index}
-                              key={video.id}
-                            >
-                              {index < videos.length - 1 && <Divider />}
-                            </MediaItem>
-                          ))}
-                          {provided.placeholder}
-                        </List>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                )}
+                <Stack direction="row">
+                  <Divider
+                    orientation="vertical"
+                    sx={{ background: "#F0F0F0", height: "auto" }}
+                  />
+                  {playlistId && (
+                    <DragDropContext onDragEnd={onDragEnd}>
+                      <Droppable droppableId={playlistId}>
+                        {(provided, snapshot) => (
+                          <List
+                            ref={provided.innerRef}
+                            subheader={
+                              <ListSubheader>Lecture automatique</ListSubheader>
+                            }
+                          >
+                            {videos.map((video, index) => (
+                              <MediaItem
+                                video={video}
+                                index={index}
+                                key={video.id}
+                              >
+                                {index < videos.length - 1 && <Divider />}
+                              </MediaItem>
+                            ))}
+                            {provided.placeholder}
+                          </List>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  )}
+                </Stack>
               </Grid>
             </Grid>
           ) : (
             <Stack sx={{ height: "100%" }}>
               <div
                 style={{
-                  width: "100%",
+                  width: "95%",
+                  marginLeft: "auto",
+                  marginRight: "auto",
                   marginBottom: "16px",
                 }}
               >

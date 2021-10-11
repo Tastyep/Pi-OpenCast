@@ -32,9 +32,7 @@ const StreamInput = () => {
       <Stack direction="row">
         <TextField
           fullWidth
-          id="outlined-basic"
           label="Media's URL"
-          variant="standard"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />

@@ -17,22 +17,14 @@ import VideoList from "components/video_list";
 
 const PageContainer = styled("div")({
   height: "100%",
+  width: "92%",
+  margin: "auto",
   overflow: "auto",
-});
-
-const ListDivider = styled(Divider)({
-  marginTop: "40px",
-  marginBottom: "20px",
 });
 
 const SubPageContainer = styled("div")({
   height: `calc(100% - 50px)`,
   overflow: "auto",
-});
-
-const ListTitle = styled(Typography)({
-  marginTop: "40px",
-  marginBottom: "20px",
 });
 
 const listLastPlayedVideos = (storeVideos) => {
@@ -77,10 +69,18 @@ const LibraryPage = observer(() => {
       <SubPageContainer>
         <Switch>
           <Route exact path={path}>
-            <ListTitle variant="h6">Recent activity</ListTitle>
+            <Typography variant="h6" sx={{ paddingTop: "32px" }}>
+              Recent activity
+            </Typography>
             <VideoList videos={listLastPlayedVideos(store.videos)} />
-            <ListDivider />
-            <ListTitle variant="h6">Most played</ListTitle>
+            <Divider
+              sx={{
+                margin: "32px 0px",
+              }}
+            />
+            <Typography variant="h6" sx={{ paddingTop: "16px" }}>
+              Most played
+            </Typography>
             <VideoList videos={listPopularVideos(store.videos)} />
           </Route>
           <Route path={`${path}/playlists`}>
