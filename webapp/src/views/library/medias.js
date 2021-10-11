@@ -1,27 +1,51 @@
-import { Avatar, Grid, List, ListItem, ListItemAvatar } from "@mui/material";
+import {
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Stack,
+} from "@mui/material";
+
+import Media from "react-media";
+import { SIZES } from "constants.js";
 
 import { observer } from "mobx-react-lite";
 
+import { duration_to_hms } from "services/duration";
+
 import { useAppStore } from "components/app_context";
+
+const MediaItem = ({ video }) => {
+  return (
+    <ListItem sx={{ width: "100%" }}>
+      <ListItemAvatar>
+        <Avatar alt={video.title} src={video.thumbnail} />
+      </ListItemAvatar>
+      <Stack direction="row" alignItems="center" sx={{ width: "100%" }}>
+        <ListItemText>{video.title}</ListItemText>
+        <Media queries={{ medium: { minWidth: SIZES.medium.min } }}>
+          {(matches) =>
+            matches.medium && <ListItemText> {video.title}</ListItemText>
+          }
+        </Media>
+
+        <ListItemText
+          primary={duration_to_hms(video.duration)}
+          sx={{ textAlign: "right" }}
+        />
+      </Stack>
+    </ListItem>
+  );
+};
 
 const MediasPage = observer(() => {
   const store = useAppStore();
 
   return (
-    <List sx={{ height: "100%" }}>
+    <List sx={{ height: "100%", width: "100%" }}>
       {Object.keys(store.videos).map((videoId, _) => (
-        <ListItem key={videoId}>
-          <ListItemAvatar>
-            <Avatar
-              alt={store.videos[videoId].title}
-              src={store.videos[videoId].thumbnail}
-            />
-          </ListItemAvatar>
-          <Grid container>
-            <Grid item>{store.videos[videoId].title}</Grid>
-            <Grid item>{store.videos[videoId].title}</Grid>
-          </Grid>
-        </ListItem>
+        <MediaItem key={videoId} video={store.videos[videoId]} />
       ))}
     </List>
   );

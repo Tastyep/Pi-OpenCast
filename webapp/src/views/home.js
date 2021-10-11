@@ -27,6 +27,7 @@ import { SIZES } from "constants.js";
 import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
+import { duration_to_hms } from "services/duration";
 
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
@@ -84,27 +85,6 @@ const MediaItem = observer(({ children, video, index }) => {
     return <Avatar>{icon}</Avatar>;
   };
 
-  const renderVideoDuration = (duration) => {
-    const date = new Date(duration * 1000);
-    const parts = [date.getUTCHours(), date.getUTCMinutes(), date.getSeconds()];
-    let formatted_duration = "";
-
-    parts.forEach((part) => {
-      if (formatted_duration === "") {
-        if (part === 0) {
-          return;
-        }
-        formatted_duration = part.toString();
-      } else {
-        formatted_duration =
-          formatted_duration + ":" + part.toString().padStart(2, "0");
-      }
-    });
-    return (
-      <ListItemText primary={formatted_duration} sx={{ textAlign: "right" }} />
-    );
-  };
-
   const downloadRatio = video.downloadRatio;
   return (
     <Draggable draggableId={video.id} index={index}>
@@ -122,34 +102,22 @@ const MediaItem = observer(({ children, video, index }) => {
             disableRipple
             onClick={() => onMediaClicked(video)}
           >
-            <Grid
-              container
-              style={{ width: "100%", height: "100%", overflow: "hidden" }}
-              direction="column"
-              spacing={1}
-            >
-              <Grid item container direction="row" xs={12}>
-                <Grid item style={{ alignSelf: "flex-start" }}>
-                  <ListItemAvatar>{renderAvatarState(video)}</ListItemAvatar>
-                </Grid>
-                <Grid>
-                  <ListItemText primary={video.title} />
-                </Grid>
-                <Grid item style={{ marginLeft: "auto" }}>
-                  {renderVideoDuration(video.duration)}
-                </Grid>
-              </Grid>
-              <Grid item container>
-                <Grid item xs={12}>
-                  {downloadRatio > 0 && downloadRatio < 1 && (
-                    <LinearProgress
-                      value={downloadRatio * 100}
-                      variant="determinate"
-                    />
-                  )}
-                </Grid>
-              </Grid>
-            </Grid>
+            <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
+              <Stack direction="row" alignItems="center">
+                <ListItemAvatar>{renderAvatarState(video)}</ListItemAvatar>
+                <ListItemText primary={video.title} />
+                <ListItemText
+                  primary={duration_to_hms(video.duration)}
+                  sx={{ textAlign: "right", minWidth: "max-content" }}
+                />
+              </Stack>
+              {downloadRatio > 0 && downloadRatio < 1 && (
+                <LinearProgress
+                  value={downloadRatio * 100}
+                  variant="determinate"
+                />
+              )}
+            </Stack>
           </ListItem>
           {children}
         </>
