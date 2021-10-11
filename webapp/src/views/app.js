@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
-import { Grid, Tabs, Tab } from "@mui/material";
+import { Divider, Grid, Tabs, Tab } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
@@ -11,6 +12,14 @@ import HomePage from "views/home";
 import LibraryPage from "views/library";
 
 import { useAppStore } from "components/app_context";
+
+const StyledTab = styled((props) => <Tab {...props} />)(() => ({
+  color: "#B0B0B0",
+  "&.Mui-selected": {
+    color: "#FFFFFF",
+    backgroundColor: "#111111",
+  },
+}));
 
 const App = observer(() => {
   const store = useAppStore();
@@ -29,18 +38,35 @@ const App = observer(() => {
         onChange={(_, newValue) => {
           setValue(newValue);
         }}
+        TabIndicatorProps={{
+          style: {
+            display: "none",
+          },
+        }}
         centered
-        sx={{ backgroundColor: "#888888" }}
+        sx={{ backgroundColor: "#333333" }}
       >
-        <Tab label="Home" to="/" component={Link} />
-        <Tab label="Library" to="/library" component={Link} />
+        <Divider
+          ortientation="vertical"
+          sx={{ backgroundColor: "#000000", width: "1px" }}
+        />
+        <StyledTab label="Home" to="/" component={Link} />
+        <Divider
+          ortientation="vertical"
+          sx={{ backgroundColor: "#000000", width: "1px" }}
+        />
+        <StyledTab label="Library" to="/library" component={Link} />
+        <Divider
+          ortientation="vertical"
+          sx={{ backgroundColor: "#000000", width: "1px" }}
+        />
       </Tabs>
       <Grid
         container
         sx={{
           height: isPlayerActive
-            ? `calc(100vh - (56px + 80px))`
-            : `calc(100vh - 56px)`,
+            ? `calc(100vh - (2 * 48px))`
+            : `calc(100vh - 48px)`,
         }}
       >
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }}></Grid>
