@@ -3,6 +3,7 @@ import React, { useCallback } from "react";
 import { styled } from "@mui/material/styles";
 
 import {
+  Container,
   Grid,
   List,
   Divider,
@@ -35,14 +36,14 @@ import StreamInput from "components/stream_input";
 const PageContainer = styled("div")({
   display: "flex",
   flexWrap: "wrap",
-  height: "100%",
+  height: `calc(100% - 16px)`,
   justifyContent: "center",
-  overflow: "hidden",
+  paddingTop: "16px",
   backgroundColor: "#F5F5F5",
 });
 
 const LargeThumbnail = styled("img")({
-  width: "90%",
+  width: "100%",
   height: "auto",
   maxHeight: "100%",
   objectFit: "contain",
@@ -50,6 +51,7 @@ const LargeThumbnail = styled("img")({
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
+  paddingBottom: "16px",
 });
 
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -163,28 +165,35 @@ const HomePage = observer(() => {
 
   return (
     <PageContainer>
-      <div style={{ marginTop: "8px", marginBottom: "16px", width: "80%" }}>
-        <StreamInput />
-      </div>
       <Media queries={{ large: { minWidth: SIZES.large.min } }}>
         {(matches) =>
           matches.large ? (
-            <Grid
-              container
-              justifyContent="center"
-              sx={{ height: `calc(100% - 72px)` }}
-            >
-              <Grid item xs={8} sx={{ height: "100%", position: "relative" }}>
-                {playingVideo && (
-                  <LargeThumbnail
-                    src={
-                      playingVideo.thumbnail === null
-                        ? noPreview
-                        : playingVideo.thumbnail
-                    }
-                    alt={playingVideo.title}
-                  />
-                )}
+            <Grid container justifyContent="center" sx={{ height: "100%" }}>
+              <Grid item xs={8} sx={{ height: "100%" }}>
+                <Container sx={{ height: "100%" }}>
+                  <Stack direction="column" sx={{ height: "100%" }}>
+                    <div
+                      style={{
+                        width: "100%",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      <StreamInput />
+                    </div>
+                    <div style={{ position: "relative", height: "100%" }}>
+                      {playingVideo && (
+                        <LargeThumbnail
+                          src={
+                            playingVideo.thumbnail === null
+                              ? noPreview
+                              : playingVideo.thumbnail
+                          }
+                          alt={playingVideo.title}
+                        />
+                      )}
+                    </div>
+                  </Stack>
+                </Container>
               </Grid>
               <Grid item xs={4} sx={{ height: "100%", overflow: "auto" }}>
                 {playlistId && (
@@ -215,29 +224,43 @@ const HomePage = observer(() => {
               </Grid>
             </Grid>
           ) : (
-            <div style={{ overflow: "auto" }}>
-              {playlistId && (
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId={playlistId}>
-                    {(provided, snapshot) => (
-                      <List
-                        ref={provided.innerRef}
-                        subheader={
-                          <ListSubheader>Lecture automatique</ListSubheader>
-                        }
-                      >
-                        {videos.map((video, index) => (
-                          <MediaItem video={video} index={index} key={video.id}>
-                            {index < videos.length - 1 && <Divider />}
-                          </MediaItem>
-                        ))}
-                        {provided.placeholder}
-                      </List>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              )}
-            </div>
+            <Stack sx={{ height: "100%" }}>
+              <div
+                style={{
+                  width: "100%",
+                  marginBottom: "16px",
+                }}
+              >
+                <StreamInput />
+              </div>
+              <div style={{ overflow: "auto" }}>
+                {playlistId && (
+                  <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId={playlistId}>
+                      {(provided, snapshot) => (
+                        <List
+                          ref={provided.innerRef}
+                          subheader={
+                            <ListSubheader>Lecture automatique</ListSubheader>
+                          }
+                        >
+                          {videos.map((video, index) => (
+                            <MediaItem
+                              video={video}
+                              index={index}
+                              key={video.id}
+                            >
+                              {index < videos.length - 1 && <Divider />}
+                            </MediaItem>
+                          ))}
+                          {provided.placeholder}
+                        </List>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                )}
+              </div>
+            </Stack>
           )
         }
       </Media>

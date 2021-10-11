@@ -32,58 +32,75 @@ const App = observer(() => {
   }, [store]);
 
   return (
-    <Router style={{ height: "100vh" }}>
-      <Tabs
-        value={value}
-        onChange={(_, newValue) => {
-          setValue(newValue);
-        }}
-        TabIndicatorProps={{
-          style: {
-            display: "none",
-          },
-        }}
-        centered
-        sx={{ backgroundColor: "#333333" }}
-      >
-        <Divider
-          ortientation="vertical"
-          sx={{ backgroundColor: "#000000", width: "1px" }}
-        />
-        <StyledTab label="Home" to="/" component={Link} />
-        <Divider
-          ortientation="vertical"
-          sx={{ backgroundColor: "#000000", width: "1px" }}
-        />
-        <StyledTab label="Library" to="/library" component={Link} />
-        <Divider
-          ortientation="vertical"
-          sx={{ backgroundColor: "#000000", width: "1px" }}
-        />
-      </Tabs>
-      <Grid
-        container
-        sx={{
-          height: isPlayerActive
-            ? `calc(100vh - (2 * 48px))`
-            : `calc(100vh - 48px)`,
-        }}
-      >
-        <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }}></Grid>
-        <Grid item xs={12} sm={10} sx={{ height: "100%" }}>
-          <Switch>
-            <Route exact path="/">
-              <HomePage />
-            </Route>
-            <Route path="/library">
-              <LibraryPage />
-            </Route>
-          </Switch>
+    <div style={{ height: "100vh", overflow: "hidden" }}>
+      <Router>
+        <Tabs
+          value={value}
+          onChange={(_, newValue) => {
+            setValue(newValue);
+          }}
+          TabIndicatorProps={{
+            style: {
+              display: "none",
+            },
+          }}
+          centered
+          sx={{ backgroundColor: "#333333" }}
+        >
+          <Divider
+            ortientation="vertical"
+            sx={{ backgroundColor: "#000000", width: "1px" }}
+          />
+          <StyledTab label="Home" to="/" component={Link} />
+          <Divider
+            ortientation="vertical"
+            sx={{ backgroundColor: "#000000", width: "1px" }}
+          />
+          <StyledTab label="Library" to="/library" component={Link} />
+          <Divider
+            ortientation="vertical"
+            sx={{ backgroundColor: "#000000", width: "1px" }}
+          />
+        </Tabs>
+        <Grid
+          container
+          sx={{
+            height: isPlayerActive
+              ? `calc(100vh - (2 * 48px))`
+              : `calc(100vh - 48px)`,
+          }}
+        >
+          <Grid
+            item
+            xs={false}
+            sm={1}
+            sx={{ backgroundColor: "#F2F2F2" }}
+          ></Grid>
+          <Grid item xs={12} sm={10} sx={{ height: "100%" }}>
+            <Switch>
+              <Route exact path="/">
+                <HomePage />
+              </Route>
+              <Route path="/library">
+                <LibraryPage />
+              </Route>
+            </Switch>
+          </Grid>
+          <Grid
+            item
+            xs={false}
+            sm={1}
+            sx={{ backgroundColor: "#F2F2F2" }}
+          ></Grid>
         </Grid>
-        <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }}></Grid>
-      </Grid>
-      {isPlayerActive && <ControlBar />}
-    </Router>
+        {isPlayerActive && (
+          <>
+            <Divider sx={{ borderColor: "#CECECE" }} />
+            <ControlBar />
+          </>
+        )}
+      </Router>
+    </div>
   );
 });
 
