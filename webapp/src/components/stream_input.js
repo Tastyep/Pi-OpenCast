@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 
-import { TextField, Button, ButtonGroup, Grid } from "@mui/material";
+import { TextField, Button, Stack } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 
 import playerAPI from "services/api/player";
 
 const StreamInput = () => {
   const [url, setUrl] = useState("");
+  const [cast, setCast] = useState(true);
   const [action, setAction] = useState(() => playerAPI.streamMedia);
-  const [castVariant, setCastVariant] = useState("contained");
-  const [queueVariant, setQueueVariant] = useState("outlined");
 
   const handleSubmit = (event) => {
     if (event) {
@@ -21,60 +22,33 @@ const StreamInput = () => {
     setUrl("");
   };
 
-  const handleActionChange = (cast) => {
-    // If clicking on the contained button
-    if (
-      (cast === true && action === playerAPI.streamMedia) ||
-      (cast === false && action === playerAPI.queueMedia)
-    ) {
-      handleSubmit(undefined);
-      return;
-    }
-    if (cast === true) {
-      setCastVariant("contained");
-      setQueueVariant("outlined");
-      setAction(() => playerAPI.streamMedia);
-    } else {
-      setCastVariant("outlined");
-      setQueueVariant("contained");
-      setAction(() => playerAPI.queueMedia);
-    }
+  const handleActionChange = () => {
+    setCast(!cast);
+    setAction(cast ? playerAPI.streamMedia : playerAPI.queueMedia);
   };
 
   return (
     <form onSubmit={(e) => handleSubmit(e)} noValidate autoComplete="off">
-      <Grid container spacing={1}>
-        <Grid item xs={6} sm={7} md={8}>
-          <TextField
-            fullWidth
-            id="outlined-basic"
-            label="Media's URL"
-            variant="standard"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6} sm={5} md={4} className="StreamButtons">
-          <ButtonGroup
-            size="medium"
-            color="primary"
-            aria-label="vertical contained primary button group"
-          >
-            <Button
-              variant={castVariant}
-              onClick={() => handleActionChange(true)}
-            >
-              Cast
-            </Button>
-            <Button
-              variant={queueVariant}
-              onClick={() => handleActionChange(false)}
-            >
-              Queue
-            </Button>
-          </ButtonGroup>
-        </Grid>
-      </Grid>
+      <Stack direction="row">
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Media's URL"
+          variant="standard"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+        />
+        <Button
+          value="check"
+          size="medium"
+          variant="outlined"
+          selected={cast}
+          sx={{ marginLeft: "24px", color: "#333333", borderColor: "#8F8F8F" }}
+          onClick={handleActionChange}
+        >
+          {cast ? <PlayArrowIcon /> : <AddToQueueIcon />}
+        </Button>
+      </Stack>
     </form>
   );
 };
