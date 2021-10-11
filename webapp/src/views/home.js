@@ -215,46 +215,29 @@ const HomePage = observer(() => {
               </Grid>
             </Grid>
           ) : (
-            <Stack spacing={2} sx={{ height: "100%" }}>
-              {playingVideo && (
-                <img
-                  src={
-                    playingVideo.thumbnail === null
-                      ? noPreview
-                      : playingVideo.thumbnail
-                  }
-                  alt={playingVideo.title}
-                  style={{ maxHeight: "40%", objectFit: "contain" }}
-                />
+            <div style={{ overflow: "auto" }}>
+              {playlistId && (
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId={playlistId}>
+                    {(provided, snapshot) => (
+                      <List
+                        ref={provided.innerRef}
+                        subheader={
+                          <ListSubheader>Lecture automatique</ListSubheader>
+                        }
+                      >
+                        {videos.map((video, index) => (
+                          <MediaItem video={video} index={index} key={video.id}>
+                            {index < videos.length - 1 && <Divider />}
+                          </MediaItem>
+                        ))}
+                        {provided.placeholder}
+                      </List>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               )}
-              <div style={{ maxHeight: "60%", overflow: "auto" }}>
-                {playlistId && (
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId={playlistId}>
-                      {(provided, snapshot) => (
-                        <List
-                          ref={provided.innerRef}
-                          subheader={
-                            <ListSubheader>Lecture automatique</ListSubheader>
-                          }
-                        >
-                          {videos.map((video, index) => (
-                            <MediaItem
-                              video={video}
-                              index={index}
-                              key={video.id}
-                            >
-                              {index < videos.length - 1 && <Divider />}
-                            </MediaItem>
-                          ))}
-                          {provided.placeholder}
-                        </List>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                )}
-              </div>
-            </Stack>
+            </div>
           )
         }
       </Media>
