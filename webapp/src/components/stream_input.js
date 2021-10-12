@@ -24,7 +24,7 @@ const StreamInput = () => {
 
   const handleActionChange = () => {
     setCast(!cast);
-    setAction(cast ? playerAPI.streamMedia : playerAPI.queueMedia);
+    setAction(cast ? () => playerAPI.streamMedia : () => playerAPI.queueMedia);
   };
 
   return (
