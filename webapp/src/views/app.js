@@ -32,7 +32,7 @@ const App = observer(() => {
   }, [store]);
 
   return (
-    <div style={{ height: "100vh", overflow: "hidden" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <Router>
         <Tabs
           value={value}
@@ -65,9 +65,8 @@ const App = observer(() => {
         <Grid
           container
           sx={{
-            height: isPlayerActive
-              ? `calc(100vh - (2 * 48px))`
-              : `calc(100vh - 48px)`,
+            minHeight: "0px", // Set minHeight of flex item to 0 otherwise it defaults to the content's height
+            flexGrow: 1,
           }}
         >
           <Grid
