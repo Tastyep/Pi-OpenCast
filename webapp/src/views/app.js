@@ -10,6 +10,7 @@ import { observer } from "mobx-react-lite";
 import ControlBar from "components/control_bar";
 import HomePage from "views/home";
 import LibraryPage from "views/library";
+import PlaylistPage from "views/playlist";
 
 import { useAppStore } from "components/app_context";
 
@@ -82,6 +83,9 @@ const App = observer(() => {
               </Route>
               <Route path="/library">
                 <LibraryPage />
+              </Route>
+              <Route path="/playlists/:id">
+                <PlaylistPage />
               </Route>
             </Switch>
           </Grid>
