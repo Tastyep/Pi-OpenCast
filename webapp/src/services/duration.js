@@ -1,4 +1,4 @@
-function duration_to_hms(duration) {
+function durationToHMS(duration) {
   const date = new Date(duration * 1000);
   const parts = [date.getUTCHours(), date.getUTCMinutes(), date.getSeconds()];
   let hms_duration = "";
@@ -17,4 +17,4 @@ function duration_to_hms(duration) {
   return hms_duration;
 }
 
-export { duration_to_hms };
+export { durationToHMS };

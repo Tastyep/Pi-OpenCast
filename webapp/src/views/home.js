@@ -28,7 +28,7 @@ import { SIZES } from "constants.js";
 import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
-import { duration_to_hms } from "services/duration";
+import { durationToHMS } from "services/duration";
 
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
@@ -109,7 +109,7 @@ const MediaItem = observer(({ children, video, index }) => {
                 <ListItemAvatar>{renderAvatarState(video)}</ListItemAvatar>
                 <ListItemText primary={video.title} />
                 <ListItemText
-                  primary={duration_to_hms(video.duration)}
+                  primary={durationToHMS(video.duration)}
                   sx={{ textAlign: "right", minWidth: "max-content" }}
                 />
               </Stack>
