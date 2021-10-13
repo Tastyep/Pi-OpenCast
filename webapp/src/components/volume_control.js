@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Stack, Slider, Tooltip, Button } from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import VolumeOff from "@mui/icons-material/VolumeOff";
 
@@ -22,7 +22,6 @@ function ValueLabelComponent(props) {
 const VolumeControl = observer(() => {
   const store = useAppStore();
   const theme = useTheme();
-  const [sliderDisplay, setSliderDisplay] = useState(false);
   const [oldVolume, setOldVolume] = useState(store.player.volume);
 
   const handleCommit = (_, value) => {
@@ -46,45 +45,40 @@ const VolumeControl = observer(() => {
       justifyContent="end"
       alignItems="center"
       sx={{ minWidth: "160px" }}
-      onMouseEnter={() => {
-        setSliderDisplay(true);
-      }}
-      onMouseLeave={() => {
-        setSliderDisplay(false);
-      }}
     >
-      {sliderDisplay && (
-        <Slider
-          size="small"
-          value={store.player.volume}
-          ValueLabelComponent={ValueLabelComponent}
-          aria-labelledby="continuous-slider"
-          sx={{
-            color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
-            "& .MuiSlider-track": {
-              border: "none",
-            },
-            "& .MuiSlider-thumb": {
-              width: 16,
-              height: 16,
-              backgroundColor: "#fff",
-              "&:before": {
-                boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
-              },
-              "&:hover, &.Mui-focusVisible, &.Mui-active": {
-                boxShadow: "none",
-              },
-            },
-          }}
-          onChange={(_, value) => {
-            store.player.setVolume(value);
-          }}
-          onChangeCommitted={handleCommit}
-        />
-      )}
-      <Button
+      <Slider
+        size="small"
+        value={store.player.volume}
+        ValueLabelComponent={ValueLabelComponent}
+        aria-labelledby="continuous-slider"
         sx={{
           color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
+          "& .MuiSlider-track": {
+            border: "none",
+          },
+          "& .MuiSlider-thumb": {
+            width: 16,
+            height: 16,
+            backgroundColor: "#fff",
+            "&:before": {
+              boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
+            },
+            "&:hover, &.Mui-focusVisible, &.Mui-active": {
+              boxShadow: "none",
+            },
+          },
+        }}
+        onChange={(_, value) => {
+          store.player.setVolume(value);
+        }}
+        onChangeCommitted={handleCommit}
+      />
+      <Button
+        size="small"
+        sx={{
+          color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
+          minWidth: "0px",
+          marginLeft: "8px",
         }}
         onClick={handleClick}
       >
