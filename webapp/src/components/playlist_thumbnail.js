@@ -16,8 +16,8 @@ const PlaylistThumbnail = ({ videos }) => {
     <Box
       sx={{
         display: "flex",
-        height: 256,
-        width: 256,
+        height: "100%",
+        width: "100%",
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#F0F0F0",

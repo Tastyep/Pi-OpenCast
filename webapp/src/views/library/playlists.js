@@ -44,6 +44,8 @@ const PlaylistItem = ({ playlist }) => {
         to={"/playlists/" + playlist.id}
         style={{
           display: "flex",
+          height: 256,
+          width: 256,
         }}
       >
         <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />

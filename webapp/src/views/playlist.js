@@ -30,7 +30,7 @@ const PlaylistPage = observer(() => {
           marginLeft: "16px",
         }}
       >
-        <Box sx={{ marginRight: "32px" }}>
+        <Box sx={{ marginRight: "32px", height: 128, width: 128 }}>
           <PlaylistThumbnail videos={videos} />
         </Box>
         <Box>
