@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, List, Typography } from "@mui/material";
 
 import { useParams } from "react-router-dom";
 
@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 
 import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
-import MediaList from "components/media_list";
+import MediaItem from "components/media_item";
 
 const PlaylistPage = observer(() => {
   const store = useAppStore();
@@ -39,7 +39,11 @@ const PlaylistPage = observer(() => {
         </Box>
       </Box>
       <Box sx={{ overflow: "auto" }}>
-        <MediaList medias={videos} />
+        <List sx={{ height: "100%", width: "100%" }}>
+          {videos.map((video) => (
+            <MediaItem key={video.id} video={video} />
+          ))}
+        </List>
       </Box>
     </Box>
   );
