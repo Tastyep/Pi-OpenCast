@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  Collapse,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Collapse, IconButton, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 import PauseIcon from "@mui/icons-material/Pause";
@@ -238,7 +233,13 @@ const ControlBar = observer(() => {
                   alt={activeVideo.title}
                   style={{ height: "100%" }}
                 />
-                <div style={{ height: "100%", marginLeft: "8px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginLeft: "8px",
+                  }}
+                >
                   <Typography variant="body2">{activeVideo.title} </Typography>
                   <Typography variant="caption">
                     {"Artist • Album • Date"}

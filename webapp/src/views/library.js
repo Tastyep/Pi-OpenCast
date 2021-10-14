@@ -27,22 +27,20 @@ const SubPageContainer = styled("div")({
   overflow: "auto",
 });
 
-const listLastPlayedVideos = (storeVideos) => {
-  const videos = Object.values(storeVideos)
+const listLastPlayedVideos = (videos) => {
+  return Object.values(videos)
     .sort((a, b) => {
       return new Date(a.last_play) < new Date(b.last_play);
     })
     .slice(0, 6);
-  return videos;
 };
 
-const listPopularVideos = (storeVideos) => {
-  const videos = Object.values(storeVideos)
+const listPopularVideos = (videos) => {
+  return Object.values(videos)
     .sort((a, b) => {
       return a.total_playing_duration < b.total_playing_duration;
     })
     .slice(0, 6);
-  return videos;
 };
 
 const LibraryPage = observer(() => {
@@ -55,6 +53,8 @@ const LibraryPage = observer(() => {
     <PageContainer>
       <Tabs
         value={value}
+        variant="scrollable"
+        allowScrollButtonsMobile
         onChange={(_, newValue) => {
           setValue(newValue);
         }}

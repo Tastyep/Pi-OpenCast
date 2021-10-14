@@ -102,6 +102,7 @@ const MediaItem = observer(({ children, video, index }) => {
             )}
             button
             disableRipple
+            autoFocus={playingVideo && video.id === playingVideo.id}
             onClick={() => onMediaClicked(video)}
           >
             <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
