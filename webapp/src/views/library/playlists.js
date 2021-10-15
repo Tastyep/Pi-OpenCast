@@ -6,11 +6,19 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   Modal,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 import { styled } from "@mui/material/styles";
 
 import { Link } from "react-router-dom";
@@ -38,20 +46,77 @@ const ModalContent = styled(Box)({
 const PlaylistItem = ({ playlist }) => {
   const store = useAppStore();
 
+  const [anchor, setAnchor] = useState(null);
+  const isMenuOpen = Boolean(anchor);
+
+  const closeMenu = () => {
+    setAnchor(null);
+  };
+  const removePlaylist = (playlist) => {
+    closeMenu();
+    playlistAPI.delete_(playlist.id).catch((error) => console.log(error));
+  };
+
   return (
-    <ListItem sx={{ flex: 0, flexDirection: "column" }}>
-      <Link
-        to={"/playlists/" + playlist.id}
-        style={{
-          display: "flex",
-          height: 256,
-          width: 256,
+    <>
+      <ListItem sx={{ flex: 0, flexDirection: "column" }}>
+        <Link
+          to={"/playlists/" + playlist.id}
+          style={{
+            display: "flex",
+            height: "256px",
+            width: "256px",
+          }}
+        >
+          <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
+        </Link>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            position: "relative",
+            bottom: "40px",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            width: "256px",
+            borderBottomLeftRadius: "12px",
+            borderBottomRightRadius: "12px",
+          }}
+        >
+          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+          <Typography sx={{ color: "#FFFFFF" }}>{playlist.name}</Typography>
+          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+          <IconButton
+            sx={{ marginLeft: "auto" }}
+            onClick={(e) => {
+              setAnchor(e.currentTarget);
+            }}
+          >
+            <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
+          </IconButton>
+        </Stack>
+      </ListItem>
+      <Menu
+        id="media-menu"
+        anchorEl={anchor}
+        open={isMenuOpen}
+        onClose={closeMenu}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
         }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
-      </Link>
-      <Typography sx={{ marginTop: "16px" }}>{playlist.name}</Typography>
-    </ListItem>
+        <MenuItem onClick={() => removePlaylist(playlist)}>
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          <ListItemText>Delete playlist</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
   );
 };
 
@@ -108,7 +173,22 @@ const PlaylistsPage = observer(() => {
           >
             <AddIcon sx={{ height: "25%", width: "25%" }} />
           </IconButton>
-          <Typography sx={{ marginTop: "16px" }}>New playlist</Typography>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            sx={{
+              position: "relative",
+              bottom: "40px",
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              width: "256px",
+              height: "40px",
+              borderBottomLeftRadius: "12px",
+              borderBottomRightRadius: "12px",
+            }}
+          >
+            <Typography sx={{ color: "#FFFFFF" }}>New playlist</Typography>
+          </Stack>
         </ListItem>
         {Object.keys(store.playlists).map((playlistId, _) => (
           <PlaylistItem
