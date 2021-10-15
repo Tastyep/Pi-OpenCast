@@ -36,7 +36,7 @@ const VideoList = observer(({ videos }) => {
           alt={video.title}
           onClick={() => playMedia(video)}
         />
-        <ImageListItemBar title={video.title} sx={{textAlign:"center"}} />
+        <ImageListItemBar title={video.title} sx={{ textAlign: "center" }} />
       </ImageListItem>
     );
   };

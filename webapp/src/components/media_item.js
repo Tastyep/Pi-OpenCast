@@ -26,6 +26,7 @@ import { SIZES } from "constants.js";
 import { durationToHMS } from "services/duration";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
+import videoAPI from "services/api/video";
 
 import { useAppStore } from "components/app_context";
 
@@ -71,6 +72,11 @@ const MediaItem = ({ playlist, video }) => {
     playlistAPI.update(playlist.id, { ids: playlist.ids });
   };
 
+  const removeVideo = (video) => {
+    closePlMenu();
+    videoAPI.delete_(video.id);
+  };
+
   return (
     <ListItem
       sx={{ width: "100%" }}
@@ -105,15 +111,11 @@ const MediaItem = ({ playlist, video }) => {
               </Grid>
               <Grid item xs alignSelf="center">
                 <ListItemText sx={{ color: "#505050" }}>
-                  {" "}
                   {"Artist"}
                 </ListItemText>
               </Grid>
               <Grid item xs alignSelf="center">
-                <ListItemText sx={{ color: "#505050" }}>
-                  {" "}
-                  {"Album"}
-                </ListItemText>
+                <ListItemText sx={{ color: "#505050" }}>{"Album"}</ListItemText>
               </Grid>
               <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
                 {isHover ? (
@@ -147,7 +149,7 @@ const MediaItem = ({ playlist, video }) => {
                         </ListItemIcon>
                         <ListItemText>Add to playlist</ListItemText>
                       </MenuItem>
-                      {playlist && (
+                      {playlist ? (
                         <MenuItem
                           onClick={() => removePlaylistVideo(playlist, video)}
                         >
@@ -155,6 +157,13 @@ const MediaItem = ({ playlist, video }) => {
                             <DeleteOutlineIcon />
                           </ListItemIcon>
                           <ListItemText>Remove from playlist</ListItemText>
+                        </MenuItem>
+                      ) : (
+                        <MenuItem onClick={() => removeVideo(video)}>
+                          <ListItemIcon>
+                            <DeleteOutlineIcon />
+                          </ListItemIcon>
+                          <ListItemText>Delete video</ListItemText>
                         </MenuItem>
                       )}
                     </Menu>

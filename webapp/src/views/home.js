@@ -208,9 +208,7 @@ const HomePage = observer(() => {
                         {(provided, snapshot) => (
                           <List
                             ref={provided.innerRef}
-                            subheader={
-                              <ListSubheader>Lecture automatique</ListSubheader>
-                            }
+                            subheader={<ListSubheader>UP NEXT</ListSubheader>}
                           >
                             {videos.map((video, index) => (
                               <MediaItem
@@ -249,9 +247,7 @@ const HomePage = observer(() => {
                       {(provided, snapshot) => (
                         <List
                           ref={provided.innerRef}
-                          subheader={
-                            <ListSubheader>Lecture automatique</ListSubheader>
-                          }
+                          subheader={<ListSubheader>UP NEXT</ListSubheader>}
                         >
                           {videos.map((video, index) => (
                             <MediaItem
