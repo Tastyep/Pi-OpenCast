@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 
-import { Divider, Grid, Tabs, Tab, Typography } from "@mui/material";
+import { Divider, Tabs, Tab, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { Switch, Route, Link, useRouteMatch } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  Link,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -47,23 +53,40 @@ const LibraryPage = observer(() => {
   const store = useAppStore();
 
   let { path, url } = useRouteMatch();
-  const [value, setValue] = useState(0);
+  let location = useLocation();
 
   return (
     <PageContainer>
       <Tabs
-        value={value}
+        value={location.pathname}
         variant="scrollable"
         allowScrollButtonsMobile
-        onChange={(_, newValue) => {
-          setValue(newValue);
-        }}
       >
-        <Tab label="Overview" to={`${url}`} component={Link} />
-        <Tab label="Playlists" to={`${url}/playlists`} component={Link} />
-        <Tab label="Artists" to={`${url}/artists`} component={Link} />
-        <Tab label="Albums" to={`${url}/albums`} component={Link} />
-        <Tab label="Titles" to={`${url}/medias`} component={Link} />
+        <Tab label="Overview" value={url} to={`${url}`} component={Link} />
+        <Tab
+          label="Playlists"
+          value={`${url}/playlists`}
+          to={`${url}/playlists`}
+          component={Link}
+        />
+        <Tab
+          label="Artists"
+          value={`${url}/artists`}
+          to={`${url}/artists`}
+          component={Link}
+        />
+        <Tab
+          label="Albums"
+          value={`${url}/albums`}
+          to={`${url}/albums`}
+          component={Link}
+        />
+        <Tab
+          label="Titles"
+          value={`${url}/medias`}
+          to={`${url}/medias`}
+          component={Link}
+        />
       </Tabs>
       <Divider />
       <SubPageContainer>

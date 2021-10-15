@@ -3,7 +3,13 @@ import React, { useEffect } from "react";
 import { Divider, Grid, Tabs, Tab } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useLocation,
+} from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -22,10 +28,51 @@ const StyledTab = styled((props) => <Tab {...props} />)(() => ({
   },
 }));
 
+const HeaderTabs = () => {
+  const location = useLocation();
+  let rootURL = location.pathname;
+  const secondSlashPos = rootURL.indexOf("/", 1);
+
+  if (secondSlashPos !== -1) {
+    rootURL = rootURL.substring(0, secondSlashPos);
+  }
+
+  return (
+    <Tabs
+      value={rootURL}
+      TabIndicatorProps={{
+        style: {
+          display: "none",
+        },
+      }}
+      centered
+      sx={{ backgroundColor: "#333333" }}
+    >
+      <Divider
+        ortientation="vertical"
+        sx={{ backgroundColor: "#000000", width: "1px" }}
+      />
+      <StyledTab label="Home" value="/" to="/" component={Link} />
+      <Divider
+        ortientation="vertical"
+        sx={{ backgroundColor: "#000000", width: "1px" }}
+      />
+      <StyledTab
+        label="Library"
+        value="/library"
+        to="/library"
+        component={Link}
+      />
+      <Divider
+        ortientation="vertical"
+        sx={{ backgroundColor: "#000000", width: "1px" }}
+      />
+    </Tabs>
+  );
+};
+
 const App = observer(() => {
   const store = useAppStore();
-
-  const [value, setValue] = React.useState(0);
   const isPlayerActive = store.player && !store.player.isStopped;
 
   useEffect(() => {
@@ -35,34 +82,7 @@ const App = observer(() => {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <Router>
-        <Tabs
-          value={value}
-          onChange={(_, newValue) => {
-            setValue(newValue);
-          }}
-          TabIndicatorProps={{
-            style: {
-              display: "none",
-            },
-          }}
-          centered
-          sx={{ backgroundColor: "#333333" }}
-        >
-          <Divider
-            ortientation="vertical"
-            sx={{ backgroundColor: "#000000", width: "1px" }}
-          />
-          <StyledTab label="Home" to="/" component={Link} />
-          <Divider
-            ortientation="vertical"
-            sx={{ backgroundColor: "#000000", width: "1px" }}
-          />
-          <StyledTab label="Library" to="/library" component={Link} />
-          <Divider
-            ortientation="vertical"
-            sx={{ backgroundColor: "#000000", width: "1px" }}
-          />
-        </Tabs>
+        <HeaderTabs />
         <Grid
           container
           sx={{
