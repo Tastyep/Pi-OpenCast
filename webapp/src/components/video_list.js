@@ -1,21 +1,13 @@
 import React from "react";
 
-import {
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  IconButton,
-} from "@mui/material";
+import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import { styled } from "@mui/material/styles";
-
-import DeleteIcon from "@mui/icons-material/Delete";
 
 import noPreview from "images/no-preview.png";
 
 import { observer } from "mobx-react-lite";
 
 import playerAPI from "services/api/player";
-import videoAPI from "services/api/video";
 
 import { useAppStore } from "./app_context";
 
@@ -28,10 +20,6 @@ const ImageListContainer = styled("div")({
 
 const VideoList = observer(({ videos }) => {
   const store = useAppStore();
-
-  const deleteVideo = (video) => {
-    videoAPI.delete_(video.id).catch((error) => console.log(error));
-  };
 
   const playMedia = (video) => {
     playerAPI
@@ -48,18 +36,7 @@ const VideoList = observer(({ videos }) => {
           alt={video.title}
           onClick={() => playMedia(video)}
         />
-        <ImageListItemBar
-          title={video.title}
-          actionIcon={
-            <IconButton
-              aria-label={`delete ${video.title}`}
-              sx={{ color: "rgba(255, 255, 255, 0.54)" }}
-              onClick={() => deleteVideo(video)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          }
-        />
+        <ImageListItemBar title={video.title} sx={{textAlign:"center"}} />
       </ImageListItem>
     );
   };
