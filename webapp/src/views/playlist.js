@@ -1,4 +1,4 @@
-import { Box, List, Typography } from "@mui/material";
+import { Box, Divider, List, Typography } from "@mui/material";
 
 import { useParams } from "react-router-dom";
 
@@ -38,8 +38,15 @@ const PlaylistPage = observer(() => {
           <Typography>{videos.length} medias</Typography>
         </Box>
       </Box>
-      <Box sx={{ overflow: "auto" }}>
-        <List sx={{ height: "100%", width: "100%" }}>
+      <Divider />
+      <Box
+        sx={{
+          height: "100%",
+          width: "100%",
+          overflow: "auto",
+        }}
+      >
+        <List sx={{ height: "100%", width: "100%", padding: "0px" }}>
           {videos.map((video) => (
             <MediaItem key={video.id} playlist={playlist} video={video} />
           ))}

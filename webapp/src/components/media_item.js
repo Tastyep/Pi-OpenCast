@@ -85,7 +85,7 @@ const MediaItem = ({ playlist, video }) => {
         {(matches) =>
           matches.large ? (
             <Grid container>
-              <Grid item xs>
+              <Grid item xs={5}>
                 <Stack direction="row" alignItems="center">
                   <IconButton
                     sx={{ marginRight: "8px" }}
