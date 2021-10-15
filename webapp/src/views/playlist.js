@@ -41,7 +41,7 @@ const PlaylistPage = observer(() => {
       <Box sx={{ overflow: "auto" }}>
         <List sx={{ height: "100%", width: "100%" }}>
           {videos.map((video) => (
-            <MediaItem key={video.id} video={video} />
+            <MediaItem key={video.id} playlist={playlist} video={video} />
           ))}
         </List>
       </Box>

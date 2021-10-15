@@ -11,7 +11,7 @@ const MediasPage = observer(() => {
   return (
     <List sx={{ height: "100%", width: "100%" }}>
       {Object.values(store.videos).map((video) => (
-        <MediaItem key={video.id} video={video} />
+        <MediaItem key={video.id} playlist={null} video={video} />
       ))}
     </List>
   );

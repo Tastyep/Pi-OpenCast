@@ -5,6 +5,7 @@ import {
   Box,
   IconButton,
   Grid,
+  Link,
   ListItem,
   ListItemAvatar,
   ListItemIcon,
@@ -17,17 +18,20 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import Media from "react-media";
 import { SIZES } from "constants.js";
 
 import { durationToHMS } from "services/duration";
 import playlistAPI from "services/api/playlist";
+import playerAPI from "services/api/player";
+
 import { useAppStore } from "components/app_context";
 
 import PlaylistThumbnail from "components/playlist_thumbnail";
 
-const MediaItem = ({ video }) => {
+const MediaItem = ({ playlist, video }) => {
   const store = useAppStore();
 
   const [isHover, setHover] = useState(false);
@@ -56,6 +60,17 @@ const MediaItem = ({ video }) => {
     playlistAPI.update(playlist.id, { ids: playlist.ids });
   };
 
+  const playVideo = (video) => {
+    closePlMenu();
+    playerAPI.playMedia(video.id).catch((error) => console.log(error));
+  };
+
+  const removePlaylistVideo = (playlist, video) => {
+    closePlMenu();
+    playlist.ids.splice(playlist.ids.indexOf(video.id), 1);
+    playlistAPI.update(playlist.id, { ids: playlist.ids });
+  };
+
   return (
     <ListItem
       sx={{ width: "100%" }}
@@ -72,10 +87,20 @@ const MediaItem = ({ video }) => {
             <Grid container>
               <Grid item xs>
                 <Stack direction="row" alignItems="center">
-                  <ListItemAvatar>
+                  <IconButton
+                    sx={{ marginRight: "8px" }}
+                    onClick={() => playVideo(video)}
+                  >
                     <Avatar alt={video.title} src={video.thumbnail} />
-                  </ListItemAvatar>
-                  <ListItemText>{video.title}</ListItemText>
+                  </IconButton>
+                  <Link
+                    href="#"
+                    color="inherit"
+                    underline="none"
+                    onClick={() => playVideo(video)}
+                  >
+                    <ListItemText>{video.title}</ListItemText>
+                  </Link>
                 </Stack>
               </Grid>
               <Grid item xs alignSelf="center">
@@ -90,7 +115,7 @@ const MediaItem = ({ video }) => {
                   {"Album"}
                 </ListItemText>
               </Grid>
-              <Grid item alignSelf="center">
+              <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
                 {isHover ? (
                   <div>
                     <IconButton
@@ -122,6 +147,16 @@ const MediaItem = ({ video }) => {
                         </ListItemIcon>
                         <ListItemText>Add to playlist</ListItemText>
                       </MenuItem>
+                      {playlist && (
+                        <MenuItem
+                          onClick={() => removePlaylistVideo(playlist, video)}
+                        >
+                          <ListItemIcon>
+                            <DeleteOutlineIcon />
+                          </ListItemIcon>
+                          <ListItemText>Remove from playlist</ListItemText>
+                        </MenuItem>
+                      )}
                     </Menu>
                     <Menu
                       id="playlist-menu"
@@ -165,7 +200,7 @@ const MediaItem = ({ video }) => {
                 ) : (
                   <ListItemText
                     primary={durationToHMS(video.duration)}
-                    sx={{ textAlign: "right", color: "#505050" }}
+                    sx={{ color: "#505050" }}
                   />
                 )}
               </Grid>
