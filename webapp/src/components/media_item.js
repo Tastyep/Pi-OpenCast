@@ -20,7 +20,7 @@ import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import Media from "react-media";
+import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { durationToHMS } from "services/duration";
@@ -87,9 +87,9 @@ const MediaItem = ({ playlist, video }) => {
         setHover(false);
       }}
     >
-      <Media queries={{ large: { minWidth: SIZES.large.min } }}>
+      <MediaQuery minWidth={SIZES.large.min}>
         {(matches) =>
-          matches.large ? (
+          matches ? (
             <Grid container>
               <Grid item xs={5}>
                 <Stack direction="row" alignItems="center">
@@ -238,7 +238,7 @@ const MediaItem = ({ playlist, video }) => {
             </Grid>
           )
         }
-      </Media>
+      </MediaQuery>
     </ListItem>
   );
 };

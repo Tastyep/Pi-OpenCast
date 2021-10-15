@@ -17,7 +17,7 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import Media from "react-media";
+import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import VolumeControl from "components/volume_control";
@@ -57,9 +57,9 @@ const ControlBar = observer(() => {
 
   // Highlight subtitle button when on
   return (
-    <Media queries={{ large: { minWidth: SIZES.large.min } }}>
+    <MediaQuery minWidth={SIZES.large.min}>
       {(matches) =>
-        matches.large ? (
+        matches ? (
           <BarContainer direction="row">
             <div>
               <IconButton size="small" onClick={() => {}}>
@@ -279,7 +279,7 @@ const ControlBar = observer(() => {
           </div>
         )
       }
-    </Media>
+    </MediaQuery>
   );
 });
 

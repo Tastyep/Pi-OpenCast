@@ -22,7 +22,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import { observer } from "mobx-react-lite";
 
-import Media from "react-media";
+import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import noPreview from "images/no-preview.png";
@@ -166,9 +166,9 @@ const HomePage = observer(() => {
 
   return (
     <PageContainer>
-      <Media queries={{ large: { minWidth: SIZES.large.min } }}>
+      <MediaQuery minWidth={SIZES.large.min}>
         {(matches) =>
-          matches.large ? (
+          matches ? (
             <Grid container justifyContent="center" sx={{ height: "100%" }}>
               <Grid item xs={8} sx={{ height: "100%" }}>
                 <Container sx={{ height: "100%" }}>
@@ -268,7 +268,7 @@ const HomePage = observer(() => {
             </Stack>
           )
         }
-      </Media>
+      </MediaQuery>
     </PageContainer>
   );
 });
