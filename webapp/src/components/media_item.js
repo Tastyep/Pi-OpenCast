@@ -136,6 +136,8 @@ const MediaItem = ({ playlist, video }) => {
                       MenuListProps={{
                         "aria-labelledby": "basic-button",
                       }}
+                      transformOrigin={{ horizontal: "right", vertical: "top" }}
+                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                     >
                       <MenuItem onClick={closeMenu}>
                         <ListItemIcon>
@@ -175,6 +177,8 @@ const MediaItem = ({ playlist, video }) => {
                       MenuListProps={{
                         "aria-labelledby": "basic-button",
                       }}
+                      transformOrigin={{ horizontal: "right", vertical: "top" }}
+                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                       sx={{ display: "flex" }}
                     >
                       <Box>
