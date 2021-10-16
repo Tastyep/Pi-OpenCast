@@ -35,12 +35,34 @@ const ModalContent = styled(Box)({
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
+  maxWidth: "75%",
   backgroundColor: "#FFFFFF",
   border: "2px solid #000",
   boxShadow: 24,
 
   p: 4,
   padding: "16px",
+});
+
+const PlaylistItemContainer = styled(ListItem)({
+  flexGrow: 0,
+  flowShrink: 1,
+  flexBasis: "256px",
+  flexDirection: "column",
+  maxWidth: "50%",
+});
+
+const PlaylistItemBar = styled((props) => <Stack {...props} />)({
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  position: "relative",
+  transform: "translate(0px, -40px)",
+  marginBottom: "-40px",
+  backgroundColor: "rgba(0, 0, 0, 0.6)",
+  borderBottomLeftRadius: "12px",
+  borderBottomRightRadius: "12px",
 });
 
 const PlaylistItem = ({ playlist }) => {
@@ -58,46 +80,28 @@ const PlaylistItem = ({ playlist }) => {
   };
 
   return (
-    <>
-      <ListItem sx={{ flex: 0, flexDirection: "column" }}>
-        <Link
-          to={"/playlists/" + playlist.id}
-          style={{
-            display: "flex",
-            height: "256px",
-            width: "256px",
+    <PlaylistItemContainer>
+      <Link
+        to={"/playlists/" + playlist.id}
+        style={{ width: "100%", aspectRatio: "1/1" }}
+      >
+        <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
+      </Link>
+      <PlaylistItemBar>
+        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+        <Typography sx={{ color: "#FFFFFF" }}>{playlist.name}</Typography>
+        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+        <IconButton
+          sx={{ marginLeft: "auto" }}
+          onClick={(e) => {
+            setAnchor(e.currentTarget);
           }}
         >
-          <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
-        </Link>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            position: "relative",
-            bottom: "40px",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-            width: "256px",
-            borderBottomLeftRadius: "12px",
-            borderBottomRightRadius: "12px",
-          }}
-        >
-          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-          <Typography sx={{ color: "#FFFFFF" }}>{playlist.name}</Typography>
-          <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-          <IconButton
-            sx={{ marginLeft: "auto" }}
-            onClick={(e) => {
-              setAnchor(e.currentTarget);
-            }}
-          >
-            <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
-          </IconButton>
-        </Stack>
-      </ListItem>
+          <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
+        </IconButton>
+      </PlaylistItemBar>
       <Menu
         id="media-menu"
         anchorEl={anchor}
@@ -116,7 +120,7 @@ const PlaylistItem = ({ playlist }) => {
           <ListItemText>Delete playlist</ListItemText>
         </MenuItem>
       </Menu>
-    </>
+    </PlaylistItemContainer>
   );
 };
 
@@ -160,36 +164,23 @@ const PlaylistsPage = observer(() => {
           </div>
         </ModalContent>
       </Modal>
-      <List sx={{ display: "flex", flexWrap: "wrap" }}>
-        <ListItem sx={{ flex: 0, flexDirection: "column" }}>
+      <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <PlaylistItemContainer>
           <IconButton
             sx={{
-              height: "256px",
-              width: "256px",
+              width: "100%",
               backgroundColor: "#F0F0F0",
               borderRadius: "5%",
+              aspectRatio: "1/1",
             }}
             onClick={() => setOpen(true)}
           >
             <AddIcon sx={{ height: "25%", width: "25%" }} />
           </IconButton>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            sx={{
-              position: "relative",
-              bottom: "40px",
-              backgroundColor: "rgba(0, 0, 0, 0.6)",
-              width: "256px",
-              height: "40px",
-              borderBottomLeftRadius: "12px",
-              borderBottomRightRadius: "12px",
-            }}
-          >
+          <PlaylistItemBar sx={{ height: "40px" }}>
             <Typography sx={{ color: "#FFFFFF" }}>New playlist</Typography>
-          </Stack>
-        </ListItem>
+          </PlaylistItemBar>
+        </PlaylistItemContainer>
         {Object.keys(store.playlists).map((playlistId, _) => (
           <PlaylistItem
             key={playlistId}
