@@ -117,7 +117,17 @@ const MediaItem = ({ playlist, video }) => {
               </Grid>
               <Grid item xs alignSelf="center">
                 <ListItemText sx={{ color: "#505050" }}>
-                  {video.album || <Divider sx={{ width: "24px" }} />}
+                  {video.album ? (
+                    <Link
+                      href={`/albums/${video.album}`}
+                      color="inherit"
+                      underline="none"
+                    >
+                      <ListItemText>{video.album}</ListItemText>
+                    </Link>
+                  ) : (
+                    <Divider sx={{ width: "24px" }} />
+                  )}
                 </ListItemText>
               </Grid>
               <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
@@ -231,7 +241,17 @@ const MediaItem = ({ playlist, video }) => {
                   <Stack>
                     <Typography>{video.title}</Typography>{" "}
                     <Typography sx={{ color: "#505050" }}>
-                      {video.album || "Artist • Album"}
+                      {video.album ? (
+                        <Link
+                          href={`/albums/${video.album}`}
+                          color="inherit"
+                          underline="none"
+                        >
+                          {video.album}
+                        </Link>
+                      ) : (
+                        "Artist • Album"
+                      )}
                     </Typography>
                   </Stack>
                 </Stack>
