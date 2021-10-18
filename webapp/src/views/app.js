@@ -17,6 +17,7 @@ import ControlBar from "components/control_bar";
 import HomePage from "views/home";
 import LibraryPage from "views/library";
 import PlaylistPage from "views/playlist";
+import AlbumPage from "views/album";
 
 import { useAppStore } from "components/app_context";
 
@@ -106,6 +107,9 @@ const App = observer(() => {
               </Route>
               <Route path="/playlists/:id">
                 <PlaylistPage />
+              </Route>
+              <Route path="/albums/:name">
+                <AlbumPage />
               </Route>
             </Switch>
           </Grid>
