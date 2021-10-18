@@ -30,12 +30,29 @@ const VideoList = observer(({ videos }) => {
 
   const renderMedia = (video) => {
     return (
-      <ImageListItem key={video.id} sx={{ minWidth: "160px" }}>
-        <img
-          src={video.thumbnail === null ? noPreview : video.thumbnail}
-          alt={video.title}
-          onClick={() => playMedia(video)}
-        />
+      <ImageListItem
+        key={video.id}
+        sx={{
+          minWidth: "160px",
+          aspectRatio: "16/9",
+          backgroundImage: `url("${video.thumbnail}")`,
+          backgroundSize: "cover",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            backgroundColor: "rgba(0,0,0,0.66)",
+          }}
+        >
+          <img
+            src={video.thumbnail === null ? noPreview : video.thumbnail}
+            alt={video.title}
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            onClick={() => playMedia(video)}
+          />
+        </div>
         <ImageListItemBar title={video.title} sx={{ textAlign: "center" }} />
       </ImageListItem>
     );

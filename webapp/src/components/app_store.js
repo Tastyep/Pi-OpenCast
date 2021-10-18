@@ -151,4 +151,34 @@ export class AppStore {
     }
     return this.videos[this.player.videoId];
   }
+
+  albums() {
+    return computed(() => {
+      let albums = {};
+      for (const video of Object.values(this.videos)) {
+        if (!albums[video.album]) {
+          albums[video.album] = {
+            videos: [video],
+          };
+        } else {
+          albums[video.album].videos.push(video);
+        }
+      }
+
+      for (const [albumName, album] of Object.entries(albums)) {
+        let counts = {};
+        let maxCount = 0;
+
+        for (const video of album.videos) {
+          counts[video.thumbnail] = (counts[video.thumbnail] || 0) + 1;
+          if (counts[video.thumbnail] > maxCount) {
+            maxCount = counts[video.thumbnail];
+            albums[albumName]["thumbnail"] = video.thumbnail;
+          }
+        }
+      }
+
+      return albums;
+    }).get();
+  }
 }
