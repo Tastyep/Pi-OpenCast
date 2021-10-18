@@ -15,7 +15,6 @@ class SourceService:
         self._video_parser = video_parser
         self._metadata_mapper = {
             "source_protocol": ["protocol"],
-            "collection_name": ["album"],
         }
 
     def is_playlist(self, source: str) -> bool:

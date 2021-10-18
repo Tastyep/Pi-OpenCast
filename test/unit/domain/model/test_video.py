@@ -31,7 +31,7 @@ class VideoTest(ModelTestCase):
         )
         self.assertEqual("source", video.source)
         self.assertEqual(collection_id, video.collection_id)
-        self.assertEqual("album_name", video.collection_name)
+        self.assertEqual("album_name", video.album)
         self.assertEqual("title", video.title)
         self.assertEqual(300, video.duration)
         self.assertEqual("/tmp/file", video.location)

@@ -77,7 +77,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": "http",
             "title": "test",
             "duration": 300,
-            "collection_name": "collection",
+            "album": "collection",
             "thumbnail": "url",
         }
         metadata = self.service.pick_stream_metadata("source")
@@ -85,7 +85,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": "http",
             "title": "test",
             "duration": 300,
-            "collection_name": "collection",
+            "album": "collection",
             "thumbnail": "url",
         }
         self.assertEqual(expected, metadata)
@@ -99,7 +99,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": None,
             "title": "test",
             "duration": None,
-            "collection_name": None,
+            "album": None,
             "thumbnail": None,
         }
         self.assertEqual(expected, metadata)
@@ -117,7 +117,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": "http",
             "title": "test",
             "duration": 300,
-            "collection_name": "album_name",
+            "album": "album_name",
             "thumbnail": "url",
         }
         self.assertEqual(expected, metadata)
@@ -133,7 +133,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": None,
             "title": "video",
             "duration": None,
-            "collection_name": None,
+            "album": None,
             "thumbnail": None,
         }
         self.assertEqual(expected, metadata)

@@ -14,7 +14,7 @@ from .event import Event, ModelId
 class VideoCreated(Event):
     source: str
     collection_id: Optional[ModelId]
-    collection_name: Optional[str]
+    album: Optional[str]
     title: Optional[str]
     duration: Optional[int]
     source_protocol: str

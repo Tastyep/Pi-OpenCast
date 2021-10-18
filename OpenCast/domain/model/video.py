@@ -45,7 +45,7 @@ class VideoSchema(Schema):
     total_playing_duration = fields.TimeDelta()
     last_play = fields.DateTime(allow_none=True)
     collection_id = fields.UUID(allow_none=True)
-    collection_name = fields.String(allow_none=True)
+    album = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
     location = fields.String(allow_none=True)
     streams = fields.Nested(StreamSchema(many=True))
@@ -56,7 +56,7 @@ class VideoSchema(Schema):
 class Video(Entity):
     Schema = VideoSchema
     METADATA_FIELDS = [
-        "collection_name",
+        "album",
         "title",
         "duration",
         "source_protocol",
@@ -68,7 +68,7 @@ class Video(Entity):
         id: Id
         source: str
         collection_id: Optional[Id] = None
-        collection_name: Optional[str] = None
+        album: Optional[str] = None
         title: Optional[str] = None
         duration: Optional[timedelta] = None
         total_playing_duration: timedelta = timedelta()
@@ -86,7 +86,7 @@ class Video(Entity):
             Evt.VideoCreated,
             self._data.source,
             self._data.collection_id,
-            self._data.collection_name,
+            self._data.album,
             self._data.title,
             self.duration,
             self._data.source_protocol,
@@ -103,8 +103,8 @@ class Video(Entity):
         return self._data.collection_id
 
     @property
-    def collection_name(self):
-        return self._data.collection_name
+    def album(self):
+        return self._data.album
 
     @property
     def title(self):
