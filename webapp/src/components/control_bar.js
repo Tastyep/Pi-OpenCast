@@ -126,7 +126,9 @@ const ControlBar = observer(() => {
               />
               <div style={{ marginLeft: "8px" }}>
                 <Typography> {activeVideo.title}</Typography>
-                <Typography>{"Artist • Album • Date"}</Typography>
+                <Typography>
+                  {activeVideo.album || "Artist • Album • Date"}
+                </Typography>
               </div>
             </Stack>
 
@@ -242,7 +244,7 @@ const ControlBar = observer(() => {
                 >
                   <Typography variant="body2">{activeVideo.title} </Typography>
                   <Typography variant="caption">
-                    {"Artist • Album • Date"}
+                    {activeVideo.album || "Artist • Album • Date"}
                   </Typography>
                 </div>
               </Stack>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   Avatar,
   Box,
+  Divider,
   IconButton,
   Grid,
   Link,
@@ -115,7 +116,9 @@ const MediaItem = ({ playlist, video }) => {
                 </ListItemText>
               </Grid>
               <Grid item xs alignSelf="center">
-                <ListItemText sx={{ color: "#505050" }}>{"Album"}</ListItemText>
+                <ListItemText sx={{ color: "#505050" }}>
+                  {video.album || <Divider sx={{ width: "24px" }} />}
+                </ListItemText>
               </Grid>
               <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
                 {isHover ? (
@@ -228,7 +231,7 @@ const MediaItem = ({ playlist, video }) => {
                   <Stack>
                     <Typography>{video.title}</Typography>{" "}
                     <Typography sx={{ color: "#505050" }}>
-                      {"Artist • Album"}
+                      {video.album || "Artist • Album"}
                     </Typography>
                   </Stack>
                 </Stack>

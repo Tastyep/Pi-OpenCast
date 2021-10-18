@@ -1,19 +1,26 @@
 import { action, makeObservable, observable } from "mobx";
 
+const VideoState = {
+  CREATED: "CREATED",
+  COLLECTING: "COLLECTING",
+  PLAYING: "PLAYING",
+  READY: "READY",
+};
+
 export default class Video {
-  id = null
-  source = ""
-  sourceProtocol = ""
-  title = ""
-  duration = 0
-  total_playing_duration = 0
-  last_play = null
-  collectionId = null
-  thumbnail = ""
-  location = ""
-  streams = {}
-  subtitle = ""
-  downloadRatio = 0
+  id = null;
+  source = "";
+  sourceProtocol = "";
+  title = "";
+  duration = 0;
+  total_playing_duration = 0;
+  last_play = null;
+  collectionId = null;
+  thumbnail = "";
+  location = "";
+  streams = {};
+  subtitle = "";
+  downloadRatio = 0;
 
   constructor(state, eventDispatcher) {
     this.id = state.id;
@@ -24,10 +31,12 @@ export default class Video {
     this.total_playing_duration = state.total_playing_duration;
     this.last_play = state.last_play;
     this.collectionId = state.collection_id;
+    this.album = state.album;
     this.thumbnail = state.thumbnail;
     this.location = state.location;
     this.streams = state.streams;
     this.subtitle = state.subtitle;
+    this.state = state.state;
 
     makeObservable(this, {
       downloadRatio: observable,
@@ -38,14 +47,14 @@ export default class Video {
     eventDispatcher.observe(
       { DownloadInfo: (e) => this._setDownloadRatio(e) },
       this.id
-    )
+    );
   }
 
   _setDownloadRatio(e) {
     if (e.total_bytes === 0 || e.downloaded_bytes === 0) {
-      this.downloadRation = 0
-      return
+      this.downloadRation = 0;
+      return;
     }
-    this.downloadRatio = e.downloaded_bytes / e.total_bytes
+    this.downloadRatio = e.downloaded_bytes / e.total_bytes;
   }
 }
