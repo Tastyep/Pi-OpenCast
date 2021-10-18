@@ -12,7 +12,7 @@ import { useAppStore } from "components/app_context";
 const AlbumItemContainer = styled(ListItem)({
   flexGrow: 0,
   flowShrink: 1,
-  flexBasis: "312px",
+  width: "256px",
   flexDirection: "column",
   maxWidth: "50%",
 });
@@ -26,8 +26,8 @@ const AlbumItemBar = styled((props) => <Stack {...props} />)({
   transform: "translate(0px, -40px)",
   marginBottom: "-40px",
   backgroundColor: "rgba(0, 0, 0, 0.6)",
-  borderBottomLeftRadius: "12px",
-  borderBottomRightRadius: "12px",
+  borderBottomLeftRadius: "8px",
+  borderBottomRightRadius: "8px",
   maxHeight: "40px",
   overflow: "hidden",
 });
@@ -52,36 +52,33 @@ const AlbumsPage = observer(() => {
                 display: "flex",
                 height: "100%",
                 width: "100%",
-                borderRadius: "5%",
-                backgroundImage: `url("${album.thumbnail}")`,
-                backgroundSize: "cover",
+                borderRadius: "8px",
                 overflow: "hidden",
-                aspectRatio: "16/9",
               }}
             >
-              <div
+              <img
+                src={album.thumbnail}
+                alt={name}
                 style={{
                   height: "100%",
                   width: "100%",
-                  backgroundColor: "rgba(0,0,0,0.6)",
+                  objectFit: "cover",
+                  aspectRatio: "1/1",
                 }}
-              >
-                <img
-                  src={album.thumbnail}
-                  alt={name}
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              </div>
+              />
             </Link>
             <AlbumItemBar>
               <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
               <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
               <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-              <Typography sx={{ color: "#FFFFFF", padding: "0px 16px" }}>
+              <Typography
+                sx={{
+                  color: "#FFFFFF",
+                  padding: "0px 16px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                }}
+              >
                 {name}
               </Typography>
               <div style={{ marginRight: "auto", visibility: "hidden" }}></div>

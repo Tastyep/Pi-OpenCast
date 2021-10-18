@@ -61,8 +61,8 @@ const PlaylistItemBar = styled((props) => <Stack {...props} />)({
   transform: "translate(0px, -40px)",
   marginBottom: "-40px",
   backgroundColor: "rgba(0, 0, 0, 0.6)",
-  borderBottomLeftRadius: "12px",
-  borderBottomRightRadius: "12px",
+  borderBottomLeftRadius: "8px",
+  borderBottomRightRadius: "8px",
 });
 
 const PlaylistItem = ({ playlist }) => {
@@ -169,9 +169,9 @@ const PlaylistsPage = observer(() => {
           <IconButton
             sx={{
               width: "100%",
+              height: "100%",
               backgroundColor: "#F0F0F0",
-              borderRadius: "5%",
-              aspectRatio: "1/1",
+              borderRadius: "8px",
             }}
             onClick={() => setOpen(true)}
           >

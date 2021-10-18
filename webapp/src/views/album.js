@@ -33,7 +33,6 @@ const AlbumPage = observer(() => {
             width: "128px",
             height: "128px",
             marginRight: "32px",
-            aspectRatio: "1.56/1",
             borderRadius: "8px",
             overflow: "hidden",
           }}
