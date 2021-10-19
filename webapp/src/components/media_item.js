@@ -28,6 +28,7 @@ import { durationToHMS } from "services/duration";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import videoAPI from "services/api/video";
+import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "components/app_context";
 
@@ -64,7 +65,7 @@ const MediaItem = ({ playlist, video }) => {
 
   const playVideo = (video) => {
     closePlMenu();
-    playerAPI.playMedia(video.id).catch((error) => console.log(error));
+    playerAPI.playMedia(video.id).catch(snackBarHandler(store));
   };
 
   const removePlaylistVideo = (playlist, video) => {

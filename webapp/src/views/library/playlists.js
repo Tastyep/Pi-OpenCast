@@ -76,7 +76,14 @@ const PlaylistItem = ({ playlist }) => {
   };
   const removePlaylist = (playlist) => {
     closeMenu();
-    playlistAPI.delete_(playlist.id).catch((error) => console.log(error));
+    playlistAPI.delete_(playlist.id).catch((error) =>
+      store.enqueueSnackbar({
+        message: error.response.data.message,
+        options: {
+          variant: "error",
+        },
+      })
+    );
   };
 
   return (
@@ -132,7 +139,14 @@ const PlaylistsPage = observer(() => {
   const [title, setTitle] = useState("");
 
   const createPlaylist = () => {
-    playlistAPI.create({ name: title }).catch((error) => console.log(error));
+    playlistAPI.create({ name: title }).catch((error) =>
+      store.enqueueSnackbar({
+        message: error.response.data.message,
+        options: {
+          variant: "error",
+        },
+      })
+    );
     setOpen(false);
   };
 

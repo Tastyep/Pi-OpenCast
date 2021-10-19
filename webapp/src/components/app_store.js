@@ -3,6 +3,7 @@ import { action, makeObservable, observable, computed } from "mobx";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import videoAPI from "services/api/video";
+import snackBarHandler from "services/api/error";
 
 export class AppStore {
   player = {};
@@ -56,7 +57,7 @@ export class AppStore {
       .then((response) => {
         this.setPlayer(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
   loadVideos() {
     videoAPI
@@ -64,7 +65,7 @@ export class AppStore {
       .then((response) => {
         this.setVideos(response.data.videos);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
   loadPlaylists() {
     playlistAPI
@@ -72,7 +73,7 @@ export class AppStore {
       .then((response) => {
         this.setPlaylists(response.data.playlists);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
 
   onVideoCreated(evt) {
@@ -81,7 +82,7 @@ export class AppStore {
       .then((response) => {
         this.addVideo(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
 
   onPlaylistCreated(evt) {
@@ -90,7 +91,7 @@ export class AppStore {
       .then((response) => {
         this.addPlaylist(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
 
   setPlayer(player) {

@@ -67,7 +67,7 @@ const PlaylistInput = () => {
   const [name, setName] = useState("");
 
   const addPlaylist = () => {
-    playlistAPI.create({ name: name }).catch((error) => console.log(error));
+    playlistAPI.create({ name: name }).catch(snackBarHandler(store));
     setName("");
   };
 

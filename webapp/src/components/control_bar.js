@@ -23,6 +23,7 @@ import { SIZES } from "constants.js";
 import VolumeControl from "components/volume_control";
 
 import playerAPI from "services/api/player";
+import snackBarHandler from "services/api/error";
 
 import "./player_control.css";
 import { useAppStore } from "./app_context";
@@ -52,7 +53,7 @@ const ControlBar = observer(() => {
       .then((response) => {
         store.loadPlayer();
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(store));
   };
 
   // Highlight subtitle button when on

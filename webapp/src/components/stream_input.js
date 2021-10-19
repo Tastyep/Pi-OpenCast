@@ -6,7 +6,11 @@ import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 
 import playerAPI from "services/api/player";
 
+import { useAppStore } from "components/app_context";
+
 const StreamInput = () => {
+  const store = useAppStore();
+
   const [url, setUrl] = useState("");
   const [cast, setCast] = useState(true);
   const [action, setAction] = useState(() => playerAPI.streamMedia);
@@ -18,7 +22,15 @@ const StreamInput = () => {
     if (url === "") {
       return;
     }
-    action(url).catch((error) => console.log(error));
+    action(url).catch((error) =>
+      store.enqueueSnackbar({
+        message: error,
+        options: {
+          variant: "error",
+        },
+      })
+    );
+
     setUrl("");
   };
 

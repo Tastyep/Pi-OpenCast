@@ -21,6 +21,8 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
+import snackBarHandler from "services/api/error";
+
 import { useAppStore } from "./app_context";
 
 // const getListStyle = isDraggingOver => ({
@@ -63,22 +65,20 @@ const Playlist = observer(({ playlistId }) => {
     event.preventDefault();
     playlistAPI
       .update(playlistId, { name: name })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(store));
     return;
   };
 
   const removePlaylist = () => {
-    playlistAPI.delete_(playlistId).catch((error) => console.log(error));
+    playlistAPI.delete_(playlistId).catch(snackBarHandler(store));
   };
 
   const onMediaClicked = (media) => {
     if (media.id !== activeVideoId) {
-      playerAPI
-        .playMedia(media.id, playlistId)
-        .catch((error) => console.log(error));
+      playerAPI.playMedia(media.id, playlistId).catch(snackBarHandler(store));
       return;
     }
-    playerAPI.pauseMedia().catch((error) => console.log(error));
+    playerAPI.pauseMedia().catch(snackBarHandler(store));
   };
 
   const renderButtonState = (video) => {
@@ -141,7 +141,7 @@ const Playlist = observer(({ playlistId }) => {
                       />
                     )}
                   </Grid>
-                  {! store.playlists[playlistId].generated && (
+                  {!store.playlists[playlistId].generated && (
                     <Grid item xs={1}>
                       <IconButton onClick={() => removePlaylist()}>
                         <DeleteIcon />

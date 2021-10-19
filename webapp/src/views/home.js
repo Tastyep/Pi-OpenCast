@@ -71,12 +71,24 @@ const MediaItem = observer(({ children, video, index }) => {
 
   const onMediaClicked = (media) => {
     if (!playingVideo || media.id !== playingVideo.id) {
-      playerAPI
-        .playMedia(media.id, playlistId)
-        .catch((error) => console.log(error));
+      playerAPI.playMedia(media.id, playlistId).catch((error) =>
+        store.enqueueSnackbar({
+          message: error.response.data.message,
+          options: {
+            variant: "error",
+          },
+        })
+      );
       return;
     }
-    playerAPI.pauseMedia().catch((error) => console.log(error));
+    playerAPI.pauseMedia().catch((error) =>
+      store.enqueueSnackbar({
+        message: error.response.data.message,
+        options: {
+          variant: "error",
+        },
+      })
+    );
   };
 
   const renderAvatarState = (video) => {

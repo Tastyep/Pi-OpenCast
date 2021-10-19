@@ -13,6 +13,6 @@ const makeWebSocket = (endpoint) => {
 
 const listen = () => {
   return makeWebSocket("/events");
-}
+};
 
 export { API, API_URL, listen };

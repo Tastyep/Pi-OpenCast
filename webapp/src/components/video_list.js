@@ -8,6 +8,7 @@ import noPreview from "images/no-preview.png";
 import { observer } from "mobx-react-lite";
 
 import playerAPI from "services/api/player";
+import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "./app_context";
 
@@ -25,7 +26,7 @@ const VideoList = observer(({ videos }) => {
     playerAPI
       .playMedia(video.id, store.player.queue)
       .then((_) => {})
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(store));
   };
 
   const renderMedia = (video) => {
