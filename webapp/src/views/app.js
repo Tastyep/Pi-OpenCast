@@ -14,6 +14,7 @@ import {
 import { observer } from "mobx-react-lite";
 
 import ControlBar from "components/control_bar";
+import Notifier from "components/notifier";
 import HomePage from "views/home";
 import LibraryPage from "views/library";
 import PlaylistPage from "views/playlist";
@@ -82,6 +83,7 @@ const App = observer(() => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <Notifier />
       <Router>
         <HeaderTabs />
         <Grid

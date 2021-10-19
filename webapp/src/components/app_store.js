@@ -8,12 +8,14 @@ export class AppStore {
   player = {};
   playlists = {};
   videos = {};
+  notifications = [];
 
   constructor(eventDispatcher, modelFactory) {
     makeObservable(this, {
       player: observable,
       playlists: observable,
       videos: observable,
+      notifications: observable,
 
       setPlayer: action,
       setPlaylists: action,
@@ -26,6 +28,9 @@ export class AppStore {
 
       addPlaylist: action,
       removePlaylist: action,
+
+      enqueueSnackbar: action,
+      removeSnackbar: action,
     });
 
     this.modelFactory = modelFactory;
@@ -184,5 +189,18 @@ export class AppStore {
 
       return albums;
     }).get();
+  }
+
+  enqueueSnackbar(note) {
+    this.notifications.push({
+      key: new Date().getTime() + Math.random(),
+      ...note,
+    });
+  }
+
+  removeSnackbar(key) {
+    this.notifications = this.notifications.filter(
+      (notification) => notification.key !== key
+    );
   }
 }
