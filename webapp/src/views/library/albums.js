@@ -34,20 +34,22 @@ const AlbumItemBar = styled((props) => <Stack {...props} />)({
 
 const AlbumsPage = observer(() => {
   const store = useAppStore();
-  const albums = store.albums();
+  const albums = Object.values(store.albums());
 
-  console.log("ALBUMS: ", albums);
-  if (albums === {}) {
+  if (albums.length === 0) {
     return null;
   }
 
+  albums.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  });
   return (
     <>
       <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        {Object.entries(albums).map(([name, album], _) => (
-          <AlbumItemContainer key={name}>
+        {albums.map((album, _) => (
+          <AlbumItemContainer key={album.name}>
             <Link
-              to={"/albums/" + name}
+              to={"/albums/" + album.name}
               style={{
                 display: "flex",
                 height: "100%",
@@ -58,7 +60,7 @@ const AlbumsPage = observer(() => {
             >
               <img
                 src={album.thumbnail}
-                alt={name}
+                alt={album.name}
                 style={{
                   height: "100%",
                   width: "100%",
@@ -79,7 +81,7 @@ const AlbumsPage = observer(() => {
                   overflow: "hidden",
                 }}
               >
-                {name}
+                {album.name}
               </Typography>
               <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
               <IconButton sx={{ marginLeft: "auto" }} onClick={(e) => {}}>

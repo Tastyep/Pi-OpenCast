@@ -126,6 +126,8 @@ const PlaylistItem = ({ playlist }) => {
 
 const PlaylistsPage = observer(() => {
   const store = useAppStore();
+  const playlists = Object.values(store.playlists);
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
 
@@ -134,6 +136,9 @@ const PlaylistsPage = observer(() => {
     setOpen(false);
   };
 
+  playlists.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  });
   return (
     <>
       <Modal open={open} onClose={() => setOpen(false)}>
@@ -181,11 +186,8 @@ const PlaylistsPage = observer(() => {
             <Typography sx={{ color: "#FFFFFF" }}>New playlist</Typography>
           </PlaylistItemBar>
         </PlaylistItemContainer>
-        {Object.keys(store.playlists).map((playlistId, _) => (
-          <PlaylistItem
-            key={playlistId}
-            playlist={store.playlists[playlistId]}
-          />
+        {playlists.map((playlist, _) => (
+          <PlaylistItem key={playlist.id} playlist={playlist} />
         ))}
       </List>
     </>

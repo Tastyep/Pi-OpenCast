@@ -156,9 +156,13 @@ export class AppStore {
     return computed(() => {
       let albums = {};
       for (const video of Object.values(this.videos)) {
+        if (!video.album) {
+          continue;
+        }
         if (!albums[video.album]) {
           albums[video.album] = {
             videos: [video],
+            name: video.album,
           };
         } else {
           albums[video.album].videos.push(video);
