@@ -6,8 +6,8 @@ from typing import List
 
 import structlog
 from hurry.filesize import alternative, size
-from youtube_dl import YoutubeDL
-from youtube_dl.utils import ISO639Utils
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import ISO639Utils
 
 from OpenCast.infra import Id
 from OpenCast.infra.event.downloader import DownloadError, DownloadInfo, DownloadSuccess
