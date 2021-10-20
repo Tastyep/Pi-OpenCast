@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import {
   Avatar,
-  Box,
+  Button,
   Divider,
   IconButton,
   Grid,
@@ -13,6 +13,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
@@ -20,6 +21,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AddIcon from "@mui/icons-material/Add";
+
+import Popper from "@mui/material/Popper";
+import Grow from "@mui/material/Grow";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
+import MenuList from "@mui/material/MenuList";
 
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
@@ -33,6 +40,85 @@ import snackBarHandler from "services/api/error";
 import { useAppStore } from "components/app_context";
 
 import PlaylistThumbnail from "components/playlist_thumbnail";
+
+const PlaylistMenu = (props) => {
+  const store = useAppStore();
+
+  const { open, anchorEl, video, onClickAway, onItemClicked } = props;
+
+  return (
+    <Popper
+      open={open}
+      anchorEl={anchorEl}
+      placement="bottom-end"
+      modifiers={{
+        offset: {
+          enabled: true,
+          offset: "0, 30",
+        },
+      }}
+      style={{
+        width: "384px",
+        height: "40%",
+      }}
+    >
+      <Paper elevation={3} sx={{ height: "100%" }}>
+        <ClickAwayListener onClickAway={onClickAway}>
+          <Stack sx={{ height: "100%" }}>
+            <ListItem>
+              <Typography variant="h5">Playlists</Typography>
+            </ListItem>
+            <Divider />
+            <MenuList
+              autoFocusItem={open}
+              id="playlist-menu"
+              aria-labelledby="composition-button"
+              sx={{ overflow: "auto" }}
+            >
+              {Object.values(store.playlists).map((playlist) => (
+                <MenuItem onClick={() => onItemClicked(playlist, video)}>
+                  <div
+                    style={{
+                      width: 64,
+                      height: 64,
+                      marginRight: 16,
+                    }}
+                  >
+                    <PlaylistThumbnail
+                      videos={store.playlistVideos(playlist.id)}
+                    />
+                  </div>
+                  <Stack direction="column">
+                    <ListItemText>{playlist.name}</ListItemText>
+                    <ListItemText>
+                      {store.playlistVideos(playlist.id).length} medias
+                    </ListItemText>
+                  </Stack>
+                </MenuItem>
+              ))}
+            </MenuList>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{
+                height: "48px",
+                transform: "translate(-8px, -48px)",
+                marginBottom: "-40px",
+                marginLeft: "auto",
+                borderRadius: "100px",
+                bottom: "8px",
+                right: "16px",
+                padding: "15px 20px",
+              }}
+            >
+              New playlist
+            </Button>
+          </Stack>
+        </ClickAwayListener>
+      </Paper>
+    </Popper>
+  );
+};
 
 const MediaItem = ({ playlist, video }) => {
   const store = useAppStore();
@@ -183,46 +269,13 @@ const MediaItem = ({ playlist, video }) => {
                         </MenuItem>
                       )}
                     </Menu>
-                    <Menu
-                      id="playlist-menu"
-                      anchorEl={anchorPl}
+                    <PlaylistMenu
                       open={isPlMenuOpen}
-                      onClose={closePlMenu}
-                      MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                      }}
-                      transformOrigin={{ horizontal: "right", vertical: "top" }}
-                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                      sx={{ display: "flex" }}
-                    >
-                      <Box>
-                        <ListItem>
-                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            All playlists
-                          </Typography>
-                        </ListItem>
-                        {Object.values(store.playlists).map((playlist) => (
-                          <MenuItem
-                            onClick={() => addToPlaylist(playlist, video)}
-                          >
-                            <div
-                              style={{ width: 64, height: 64, marginRight: 16 }}
-                            >
-                              <PlaylistThumbnail
-                                videos={store.playlistVideos(playlist.id)}
-                              />
-                            </div>
-                            <Stack direction="column">
-                              <ListItemText>{playlist.name}</ListItemText>
-                              <ListItemText>
-                                {store.playlistVideos(playlist.id).length}
-                                medias
-                              </ListItemText>
-                            </Stack>
-                          </MenuItem>
-                        ))}
-                      </Box>
-                    </Menu>
+                      anchorEl={anchorPl}
+                      video={video}
+                      onClickAway={closePlMenu}
+                      onItemClicked={addToPlaylist}
+                    />
                   </div>
                 ) : (
                   <ListItemText
