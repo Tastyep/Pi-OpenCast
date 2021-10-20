@@ -29,10 +29,11 @@ const PlaylistModal = (props) => {
   const store = useAppStore();
 
   const [title, setTitle] = useState("");
-  const { open, close } = props;
+  const { open, close, videos = [] } = props;
 
   const createPlaylist = () => {
-    playlistAPI.create({ name: title }).catch((error) =>
+    const ids = videos.map((video) => video.id);
+    playlistAPI.create({ name: title, ids: ids }).catch((error) =>
       store.enqueueSnackbar({
         message: error.response.data.message,
         options: {
@@ -53,6 +54,7 @@ const PlaylistModal = (props) => {
           id="standard-basic"
           label="Title"
           variant="standard"
+          autoFocus
           sx={{ width: "100%" }}
           onChange={(e) => setTitle(e.target.value)}
         />

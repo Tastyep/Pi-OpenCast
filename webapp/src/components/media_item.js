@@ -40,83 +40,96 @@ import snackBarHandler from "services/api/error";
 import { useAppStore } from "components/app_context";
 
 import PlaylistThumbnail from "components/playlist_thumbnail";
+import PlaylistModal from "components/playlist_modal";
 
 const PlaylistMenu = (props) => {
   const store = useAppStore();
 
-  const { open, anchorEl, video, onClickAway, onItemClicked } = props;
+  const { open, anchorEl, video, closeMenu, onItemClicked } = props;
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <Popper
-      open={open}
-      anchorEl={anchorEl}
-      placement="bottom-end"
-      modifiers={{
-        offset: {
-          enabled: true,
-          offset: "0, 30",
-        },
-      }}
-      style={{
-        width: "384px",
-        height: "40%",
-      }}
-    >
-      <Paper elevation={3} sx={{ height: "100%" }}>
-        <ClickAwayListener onClickAway={onClickAway}>
-          <Stack sx={{ height: "100%" }}>
-            <ListItem>
-              <Typography variant="h5">Playlists</Typography>
-            </ListItem>
-            <Divider />
-            <MenuList
-              autoFocusItem={open}
-              id="playlist-menu"
-              aria-labelledby="composition-button"
-              sx={{ overflow: "auto" }}
-            >
-              {Object.values(store.playlists).map((playlist) => (
-                <MenuItem onClick={() => onItemClicked(playlist, video)}>
-                  <div
-                    style={{
-                      width: 64,
-                      height: 64,
-                      marginRight: 16,
-                    }}
-                  >
-                    <PlaylistThumbnail
-                      videos={store.playlistVideos(playlist.id)}
-                    />
-                  </div>
-                  <Stack direction="column">
-                    <ListItemText>{playlist.name}</ListItemText>
-                    <ListItemText>
-                      {store.playlistVideos(playlist.id).length} medias
-                    </ListItemText>
-                  </Stack>
-                </MenuItem>
-              ))}
-            </MenuList>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              sx={{
-                height: "48px",
-                transform: "translate(-8px, -48px)",
-                marginBottom: "-40px",
-                marginLeft: "auto",
-                borderRadius: "100px",
-                bottom: "8px",
-                right: "16px",
-                padding: "15px 20px",
-              }}
-            >
-              New playlist
-            </Button>
-          </Stack>
-        </ClickAwayListener>
-      </Paper>
-    </Popper>
+    <>
+      <PlaylistModal
+        open={modalOpen}
+        close={() => setModalOpen(false)}
+        videos={[video]}
+      />
+      <Popper
+        open={open}
+        anchorEl={anchorEl}
+        placement="bottom-end"
+        modifiers={{
+          offset: {
+            enabled: true,
+            offset: "0, 30",
+          },
+        }}
+        style={{
+          width: "384px",
+          height: "40%",
+        }}
+      >
+        <Paper elevation={3} sx={{ height: "100%" }}>
+          <ClickAwayListener onClickAway={closeMenu}>
+            <Stack sx={{ height: "100%" }}>
+              <ListItem>
+                <Typography variant="h5">Playlists</Typography>
+              </ListItem>
+              <Divider />
+              <MenuList
+                autoFocusItem={open}
+                id="playlist-menu"
+                aria-labelledby="composition-button"
+                sx={{ overflow: "auto" }}
+              >
+                {Object.values(store.playlists).map((playlist) => (
+                  <MenuItem onClick={() => onItemClicked(playlist, video)}>
+                    <div
+                      style={{
+                        width: 64,
+                        height: 64,
+                        marginRight: 16,
+                      }}
+                    >
+                      <PlaylistThumbnail
+                        videos={store.playlistVideos(playlist.id)}
+                      />
+                    </div>
+                    <Stack direction="column">
+                      <ListItemText>{playlist.name}</ListItemText>
+                      <ListItemText>
+                        {store.playlistVideos(playlist.id).length} medias
+                      </ListItemText>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </MenuList>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  closeMenu();
+                  setModalOpen(true);
+                }}
+                sx={{
+                  height: "48px",
+                  transform: "translate(-8px, -48px)",
+                  marginBottom: "-40px",
+                  marginLeft: "auto",
+                  borderRadius: "100px",
+                  bottom: "8px",
+                  right: "16px",
+                  padding: "15px 20px",
+                }}
+              >
+                New playlist
+              </Button>
+            </Stack>
+          </ClickAwayListener>
+        </Paper>
+      </Popper>
+    </>
   );
 };
 
@@ -273,7 +286,7 @@ const MediaItem = ({ playlist, video }) => {
                       open={isPlMenuOpen}
                       anchorEl={anchorPl}
                       video={video}
-                      onClickAway={closePlMenu}
+                      closeMenu={closePlMenu}
                       onItemClicked={addToPlaylist}
                     />
                   </div>
