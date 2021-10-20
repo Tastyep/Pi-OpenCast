@@ -9,6 +9,7 @@ import { styled } from "@mui/material/styles";
 
 import { useAppStore } from "components/app_context";
 import playlistAPI from "services/api/playlist";
+import snackBarHandler from "services/api/error";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -33,14 +34,7 @@ const PlaylistModal = (props) => {
 
   const createPlaylist = () => {
     const ids = videos.map((video) => video.id);
-    playlistAPI.create({ name: title, ids: ids }).catch((error) =>
-      store.enqueueSnackbar({
-        message: error.response.data.message,
-        options: {
-          variant: "error",
-        },
-      })
-    );
+    playlistAPI.create({ name: title, ids: ids }).catch(snackBarHandler(store));
     close();
   };
 

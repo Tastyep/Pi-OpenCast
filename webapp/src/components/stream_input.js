@@ -5,6 +5,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 
 import playerAPI from "services/api/player";
+import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "components/app_context";
 
@@ -22,15 +23,7 @@ const StreamInput = () => {
     if (url === "") {
       return;
     }
-    action(url).catch((error) =>
-      store.enqueueSnackbar({
-        message: error,
-        options: {
-          variant: "error",
-        },
-      })
-    );
-
+    action(url).catch(snackBarHandler(store));
     setUrl("");
   };
 

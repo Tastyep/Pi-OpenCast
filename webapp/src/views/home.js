@@ -28,6 +28,7 @@ import { SIZES } from "constants.js";
 import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
+import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
 
 import { useAppStore } from "components/app_context";
@@ -71,24 +72,10 @@ const MediaItem = observer(({ children, video, index }) => {
 
   const onMediaClicked = (media) => {
     if (!playingVideo || media.id !== playingVideo.id) {
-      playerAPI.playMedia(media.id, playlistId).catch((error) =>
-        store.enqueueSnackbar({
-          message: error.response.data.message,
-          options: {
-            variant: "error",
-          },
-        })
-      );
+      playerAPI.playMedia(media.id, playlistId).catch(snackBarHandler(store));
       return;
     }
-    playerAPI.pauseMedia().catch((error) =>
-      store.enqueueSnackbar({
-        message: error.response.data.message,
-        options: {
-          variant: "error",
-        },
-      })
-    );
+    playerAPI.pauseMedia().catch(snackBarHandler(store));
   };
 
   const renderAvatarState = (video) => {

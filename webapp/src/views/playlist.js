@@ -15,6 +15,7 @@ import PlaylistThumbnail from "components/playlist_thumbnail";
 import MediaItem from "components/media_item";
 
 import playlistAPI from "services/api/playlist";
+import snackBarHandler from "services/api/error";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -38,14 +39,9 @@ const UpdateModal = (props) => {
   const [name, setName] = useState(playlist.name);
 
   const updatePlaylist = () => {
-    playlistAPI.update(playlist.id, { name: name }).catch((error) =>
-      store.enqueueSnackbar({
-        message: error.response.data.message,
-        options: {
-          variant: "error",
-        },
-      })
-    );
+    playlistAPI
+      .update(playlist.id, { name: name })
+      .catch(snackBarHandler(store));
     close();
   };
 

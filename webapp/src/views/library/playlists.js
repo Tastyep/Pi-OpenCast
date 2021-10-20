@@ -21,8 +21,10 @@ import { Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
-import { useAppStore } from "components/app_context";
 import playlistAPI from "services/api/playlist";
+import snackBarHandler from "services/api/error";
+
+import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
 import PlaylistModal from "components/playlist_modal";
 
@@ -58,14 +60,7 @@ const PlaylistItem = ({ playlist }) => {
   };
   const removePlaylist = (playlist) => {
     closeMenu();
-    playlistAPI.delete_(playlist.id).catch((error) =>
-      store.enqueueSnackbar({
-        message: error.response.data.message,
-        options: {
-          variant: "error",
-        },
-      })
-    );
+    playlistAPI.delete_(playlist.id).catch(snackBarHandler(store));
   };
 
   return (
