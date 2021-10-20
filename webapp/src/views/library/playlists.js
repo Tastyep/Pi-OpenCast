@@ -1,8 +1,6 @@
 import { useState } from "react";
 
 import {
-  Box,
-  Button,
   IconButton,
   List,
   ListItem,
@@ -10,9 +8,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Modal,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -28,21 +24,7 @@ import { observer } from "mobx-react-lite";
 import { useAppStore } from "components/app_context";
 import playlistAPI from "services/api/playlist";
 import PlaylistThumbnail from "components/playlist_thumbnail";
-
-const ModalContent = styled(Box)({
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  maxWidth: "75%",
-  backgroundColor: "#FFFFFF",
-  border: "2px solid #000",
-  boxShadow: 24,
-
-  p: 4,
-  padding: "16px",
-});
+import PlaylistModal from "components/playlist_modal";
 
 const PlaylistItemContainer = styled(ListItem)({
   flexGrow: 0,
@@ -136,53 +118,13 @@ const PlaylistsPage = observer(() => {
   const playlists = Object.values(store.playlists);
 
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-
-  const createPlaylist = () => {
-    playlistAPI.create({ name: title }).catch((error) =>
-      store.enqueueSnackbar({
-        message: error.response.data.message,
-        options: {
-          variant: "error",
-        },
-      })
-    );
-    setOpen(false);
-  };
 
   playlists.sort((a, b) => {
     return a.name.localeCompare(b.name);
   });
   return (
     <>
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <ModalContent>
-          <Typography variant="h6" sx={{ marginBottom: "8px" }}>
-            New playlist
-          </Typography>
-          <TextField
-            id="standard-basic"
-            label="Title"
-            variant="standard"
-            sx={{ width: "100%" }}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "end",
-              marginTop: "24px",
-            }}
-          >
-            <Button variant="text" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="contained" onClick={() => createPlaylist()}>
-              Save
-            </Button>
-          </div>
-        </ModalContent>
-      </Modal>
+      <PlaylistModal open={open} close={() => setOpen(false)} />
       <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <PlaylistItemContainer>
           <IconButton
