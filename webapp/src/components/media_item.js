@@ -231,7 +231,7 @@ const MediaItem = ({ playlist, video }) => {
                 </ListItemText>
               </Grid>
               <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
-                {isHover ? (
+                {isHover || isMenuOpen || isPlMenuOpen ? (
                   <div>
                     <IconButton
                       aria-controls="media-menu"
