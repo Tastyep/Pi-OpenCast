@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from re import compile as reg_compile
+from typing import Callable, Generic, List, Optional, TypeVar
 
 from marshmallow import Schema, fields
 from marshmallow_enum import EnumField
@@ -54,15 +55,36 @@ class VideoSchema(Schema):
     state = EnumField(State)
 
 
+T = TypeVar("T")
+
+
+@dataclass
+class Metadata(Generic[T]):
+    name: T
+    post_processor: Optional[Callable[[T], T]] = None
+
+
+def artist_processor():
+    pattern = reg_compile(r"[,]")
+
+    def impl(artist: str):
+        return pattern.split(artist)[0]
+
+    return impl
+
+
+METADATA_FIELDS = [
+    Metadata[str]("artist", artist_processor()),
+    Metadata[str]("album"),
+    Metadata[str]("title"),
+    Metadata[int]("duration"),
+    Metadata[str]("source_protocol"),
+    Metadata[str]("thumbnail"),
+]
+
+
 class Video(Entity):
     Schema = VideoSchema
-    METADATA_FIELDS = [
-        "album",
-        "title",
-        "duration",
-        "source_protocol",
-        "thumbnail",
-    ]
 
     @dataclass
     class Data:

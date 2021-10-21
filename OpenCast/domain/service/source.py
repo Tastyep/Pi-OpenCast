@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import structlog
 
-from OpenCast.domain.model.video import Stream, Video
+from OpenCast.domain.model.video import METADATA_FIELDS, Stream
 
 
 class SourceService:
@@ -38,20 +38,22 @@ class SourceService:
         if data is None:
             return None
 
-        metadata = {field: None for field in Video.METADATA_FIELDS}
-        for field in Video.METADATA_FIELDS:
-            if field in data:
-                metadata[field] = data.get(field, None)
-            elif field in self._metadata_mapper:
-                for alt_field in self._metadata_mapper[field]:
+        metadata = {field.name: None for field in METADATA_FIELDS}
+        for field in METADATA_FIELDS:
+            if field.name in data:
+                metadata[field.name] = data.get(field.name, None)
+            elif field.name in self._metadata_mapper:
+                for alt_field in self._metadata_mapper[field.name]:
                     if alt_field in data:
-                        metadata[field] = data[alt_field]
+                        metadata[field.name] = data[alt_field]
                         break
+            if metadata[field.name] and field.post_processor:
+                metadata[field.name] = field.post_processor(metadata[field.name])
 
         return metadata
 
     def pick_file_metadata(self, source: Path) -> dict:
-        metadata = {field: None for field in Video.METADATA_FIELDS}
+        metadata = {field.name: None for field in METADATA_FIELDS}
         metadata["title"] = source.stem
         return metadata
 
