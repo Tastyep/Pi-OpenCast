@@ -32,6 +32,7 @@ class VideoServiceTest(ServiceTestCase):
             "title": "title",
             "duration": 300,
             "source_protocol": "http",
+            "artist": "artist",
             "album": "album",
             "thumbnail": "thumbnail_url",
         }
@@ -55,6 +56,7 @@ class VideoServiceTest(ServiceTestCase):
 
         path_inst.is_file.return_value = True
         metadata = {
+            "artist": None,
             "album": None,
             "title": "test_title",
             "duration": None,

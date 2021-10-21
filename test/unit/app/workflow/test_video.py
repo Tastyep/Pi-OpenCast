@@ -51,6 +51,7 @@ class VideoWorkflowTest(WorkflowTestCase):
             Evt.VideoCreated,
             cmd.id,
             *self.video.to_tuple(),
+            "artist",
             "album",
             "title",
             300,
@@ -64,6 +65,7 @@ class VideoWorkflowTest(WorkflowTestCase):
         event = Evt.VideoCreated(
             None,
             *self.video.to_tuple(),
+            "artist",
             "album",
             "title",
             300,
@@ -82,6 +84,7 @@ class VideoWorkflowTest(WorkflowTestCase):
         event = Evt.VideoCreated(
             None,
             *self.video.to_tuple(),
+            "artist",
             "album",
             "title",
             300,
@@ -113,6 +116,7 @@ class VideoWorkflowTest(WorkflowTestCase):
         event = Evt.VideoCreated(
             None,
             *self.video.to_tuple(),
+            "artist",
             "album",
             "title",
             300,

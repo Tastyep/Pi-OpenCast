@@ -18,6 +18,7 @@ class VideoTest(ModelTestCase):
             IdentityService.random(),
             "source",
             collection_id,
+            "artist",
             "album_name",
             "title",
             timedelta(seconds=300),
@@ -31,6 +32,7 @@ class VideoTest(ModelTestCase):
         )
         self.assertEqual("source", video.source)
         self.assertEqual(collection_id, video.collection_id)
+        self.assertEqual("artist", video.artist)
         self.assertEqual("album_name", video.album)
         self.assertEqual("title", video.title)
         self.assertEqual(300, video.duration)

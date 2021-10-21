@@ -77,7 +77,8 @@ class SourceServiceTest(TestCase):
             "source_protocol": "http",
             "title": "test",
             "duration": 300,
-            "album": "collection",
+            "artist": "artist",
+            "album": "album",
             "thumbnail": "url",
         }
         metadata = self.service.pick_stream_metadata("source")
@@ -85,7 +86,8 @@ class SourceServiceTest(TestCase):
             "source_protocol": "http",
             "title": "test",
             "duration": 300,
-            "album": "collection",
+            "artist": "artist",
+            "album": "album",
             "thumbnail": "url",
         }
         self.assertEqual(expected, metadata)
@@ -99,6 +101,22 @@ class SourceServiceTest(TestCase):
             "source_protocol": None,
             "title": "test",
             "duration": None,
+            "artist": None,
+            "album": None,
+            "thumbnail": None,
+        }
+        self.assertEqual(expected, metadata)
+
+    def test_pick_stream_metadata_post_processed(self):
+        self.downloader.download_metadata.return_value = {
+            "artist": "toto, band members",
+        }
+        metadata = self.service.pick_stream_metadata("source")
+        expected = {
+            "source_protocol": None,
+            "title": None,
+            "duration": None,
+            "artist": "toto",
             "album": None,
             "thumbnail": None,
         }
@@ -109,6 +127,7 @@ class SourceServiceTest(TestCase):
             "protocol": "http",
             "title": "test",
             "duration": 300,
+            "artist": "artist",
             "album": "album_name",
             "thumbnail": "url",
         }
@@ -117,6 +136,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": "http",
             "title": "test",
             "duration": 300,
+            "artist": "artist",
             "album": "album_name",
             "thumbnail": "url",
         }
@@ -133,6 +153,7 @@ class SourceServiceTest(TestCase):
             "source_protocol": None,
             "title": "video",
             "duration": None,
+            "artist": None,
             "album": None,
             "thumbnail": None,
         }

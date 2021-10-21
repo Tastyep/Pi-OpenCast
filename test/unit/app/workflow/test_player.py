@@ -92,6 +92,7 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
             self.video.id,
             self.video.source,
             self.video.collection_id,
+            "artist",
             "album",
             "title",
             300,

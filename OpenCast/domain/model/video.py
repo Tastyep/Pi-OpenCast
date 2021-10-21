@@ -45,6 +45,7 @@ class VideoSchema(Schema):
     total_playing_duration = fields.TimeDelta()
     last_play = fields.DateTime(allow_none=True)
     collection_id = fields.UUID(allow_none=True)
+    artist = fields.String(allow_none=True)
     album = fields.String(allow_none=True)
     thumbnail = fields.String(allow_none=True)
     location = fields.String(allow_none=True)
@@ -68,6 +69,7 @@ class Video(Entity):
         id: Id
         source: str
         collection_id: Optional[Id] = None
+        artist: Optional[str] = None
         album: Optional[str] = None
         title: Optional[str] = None
         duration: Optional[timedelta] = None
@@ -86,6 +88,7 @@ class Video(Entity):
             Evt.VideoCreated,
             self._data.source,
             self._data.collection_id,
+            self._data.artist,
             self._data.album,
             self._data.title,
             self.duration,
@@ -101,6 +104,10 @@ class Video(Entity):
     @property
     def collection_id(self):
         return self._data.collection_id
+
+    @property
+    def artist(self):
+        return self._data.artist
 
     @property
     def album(self):
