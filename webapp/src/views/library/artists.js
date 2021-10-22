@@ -1,9 +1,6 @@
 import { useState } from "react";
 
-import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -23,6 +20,7 @@ import { Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 
 import { useAppStore } from "components/app_context";
+import ArtistThumbnail from "components/artist_thumbnail";
 
 const ArtistItemContainer = styled(ListItem)({
   flexGrow: 0,
@@ -45,35 +43,6 @@ const ArtistItemBar = styled((props) => <Stack {...props} />)({
   borderBottomLeftRadius: "8px",
   borderBottomRightRadius: "8px",
 });
-
-const ArtistThumbnail = ({ albums }) => {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        height: "100%",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#F0F0F0",
-        borderRadius: "5%",
-        overflow: "hidden",
-      }}
-    >
-      <ImageList cols={2} gap={0} sx={{ width: "100%", height: "100%" }}>
-        {[0, 1, 2, 3].map((index) => (
-          <ImageListItem key={index}>
-            <img
-              src={albums[index % albums.length].thumbnail}
-              alt={albums[index % albums.length].name}
-              loading="lazy"
-            />
-          </ImageListItem>
-        ))}
-      </ImageList>
-    </Box>
-  );
-};
 
 const ArtistItem = ({ artist }) => {
   const [anchor, setAnchor] = useState(null);
