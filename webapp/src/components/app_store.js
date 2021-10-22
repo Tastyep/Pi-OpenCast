@@ -192,6 +192,62 @@ export class AppStore {
     }).get();
   }
 
+  artists() {
+    return computed(() => {
+      let artists = {};
+      for (const video of Object.values(this.videos)) {
+        if (!video.artist) {
+          continue;
+        }
+        if (!artists[video.artist]) {
+          artists[video.artist] = {
+            videos: [video],
+            name: video.artist,
+          };
+        } else {
+          artists[video.artist].videos.push(video);
+        }
+      }
+
+      for (let artist of Object.values(artists)) {
+        let albums = {};
+
+        for (const video of artist.videos) {
+          if (!video.album) {
+            continue;
+          }
+          if (!albums[video.album]) {
+            albums[video.album] = {
+              name: video.album,
+              thumbnails: { [video.thumbnail]: 1 },
+              count: 1,
+            };
+          } else {
+            let thumbnail_count =
+              albums[video.album].thumbnails[video.thumbnail];
+            albums[video.album].thumbnails[video.thumbnail] =
+              (thumbnail_count || 0) + 1;
+            albums[video.album].count += 1;
+          }
+        }
+
+        albums = Object.values(albums).sort((a, b) => b.count - a.count);
+        for (let album of albums) {
+          delete album.count;
+          // Sort by count, take the thumbnail of the most found
+          album.thumbnail = Object.keys(album.thumbnails).sort(
+            (a, b) => album.thumbnails[b] - album.thumbnails[a]
+          )[0];
+          delete album.thumbnails;
+        }
+
+        artist.albums = albums;
+      }
+
+      return artists;
+    }).get();
+  }
+
   enqueueSnackbar(note) {
     this.notifications.push({
       key: new Date().getTime() + Math.random(),
