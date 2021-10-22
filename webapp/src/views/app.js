@@ -18,6 +18,7 @@ import Notifier from "components/notifier";
 import HomePage from "views/home";
 import LibraryPage from "views/library";
 import PlaylistPage from "views/playlist";
+import ArtistPage from "views/artist";
 import AlbumPage from "views/album";
 
 import { useAppStore } from "components/app_context";
@@ -109,6 +110,9 @@ const App = observer(() => {
               </Route>
               <Route path="/playlists/:id">
                 <PlaylistPage />
+              </Route>
+              <Route path="/artists/:name">
+                <ArtistPage />
               </Route>
               <Route path="/albums/:name">
                 <AlbumPage />
