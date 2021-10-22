@@ -41,6 +41,7 @@ const PlaylistItemBar = styled((props) => <Stack {...props} />)({
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
+  height: "40px",
   position: "relative",
   transform: "translate(0px, -40px)",
   marginBottom: "-40px",
@@ -133,7 +134,7 @@ const PlaylistsPage = observer(() => {
           >
             <AddIcon sx={{ height: "25%", width: "25%" }} />
           </IconButton>
-          <PlaylistItemBar sx={{ height: "40px" }}>
+          <PlaylistItemBar>
             <Typography sx={{ color: "#FFFFFF" }}>New playlist</Typography>
           </PlaylistItemBar>
         </PlaylistItemContainer>

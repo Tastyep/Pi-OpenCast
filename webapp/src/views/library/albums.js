@@ -22,13 +22,13 @@ const AlbumItemBar = styled((props) => <Stack {...props} />)({
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
+  height: "40px",
   position: "relative",
   transform: "translate(0px, -40px)",
   marginBottom: "-40px",
   backgroundColor: "rgba(0, 0, 0, 0.6)",
   borderBottomLeftRadius: "8px",
   borderBottomRightRadius: "8px",
-  maxHeight: "40px",
   overflow: "hidden",
 });
 
