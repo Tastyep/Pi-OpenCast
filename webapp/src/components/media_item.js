@@ -42,6 +42,30 @@ import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
 import PlaylistModal from "components/playlist_modal";
 
+const renderArtistAlbum = (video) => {
+  const artist = video.artist ? (
+    <Link href={`/artists/${video.artist}`} color="inherit" underline="none">
+      {video.artist}
+    </Link>
+  ) : (
+    "Artist"
+  );
+
+  const album = video.album ? (
+    <Link href={`/albums/${video.album}`} color="inherit" underline="none">
+      {video.album}
+    </Link>
+  ) : (
+    "Album"
+  );
+
+  return (
+    <>
+      {artist} • {album}
+    </>
+  );
+};
+
 const PlaylistMenu = (props) => {
   const store = useAppStore();
 
@@ -211,24 +235,34 @@ const MediaItem = ({ playlist, video }) => {
                 </Stack>
               </Grid>
               <Grid item xs alignSelf="center">
-                <ListItemText sx={{ color: "#505050" }}>
-                  {"Artist"}
-                </ListItemText>
+                {video.artist ? (
+                  <Link
+                    href={`/artists/${video.artist}`}
+                    color="inherit"
+                    underline="none"
+                  >
+                    <ListItemText sx={{ color: "#505050" }}>
+                      {video.artist}
+                    </ListItemText>
+                  </Link>
+                ) : (
+                  <Divider sx={{ width: "24px" }} />
+                )}
               </Grid>
               <Grid item xs alignSelf="center">
-                <ListItemText sx={{ color: "#505050" }}>
-                  {video.album ? (
-                    <Link
-                      href={`/albums/${video.album}`}
-                      color="inherit"
-                      underline="none"
-                    >
-                      <ListItemText>{video.album}</ListItemText>
-                    </Link>
-                  ) : (
-                    <Divider sx={{ width: "24px" }} />
-                  )}
-                </ListItemText>
+                {video.album ? (
+                  <Link
+                    href={`/albums/${video.album}`}
+                    color="inherit"
+                    underline="none"
+                  >
+                    <ListItemText sx={{ color: "#505050" }}>
+                      {video.album}
+                    </ListItemText>
+                  </Link>
+                ) : (
+                  <Divider sx={{ width: "24px" }} />
+                )}
               </Grid>
               <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
                 {isHover || isMenuOpen || isPlMenuOpen ? (
@@ -308,17 +342,7 @@ const MediaItem = ({ playlist, video }) => {
                   <Stack>
                     <Typography>{video.title}</Typography>{" "}
                     <Typography sx={{ color: "#505050" }}>
-                      {video.album ? (
-                        <Link
-                          href={`/albums/${video.album}`}
-                          color="inherit"
-                          underline="none"
-                        >
-                          {video.album}
-                        </Link>
-                      ) : (
-                        "Artist • Album"
-                      )}
+                      {renderArtistAlbum(video)}
                     </Typography>
                   </Stack>
                 </Stack>
