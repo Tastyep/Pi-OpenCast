@@ -110,7 +110,11 @@ const MediaItem = observer(({ children, video, index }) => {
                 <ListItemText primary={video.title} />
                 <ListItemText
                   primary={durationToHMS(video.duration)}
-                  sx={{ textAlign: "right", minWidth: "max-content" }}
+                  sx={{
+                    textAlign: "right",
+                    minWidth: "max-content",
+                    marginLeft: "8px",
+                  }}
                 />
               </Stack>
               {downloadRatio > 0 && downloadRatio < 1 && (
@@ -196,7 +200,7 @@ const HomePage = observer(() => {
                 </Container>
               </Grid>
               <Grid item xs={4} sx={{ height: "100%", overflow: "auto" }}>
-                <Stack direction="row">
+                <Stack direction="row" sx={{ height: "100%" }}>
                   <Divider
                     orientation="vertical"
                     sx={{ background: "#F0F0F0", height: "auto" }}
@@ -208,6 +212,7 @@ const HomePage = observer(() => {
                           <List
                             ref={provided.innerRef}
                             subheader={<ListSubheader>UP NEXT</ListSubheader>}
+                            sx={{ width: "100%" }}
                           >
                             {videos.map((video, index) => (
                               <MediaItem
@@ -228,7 +233,7 @@ const HomePage = observer(() => {
               </Grid>
             </Grid>
           ) : (
-            <Stack sx={{ height: "100%" }}>
+            <Stack sx={{ height: "100%", width: "100%" }}>
               <div
                 style={{
                   width: "95%",

@@ -9,7 +9,7 @@ const MediasPage = observer(() => {
   const store = useAppStore();
 
   return (
-    <List sx={{ height: "100%", width: "100%" }}>
+    <List sx={{ height: `calc(100% - 16px)`, width: "100%" }}>
       {Object.values(store.videos).map((video) => (
         <MediaItem key={video.id} playlist={null} video={video} />
       ))}
