@@ -114,12 +114,10 @@ class PlayerProducer(DataProducer):
     def parent_producer(self):
         return super()
 
-    def play(self, source: str, playlist_id=None):
+    def play(self, source: str):
         video_id = IdentityService.id_video(source)
         player = self._population.last(Player)
-        if playlist_id is None:
-            playlist_id = player.queue
-        player.play(video_id, playlist_id)
+        player.play(video_id)
         video = self._population.find(Video, video_id)
         video.state = VideoState.READY
         video.start()

@@ -275,18 +275,14 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
     def test_starting_to_aborted(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id, self.workflow.video.id)
         self.workflow.to_STARTING(event)
-        cmd = self.expect_dispatch(
-            PlayerCmd.PlayVideo, self.player_id, self.video.id, self.player_playlist_id
-        )
+        cmd = self.expect_dispatch(PlayerCmd.PlayVideo, self.player_id, self.video.id)
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_ABORTED())
 
     def test_queueing_to_completed(self):
         event = QueueVideoWorkflow.Completed(self.workflow.id, self.workflow.video.id)
         self.workflow.to_STARTING(event)
-        cmd = self.expect_dispatch(
-            PlayerCmd.PlayVideo, self.player_id, self.video.id, self.player_playlist_id
-        )
+        cmd = self.expect_dispatch(PlayerCmd.PlayVideo, self.player_id, self.video.id)
         self.raise_event(
             PlayerEvt.PlayerStateUpdated,
             cmd.id,

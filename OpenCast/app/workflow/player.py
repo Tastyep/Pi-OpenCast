@@ -254,7 +254,6 @@ class StreamVideoWorkflow(Workflow):
             PlayerCmd.PlayVideo,
             IdentityService.id_player(),
             self.video.id,
-            self.playlist_id,
         )
 
     def on_enter_COMPLETED(self, _):

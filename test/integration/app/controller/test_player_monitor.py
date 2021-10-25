@@ -150,18 +150,13 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play(self):
-        playlist_id = IdentityService.id_playlist()
         video_id = IdentityService.id_video("source")
-        self.data_producer.playlist(playlist_id, "test", []).video(
+        self.data_producer.select(Player, IdentityService.id_player()).video(
             "source", state=VideoState.READY
         ).populate(self.data_facade)
         self.expect_and_raise(
-            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
+            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id),
             [
-                {
-                    "type": PlayerEvt.PlayerQueueUpdated,
-                    "args": {"queue": playlist_id},
-                },
                 {
                     "type": PlayerEvt.PlayerStateUpdated,
                     "args": {
@@ -182,7 +177,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
         resp = await self.client.post(
             "/api/player/play",
-            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+            params={"id": str(video_id)},
         )
         body = await resp.json()
         player = self.data_facade.player_repo.get_player()
@@ -191,44 +186,41 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_play_video_not_found(self):
-        playlist_id = IdentityService.id_playlist()
         video_id = IdentityService.id_video("source")
-        self.data_producer.playlist(playlist_id, "test", []).populate(self.data_facade)
 
         resp = await self.client.post(
             "/api/player/play",
-            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+            params={"id": str(video_id)},
         )
         self.assertEqual(404, resp.status)
 
     @unittest_run_loop
-    async def test_play_playlist_not_found(self):
-        playlist_id = IdentityService.id_playlist()
+    async def test_play_not_queued(self):
         video_id = IdentityService.id_video("source")
         self.data_producer.video("source").populate(self.data_facade)
-        playlist_id = IdentityService.id_playlist()
 
         resp = await self.client.post(
             "/api/player/play",
-            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+            params={"id": str(video_id)},
         )
-        self.assertEqual(404, resp.status)
+        body = await resp.json()
+        self.assertEqual(403, resp.status)
+        self.assertEqual({"message": "the video is not queued", "details": {}}, body)
 
     @unittest_run_loop
     async def test_play_error(self):
-        playlist_id = IdentityService.id_playlist()
-        self.data_producer.playlist(playlist_id, "test").video("source").populate(
-            self.data_facade
-        )
+        self.data_producer.select(Player, IdentityService.id_player()).video(
+            "source"
+        ).populate(self.data_facade)
         video_id = IdentityService.id_video("source")
         self.expect_and_error(
-            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id, playlist_id),
+            make_cmd(PlayerCmd.PlayVideo, self.player_id, video_id),
             error="Error message",
         )
 
         resp = await self.client.post(
             "/api/player/play",
-            params={"id": str(video_id), "playlist_id": str(playlist_id)},
+            params={"id": str(video_id)},
         )
         body = await resp.json()
         self.assertEqual(500, resp.status)

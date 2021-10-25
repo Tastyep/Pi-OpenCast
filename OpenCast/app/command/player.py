@@ -11,7 +11,6 @@ class CreatePlayer(Command):
 @command
 class PlayVideo(Command):
     video_id: ModelId
-    playlist_id: ModelId
 
 
 @command

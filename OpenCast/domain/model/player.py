@@ -84,11 +84,6 @@ class Player(Entity):
     def volume(self):
         return self._data.volume
 
-    @queue.setter
-    def queue(self, playlist_id: Id):
-        self._data.queue = playlist_id
-        self._record(Evt.PlayerQueueUpdated, self._data.queue)
-
     @subtitle_state.setter
     def subtitle_state(self, state):
         self._data.sub_state = state
@@ -115,13 +110,11 @@ class Player(Entity):
             Evt.PlayerStateUpdated, old_state, self._data.state, self._data.video_id
         )
 
-    def play(self, video_id: Id, playlist_id: Id):
+    def play(self, video_id: Id):
         if self._data.state is not State.STOPPED:
             raise DomainError("the player is already started")
 
         self._data.video_id = video_id
-        if self._data.queue != playlist_id:
-            self.queue = playlist_id
         self.state = State.PLAYING
 
     def stop(self):

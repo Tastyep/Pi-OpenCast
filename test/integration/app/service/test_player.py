@@ -1,5 +1,6 @@
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as Evt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import Player
@@ -17,7 +18,7 @@ class PlayerServiceTest(ServiceTestCase):
         self.video_repo = self.data_facade.video_repo
 
         self.player_id = IdentityService.id_player()
-        self.player_playlist_id = IdentityService.id_playlist()
+        self.player_playlist_id = HOME_PLAYLIST.id
 
     def test_create(self):
         self.evt_expecter.expect(
@@ -38,8 +39,6 @@ class PlayerServiceTest(ServiceTestCase):
 
         video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
-            Evt.PlayerQueueUpdated, self.player_id, self.player_playlist_id
-        ).expect(
             Evt.PlayerStateUpdated,
             self.player_id,
             PlayerState.STOPPED,
@@ -51,7 +50,7 @@ class PlayerServiceTest(ServiceTestCase):
             VideoState.READY,
             VideoState.PLAYING,  #
         ).from_(
-            Cmd.PlayVideo, self.player_id, video_id, self.player_playlist_id
+            Cmd.PlayVideo, self.player_id, video_id
         )
 
     def test_stop_player(self):
@@ -127,7 +126,7 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
     def test_change_video_volume(self):
-        self.data_producer.player().video("source").play("source", None).populate(
+        self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 

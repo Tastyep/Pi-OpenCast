@@ -25,18 +25,16 @@ class PlayerTest(ModelTestCase):
 
     def test_play(self):
         video_id = IdentityService.id_video("source")
-        playlist_id = IdentityService.id_playlist()
-        self.player.play(video_id, playlist_id)
+        self.player.play(video_id)
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.assertEqual(video_id, self.player.video_id)
-        self.assertEqual(playlist_id, self.player.queue)
-        self.expect_events(self.player, Evt.PlayerQueueUpdated, Evt.PlayerStateUpdated)
+        self.expect_events(self.player, Evt.PlayerStateUpdated)
 
     def test_play_already_playing(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.play(video_id)
         with self.assertRaises(DomainError) as ctx:
-            self.player.play(video_id, self.player.queue)
+            self.player.play(video_id)
         self.assertEqual("the player is already started", str(ctx.exception))
 
     def test_stop(self):
@@ -55,7 +53,7 @@ class PlayerTest(ModelTestCase):
 
     def test_toggle_pause(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.play(video_id)
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PAUSED, self.player.state)
         self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerStateUpdated)
@@ -67,7 +65,7 @@ class PlayerTest(ModelTestCase):
 
     def test_toggle_pause_twice(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.play(video_id)
         self.player.toggle_pause()
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PLAYING, self.player.state)
@@ -93,7 +91,7 @@ class PlayerTest(ModelTestCase):
 
     def test_seek_video(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.play(video_id)
         self.player.seek_video()
         self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.VideoSeeked)
 

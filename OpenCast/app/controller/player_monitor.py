@@ -12,6 +12,7 @@ from OpenCast.app.workflow.player import (
     StreamVideoWorkflow,
     Video,
 )
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import Player, PlayerSchema
@@ -180,13 +181,6 @@ class PlayerMonitController(MonitorController):
         parameters=[
             {
                 "in": "query",
-                "name": "playlist_id",
-                "description": "ID of the playlist",
-                "type": "string",
-                "required": True,
-            },
-            {
-                "in": "query",
                 "name": "id",
                 "description": "ID of the media",
                 "type": "string",
@@ -200,15 +194,16 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def play(self, req):
-        playlist_id = Id(req.query["playlist_id"])
         video_id = Id(req.query["id"])
-        if not self._playlist_repo.exists(playlist_id) or not self._video_repo.exists(
-            video_id
-        ):
+        if not self._video_repo.exists(video_id):
             return self._not_found()
 
+        playlist = self._playlist_repo.get(HOME_PLAYLIST.id)
+        if video_id not in playlist.ids:
+            return self._forbidden("the video is not queued")
+
         handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
-        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id, playlist_id)
+        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id)
 
         return await channel.receive()
 

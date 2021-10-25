@@ -17,11 +17,6 @@ class PlayerCreated(Event):
 
 
 @dataclass
-class PlayerQueueUpdated(Event):
-    queue: ModelId
-
-
-@dataclass
 class PlayerStateUpdated(Event):
     old: State
     new: State

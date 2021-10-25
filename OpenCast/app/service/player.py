@@ -41,7 +41,7 @@ class PlayerService(Service):
             # Stop the player so that it triggers observers of PlayerStateUpdated
             if player.state != PlayerState.STOPPED:
                 player.stop()
-            player.play(video.id, cmd.playlist_id)
+            player.play(video.id)
             video.start()
 
             self._player.play(video.location, video.streamable())

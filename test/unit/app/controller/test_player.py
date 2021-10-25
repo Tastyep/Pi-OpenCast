@@ -41,7 +41,6 @@ class PlayerControllerTest(ControllerTestCase):
                     "args": {
                         "model_id": self.player.id,
                         "video_id": next_video_id,
-                        "playlist_id": self.player.queue,
                     },
                 },
             ]
