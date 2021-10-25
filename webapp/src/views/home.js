@@ -68,11 +68,10 @@ const MediaItem = observer(({ children, video, index }) => {
   const store = useAppStore();
   const isPlayerPlaying = store.player.isPlaying;
   const playingVideo = store.playingVideo();
-  const playlistId = store.player.queue;
 
   const onMediaClicked = (media) => {
     if (!playingVideo || media.id !== playingVideo.id) {
-      playerAPI.playMedia(media.id, playlistId).catch(snackBarHandler(store));
+      playerAPI.playMedia(media.id).catch(snackBarHandler(store));
       return;
     }
     playerAPI.pauseMedia().catch(snackBarHandler(store));

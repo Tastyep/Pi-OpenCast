@@ -34,7 +34,17 @@ const PlaylistModal = (props) => {
 
   const createPlaylist = () => {
     const ids = videos.map((video) => video.id);
-    playlistAPI.create({ name: title, ids: ids }).catch(snackBarHandler(store));
+    playlistAPI
+      .create({ name: title, ids: ids })
+      .then((_) => {
+        store.enqueueSnackbar({
+          message: "playlist '" + title + "' created",
+          options: {
+            variant: "success",
+          },
+        });
+      })
+      .catch(snackBarHandler(store));
     close();
   };
 

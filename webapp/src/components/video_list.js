@@ -2,7 +2,6 @@ import React from "react";
 
 import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import Stack from "@mui/material/Stack";
-import { styled } from "@mui/material/styles";
 
 import noPreview from "images/no-preview.png";
 
@@ -13,19 +12,12 @@ import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "./app_context";
 
-const ImageListContainer = styled("div")({
-  display: "flex",
-  flexWrap: "wrap",
-  justifyContent: "center",
-  overflow: "hidden",
-});
-
 const VideoList = observer(({ videos }) => {
   const store = useAppStore();
 
   const playMedia = (video) => {
     playerAPI
-      .playMedia(video.id, store.player.queue)
+      .playMedia(video.id)
       .then((_) => {})
       .catch(snackBarHandler(store));
   };

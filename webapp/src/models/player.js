@@ -36,7 +36,6 @@ export default class Player {
 
     eventDispatcher.observe(
       {
-        PlayerQueueUpdated: (e) => this.setQueue(e.queue),
         PlayerStateUpdated: (e) => this.onPlayerStateUpdated(e),
         VolumeUpdated: (e) => this.setVolume(e.volume),
         SubtitleStateUpdated: (e) => this.setSubState(e.state),
