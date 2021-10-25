@@ -31,6 +31,7 @@ import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { durationToHMS } from "services/duration";
+import { queueNext } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import videoAPI from "services/api/video";
@@ -172,6 +173,23 @@ const MediaItem = ({ playlist, video }) => {
     setAnchorPl(null);
   };
 
+  const playNext = (video) => {
+    closeMenu();
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      video.id
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        if (store.player.isStopped) {
+          playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+        }
+      })
+      .catch(snackBarHandler(store));
+  };
+
   const selectPlaylist = () => {
     setAnchorPl(anchor);
     closeMenu();
@@ -180,7 +198,9 @@ const MediaItem = ({ playlist, video }) => {
   const addToPlaylist = (playlist, video) => {
     closePlMenu();
     playlist.ids.push(video.id);
-    playlistAPI.update(playlist.id, { ids: playlist.ids });
+    playlistAPI
+      .update(playlist.id, { ids: playlist.ids })
+      .catch(snackBarHandler(store));
   };
 
   const playVideo = (video) => {
@@ -283,7 +303,7 @@ const MediaItem = ({ playlist, video }) => {
                       transformOrigin={{ horizontal: "right", vertical: "top" }}
                       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                     >
-                      <MenuItem onClick={closeMenu}>
+                      <MenuItem onClick={() => playNext(video)}>
                         <ListItemIcon>
                           <PlaylistPlayIcon />
                         </ListItemIcon>

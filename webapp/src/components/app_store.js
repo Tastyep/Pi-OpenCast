@@ -122,6 +122,10 @@ export class AppStore {
     playlist.ids = playlist.ids.filter((id) => id !== videoId);
   }
 
+  get playerPlaylist() {
+    return this.playlists[this.player.queue];
+  }
+
   playlistVideos(id) {
     return computed(() => {
       if (!Object.keys(this.playlists).includes(id)) {
