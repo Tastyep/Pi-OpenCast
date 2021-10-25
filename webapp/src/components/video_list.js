@@ -8,7 +8,9 @@ import noPreview from "images/no-preview.png";
 import { observer } from "mobx-react-lite";
 
 import playerAPI from "services/api/player";
+import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
+import { queueNext } from "services/playlist";
 
 import { useAppStore } from "./app_context";
 
@@ -16,10 +18,19 @@ const VideoList = observer(({ videos }) => {
   const store = useAppStore();
 
   const playMedia = (video) => {
-    playerAPI
-      .playMedia(video.id)
-      .then((_) => {})
-      .catch(snackBarHandler(store));
+    const playerPlaylist = store.playerPlaylist;
+
+    if (playerPlaylist.ids.includes(video.id)) {
+      playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+    } else {
+      const ids = queueNext(playerPlaylist, store.player.videoId, video.id);
+      playlistAPI
+        .update(playerPlaylist.id, { ids: ids })
+        .then(() => {
+          playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+        })
+        .catch(snackBarHandler(store));
+    }
   };
 
   const MediaItem = ({ media }) => {

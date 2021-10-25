@@ -204,8 +204,19 @@ const MediaItem = ({ playlist, video }) => {
   };
 
   const playVideo = (video) => {
-    closePlMenu();
-    playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+    const playerPlaylist = store.playerPlaylist;
+
+    if (playerPlaylist.ids.includes(video.id)) {
+      playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+    } else {
+      const ids = queueNext(playerPlaylist, store.player.videoId, video.id);
+      playlistAPI
+        .update(playerPlaylist.id, { ids: ids })
+        .then(() => {
+          playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+        })
+        .catch(snackBarHandler(store));
+    }
   };
 
   const removePlaylistVideo = (playlist, video) => {
@@ -353,15 +364,23 @@ const MediaItem = ({ playlist, video }) => {
             <Grid container alignItems="center">
               <Grid item xs>
                 <Stack direction="row" alignItems="center">
-                  <ListItemAvatar>
+                  <IconButton
+                    sx={{ marginRight: "8px" }}
+                    onClick={() => playVideo(video)}
+                  >
                     <Avatar alt={video.title} src={video.thumbnail} />
-                  </ListItemAvatar>
-                  <Stack>
+                  </IconButton>
+                  <Link
+                    href="#"
+                    color="inherit"
+                    underline="none"
+                    onClick={() => playVideo(video)}
+                  >
                     <Typography>{video.title}</Typography>{" "}
                     <Typography sx={{ color: "#505050" }}>
                       {renderArtistAlbum(video)}
                     </Typography>
-                  </Stack>
+                  </Link>
                 </Stack>
               </Grid>
               <Grid item alignSelf="center">
