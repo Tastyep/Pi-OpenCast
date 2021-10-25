@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 import { TextField, Button, Stack } from "@mui/material";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import AddToQueueIcon from "@mui/icons-material/AddToQueue";
+import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
@@ -49,7 +49,7 @@ const StreamInput = () => {
           sx={{ marginLeft: "24px", color: "#333333", borderColor: "#8F8F8F" }}
           onClick={handleActionChange}
         >
-          {cast ? <PlayArrowIcon /> : <AddToQueueIcon />}
+          {cast ? <PlaylistPlayIcon /> : <PlaylistAddIcon />}
         </Button>
       </Stack>
     </form>
