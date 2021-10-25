@@ -22,6 +22,7 @@ import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
+import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 
 import Popper from "@mui/material/Popper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -31,7 +32,7 @@ import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { durationToHMS } from "services/duration";
-import { queueNext } from "services/playlist";
+import { queueNext, queueLast } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import videoAPI from "services/api/video";
@@ -190,6 +191,22 @@ const MediaItem = ({ playlist, video }) => {
       .catch(snackBarHandler(store));
   };
 
+  const queue = (video) => {
+    closeMenu();
+    const playlistIds = queueLast(store.playerPlaylist, video.id);
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        store.enqueueSnackbar({
+          message: video.title + " queued",
+          options: {
+            variant: "success",
+          },
+        });
+      })
+      .catch(snackBarHandler(store));
+  };
+
   const selectPlaylist = () => {
     setAnchorPl(anchor);
     closeMenu();
@@ -319,6 +336,12 @@ const MediaItem = ({ playlist, video }) => {
                           <PlaylistPlayIcon />
                         </ListItemIcon>
                         <ListItemText>Play next</ListItemText>
+                      </MenuItem>
+                      <MenuItem onClick={() => queue(video)}>
+                        <ListItemIcon>
+                          <QueueMusicIcon />
+                        </ListItemIcon>
+                        <ListItemText>Add to queue</ListItemText>
                       </MenuItem>
                       <MenuItem onClick={selectPlaylist}>
                         <ListItemIcon>

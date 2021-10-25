@@ -13,4 +13,15 @@ function queueNext(playlist, activeMediaId, mediaId) {
   return ids;
 }
 
-export { queueNext };
+function queueLast(playlist, mediaId) {
+  let ids = Array.from(playlist.ids);
+  const mediaIdx = ids.indexOf(mediaId);
+
+  if (mediaIdx !== -1) {
+    ids.splice(mediaIdx, 1);
+  }
+  ids.push(mediaId);
+  return ids;
+}
+
+export { queueNext, queueLast };
