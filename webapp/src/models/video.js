@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from "mobx";
 
+// eslint-disable-next-line no-unused-vars
 const VideoState = {
   CREATED: "CREATED",
   COLLECTING: "COLLECTING",

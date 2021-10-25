@@ -15,8 +15,11 @@ import {
   LinearProgress,
   Stack,
 } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -137,6 +140,12 @@ const HomePage = observer(() => {
   const videos = store.playlistVideos(playlistId);
   const playingVideo = store.playingVideo();
 
+  const emptyPlaylist = () => {
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: [] })
+      .catch(snackBarHandler(store));
+  };
+
   const onDragEnd = useCallback(
     (result) => {
       const { destination, source, draggableId } = result;
@@ -158,9 +167,13 @@ const HomePage = observer(() => {
 
       const destPlaylist = store.playlists[destination.droppableId];
       const srcPlaylist = store.playlists[source.droppableId];
-      playlistAPI.update(destination.droppableId, { ids: destPlaylist.ids });
+      playlistAPI
+        .update(destination.droppableId, { ids: destPlaylist.ids })
+        .catch(snackBarHandler(store));
       if (destination.dropppableId !== source.droppableId) {
-        playlistAPI.update(source.droppableId, { ids: srcPlaylist.ids });
+        playlistAPI
+          .update(source.droppableId, { ids: srcPlaylist.ids })
+          .catch(snackBarHandler(store));
       }
     },
     [store]
@@ -210,7 +223,21 @@ const HomePage = observer(() => {
                         {(provided, snapshot) => (
                           <List
                             ref={provided.innerRef}
-                            subheader={<ListSubheader>UP NEXT</ListSubheader>}
+                            subheader={
+                              <ListSubheader>
+                                <Stack direction="row" alignItems="center">
+                                  <Typography sx={{ color: "#666666" }}>
+                                    UP NEXT
+                                  </Typography>
+                                  <IconButton
+                                    sx={{ marginLeft: "auto" }}
+                                    onClick={emptyPlaylist}
+                                  >
+                                    <ClearAllIcon />
+                                  </IconButton>
+                                </Stack>
+                              </ListSubheader>
+                            }
                             sx={{ width: "100%" }}
                           >
                             {videos.map((video, index) => (
@@ -250,7 +277,21 @@ const HomePage = observer(() => {
                       {(provided, snapshot) => (
                         <List
                           ref={provided.innerRef}
-                          subheader={<ListSubheader>UP NEXT</ListSubheader>}
+                          subheader={
+                            <ListSubheader>
+                              <Stack direction="row" alignItems="center">
+                                <Typography sx={{ color: "#666666" }}>
+                                  UP NEXT
+                                </Typography>
+                                <IconButton
+                                  sx={{ marginLeft: "auto" }}
+                                  onClick={emptyPlaylist}
+                                >
+                                  <ClearAllIcon />
+                                </IconButton>
+                              </Stack>
+                            </ListSubheader>
+                          }
                         >
                           {videos.map((video, index) => (
                             <MediaItem

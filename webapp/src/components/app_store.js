@@ -156,7 +156,7 @@ export class AppStore {
     delete this.videos[id];
   }
   playingVideo() {
-    if (!this.player.videoId) {
+    if (!this.player.videoId || this.player.isStopped) {
       return null;
     }
     return this.videos[this.player.videoId];
