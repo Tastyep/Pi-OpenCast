@@ -55,20 +55,18 @@ const VideoList = observer(({ videos }) => {
           backgroundSize: "cover",
         }}
       >
-        <>
-          <img
-            src={media.thumbnail === null ? noPreview : media.thumbnail}
-            alt={media.title}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              backgroundColor: "rgba(0,0,0,0.66)",
-            }}
-            onClick={() => playMedia(media)}
-          />
-          <ImageListItemBar title={media.title} sx={{ textAlign: "center" }} />
-        </>
+        <img
+          src={media.thumbnail === null ? noPreview : media.thumbnail}
+          alt={media.title}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            backgroundColor: "rgba(0,0,0,0.66)",
+          }}
+          onClick={() => playMedia(media)}
+        />
+        <ImageListItemBar title={media.title} sx={{ textAlign: "center" }} />
       </ImageListItem>
     );
   };

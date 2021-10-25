@@ -24,7 +24,6 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 
 import Popper from "@mui/material/Popper";
-import Grow from "@mui/material/Grow";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MenuList from "@mui/material/MenuList";
 
@@ -137,14 +136,12 @@ const PlaylistMenu = (props) => {
                   setModalOpen(true);
                 }}
                 sx={{
-                  height: "48px",
-                  transform: "translate(-8px, -48px)",
-                  marginBottom: "-40px",
+                  height: "40px",
+                  transform: "translate(-8px, -40px)",
+                  marginBottom: "-32px",
                   marginLeft: "auto",
                   borderRadius: "100px",
-                  bottom: "8px",
-                  right: "16px",
-                  padding: "15px 20px",
+                  right: "8px",
                 }}
               >
                 New playlist
