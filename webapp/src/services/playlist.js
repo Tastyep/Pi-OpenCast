@@ -1,27 +1,50 @@
-function queueNext(playlist, activeMediaId, mediaId) {
-  let ids = Array.from(playlist.ids);
-  const activeIdx = ids.indexOf(activeMediaId);
-  const mediaIdx = ids.indexOf(mediaId);
-  const insertIdx = activeIdx === -1 ? 0 : activeIdx + 1;
+function queueNext(playlist, activeMediaId, mediaIds) {
+  let activeMediaIdx = playlist.ids.indexOf(activeMediaId);
 
-  if (mediaIdx === -1) {
-    ids.splice(insertIdx, 0, mediaId);
-  } else {
-    // move the media to its new position
-    ids.splice(insertIdx, 0, ids.splice(mediaIdx, 1)[0]);
+  // Remove the currently playing video from the given ids (if present)
+  if (activeMediaIdx !== -1) {
+    const activeDuplicateIdx = mediaIds.indexOf(activeMediaId);
+
+    if (activeDuplicateIdx !== -1) {
+      mediaIds.splice(activeDuplicateIdx, 1);
+    }
   }
-  return ids;
+
+  // Remove duplicates by removing already queued medias
+  // [1,2,3] + [a,B,c,3] = [1,2,3,a,B,c]
+  let ids = mediaIds.concat(Array.from(playlist.ids));
+  ids = [...new Set(ids)];
+  if (activeMediaIdx === -1) {
+    return ids;
+  }
+
+  // [1,2,3,a,B,c] -> [a,B] -> [a,B,1,2,3] -> [a,B,1,2,3,c]
+  activeMediaIdx = ids.indexOf(activeMediaId, mediaIds.length);
+  return ids
+    .slice(mediaIds.length, activeMediaIdx + 1)
+    .concat(ids.slice(0, mediaIds.length))
+    .concat(ids.slice(activeMediaIdx + 1));
 }
 
-function queueLast(playlist, mediaId) {
-  let ids = Array.from(playlist.ids);
-  const mediaIdx = ids.indexOf(mediaId);
+function queueLast(playlist, activeMediaId, mediaIds) {
+  let activeMediaIdx = playlist.ids.indexOf(activeMediaId);
 
-  if (mediaIdx !== -1) {
-    ids.splice(mediaIdx, 1);
+  // Remove the currently playing video from the given ids (if present)
+  if (activeMediaIdx !== -1) {
+    const activeDuplicateIdx = mediaIds.indexOf(activeMediaId);
+
+    if (activeDuplicateIdx !== -1) {
+      mediaIds.splice(activeDuplicateIdx, 1);
+    }
   }
-  ids.push(mediaId);
-  return ids;
+
+  // Remove duplicates by removing already queued medias
+  // [1,2,3] + [a,B,c,3] = [1,2,3,a,B,c]
+  let ids = mediaIds.concat(Array.from(playlist.ids));
+  ids = [...new Set(ids)];
+
+  // [1,2,3,a,B,c] -> [a,B,c,1,2,3]
+  return ids.slice(mediaIds.length).concat(ids.slice(0, mediaIds.length));
 }
 
 export { queueNext, queueLast };

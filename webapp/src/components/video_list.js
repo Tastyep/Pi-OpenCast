@@ -23,7 +23,7 @@ const VideoList = observer(({ videos }) => {
     if (playerPlaylist.ids.includes(video.id)) {
       playerAPI.playMedia(video.id).catch(snackBarHandler(store));
     } else {
-      const ids = queueNext(playerPlaylist, store.player.videoId, video.id);
+      const ids = queueNext(playerPlaylist, store.player.videoId, [video.id]);
       playlistAPI
         .update(playerPlaylist.id, { ids: ids })
         .then(() => {

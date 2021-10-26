@@ -8,7 +8,6 @@ import {
   Grid,
   Link,
   ListItem,
-  ListItemAvatar,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -176,11 +175,9 @@ const MediaItem = ({ playlist, video }) => {
 
   const playNext = (video) => {
     closeMenu();
-    const playlistIds = queueNext(
-      store.playerPlaylist,
-      store.player.videoId,
-      video.id
-    );
+    const playlistIds = queueNext(store.playerPlaylist, store.player.videoId, [
+      video.id,
+    ]);
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
@@ -193,7 +190,9 @@ const MediaItem = ({ playlist, video }) => {
 
   const queue = (video) => {
     closeMenu();
-    const playlistIds = queueLast(store.playerPlaylist, video.id);
+    const playlistIds = queueLast(store.playerPlaylist, store.player.videoId, [
+      video.id,
+    ]);
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
@@ -226,7 +225,7 @@ const MediaItem = ({ playlist, video }) => {
     if (playerPlaylist.ids.includes(video.id)) {
       playerAPI.playMedia(video.id).catch(snackBarHandler(store));
     } else {
-      const ids = queueNext(playerPlaylist, store.player.videoId, video.id);
+      const ids = queueNext(playerPlaylist, store.player.videoId, [video.id]);
       playlistAPI
         .update(playerPlaylist.id, { ids: ids })
         .then(() => {
