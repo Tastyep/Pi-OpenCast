@@ -14,6 +14,8 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 
 import { styled } from "@mui/material/styles";
 
@@ -21,7 +23,9 @@ import { Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
+import { queueNext, queueLast } from "services/playlist";
 import playlistAPI from "services/api/playlist";
+import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "components/app_context";
@@ -59,6 +63,44 @@ const PlaylistItem = ({ playlist }) => {
   const closeMenu = () => {
     setAnchor(null);
   };
+
+  const playNext = (playlist) => {
+    closeMenu();
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      playlist.ids
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        if (store.player.isStopped) {
+          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+        }
+      })
+      .catch(snackBarHandler(store));
+  };
+
+  const queue = (playlist) => {
+    closeMenu();
+    const playlistIds = queueLast(
+      store.playerPlaylist,
+      store.player.videoId,
+      playlist.ids
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        store.enqueueSnackbar({
+          message: playlist.name + " queued",
+          options: {
+            variant: "success",
+          },
+        });
+      })
+      .catch(snackBarHandler(store));
+  };
+
   const removePlaylist = (playlist) => {
     closeMenu();
     playlistAPI.delete_(playlist.id).catch(snackBarHandler(store));
@@ -98,6 +140,18 @@ const PlaylistItem = ({ playlist }) => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
+        <MenuItem onClick={() => playNext(playlist)}>
+          <ListItemIcon>
+            <PlaylistPlayIcon />
+          </ListItemIcon>
+          <ListItemText>Play next</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => queue(playlist)}>
+          <ListItemIcon>
+            <QueueMusicIcon />
+          </ListItemIcon>
+          <ListItemText>Add to queue</ListItemText>
+        </MenuItem>
         <MenuItem onClick={() => removePlaylist(playlist)}>
           <ListItemIcon>
             <DeleteIcon />
