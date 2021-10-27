@@ -12,7 +12,7 @@ function queueNext(playlist, activeMediaId, mediaIds) {
 
   // Remove duplicates by removing already queued medias
   // [1,2,3] + [a,B,c,3] = [1,2,3,a,B,c]
-  let ids = mediaIds.concat(Array.from(playlist.ids));
+  let ids = mediaIds.concat(playlist.ids);
   ids = [...new Set(ids)];
   if (activeMediaIdx === -1) {
     return ids;
@@ -40,11 +40,22 @@ function queueLast(playlist, activeMediaId, mediaIds) {
 
   // Remove duplicates by removing already queued medias
   // [1,2,3] + [a,B,c,3] = [1,2,3,a,B,c]
-  let ids = mediaIds.concat(Array.from(playlist.ids));
+  let ids = mediaIds.concat(playlist.ids);
   ids = [...new Set(ids)];
 
   // [1,2,3,a,B,c] -> [a,B,c,1,2,3]
   return ids.slice(mediaIds.length).concat(ids.slice(0, mediaIds.length));
 }
 
-export { queueNext, queueLast };
+function shuffleIds(ids) {
+  let shuffledIds = Array.from(ids);
+
+  for (let i = shuffledIds.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledIds[i], shuffledIds[j]] = [shuffledIds[j], shuffledIds[i]];
+  }
+
+  return shuffledIds;
+}
+
+export { queueNext, queueLast, shuffleIds };

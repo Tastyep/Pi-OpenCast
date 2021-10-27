@@ -16,6 +16,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
+import ShuffleIcon from "@mui/icons-material/Shuffle";
 
 import { styled } from "@mui/material/styles";
 
@@ -23,7 +24,7 @@ import { Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
-import { queueNext, queueLast } from "services/playlist";
+import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
@@ -62,6 +63,24 @@ const PlaylistItem = ({ playlist }) => {
 
   const closeMenu = () => {
     setAnchor(null);
+  };
+
+  const shufflePlayNext = (playlist) => {
+    closeMenu();
+
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      shuffleIds(playlist.ids)
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        if (store.player.isStopped) {
+          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+        }
+      })
+      .catch(snackBarHandler(store));
   };
 
   const playNext = (playlist) => {
@@ -140,6 +159,12 @@ const PlaylistItem = ({ playlist }) => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
+        <MenuItem onClick={() => shufflePlayNext(playlist)}>
+          <ListItemIcon>
+            <ShuffleIcon />
+          </ListItemIcon>
+          <ListItemText>Shuffle play</ListItemText>
+        </MenuItem>
         <MenuItem onClick={() => playNext(playlist)}>
           <ListItemIcon>
             <PlaylistPlayIcon />
