@@ -14,8 +14,8 @@ export default class Video {
   sourceProtocol = "";
   title = "";
   duration = 0;
-  total_playing_duration = 0;
-  last_play = null;
+  totalPlayingDuration = 0;
+  lastPlay = null;
   collectionId = null;
   artist = "";
   album = "";
@@ -31,8 +31,8 @@ export default class Video {
     this.sourceProtocol = state.source_protocol;
     this.title = state.title;
     this.duration = state.duration;
-    this.total_playing_duration = state.total_playing_duration;
-    this.last_play = state.last_play;
+    this.totalPlayingDuration = state.total_playing_duration;
+    this.lastPlay = state.last_play;
     this.collectionId = state.collection_id;
     this.artist = state.artist;
     this.album = state.album;
@@ -43,15 +43,38 @@ export default class Video {
     this.state = state.state;
 
     makeObservable(this, {
+      state: observable,
+      totalPlayingDuration: observable,
+      lastPlay: observable,
       downloadRatio: observable,
 
+      setState: action,
+      setTotalPlayingDuration: action,
+      setLastPlay: action,
       _setDownloadRatio: action,
     });
 
     eventDispatcher.observe(
-      { DownloadInfo: (e) => this._setDownloadRatio(e) },
+      {
+        DownloadInfo: (e) => this._setDownloadRatio(e),
+        VideoStateUpdated: (e) => {
+          this.setState(e.new);
+          this.setTotalPlayingDuration(e.total_playing_duration);
+          this.setLastPlay(e.last_play);
+        },
+      },
       this.id
     );
+  }
+
+  setState(state) {
+    this.state = state;
+  }
+  setTotalPlayingDuration(duration) {
+    this.totalPlayingDuration = duration;
+  }
+  setLastPlay(lastPlay) {
+    this.lastPlay = lastPlay;
   }
 
   _setDownloadRatio(e) {

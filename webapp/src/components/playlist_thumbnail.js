@@ -4,7 +4,7 @@ import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 const listPopularVideos = (videos) => {
   return videos
     .sort((a, b) => {
-      return a.total_playing_duration < b.total_playing_duration;
+      return a.totalPlayingDuration < b.totalPlayingDuration;
     })
     .slice(0, 4);
 };

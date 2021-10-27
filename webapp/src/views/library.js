@@ -36,7 +36,7 @@ const SubPageContainer = styled("div")({
 const listLastPlayedVideos = (videos) => {
   return Object.values(videos)
     .sort((a, b) => {
-      return new Date(a.last_play) < new Date(b.last_play);
+      return new Date(a.lastPlay) < new Date(b.lastPlay);
     })
     .slice(0, 6);
 };
@@ -44,7 +44,7 @@ const listLastPlayedVideos = (videos) => {
 const listPopularVideos = (videos) => {
   return Object.values(videos)
     .sort((a, b) => {
-      return a.total_playing_duration < b.total_playing_duration;
+      return a.totalPlayingDuration < b.totalPlayingDuration;
     })
     .slice(0, 6);
 };
