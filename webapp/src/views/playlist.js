@@ -1,10 +1,21 @@
 import { useState } from "react";
 
 import { Box, Button, Divider, List, Stack, Typography } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
+
 import EditIcon from "@mui/icons-material/Edit";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import QueueMusicIcon from "@mui/icons-material/QueueMusic";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+
 import { styled } from "@mui/material/styles";
 
 import { useParams } from "react-router-dom";
@@ -82,11 +93,98 @@ const UpdateModal = (props) => {
   );
 };
 
+const PlaylistMenu = (props) => {
+  const store = useAppStore();
+  const { open, anchorEl, playlist, closeMenu } = props;
+
+  const playNext = (playlist) => {
+    closeMenu();
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      playlist.ids
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        if (store.player.isStopped) {
+          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+        }
+      })
+      .catch(snackBarHandler(store));
+  };
+
+  const queue = (playlist) => {
+    closeMenu();
+    const playlistIds = queueLast(
+      store.playerPlaylist,
+      store.player.videoId,
+      playlist.ids
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        store.enqueueSnackbar({
+          message: playlist.name + " queued",
+          options: {
+            variant: "success",
+          },
+        });
+      })
+      .catch(snackBarHandler(store));
+  };
+
+  const removePlaylist = (playlist) => {
+    closeMenu();
+    playlistAPI
+      .delete_(playlist.id)
+      .then((_) => {
+        window.location.href = "/library/playlists";
+      })
+      .catch(snackBarHandler(store));
+  };
+
+  return (
+    <Menu
+      id="playlist-menu"
+      anchorEl={anchorEl}
+      open={open}
+      onClose={closeMenu}
+      MenuListProps={{
+        "aria-labelledby": "basic-button",
+      }}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+    >
+      <MenuItem onClick={() => playNext(playlist)}>
+        <ListItemIcon>
+          <PlaylistPlayIcon />
+        </ListItemIcon>
+        <ListItemText>Play next</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={() => queue(playlist)}>
+        <ListItemIcon>
+          <QueueMusicIcon />
+        </ListItemIcon>
+        <ListItemText>Add to queue</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={() => removePlaylist(playlist)}>
+        <ListItemIcon>
+          <DeleteIcon />
+        </ListItemIcon>
+        <ListItemText>Delete playlist</ListItemText>
+      </MenuItem>
+    </Menu>
+  );
+};
+
 const PlaylistPage = observer(() => {
   const store = useAppStore();
   const { id } = useParams();
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const [anchor, setAnchor] = useState(null);
+  const isMenuOpen = Boolean(anchor);
 
   const playlist = store.playlists[id];
   const videos = store.playlistVideos(id);
@@ -134,23 +232,39 @@ const PlaylistPage = observer(() => {
         <Box>
           <Typography variant="h4">{playlist.name}</Typography>
           <Typography>{videos.length} medias</Typography>
-          <Stack direction="row" sx={{ marginTop: "16px" }}>
-            <Button
-              variant="contained"
-              startIcon={<ShuffleIcon />}
-              sx={{ alignItems: "flex-start", marginRight: "8px" }}
-              onClick={() => shufflePlayNext(playlist)}
+          <Stack direction="row" alignItems="center" sx={{ marginTop: "16px" }}>
+            <Box>
+              <Button
+                variant="contained"
+                startIcon={<ShuffleIcon />}
+                sx={{ alignItems: "flex-start", marginRight: "8px" }}
+                onClick={() => shufflePlayNext(playlist)}
+              >
+                Shuffle
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<EditIcon />}
+                sx={{ alignItems: "flex-start" }}
+                onClick={() => setModalOpen(true)}
+              >
+                Edit playlist
+              </Button>
+            </Box>
+            <IconButton
+              aria-controls="playlist-menu"
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen ? "true" : undefined}
+              onClick={(e) => setAnchor(e.currentTarget)}
             >
-              Shuffle
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
-              sx={{ alignItems: "flex-start" }}
-              onClick={() => setModalOpen(true)}
-            >
-              Edit playlist
-            </Button>
+              <MoreVertIcon />
+            </IconButton>
+            <PlaylistMenu
+              open={isMenuOpen}
+              anchorEl={anchor}
+              playlist={playlist}
+              closeMenu={() => setAnchor(null)}
+            />
           </Stack>
         </Box>
       </Box>
