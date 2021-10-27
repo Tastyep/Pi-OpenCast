@@ -105,6 +105,11 @@ const MediaItem = observer(({ children, video, index }) => {
             disableRipple
             autoFocus={playingVideo && video.id === playingVideo.id}
             onClick={() => onMediaClicked(video)}
+            sx={
+              playingVideo && video.id === playingVideo.id
+                ? { backgroundColor: "rgba(246,250,254,1)" }
+                : {}
+            }
           >
             <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
               <Stack direction="row" alignItems="center">
