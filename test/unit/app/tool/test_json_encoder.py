@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from enum import Enum
 from test.util import TestCase
 
@@ -12,7 +13,7 @@ from OpenCast.domain.event.video import VideoCreated
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.video import Path
 from OpenCast.domain.model.video import State as VideoState
-from OpenCast.domain.model.video import Stream, Video, datetime, timedelta
+from OpenCast.domain.model.video import Stream, Video
 from OpenCast.domain.service.identity import IdentityService
 
 
@@ -31,6 +32,14 @@ class EnhancedEncoderTest(TestCase):
 
         color = Color.RED
         json.dumps({"color": color}, cls=EnhancedJSONEncoder)
+
+    def test_encode_datetime(self):
+        now = datetime.now()
+        json.dumps({"now": now}, cls=EnhancedJSONEncoder)
+
+    def test_encode_timedelta(self):
+        duration = timedelta()
+        json.dumps({"duration": duration}, cls=EnhancedJSONEncoder)
 
 
 class ModelEncoderTest(TestCase):

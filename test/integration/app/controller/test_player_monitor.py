@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import make_cmd
@@ -170,6 +172,8 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                     "args": {
                         "old": VideoState.READY,
                         "new": VideoState.PLAYING,
+                        "total_playing_duration": timedelta(),
+                        "last_play": datetime.now(),
                     },
                 },
             ],

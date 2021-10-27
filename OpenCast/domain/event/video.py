@@ -2,6 +2,7 @@
 
 
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -47,3 +48,5 @@ class VideoSubtitleFetched(Event):
 class VideoStateUpdated(Event):
     old: State
     new: State
+    total_playing_duration: timedelta
+    last_play: datetime

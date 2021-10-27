@@ -187,7 +187,13 @@ class Video(Entity):
 
         old = self._data.state
         self._data.state = state
-        self._record(Evt.VideoStateUpdated, old, self._data.state)
+        self._record(
+            Evt.VideoStateUpdated,
+            old,
+            self._data.state,
+            self._data.total_playing_duration,
+            self._data.last_play,
+        )
 
     def streamable(self):
         return self._data.source_protocol in ["m3u8"]

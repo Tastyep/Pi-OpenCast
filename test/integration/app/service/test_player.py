@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from unittest.mock import patch
+
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.constant import HOME_PLAYLIST
@@ -32,7 +35,11 @@ class PlayerServiceTest(ServiceTestCase):
         ).from_(Cmd.CreatePlayer, self.player_id, self.player_playlist_id)
         self.media_player.set_volume.assert_called_once_with(70)
 
-    def test_play_video(self):
+    @patch("OpenCast.domain.model.video.datetime")
+    def test_play_video(self, datetime_mock):
+        now = datetime.now()
+        datetime_mock.now.return_value = now
+
         self.data_producer.player().video("source", state=VideoState.READY).populate(
             self.data_facade
         )
@@ -48,12 +55,18 @@ class PlayerServiceTest(ServiceTestCase):
             VideoEvt.VideoStateUpdated,
             video_id,
             VideoState.READY,
-            VideoState.PLAYING,  #
+            VideoState.PLAYING,
+            timedelta(),
+            now,
         ).from_(
             Cmd.PlayVideo, self.player_id, video_id
         )
 
-    def test_stop_player(self):
+    @patch("OpenCast.domain.model.video.datetime")
+    def test_stop_player(self, datetime_mock):
+        now = datetime.now()
+        datetime_mock.now.return_value = now
+
         self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
@@ -69,12 +82,18 @@ class PlayerServiceTest(ServiceTestCase):
             VideoEvt.VideoStateUpdated,
             video_id,
             VideoState.PLAYING,
-            VideoState.READY,  #
+            VideoState.READY,
+            timedelta(),
+            now,
         ).from_(
             Cmd.StopPlayer, self.player_id
         )
 
-    def test_toggle_player_state(self):
+    @patch("OpenCast.domain.model.video.datetime")
+    def test_toggle_player_state(self, datetime_mock):
+        now = datetime.now()
+        datetime_mock.now.return_value = now
+
         self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
@@ -91,6 +110,8 @@ class PlayerServiceTest(ServiceTestCase):
             video_id,
             VideoState.PLAYING,
             VideoState.READY,  #
+            timedelta(),
+            now,
         ).from_(
             Cmd.TogglePlayerState, self.player_id
         )
@@ -105,6 +126,8 @@ class PlayerServiceTest(ServiceTestCase):
             video_id,
             VideoState.READY,
             VideoState.PLAYING,  #
+            timedelta(),
+            now,
         ).from_(
             Cmd.TogglePlayerState, self.player_id
         )

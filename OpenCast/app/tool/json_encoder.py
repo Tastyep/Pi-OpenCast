@@ -1,5 +1,6 @@
 """ Custom JSON encoder definitions """
 
+from datetime import datetime, timedelta
 from enum import Enum
 from json import JSONEncoder
 from pathlib import PosixPath
@@ -16,6 +17,10 @@ class EnhancedJSONEncoder(JSONEncoder):
             return str(obj)
         if isinstance(obj, Enum):
             return obj.name
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, timedelta):
+            return obj.total_seconds()
         return super().default(obj)
 
 
