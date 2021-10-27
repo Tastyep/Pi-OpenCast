@@ -4,18 +4,21 @@ import { Box, Button, Divider, List, Stack, Typography } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import EditIcon from "@mui/icons-material/Edit";
+import ShuffleIcon from "@mui/icons-material/Shuffle";
 import { styled } from "@mui/material/styles";
 
 import { useParams } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
+import { queueNext, queueLast, shuffleIds } from "services/playlist";
+import playlistAPI from "services/api/playlist";
+import playerAPI from "services/api/player";
+import snackBarHandler from "services/api/error";
+
 import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
 import MediaItem from "components/media_item";
-
-import playlistAPI from "services/api/playlist";
-import snackBarHandler from "services/api/error";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -88,6 +91,22 @@ const PlaylistPage = observer(() => {
   const playlist = store.playlists[id];
   const videos = store.playlistVideos(id);
 
+  const shufflePlayNext = (playlist) => {
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      shuffleIds(playlist.ids)
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .then((_) => {
+        if (store.player.isStopped) {
+          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+        }
+      })
+      .catch(snackBarHandler(store));
+  };
+
   if (!playlist) {
     return null;
   }
@@ -116,6 +135,14 @@ const PlaylistPage = observer(() => {
           <Typography variant="h4">{playlist.name}</Typography>
           <Typography>{videos.length} medias</Typography>
           <Stack direction="row" sx={{ marginTop: "16px" }}>
+            <Button
+              variant="contained"
+              startIcon={<ShuffleIcon />}
+              sx={{ alignItems: "flex-start", marginRight: "8px" }}
+              onClick={() => shufflePlayNext(playlist)}
+            >
+              Shuffle
+            </Button>
             <Button
               variant="outlined"
               startIcon={<EditIcon />}
