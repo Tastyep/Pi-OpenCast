@@ -70,20 +70,22 @@ const AlbumsPage = observer(() => {
               />
             </Link>
             <AlbumItemBar>
-              <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-              <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-              <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+              <div
+                style={{
+                  width: "40px",
+                  marginRight: "auto",
+                  visibility: "hidden",
+                }}
+              ></div>
               <Typography
                 sx={{
                   color: "#FFFFFF",
-                  padding: "0px 16px",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                 }}
               >
                 {album.name}
               </Typography>
-              <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
               <IconButton sx={{ marginLeft: "auto" }} onClick={(e) => {}}>
                 <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
               </IconButton>

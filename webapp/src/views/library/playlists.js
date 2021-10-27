@@ -134,11 +134,14 @@ const PlaylistItem = ({ playlist }) => {
         <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
       </Link>
       <PlaylistItemBar>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-        <Typography sx={{ color: "#FFFFFF" }}>{playlist.name}</Typography>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+        <div
+          style={{ width: "40px", marginRight: "auto", visibility: "hidden" }}
+        ></div>
+        <Typography
+          sx={{ color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden" }}
+        >
+          {playlist.name}
+        </Typography>
         <IconButton
           sx={{ marginLeft: "auto" }}
           onClick={(e) => {

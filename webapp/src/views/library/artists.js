@@ -61,11 +61,14 @@ const ArtistItem = ({ artist }) => {
         <ArtistThumbnail albums={artist.albums} />
       </Link>
       <ArtistItemBar>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
-        <Typography sx={{ color: "#FFFFFF" }}>{artist.name}</Typography>
-        <div style={{ marginRight: "auto", visibility: "hidden" }}></div>
+        <div
+          style={{ width: "40px", marginRight: "auto", visibility: "hidden" }}
+        ></div>
+        <Typography
+          sx={{ color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden" }}
+        >
+          {artist.name}
+        </Typography>
         <IconButton
           sx={{ marginLeft: "auto" }}
           onClick={(e) => {
