@@ -34,7 +34,7 @@ function humanReadableDuration(duration) {
       return;
     }
     if (format_duration !== "") {
-      format_duration = format_duration + " ";
+      format_duration = format_duration + ", ";
     }
     format_duration =
       format_duration + pluralize(Object.keys(part)[0], value, true);

@@ -215,7 +215,6 @@ const PlaylistPage = observer(() => {
       total += store.videos[id].duration;
     }
 
-    console.log("TOTAL: ", total);
     return humanReadableDuration(total);
   };
 
@@ -224,7 +223,7 @@ const PlaylistPage = observer(() => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <Stack sx={{ height: "100%" }}>
       <UpdateModal
         open={isModalOpen}
         close={() => setModalOpen(false)}
@@ -232,56 +231,61 @@ const PlaylistPage = observer(() => {
       />
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
           marginTop: "32px",
-          marginBottom: "32px",
+          marginBottom: "24px",
           marginLeft: "16px",
         }}
       >
-        <Box sx={{ marginRight: "32px", height: 128, width: 128 }}>
-          <PlaylistThumbnail videos={videos} />
-        </Box>
-        <Box>
-          <Typography variant="h4">{playlist.name}</Typography>
-          <Typography>{pluralize("media", videos.length, true)}</Typography>
-          <Typography>{playlistDuration()}</Typography>
-          <Stack direction="row" alignItems="center" sx={{ marginTop: "16px" }}>
-            <Box>
-              <Button
-                variant="contained"
-                startIcon={<ShuffleIcon />}
-                sx={{ alignItems: "flex-start", marginRight: "8px" }}
-                onClick={() => shufflePlayNext(playlist)}
-              >
-                Shuffle
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<EditIcon />}
-                sx={{ alignItems: "flex-start" }}
-                onClick={() => setModalOpen(true)}
-              >
-                Edit playlist
-              </Button>
-            </Box>
-            <IconButton
-              aria-controls="playlist-menu"
-              aria-haspopup="true"
-              aria-expanded={isMenuOpen ? "true" : undefined}
-              onClick={(e) => setAnchor(e.currentTarget)}
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ marginRight: "32px", height: 128, width: 128 }}>
+            <PlaylistThumbnail videos={videos} />
+          </Box>
+          <Box>
+            <Typography variant="h4">{playlist.name}</Typography>
+            <Typography>{pluralize("media", videos.length, true)}</Typography>
+            <Typography>{playlistDuration()}</Typography>
+          </Box>
+        </Stack>
+        <Stack direction="row" sx={{ marginTop: "16px" }}>
+          <Box>
+            <Button
+              disableElevation
+              variant="contained"
+              startIcon={<ShuffleIcon />}
+              sx={{ alignItems: "flex-start", marginRight: "8px" }}
+              onClick={() => shufflePlayNext(playlist)}
             >
-              <MoreVertIcon />
-            </IconButton>
-            <PlaylistMenu
-              open={isMenuOpen}
-              anchorEl={anchor}
-              playlist={playlist}
-              closeMenu={() => setAnchor(null)}
-            />
-          </Stack>
-        </Box>
+              Shuffle
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              sx={{ alignItems: "flex-start" }}
+              onClick={() => setModalOpen(true)}
+            >
+              Edit playlist
+            </Button>
+          </Box>
+          <IconButton
+            aria-controls="playlist-menu"
+            aria-haspopup="true"
+            aria-expanded={isMenuOpen ? "true" : undefined}
+            onClick={(e) => setAnchor(e.currentTarget)}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          <PlaylistMenu
+            open={isMenuOpen}
+            anchorEl={anchor}
+            playlist={playlist}
+            closeMenu={() => setAnchor(null)}
+          />
+        </Stack>
       </Box>
       <Divider />
       <Box
@@ -297,7 +301,7 @@ const PlaylistPage = observer(() => {
           ))}
         </List>
       </Box>
-    </Box>
+    </Stack>
   );
 });
 

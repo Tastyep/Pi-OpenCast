@@ -2,7 +2,7 @@ function queueNext(playlist, activeMediaId, mediaIds) {
   let activeMediaIdx = playlist.ids.indexOf(activeMediaId);
 
   // Remove the currently playing video from the given ids (if present)
-  if (activeMediaIdx !== -1) {
+  if (activeMediaIdx !== -1 && mediaIds !== playlist.ids) {
     const activeDuplicateIdx = mediaIds.indexOf(activeMediaId);
 
     if (activeDuplicateIdx !== -1) {
