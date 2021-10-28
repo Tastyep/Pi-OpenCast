@@ -26,6 +26,7 @@ import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
+import { humanReadableDuration } from "services/duration";
 
 import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
@@ -207,6 +208,17 @@ const PlaylistPage = observer(() => {
       .catch(snackBarHandler(store));
   };
 
+  const playlistDuration = () => {
+    let total = 0;
+
+    for (const id of playlist.ids) {
+      total += store.videos[id].duration;
+    }
+
+    console.log("TOTAL: ", total);
+    return humanReadableDuration(total);
+  };
+
   if (!playlist) {
     return null;
   }
@@ -234,6 +246,7 @@ const PlaylistPage = observer(() => {
         <Box>
           <Typography variant="h4">{playlist.name}</Typography>
           <Typography>{pluralize("media", videos.length, true)}</Typography>
+          <Typography>{playlistDuration()}</Typography>
           <Stack direction="row" alignItems="center" sx={{ marginTop: "16px" }}>
             <Box>
               <Button
