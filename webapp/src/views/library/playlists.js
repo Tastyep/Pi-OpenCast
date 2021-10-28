@@ -65,7 +65,7 @@ const PlaylistItem = ({ playlist }) => {
     setAnchor(null);
   };
 
-  const shufflePlayNext = (playlist) => {
+  const shufflePlayNext = () => {
     closeMenu();
 
     const playlistIds = queueNext(
@@ -83,7 +83,7 @@ const PlaylistItem = ({ playlist }) => {
       .catch(snackBarHandler(store));
   };
 
-  const playNext = (playlist) => {
+  const playNext = () => {
     closeMenu();
     const playlistIds = queueNext(
       store.playerPlaylist,
@@ -100,7 +100,7 @@ const PlaylistItem = ({ playlist }) => {
       .catch(snackBarHandler(store));
   };
 
-  const queue = (playlist) => {
+  const queue = () => {
     closeMenu();
     const playlistIds = queueLast(
       store.playerPlaylist,
@@ -168,19 +168,19 @@ const PlaylistItem = ({ playlist }) => {
           </ListItemIcon>
           <ListItemText>Shuffle play</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => playNext(playlist)}>
+        <MenuItem onClick={() => playNext()}>
           <ListItemIcon>
             <PlaylistPlayIcon />
           </ListItemIcon>
           <ListItemText>Play next</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => queue(playlist)}>
+        <MenuItem onClick={() => queue()}>
           <ListItemIcon>
             <QueueMusicIcon />
           </ListItemIcon>
           <ListItemText>Add to queue</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => removePlaylist(playlist)}>
+        <MenuItem onClick={() => removePlaylist()}>
           <ListItemIcon>
             <DeleteIcon />
           </ListItemIcon>
