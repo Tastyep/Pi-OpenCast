@@ -7,6 +7,8 @@ import { observer } from "mobx-react-lite";
 import { useAppStore } from "components/app_context";
 import MediaItem from "components/media_item";
 
+const pluralize = require("pluralize");
+
 const AlbumPage = observer(() => {
   const store = useAppStore();
   const { name } = useParams();
@@ -49,7 +51,9 @@ const AlbumPage = observer(() => {
         </Box>
         <Box>
           <Typography variant="h4">{name}</Typography>
-          <Typography>{album.videos.length} medias</Typography>
+          <Typography>
+            {pluralize("media", album.videos.length, true)}
+          </Typography>
         </Box>
       </Box>
       <Divider />

@@ -8,6 +8,8 @@ import { useAppStore } from "components/app_context";
 import ArtistThumbnail from "components/artist_thumbnail";
 import MediaItem from "components/media_item";
 
+const pluralize = require("pluralize");
+
 const ArtistPage = observer(() => {
   const store = useAppStore();
   const { name } = useParams();
@@ -42,7 +44,9 @@ const ArtistPage = observer(() => {
         </Box>
         <Box>
           <Typography variant="h4">{name}</Typography>
-          <Typography>{artist.videos.length} medias</Typography>
+          <Typography>
+            {pluralize("media", artist.videos.length, true)}
+          </Typography>
         </Box>
       </Box>
       <Divider />

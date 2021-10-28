@@ -31,6 +31,8 @@ import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
 import MediaItem from "components/media_item";
 
+const pluralize = require("pluralize");
+
 const ModalContent = styled(Box)({
   position: "absolute",
   top: "50%",
@@ -231,7 +233,7 @@ const PlaylistPage = observer(() => {
         </Box>
         <Box>
           <Typography variant="h4">{playlist.name}</Typography>
-          <Typography>{videos.length} medias</Typography>
+          <Typography>{pluralize("media", videos.length, true)}</Typography>
           <Stack direction="row" alignItems="center" sx={{ marginTop: "16px" }}>
             <Box>
               <Button
