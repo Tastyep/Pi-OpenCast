@@ -102,6 +102,7 @@ const PlaylistMenu = (props) => {
 
   const playNext = (playlist) => {
     closeMenu();
+
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
@@ -236,12 +237,7 @@ const PlaylistPage = observer(() => {
           marginLeft: "16px",
         }}
       >
-        <Stack
-          direction="row"
-          sx={{
-            alignItems: "center",
-          }}
-        >
+        <Stack direction="row" alignItems="center">
           <Box sx={{ marginRight: "32px", height: 128, width: 128 }}>
             <PlaylistThumbnail videos={videos} />
           </Box>
