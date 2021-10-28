@@ -14,7 +14,7 @@ async function queueMedia(url) {
 
 async function playMedia(id) {
   return await API.post("/player/play", null, {
-    params: { id: id},
+    params: { id: id },
   });
 }
 
@@ -57,6 +57,6 @@ const playerAPI = {
   updateVolume,
   toggleSubtitle,
   seekSubtitle,
-}
+};
 
 export default playerAPI;

@@ -33,4 +33,4 @@ const playlistAPI = {
   videos,
 };
 
-export default playlistAPI
+export default playlistAPI;

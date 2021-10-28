@@ -6,9 +6,7 @@ import { listen as listenAppEvents } from "services/api/api";
 import ModelFactory from "models/factory";
 
 const AppContext = React.createContext(null);
-const eventDispatcher = new SocketEventDispatcher([
-  listenAppEvents(),
-]);
+const eventDispatcher = new SocketEventDispatcher([listenAppEvents()]);
 const modelFactory = new ModelFactory(eventDispatcher);
 
 export const AppProvider = ({ children }) => {

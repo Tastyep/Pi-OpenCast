@@ -18,4 +18,4 @@ const videoAPI = {
   delete_,
 };
 
-export default videoAPI
+export default videoAPI;
