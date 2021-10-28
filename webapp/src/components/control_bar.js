@@ -56,6 +56,60 @@ const ControlBar = observer(() => {
       .catch(snackBarHandler(store));
   };
 
+  const playNext = () => {
+    if (!activeVideo) {
+      store.enqueueSnackbar({
+        message: "no active media",
+        options: {
+          variant: "error",
+        },
+      });
+      return;
+    }
+
+    const playlist = store.playerPlaylist;
+    const idx = playlist.ids.indexOf(activeVideo.id);
+
+    if (idx + 1 === playlist.ids.length) {
+      store.enqueueSnackbar({
+        message: "no more media available",
+        options: {
+          variant: "error",
+        },
+      });
+      return;
+    }
+
+    playerAPI.playMedia(playlist.ids[idx + 1]).catch(snackBarHandler(store));
+  };
+
+  const playPrev = () => {
+    if (!activeVideo) {
+      store.enqueueSnackbar({
+        message: "no active media",
+        options: {
+          variant: "error",
+        },
+      });
+      return;
+    }
+
+    const playlist = store.playerPlaylist;
+    const idx = playlist.ids.indexOf(activeVideo.id);
+
+    if (idx - 1 < 0) {
+      store.enqueueSnackbar({
+        message: "no more media available",
+        options: {
+          variant: "error",
+        },
+      });
+      return;
+    }
+
+    playerAPI.playMedia(playlist.ids[idx - 1]).catch(snackBarHandler(store));
+  };
+
   // Highlight subtitle button when on
   return (
     <MediaQuery minWidth={SIZES.large.min}>
@@ -63,7 +117,7 @@ const ControlBar = observer(() => {
         matches ? (
           <BarContainer direction="row">
             <div>
-              <IconButton size="small" onClick={() => {}}>
+              <IconButton size="small" onClick={playPrev}>
                 <SkipPreviousIcon />
               </IconButton>
               <IconButton
@@ -84,7 +138,7 @@ const ControlBar = observer(() => {
               >
                 <StopIcon />
               </IconButton>
-              <IconButton size="small" onClick={() => {}}>
+              <IconButton size="small" onClick={playNext}>
                 <SkipNextIcon />
               </IconButton>
 
@@ -250,7 +304,7 @@ const ControlBar = observer(() => {
                 </div>
               </Stack>
               <div style={{ display: "flex" }}>
-                <IconButton size="small" onClick={() => {}}>
+                <IconButton size="small" onClick={playPrev}>
                   <SkipPreviousIcon />
                 </IconButton>
                 <IconButton
@@ -271,7 +325,7 @@ const ControlBar = observer(() => {
                 >
                   <StopIcon />
                 </IconButton>
-                <IconButton size="small" onClick={() => {}}>
+                <IconButton size="small" onClick={playNext}>
                   <SkipNextIcon />
                 </IconButton>
               </div>
