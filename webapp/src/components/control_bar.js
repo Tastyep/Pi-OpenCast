@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Collapse, IconButton, Stack, Typography } from "@mui/material";
+import { Collapse, Grid, IconButton, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 import PauseIcon from "@mui/icons-material/Pause";
@@ -30,7 +30,7 @@ import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
 const BarContainer = styled(Stack)({
-  background: "#F2F2F2",
+  backgroundColor: "#F2F2F2",
   alignItems: "center",
   flexDirection: "row",
   justifyContent: "space-between",
@@ -215,19 +215,23 @@ const ControlBar = observer(() => {
               in={expanded}
               timeout="auto"
               unmountOnExit
-              root={{ height: 200 }}
               sx={{
                 minHeight: "auto",
               }}
             >
-              <BarContainer>
-                <div>
+              <Grid
+                container
+                sx={{ paddingBottom: "8px", backgroundColor: "#F2F2F2" }}
+              >
+                <Grid item xs={12} sx={{ paddingLeft: "8px" }}>
+                  <VolumeControl />
+                </Grid>
+                <Grid item xs={6}>
                   <IconButton
                     size="small"
                     onClick={() =>
                       updatePlayer(playerAPI.seekMedia, false, true)
                     }
-                    sx={{ marginLeft: "16px" }}
                   >
                     <FastRewindIcon />
                   </IconButton>
@@ -238,6 +242,14 @@ const ControlBar = observer(() => {
                     }
                   >
                     <ArrowLeftIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    disableFocusRipple
+                    disableRipple
+                    onClick={() => updatePlayer(playerAPI.stopMedia)}
+                  >
+                    <StopIcon />
                   </IconButton>
                   <IconButton
                     size="small"
@@ -255,8 +267,8 @@ const ControlBar = observer(() => {
                   >
                     <FastForwardIcon />
                   </IconButton>
-                </div>
-                <div>
+                </Grid>
+                <Grid item container xs={6} justifyContent="flex-end">
                   <IconButton
                     size="small"
                     onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}
@@ -275,35 +287,36 @@ const ControlBar = observer(() => {
                   >
                     <AddCircleOutlineIcon />
                   </IconButton>
-                </div>
-                <VolumeControl />
-              </BarContainer>
+                </Grid>
+              </Grid>
             </Collapse>
             <BarContainer direction="row">
               <Stack
                 direction="row"
                 alignItems="center"
-                style={{ height: "100%" }}
+                style={{ height: "100%", minWidth: "0px" }}
               >
                 <img
                   src={activeVideo.thumbnail}
                   alt={activeVideo.title}
                   style={{ height: "100%" }}
                 />
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
+                <Stack
+                  sx={{
                     marginLeft: "8px",
+                    minWidth: "0px",
+                    overflow: "hidden",
                   }}
                 >
-                  <Typography variant="body2">{activeVideo.title} </Typography>
+                  <Typography noWrap variant="body2">
+                    {activeVideo.title}
+                  </Typography>
                   <Typography variant="caption">
                     {activeVideo.album || "Artist • Album • Date"}
                   </Typography>
-                </div>
+                </Stack>
               </Stack>
-              <div style={{ display: "flex" }}>
+              <Stack direction="row">
                 <IconButton size="small" onClick={playPrev}>
                   <SkipPreviousIcon />
                 </IconButton>
@@ -317,21 +330,13 @@ const ControlBar = observer(() => {
                     <PlayArrowIcon fontSize="large" />
                   )}
                 </IconButton>
-                <IconButton
-                  size="small"
-                  disableFocusRipple
-                  disableRipple
-                  onClick={() => updatePlayer(playerAPI.stopMedia)}
-                >
-                  <StopIcon />
-                </IconButton>
                 <IconButton size="small" onClick={playNext}>
                   <SkipNextIcon />
                 </IconButton>
-              </div>
-              <IconButton size="small" onClick={() => setExpanded(!expanded)}>
-                {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </IconButton>
+                <IconButton size="small" onClick={() => setExpanded(!expanded)}>
+                  {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                </IconButton>
+              </Stack>
             </BarContainer>
           </div>
         )

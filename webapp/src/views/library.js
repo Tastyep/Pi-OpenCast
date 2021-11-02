@@ -101,9 +101,7 @@ const LibraryPage = observer(() => {
                 margin: "32px 0px",
               }}
             />
-            <Typography variant="h6" sx={{ paddingTop: "16px" }}>
-              Most played
-            </Typography>
+            <Typography variant="h6">Most played</Typography>
             <VideoList videos={listPopularVideos(store.videos)} count={10} />
           </Route>
           <Route path={`${path}/playlists`}>

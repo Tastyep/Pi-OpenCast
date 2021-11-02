@@ -75,7 +75,7 @@ const VideoList = observer(({ videos, count }) => {
               aspectRatio: "1/1",
               backgroundImage: `url("${media.thumbnail}")`,
               backgroundSize: "cover",
-              borderRadius: "6px",
+              borderRadius: "8px",
               overflow: "hidden",
             }}
           >
