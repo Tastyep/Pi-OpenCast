@@ -267,10 +267,11 @@ const HomePage = observer(() => {
             <Stack sx={{ height: "100%", width: "100%" }}>
               <div
                 style={{
-                  width: "95%",
-                  marginLeft: "auto",
-                  marginRight: "auto",
+                  width: "100%",
+                  paddingLeft: "16px",
+                  paddingRight: "16px",
                   marginBottom: "16px",
+                  boxSizing: "border-box",
                 }}
               >
                 <StreamInput />
@@ -289,7 +290,10 @@ const HomePage = observer(() => {
                                   UP NEXT
                                 </Typography>
                                 <IconButton
-                                  sx={{ marginLeft: "auto" }}
+                                  sx={{
+                                    marginLeft: "auto",
+                                    paddingRight: "0px",
+                                  }}
                                   onClick={emptyPlaylist}
                                 >
                                   <ClearAllIcon />

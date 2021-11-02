@@ -46,7 +46,7 @@ const StreamInput = () => {
           size="medium"
           variant="outlined"
           selected={cast}
-          sx={{ marginLeft: "24px", color: "#333333", borderColor: "#8F8F8F" }}
+          sx={{ marginLeft: "16px", color: "#333333", borderColor: "#8F8F8F" }}
           onClick={handleActionChange}
         >
           {cast ? <PlaylistPlayIcon /> : <PlaylistAddIcon />}

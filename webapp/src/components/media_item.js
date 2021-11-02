@@ -248,7 +248,7 @@ const MediaItem = ({ playlist, video }) => {
 
   return (
     <ListItem
-      sx={{ width: "100%" }}
+      sx={{ width: "100%", paddingLeft: "0px" }}
       onMouseEnter={() => {
         setHover(true);
       }}
