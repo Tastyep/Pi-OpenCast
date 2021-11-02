@@ -216,11 +216,13 @@ const HomePage = observer(() => {
                   </Stack>
                 </Container>
               </Grid>
-              <Grid item xs={4} sx={{ height: "100%", overflow: "auto" }}>
+              <Grid item xs={4} sx={{ height: "100%" }}>
                 <Stack direction="row" sx={{ height: "100%" }}>
                   <Divider
                     orientation="vertical"
-                    sx={{ background: "#F0F0F0", height: "auto" }}
+                    sx={{
+                      backgroundColor: "#F0F0F0",
+                    }}
                   />
                   {playlistId && (
                     <DragDropContext onDragEnd={onDragEnd}>
@@ -243,7 +245,7 @@ const HomePage = observer(() => {
                                 </Stack>
                               </ListSubheader>
                             }
-                            sx={{ width: "100%" }}
+                            sx={{ width: "100%", overflow: "auto" }}
                           >
                             {videos.map((video, index) => (
                               <MediaItem
