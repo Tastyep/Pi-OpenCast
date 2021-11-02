@@ -29,7 +29,8 @@ const AlbumItemContainer = styled(ListItem)({
   flowShrink: 1,
   width: "256px",
   flexDirection: "column",
-  maxWidth: "50%",
+  maxWidth: `calc(50% - 8px)`, // Remove the gap between items
+  padding: "0px 0px",
 });
 
 const AlbumItemBar = styled((props) => <Stack {...props} />)({
@@ -215,7 +216,14 @@ const AlbumsPage = observer(() => {
     return a.name.localeCompare(b.name);
   });
   return (
-    <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+    <List
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: "8px 16px",
+      }}
+    >
       {albums.map((album, _) => (
         <AlbumItem key={album.name} album={album} />
       ))}

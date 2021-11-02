@@ -38,7 +38,8 @@ const PlaylistItemContainer = styled(ListItem)({
   flowShrink: 1,
   flexBasis: "256px",
   flexDirection: "column",
-  maxWidth: "50%",
+  maxWidth: `calc(50% - 8px)`, // Remove the gap between items
+  padding: "0px 0px",
 });
 
 const PlaylistItemBar = styled((props) => <Stack {...props} />)({
@@ -203,7 +204,14 @@ const PlaylistsPage = observer(() => {
   return (
     <>
       <PlaylistModal open={open} close={() => setOpen(false)} />
-      <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+      <List
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "8px 16px",
+        }}
+      >
         <PlaylistItemContainer>
           <IconButton
             sx={{

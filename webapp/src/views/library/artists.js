@@ -34,7 +34,8 @@ const ArtistItemContainer = styled(ListItem)({
   flowShrink: 1,
   flexBasis: "256px",
   flexDirection: "column",
-  maxWidth: "50%",
+  maxWidth: `calc(50% - 8px)`, // Remove the gap between items
+  padding: "0px 0px",
 });
 
 const ArtistItemBar = styled((props) => <Stack {...props} />)({
@@ -194,7 +195,14 @@ const ArtistsPage = observer(() => {
 
   return (
     <>
-      <List sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+      <List
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "8px 16px",
+        }}
+      >
         {artists.map((artist, _) => (
           <ArtistItem key={artist.name} artist={artist} />
         ))}
