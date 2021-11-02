@@ -38,7 +38,7 @@ const listLastPlayedVideos = (videos) => {
     .sort((a, b) => {
       return new Date(a.lastPlay) < new Date(b.lastPlay);
     })
-    .slice(0, 6);
+    .slice(0, 10);
 };
 
 const listPopularVideos = (videos) => {
@@ -46,7 +46,7 @@ const listPopularVideos = (videos) => {
     .sort((a, b) => {
       return a.totalPlayingDuration < b.totalPlayingDuration;
     })
-    .slice(0, 6);
+    .slice(0, 10);
 };
 
 const LibraryPage = observer(() => {
@@ -95,7 +95,7 @@ const LibraryPage = observer(() => {
             <Typography variant="h6" sx={{ paddingTop: "32px" }}>
               Recent activity
             </Typography>
-            <VideoList videos={listLastPlayedVideos(store.videos)} />
+            <VideoList videos={listLastPlayedVideos(store.videos)} count={10} />
             <Divider
               sx={{
                 margin: "32px 0px",
@@ -104,7 +104,7 @@ const LibraryPage = observer(() => {
             <Typography variant="h6" sx={{ paddingTop: "16px" }}>
               Most played
             </Typography>
-            <VideoList videos={listPopularVideos(store.videos)} />
+            <VideoList videos={listPopularVideos(store.videos)} count={10} />
           </Route>
           <Route path={`${path}/playlists`}>
             <PlaylistsPage />

@@ -14,7 +14,7 @@ import { queueNext } from "services/playlist";
 
 import { useAppStore } from "./app_context";
 
-const VideoList = observer(({ videos }) => {
+const VideoList = observer(({ videos, count }) => {
   const store = useAppStore();
 
   const playMedia = (video) => {
@@ -35,18 +35,18 @@ const VideoList = observer(({ videos }) => {
 
   return (
     <ImageList
-      cols={6}
-      gap={2}
+      cols={count}
+      gap={8}
       sx={{ flexWrap: "nowrap", transform: "translateZ(0)" }}
     >
-      {[...Array(6).keys()].map((index) => {
+      {[...Array(count).keys()].map((index) => {
         if (index >= videos.length) {
           return (
             <Stack
               direction="column"
               sx={{
-                minWidth: "200px",
-                aspectRatio: "16/9",
+                minWidth: "min(256px, 40vw)",
+                aspectRatio: "1/1",
                 overflow: "hidden",
               }}
             >
@@ -71,10 +71,12 @@ const VideoList = observer(({ videos }) => {
         return (
           <ImageListItem
             sx={{
-              minWidth: "200px",
-              aspectRatio: "16/9",
+              minWidth: "min(256px, 40vw)",
+              aspectRatio: "1/1",
               backgroundImage: `url("${media.thumbnail}")`,
               backgroundSize: "cover",
+              borderRadius: "6px",
+              overflow: "hidden",
             }}
           >
             <img
@@ -83,7 +85,7 @@ const VideoList = observer(({ videos }) => {
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "contain",
+                objectFit: "cover",
                 backgroundColor: "rgba(0,0,0,0.66)",
               }}
               onClick={() => playMedia(media)}
