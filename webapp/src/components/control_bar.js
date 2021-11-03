@@ -34,7 +34,7 @@ const BarContainer = styled(Stack)({
   alignItems: "center",
   flexDirection: "row",
   justifyContent: "space-between",
-  height: "48px",
+  height: "56px",
   overflow: "clip",
 });
 
@@ -116,7 +116,7 @@ const ControlBar = observer(() => {
       {(matches) =>
         matches ? (
           <BarContainer direction="row">
-            <div>
+            <Stack direction="row">
               <IconButton size="small" onClick={playPrev}>
                 <SkipPreviousIcon />
               </IconButton>
@@ -167,24 +167,35 @@ const ControlBar = observer(() => {
               >
                 <FastForwardIcon />
               </IconButton>
-            </div>
+            </Stack>
 
             <Stack
               direction="row"
               alignItems="center"
-              style={{ height: "100%" }}
+              sx={{
+                height: "100%",
+                minWidth: "0px",
+                margin: "0px 16px",
+                overflow: "hidden",
+              }}
             >
               <img
                 src={activeVideo.thumbnail}
                 alt={activeVideo.title}
                 style={{ height: "100%" }}
               />
-              <div style={{ marginLeft: "8px" }}>
-                <Typography> {activeVideo.title}</Typography>
+              <Stack
+                sx={{
+                  marginLeft: "8px",
+                  minWidth: "0px",
+                  overflow: "hidden",
+                }}
+              >
+                <Typography noWrap> {activeVideo.title}</Typography>
                 <Typography>
                   {activeVideo.album || "Artist • Album • Date"}
                 </Typography>
-              </div>
+              </Stack>
             </Stack>
 
             <Stack direction="row">
@@ -299,7 +310,11 @@ const ControlBar = observer(() => {
                 <img
                   src={activeVideo.thumbnail}
                   alt={activeVideo.title}
-                  style={{ height: "100%" }}
+                  style={{
+                    height: "100%",
+                    aspectRatio: "1/1",
+                    objectFit: "cover",
+                  }}
                 />
                 <Stack
                   sx={{
