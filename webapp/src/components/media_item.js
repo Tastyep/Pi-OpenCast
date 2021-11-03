@@ -111,12 +111,6 @@ const PlaylistMenu = (props) => {
         open={open}
         anchorEl={anchorEl}
         placement="bottom-end"
-        modifiers={{
-          offset: {
-            enabled: true,
-            offset: "0, 30",
-          },
-        }}
         style={{
           width: "min(400px, 75%)",
           height: "40%",
