@@ -42,7 +42,9 @@ import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
 import PlaylistModal from "components/playlist_modal";
 
-const renderArtistAlbum = (video) => {
+const pluralize = require("pluralize");
+
+const renderMediaSecondaryData = (video) => {
   const artist = video.artist ? (
     <Link href={`/artists/${video.artist}`} color="inherit" underline="none">
       {video.artist}
@@ -59,10 +61,30 @@ const renderArtistAlbum = (video) => {
     "Album"
   );
 
+  const duration = durationToHMS(video.duration);
+
   return (
-    <>
-      {artist} • {album}
-    </>
+    <Grid
+      container
+      direction="row"
+      sx={{ flexWrap: "nowrap", color: "#505050", minWidth: "0px" }}
+    >
+      <Grid item zeroMinWidth>
+        <Typography noWrap>{artist}</Typography>
+      </Grid>
+      <Grid item zeroMinWidth>
+        <Stack direction="row">
+          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
+          <Typography noWrap>{album}</Typography>
+        </Stack>
+      </Grid>
+      <Grid item>
+        <Stack direction="row">
+          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
+          <Typography noWrap>{duration}</Typography>
+        </Stack>
+      </Grid>
+    </Grid>
   );
 };
 
@@ -90,7 +112,7 @@ const PlaylistMenu = (props) => {
           },
         }}
         style={{
-          width: "384px",
+          width: "min(400px, 75%)",
           height: "40%",
         }}
       >
@@ -108,7 +130,10 @@ const PlaylistMenu = (props) => {
                 sx={{ overflow: "auto" }}
               >
                 {Object.values(store.playlists).map((playlist) => (
-                  <MenuItem onClick={() => onItemClicked(playlist, video)}>
+                  <MenuItem
+                    key={playlist.id}
+                    onClick={() => onItemClicked(playlist, video)}
+                  >
                     <div
                       style={{
                         width: 64,
@@ -123,7 +148,11 @@ const PlaylistMenu = (props) => {
                     <Stack direction="column">
                       <ListItemText>{playlist.name}</ListItemText>
                       <ListItemText>
-                        {store.playlistVideos(playlist.id).length} medias
+                        {pluralize(
+                          "media",
+                          store.playlistVideos(playlist.id).length,
+                          true
+                        )}
                       </ListItemText>
                     </Stack>
                   </MenuItem>
@@ -310,70 +339,14 @@ const MediaItem = ({ playlist, video }) => {
               </Grid>
               <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
                 {isHover || isMenuOpen || isPlMenuOpen ? (
-                  <div>
-                    <IconButton
-                      aria-controls="media-menu"
-                      aria-haspopup="true"
-                      aria-expanded={isMenuOpen ? "true" : undefined}
-                      onClick={(e) => setAnchor(e.currentTarget)}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                      id="media-menu"
-                      anchorEl={anchor}
-                      open={isMenuOpen}
-                      onClose={closeMenu}
-                      MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                      }}
-                      transformOrigin={{ horizontal: "right", vertical: "top" }}
-                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                    >
-                      <MenuItem onClick={() => playNext(video)}>
-                        <ListItemIcon>
-                          <PlaylistPlayIcon />
-                        </ListItemIcon>
-                        <ListItemText>Play next</ListItemText>
-                      </MenuItem>
-                      <MenuItem onClick={() => queue(video)}>
-                        <ListItemIcon>
-                          <QueueMusicIcon />
-                        </ListItemIcon>
-                        <ListItemText>Add to queue</ListItemText>
-                      </MenuItem>
-                      <MenuItem onClick={selectPlaylist}>
-                        <ListItemIcon>
-                          <PlaylistAddIcon />
-                        </ListItemIcon>
-                        <ListItemText>Add to playlist</ListItemText>
-                      </MenuItem>
-                      {playlist ? (
-                        <MenuItem
-                          onClick={() => removePlaylistVideo(playlist, video)}
-                        >
-                          <ListItemIcon>
-                            <DeleteOutlineIcon />
-                          </ListItemIcon>
-                          <ListItemText>Remove from playlist</ListItemText>
-                        </MenuItem>
-                      ) : (
-                        <MenuItem onClick={() => removeVideo(video)}>
-                          <ListItemIcon>
-                            <DeleteOutlineIcon />
-                          </ListItemIcon>
-                          <ListItemText>Delete video</ListItemText>
-                        </MenuItem>
-                      )}
-                    </Menu>
-                    <PlaylistMenu
-                      open={isPlMenuOpen}
-                      anchorEl={anchorPl}
-                      video={video}
-                      closeMenu={closePlMenu}
-                      onItemClicked={addToPlaylist}
-                    />
-                  </div>
+                  <IconButton
+                    aria-controls="media-menu"
+                    aria-haspopup="true"
+                    aria-expanded={isMenuOpen ? "true" : undefined}
+                    onClick={(e) => setAnchor(e.currentTarget)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
                 ) : (
                   <ListItemText
                     primary={durationToHMS(video.duration)}
@@ -383,38 +356,101 @@ const MediaItem = ({ playlist, video }) => {
               </Grid>
             </Grid>
           ) : (
-            <Grid container alignItems="center">
-              <Grid item xs>
-                <Stack direction="row" alignItems="center">
-                  <IconButton
-                    sx={{ marginRight: "8px" }}
-                    onClick={() => playVideo(video)}
-                  >
-                    <Avatar alt={video.title} src={video.thumbnail} />
-                  </IconButton>
+            <Grid container alignItems="center" flexWrap="nowrap">
+              <Grid
+                item
+                container
+                xs
+                zeroMinWidth
+                direction="row"
+                flexWrap="nowrap"
+              >
+                <IconButton
+                  sx={{ marginRight: "8px" }}
+                  onClick={() => playVideo(video)}
+                >
+                  <Avatar alt={video.title} src={video.thumbnail} />
+                </IconButton>
+                <Stack sx={{ minWidth: "0px" }}>
                   <Link
                     href="#"
                     color="inherit"
                     underline="none"
                     onClick={() => playVideo(video)}
                   >
-                    <Typography>{video.title}</Typography>{" "}
-                    <Typography sx={{ color: "#505050" }}>
-                      {renderArtistAlbum(video)}
-                    </Typography>
+                    <Typography noWrap>{video.title}</Typography>
                   </Link>
+                  {renderMediaSecondaryData(video)}
                 </Stack>
               </Grid>
               <Grid item alignSelf="center">
-                <ListItemText
-                  primary={durationToHMS(video.duration)}
-                  sx={{ textAlign: "right", color: "#505050" }}
-                />
+                <IconButton
+                  aria-controls="media-menu"
+                  aria-haspopup="true"
+                  aria-expanded={isMenuOpen ? "true" : undefined}
+                  onClick={(e) => setAnchor(e.currentTarget)}
+                >
+                  <MoreVertIcon />
+                </IconButton>
               </Grid>
             </Grid>
           )
         }
       </MediaQuery>
+      <div>
+        <Menu
+          id="media-menu"
+          anchorEl={anchor}
+          open={isMenuOpen}
+          onClose={closeMenu}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        >
+          <MenuItem onClick={() => playNext(video)}>
+            <ListItemIcon>
+              <PlaylistPlayIcon />
+            </ListItemIcon>
+            <ListItemText>Play next</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={() => queue(video)}>
+            <ListItemIcon>
+              <QueueMusicIcon />
+            </ListItemIcon>
+            <ListItemText>Add to queue</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={selectPlaylist}>
+            <ListItemIcon>
+              <PlaylistAddIcon />
+            </ListItemIcon>
+            <ListItemText>Add to playlist</ListItemText>
+          </MenuItem>
+          {playlist ? (
+            <MenuItem onClick={() => removePlaylistVideo(playlist, video)}>
+              <ListItemIcon>
+                <DeleteOutlineIcon />
+              </ListItemIcon>
+              <ListItemText>Remove from playlist</ListItemText>
+            </MenuItem>
+          ) : (
+            <MenuItem onClick={() => removeVideo(video)}>
+              <ListItemIcon>
+                <DeleteOutlineIcon />
+              </ListItemIcon>
+              <ListItemText>Delete video</ListItemText>
+            </MenuItem>
+          )}
+        </Menu>
+        <PlaylistMenu
+          open={isPlMenuOpen}
+          anchorEl={anchorPl}
+          video={video}
+          closeMenu={closePlMenu}
+          onItemClicked={addToPlaylist}
+        />
+      </div>
     </ListItem>
   );
 };
