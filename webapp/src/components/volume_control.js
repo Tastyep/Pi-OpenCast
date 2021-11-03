@@ -49,7 +49,9 @@ const VolumeControl = observer(() => {
       <Slider
         size="small"
         value={store.player.volume}
-        ValueLabelComponent={ValueLabelComponent}
+        components={{
+          ValueLabel: ValueLabelComponent,
+        }}
         aria-labelledby="continuous-slider"
         sx={{
           color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
