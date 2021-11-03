@@ -6,7 +6,6 @@ import {
   Divider,
   IconButton,
   Grid,
-  Link,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -27,6 +26,10 @@ import Popper from "@mui/material/Popper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MenuList from "@mui/material/MenuList";
 
+import { styled } from "@mui/material/styles";
+
+import { Link } from "react-router-dom";
+
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
@@ -44,19 +47,22 @@ import PlaylistModal from "components/playlist_modal";
 
 const pluralize = require("pluralize");
 
+const StyledLink = styled(Link)({
+  color: "inherit",
+  textDecoration: "none",
+});
+
 const renderMediaSecondaryData = (video) => {
   const artist = video.artist ? (
-    <Link href={`/artists/${video.artist}`} color="inherit" underline="none">
+    <StyledLink to={`/library/artists/${video.artist}`}>
       {video.artist}
-    </Link>
+    </StyledLink>
   ) : (
     "Artist"
   );
 
   const album = video.album ? (
-    <Link href={`/albums/${video.album}`} color="inherit" underline="none">
-      {video.album}
-    </Link>
+    <StyledLink to={`/library/albums/${video.album}`}>{video.album}</StyledLink>
   ) : (
     "Album"
   );
@@ -297,42 +303,37 @@ const MediaItem = ({ playlist, video }) => {
                   >
                     <Avatar alt={video.title} src={video.thumbnail} />
                   </IconButton>
-                  <Link
-                    href="#"
-                    color="inherit"
-                    underline="none"
-                    onClick={() => playVideo(video)}
-                  >
+                  <StyledLink to="#" onClick={() => playVideo(video)}>
                     <ListItemText>{video.title}</ListItemText>
-                  </Link>
+                  </StyledLink>
                 </Stack>
               </Grid>
               <Grid item xs alignSelf="center">
                 {video.artist ? (
-                  <Link
-                    href={`/artists/${video.artist}`}
+                  <StyledLink
+                    to={`/library/artists/${video.artist}`}
                     color="inherit"
                     underline="none"
                   >
                     <ListItemText sx={{ color: "#505050" }}>
                       {video.artist}
                     </ListItemText>
-                  </Link>
+                  </StyledLink>
                 ) : (
                   <Divider sx={{ width: "24px" }} />
                 )}
               </Grid>
               <Grid item xs alignSelf="center">
                 {video.album ? (
-                  <Link
-                    href={`/albums/${video.album}`}
+                  <StyledLink
+                    to={`/library/albums/${video.album}`}
                     color="inherit"
                     underline="none"
                   >
                     <ListItemText sx={{ color: "#505050" }}>
                       {video.album}
                     </ListItemText>
-                  </Link>
+                  </StyledLink>
                 ) : (
                   <Divider sx={{ width: "24px" }} />
                 )}
@@ -372,14 +373,14 @@ const MediaItem = ({ playlist, video }) => {
                   <Avatar alt={video.title} src={video.thumbnail} />
                 </IconButton>
                 <Stack sx={{ minWidth: "0px" }}>
-                  <Link
-                    href="#"
+                  <StyledLink
+                    to="#"
                     color="inherit"
                     underline="none"
                     onClick={() => playVideo(video)}
                   >
                     <Typography noWrap>{video.title}</Typography>
-                  </Link>
+                  </StyledLink>
                   {renderMediaSecondaryData(video)}
                 </Stack>
               </Grid>

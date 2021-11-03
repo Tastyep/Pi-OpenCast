@@ -43,6 +43,7 @@ const VideoList = observer(({ videos, count }) => {
         if (index >= videos.length) {
           return (
             <Stack
+              key={index}
               direction="column"
               sx={{
                 minWidth: "min(256px, 40vw)",
@@ -70,6 +71,7 @@ const VideoList = observer(({ videos, count }) => {
         const media = videos[index];
         return (
           <ImageListItem
+            key={index}
             sx={{
               minWidth: "min(256px, 40vw)",
               aspectRatio: "1/1",

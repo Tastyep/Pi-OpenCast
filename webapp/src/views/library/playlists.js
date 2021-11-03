@@ -20,7 +20,7 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 
 import { styled } from "@mui/material/styles";
 
-import { Link } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -61,6 +61,8 @@ const PlaylistItem = ({ playlist }) => {
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
+
+  const { url } = useRouteMatch();
 
   const closeMenu = () => {
     setAnchor(null);
@@ -129,7 +131,7 @@ const PlaylistItem = ({ playlist }) => {
   return (
     <PlaylistItemContainer>
       <Link
-        to={"/playlists/" + playlist.id}
+        to={`${url}/${playlist.id}`}
         style={{ width: "100%", aspectRatio: "1/1" }}
       >
         <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
