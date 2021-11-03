@@ -22,6 +22,9 @@ import { useAppStore } from "components/app_context";
 
 const StyledTab = styled((props) => <Tab {...props} />)(() => ({
   color: "#B0B0B0",
+  border: "black",
+  borderStyle: "hidden solid hidden solid",
+  borderWidth: "1px",
   "&.Mui-selected": {
     color: "#FFFFFF",
     backgroundColor: "#111111",
@@ -48,24 +51,12 @@ const HeaderTabs = () => {
       centered
       sx={{ backgroundColor: "#333333" }}
     >
-      <Divider
-        ortientation="vertical"
-        sx={{ backgroundColor: "#000000", width: "1px" }}
-      />
       <StyledTab label="Home" value="/" to="/" component={Link} />
-      <Divider
-        ortientation="vertical"
-        sx={{ backgroundColor: "#000000", width: "1px" }}
-      />
       <StyledTab
         label="Library"
         value="/library"
         to="/library"
         component={Link}
-      />
-      <Divider
-        ortientation="vertical"
-        sx={{ backgroundColor: "#000000", width: "1px" }}
       />
     </Tabs>
   );
