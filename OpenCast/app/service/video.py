@@ -129,6 +129,8 @@ class VideoService(Service):
 
     def stop_video(self, ctx, video_id):
         video = self._video_repo.get(video_id)
+        if video is None:  # When the playing video has been deleted
+            return
         video.stop()
         ctx.update(video)
 

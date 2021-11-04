@@ -5,6 +5,7 @@ import structlog
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import settings
 from OpenCast.domain.event import player as PlayerEvt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
 
@@ -17,6 +18,7 @@ class PlayerService(Service):
         super().__init__(app_facade, logger, player_cmds)
 
         self._observe_event(PlayerEvt.PlayerCreated)
+        self._observe_event(VideoEvt.VideoDeleted)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
@@ -109,6 +111,9 @@ class PlayerService(Service):
 
     def _player_created(self, evt):
         self._init_player(evt.volume)
+
+    def _video_deleted(self, evt):
+        self._stop_player(evt)
 
     # Private
     def _player_model(self):

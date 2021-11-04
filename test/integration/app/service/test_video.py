@@ -4,8 +4,10 @@ from unittest.mock import patch
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.config import settings
+from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Stream
 from OpenCast.domain.service.identity import IdentityService
@@ -86,17 +88,25 @@ class VideoServiceTest(ServiceTestCase):
         )
 
     def test_delete_video(self):
-        self.data_producer.player().video("source").video("source2").populate(
-            self.data_facade
-        )
+        self.data_producer.player().video("source").video("source2").play(
+            "source"
+        ).populate(self.data_facade)
 
         player = self.player_repo.get_player()
         video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(VideoEvt.VideoDeleted, video_id).expect(
+            PlayerEvt.PlayerStateUpdated,
+            player.id,
+            PlayerState.PLAYING,
+            PlayerState.STOPPED,
+            video_id,
+        ).expect(
             PlaylistEvt.PlaylistContentUpdated,
             player.queue,
             [IdentityService.id_video("source2")],
-        ).from_(Cmd.DeleteVideo, video_id)
+        ).from_(
+            Cmd.DeleteVideo, video_id
+        )
 
         other_video_id = IdentityService.id_video("source2")
         self.assertListEqual(
