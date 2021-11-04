@@ -28,8 +28,17 @@ const StreamInput = () => {
   };
 
   const handleActionChange = () => {
-    setCast(!cast);
-    setAction(cast ? () => playerAPI.streamMedia : () => playerAPI.queueMedia);
+    const newState = !cast;
+    setCast(newState);
+    setAction(
+      newState ? () => playerAPI.streamMedia : () => playerAPI.queueMedia
+    );
+    store.enqueueSnackbar({
+      message: newState ? "play medias" : "queue medias",
+      options: {
+        variant: "info",
+      },
+    });
   };
 
   return (
