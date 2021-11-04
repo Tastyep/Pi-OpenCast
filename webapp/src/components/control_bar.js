@@ -40,9 +40,10 @@ const BarContainer = styled(Stack)({
 
 const ControlBar = observer(() => {
   const store = useAppStore();
-  const [expanded, setExpanded] = useState(false);
-
+  const isPlayerPlaying = store.player.isPlaying;
   const activeVideo = store.videos[store.player.videoId];
+
+  const [expanded, setExpanded] = useState(false);
 
   if (!activeVideo) {
     return null;
@@ -124,7 +125,7 @@ const ControlBar = observer(() => {
                 size="small"
                 onClick={() => updatePlayer(playerAPI.pauseMedia)}
               >
-                {store.player.state !== "PAUSED" ? (
+                {isPlayerPlaying ? (
                   <PauseIcon fontSize="large" />
                 ) : (
                   <PlayArrowIcon fontSize="large" />
