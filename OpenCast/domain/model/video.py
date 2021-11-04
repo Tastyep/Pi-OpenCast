@@ -60,7 +60,7 @@ T = TypeVar("T")
 
 @dataclass
 class Metadata(Generic[T]):
-    name: T
+    name: str
     post_processor: Optional[Callable[[T], T]] = None
 
 
@@ -212,14 +212,16 @@ class Video(Entity):
         )
 
     def start(self):
+        if self.state is State.PLAYING:
+            raise DomainError("the video is already started")
         if self.state is not State.READY:
-            raise DomainError("the video can't be started")
+            raise DomainError("the video is not ready")
         self._data.last_play = datetime.now()
         self.state = State.PLAYING
 
     def stop(self):
         if self.state is not State.PLAYING:
-            raise DomainError("the video is not playing")
+            raise DomainError("the video is not started")
         self._data.total_playing_duration += datetime.now() - self._data.last_play
         self.state = State.READY
 

@@ -65,10 +65,16 @@ class VideoTest(ModelTestCase):
         self.video.start()
         self.expect_events(self.video, Evt.VideoStateUpdated)
 
+    def test_start_already_started(self):
+        self.video.state = VideoState.PLAYING
+        with self.assertRaises(DomainError) as ctx:
+            self.video.start()
+        self.assertEqual("the video is already started", str(ctx.exception))
+
     def test_start_not_ready(self):
         with self.assertRaises(DomainError) as ctx:
             self.video.start()
-        self.assertEqual("the video can't be started", str(ctx.exception))
+        self.assertEqual("the video is not ready", str(ctx.exception))
 
     def test_start_stop(self):
         self.video.state = VideoState.READY
@@ -81,7 +87,7 @@ class VideoTest(ModelTestCase):
     def test_stop_not_started(self):
         with self.assertRaises(DomainError) as ctx:
             self.video.stop()
-        self.assertEqual("the video is not playing", str(ctx.exception))
+        self.assertEqual("the video is not started", str(ctx.exception))
 
     def test_delete(self):
         self.video.delete()
