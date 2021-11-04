@@ -123,7 +123,7 @@ const PlaylistItem = ({ playlist }) => {
       .catch(snackBarHandler(store));
   };
 
-  const removePlaylist = (playlist) => {
+  const removePlaylist = () => {
     closeMenu();
     playlistAPI.delete_(playlist.id).catch(snackBarHandler(store));
   };
@@ -183,7 +183,7 @@ const PlaylistItem = ({ playlist }) => {
           </ListItemIcon>
           <ListItemText>Add to queue</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => removePlaylist()}>
+        <MenuItem onClick={removePlaylist}>
           <ListItemIcon>
             <DeleteIcon />
           </ListItemIcon>
