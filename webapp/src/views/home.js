@@ -23,10 +23,10 @@ import ClearAllIcon from "@mui/icons-material/ClearAll";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
-import { observer } from "mobx-react-lite";
-
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
+
+import { observer } from "mobx-react-lite";
 
 import noPreview from "images/no-preview.png";
 import playerAPI from "services/api/player";

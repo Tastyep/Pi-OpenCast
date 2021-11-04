@@ -21,6 +21,8 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import Popper from "@mui/material/Popper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -32,6 +34,9 @@ import { Link } from "react-router-dom";
 
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
+
+import { observer } from "mobx-react-lite";
+import { computed } from "mobx";
 
 import { durationToHMS } from "services/duration";
 import { queueNext, queueLast } from "services/playlist";
@@ -51,6 +56,28 @@ const StyledLink = styled(Link)({
   color: "inherit",
   textDecoration: "none",
 });
+
+const playVideo = (video, store) => {
+  const playerPlaylist = store.playerPlaylist;
+
+  if (playerPlaylist.ids.includes(video.id)) {
+    const playingVideo = store.playingVideo();
+
+    if (playingVideo && video.id === playingVideo.id) {
+      playerAPI.pauseMedia(video.id).catch(snackBarHandler(store));
+    } else {
+      playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+    }
+  } else {
+    const ids = queueNext(playerPlaylist, store.player.videoId, [video.id]);
+    playlistAPI
+      .update(playerPlaylist.id, { ids: ids })
+      .then(() => {
+        playerAPI.playMedia(video.id).catch(snackBarHandler(store));
+      })
+      .catch(snackBarHandler(store));
+  }
+};
 
 const renderMediaSecondaryData = (video) => {
   const artist = video.artist ? (
@@ -184,6 +211,39 @@ const PlaylistMenu = (props) => {
   );
 };
 
+const MediaAvatar = observer(({ video }) => {
+  const store = useAppStore();
+  const isMediaActive = computed(() => {
+    const playingVideo = store.playingVideo();
+    return playingVideo && video.id === playingVideo.id;
+  }).get();
+
+  if (!isMediaActive) {
+    return (
+      <IconButton
+        sx={{ marginRight: "8px" }}
+        onClick={() => playVideo(video, store)}
+      >
+        <Avatar alt={video.title} src={video.thumbnail} />
+      </IconButton>
+    );
+  }
+
+  const isPlayerPlaying = store.player.isPlaying;
+  return (
+    <IconButton
+      sx={{ marginRight: "8px" }}
+      onClick={() => {
+        playerAPI.pauseMedia().catch(snackBarHandler(store));
+      }}
+    >
+      <Avatar alt={video.title}>
+        {isPlayerPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}
+      </Avatar>
+    </IconButton>
+  );
+});
+
 const MediaItem = ({ playlist, video }) => {
   const store = useAppStore();
 
@@ -248,22 +308,6 @@ const MediaItem = ({ playlist, video }) => {
       .catch(snackBarHandler(store));
   };
 
-  const playVideo = (video) => {
-    const playerPlaylist = store.playerPlaylist;
-
-    if (playerPlaylist.ids.includes(video.id)) {
-      playerAPI.playMedia(video.id).catch(snackBarHandler(store));
-    } else {
-      const ids = queueNext(playerPlaylist, store.player.videoId, [video.id]);
-      playlistAPI
-        .update(playerPlaylist.id, { ids: ids })
-        .then(() => {
-          playerAPI.playMedia(video.id).catch(snackBarHandler(store));
-        })
-        .catch(snackBarHandler(store));
-    }
-  };
-
   const removePlaylistVideo = (playlist, video) => {
     closePlMenu();
     playlist.ids.splice(playlist.ids.indexOf(video.id), 1);
@@ -291,13 +335,8 @@ const MediaItem = ({ playlist, video }) => {
             <Grid container>
               <Grid item xs={5}>
                 <Stack direction="row" alignItems="center">
-                  <IconButton
-                    sx={{ marginRight: "8px" }}
-                    onClick={() => playVideo(video)}
-                  >
-                    <Avatar alt={video.title} src={video.thumbnail} />
-                  </IconButton>
-                  <StyledLink to="#" onClick={() => playVideo(video)}>
+                  <MediaAvatar video={video} />
+                  <StyledLink to="#" onClick={() => playVideo(video, store)}>
                     <ListItemText>{video.title}</ListItemText>
                   </StyledLink>
                 </Stack>
@@ -360,18 +399,13 @@ const MediaItem = ({ playlist, video }) => {
                 direction="row"
                 flexWrap="nowrap"
               >
-                <IconButton
-                  sx={{ marginRight: "8px" }}
-                  onClick={() => playVideo(video)}
-                >
-                  <Avatar alt={video.title} src={video.thumbnail} />
-                </IconButton>
+                <MediaAvatar video={video} />
                 <Stack sx={{ minWidth: "0px" }}>
                   <StyledLink
                     to="#"
                     color="inherit"
                     underline="none"
-                    onClick={() => playVideo(video)}
+                    onClick={() => playVideo(video, store)}
                   >
                     <Typography noWrap>{video.title}</Typography>
                   </StyledLink>
