@@ -70,7 +70,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 const MediaItem = observer(({ children, video, index }) => {
   const store = useAppStore();
   const isPlayerPlaying = store.player.isPlaying;
-  const playingVideo = store.playingVideo();
+  const playingVideo = store.playingVideo;
 
   const onMediaClicked = (media) => {
     if (!playingVideo || media.id !== playingVideo.id) {
@@ -139,17 +139,26 @@ const MediaItem = observer(({ children, video, index }) => {
   );
 });
 
-const HomePage = observer(() => {
+const PlayingMediaThumbnail = observer(() => {
+  const store = useAppStore();
+  const video = store.playingVideo;
+
+  if (!video) {
+    return null;
+  }
+
+  return (
+    <LargeThumbnail
+      src={video.thumbnail === null ? noPreview : video.thumbnail}
+      alt={video.title}
+    />
+  );
+});
+
+const MainPlaylist = observer(() => {
   const store = useAppStore();
   const playlistId = store.player.queue;
   const videos = store.playlistVideos(playlistId);
-  const playingVideo = store.playingVideo();
-
-  const emptyPlaylist = () => {
-    playlistAPI
-      .update(store.playerPlaylist.id, { ids: [] })
-      .catch(snackBarHandler(store));
-  };
 
   const onDragEnd = useCallback(
     (result) => {
@@ -184,6 +193,51 @@ const HomePage = observer(() => {
     [store]
   );
 
+  const emptyPlaylist = () => {
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: [] })
+      .catch(snackBarHandler(store));
+  };
+
+  if (!playlistId) {
+    return null;
+  }
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId={playlistId}>
+        {(provided, _) => (
+          <List
+            ref={provided.innerRef}
+            subheader={
+              <ListSubheader>
+                <Stack direction="row" alignItems="center">
+                  <Typography sx={{ color: "#666666" }}>UP NEXT</Typography>
+                  <IconButton
+                    sx={{ marginLeft: "auto", paddingRight: "0px" }}
+                    onClick={emptyPlaylist}
+                  >
+                    <ClearAllIcon />
+                  </IconButton>
+                </Stack>
+              </ListSubheader>
+            }
+            sx={{ width: "100%", overflow: "auto" }}
+          >
+            {videos.map((video, index) => (
+              <MediaItem video={video} index={index} key={video.id}>
+                {index < videos.length - 1 && <Divider />}
+              </MediaItem>
+            ))}
+            {provided.placeholder}
+          </List>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+});
+
+const HomePage = () => {
   return (
     <PageContainer>
       <MediaQuery minWidth={SIZES.large.min}>
@@ -202,16 +256,7 @@ const HomePage = observer(() => {
                       <StreamInput />
                     </div>
                     <div style={{ position: "relative", height: "100%" }}>
-                      {playingVideo && (
-                        <LargeThumbnail
-                          src={
-                            playingVideo.thumbnail === null
-                              ? noPreview
-                              : playingVideo.thumbnail
-                          }
-                          alt={playingVideo.title}
-                        />
-                      )}
+                      <PlayingMediaThumbnail />
                     </div>
                   </Stack>
                 </Container>
@@ -224,44 +269,7 @@ const HomePage = observer(() => {
                       backgroundColor: "#F0F0F0",
                     }}
                   />
-                  {playlistId && (
-                    <DragDropContext onDragEnd={onDragEnd}>
-                      <Droppable droppableId={playlistId}>
-                        {(provided, snapshot) => (
-                          <List
-                            ref={provided.innerRef}
-                            subheader={
-                              <ListSubheader>
-                                <Stack direction="row" alignItems="center">
-                                  <Typography sx={{ color: "#666666" }}>
-                                    UP NEXT
-                                  </Typography>
-                                  <IconButton
-                                    sx={{ marginLeft: "auto" }}
-                                    onClick={emptyPlaylist}
-                                  >
-                                    <ClearAllIcon />
-                                  </IconButton>
-                                </Stack>
-                              </ListSubheader>
-                            }
-                            sx={{ width: "100%", overflow: "auto" }}
-                          >
-                            {videos.map((video, index) => (
-                              <MediaItem
-                                video={video}
-                                index={index}
-                                key={video.id}
-                              >
-                                {index < videos.length - 1 && <Divider />}
-                              </MediaItem>
-                            ))}
-                            {provided.placeholder}
-                          </List>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
-                  )}
+                  <MainPlaylist />
                 </Stack>
               </Grid>
             </Grid>
@@ -278,54 +286,13 @@ const HomePage = observer(() => {
               >
                 <StreamInput />
               </div>
-              <div style={{ overflow: "auto" }}>
-                {playlistId && (
-                  <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId={playlistId}>
-                      {(provided, snapshot) => (
-                        <List
-                          ref={provided.innerRef}
-                          subheader={
-                            <ListSubheader>
-                              <Stack direction="row" alignItems="center">
-                                <Typography sx={{ color: "#666666" }}>
-                                  UP NEXT
-                                </Typography>
-                                <IconButton
-                                  sx={{
-                                    marginLeft: "auto",
-                                    paddingRight: "0px",
-                                  }}
-                                  onClick={emptyPlaylist}
-                                >
-                                  <ClearAllIcon />
-                                </IconButton>
-                              </Stack>
-                            </ListSubheader>
-                          }
-                        >
-                          {videos.map((video, index) => (
-                            <MediaItem
-                              video={video}
-                              index={index}
-                              key={video.id}
-                            >
-                              {index < videos.length - 1 && <Divider />}
-                            </MediaItem>
-                          ))}
-                          {provided.placeholder}
-                        </List>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                )}
-              </div>
+              <MainPlaylist />
             </Stack>
           )
         }
       </MediaQuery>
     </PageContainer>
   );
-});
+};
 
 export default HomePage;

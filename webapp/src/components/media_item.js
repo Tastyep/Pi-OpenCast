@@ -61,7 +61,7 @@ const playVideo = (video, store) => {
   const playerPlaylist = store.playerPlaylist;
 
   if (playerPlaylist.ids.includes(video.id)) {
-    const playingVideo = store.playingVideo();
+    const playingVideo = store.playingVideo;
 
     if (playingVideo && video.id === playingVideo.id) {
       playerAPI.pauseMedia(video.id).catch(snackBarHandler(store));
@@ -214,7 +214,7 @@ const PlaylistMenu = (props) => {
 const MediaAvatar = observer(({ video }) => {
   const store = useAppStore();
   const isMediaActive = computed(() => {
-    const playingVideo = store.playingVideo();
+    const playingVideo = store.playingVideo;
     return playingVideo && video.id === playingVideo.id;
   }).get();
 
