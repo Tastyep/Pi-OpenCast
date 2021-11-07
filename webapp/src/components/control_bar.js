@@ -50,11 +50,7 @@ const ControlBar = observer(() => {
   }
 
   const updatePlayer = (update, ...args) => {
-    update(...args)
-      .then((response) => {
-        store.loadPlayer();
-      })
-      .catch(snackBarHandler(store));
+    update(...args).catch(snackBarHandler(store));
   };
 
   const playNext = () => {

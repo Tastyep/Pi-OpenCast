@@ -11,8 +11,6 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import { observer } from "mobx-react-lite";
-
 import ControlBar from "components/control_bar";
 import Notifier from "components/notifier";
 import HomePage from "views/home";
@@ -62,9 +60,10 @@ const HeaderTabs = () => {
   );
 };
 
-const App = observer(() => {
+const App = () => {
   const store = useAppStore();
-  const isPlayerActive = store.player && !store.player.isStopped;
+
+  console.log("APP");
 
   useEffect(() => {
     store.load();
@@ -105,15 +104,13 @@ const App = observer(() => {
             sx={{ backgroundColor: "#F2F2F2" }}
           ></Grid>
         </Grid>
-        {isPlayerActive && (
-          <>
-            <Divider sx={{ borderColor: "#CECECE" }} />
-            <ControlBar />
-          </>
-        )}
+        <>
+          <Divider sx={{ borderColor: "#CECECE" }} />
+          <ControlBar />
+        </>
       </Router>
     </div>
   );
-});
+};
 
 export default App;
