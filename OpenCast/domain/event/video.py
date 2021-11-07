@@ -46,7 +46,7 @@ class VideoSubtitleFetched(Event):
 
 @dataclass
 class VideoStateUpdated(Event):
-    old: State
-    new: State
+    old_state: State
+    new_state: State
     total_playing_duration: timedelta
     last_play: datetime

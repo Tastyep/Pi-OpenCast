@@ -50,8 +50,7 @@ class PlayerServiceTest(ServiceTestCase):
             self.player_id,
             PlayerState.STOPPED,
             PlayerState.PLAYING,
-            video_id,
-        ).expect(
+        ).expect(Evt.PlayerVideoUpdated, self.player_id, None, video_id,).expect(
             VideoEvt.VideoStateUpdated,
             video_id,
             VideoState.READY,
@@ -77,8 +76,7 @@ class PlayerServiceTest(ServiceTestCase):
             self.player_id,
             PlayerState.PLAYING,
             PlayerState.STOPPED,
-            video_id,
-        ).expect(
+        ).expect(Evt.PlayerVideoUpdated, self.player_id, video_id, None,).expect(
             VideoEvt.VideoStateUpdated,
             video_id,
             VideoState.PLAYING,
@@ -98,39 +96,18 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
-        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
             Evt.PlayerStateUpdated,
             self.player_id,
             PlayerState.PLAYING,
             PlayerState.PAUSED,
-            video_id,
-        ).expect(
-            VideoEvt.VideoStateUpdated,
-            video_id,
-            VideoState.PLAYING,
-            VideoState.READY,  #
-            timedelta(),
-            now,
-        ).from_(
-            Cmd.TogglePlayerState, self.player_id
-        )
+        ).from_(Cmd.TogglePlayerState, self.player_id)
         self.evt_expecter.expect(
             Evt.PlayerStateUpdated,
             self.player_id,
             PlayerState.PAUSED,
             PlayerState.PLAYING,
-            video_id,
-        ).expect(
-            VideoEvt.VideoStateUpdated,
-            video_id,
-            VideoState.READY,
-            VideoState.PLAYING,  #
-            timedelta(),
-            now,
-        ).from_(
-            Cmd.TogglePlayerState, self.player_id
-        )
+        ).from_(Cmd.TogglePlayerState, self.player_id)
 
     def test_seek_video(self):
         self.data_producer.player().video("source").play("source").populate(

@@ -58,7 +58,7 @@ export default class Video {
       {
         DownloadInfo: (e) => this._setDownloadRatio(e),
         VideoStateUpdated: (e) => {
-          this.setState(e.new);
+          this.setState(e.new_state);
           this.setTotalPlayingDuration(e.total_playing_duration);
           this.setLastPlay(e.last_play);
         },

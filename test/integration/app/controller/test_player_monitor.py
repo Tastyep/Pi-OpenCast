@@ -162,16 +162,22 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 {
                     "type": PlayerEvt.PlayerStateUpdated,
                     "args": {
-                        "old": PlayerState.STOPPED,
-                        "new": PlayerState.PLAYING,
-                        "video_id": video_id,
+                        "old_state": PlayerState.STOPPED,
+                        "new_state": PlayerState.PLAYING,
+                    },
+                },
+                {
+                    "type": PlayerEvt.PlayerVideoUpdated,
+                    "args": {
+                        "old_video_id": None,
+                        "new_video_id": video_id,
                     },
                 },
                 {
                     "type": VideoEvt.VideoStateUpdated,
                     "args": {
-                        "old": VideoState.READY,
-                        "new": VideoState.PLAYING,
+                        "old_state": VideoState.READY,
+                        "new_state": VideoState.PLAYING,
                         "total_playing_duration": timedelta(),
                         "last_play": datetime.now(),
                     },
@@ -248,11 +254,17 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
                 {
                     "type": PlayerEvt.PlayerStateUpdated,
                     "args": {
-                        "old": PlayerState.PLAYING,
-                        "new": PlayerState.STOPPED,
-                        "video_id": video_id,
+                        "old_state": PlayerState.PLAYING,
+                        "new_state": PlayerState.STOPPED,
                     },
-                }
+                },
+                {
+                    "type": PlayerEvt.PlayerVideoUpdated,
+                    "args": {
+                        "old_video_id": video_id,
+                        "new_video_id": None,
+                    },
+                },
             ],
         )
 
@@ -284,18 +296,16 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
-        video_id = IdentityService.id_video("source")
         self.expect_and_raise(
             make_cmd(PlayerCmd.TogglePlayerState, self.player_id),
             [
                 {
                     "type": PlayerEvt.PlayerStateUpdated,
                     "args": {
-                        "old": PlayerState.PLAYING,
-                        "new": PlayerState.PAUSED,
-                        "video_id": video_id,
+                        "old_state": PlayerState.PLAYING,
+                        "new_state": PlayerState.PAUSED,
                     },
-                }
+                },
             ],
         )
 

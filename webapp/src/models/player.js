@@ -19,9 +19,9 @@ export default class Player {
     makeObservable(this, {
       queue: observable,
       state: observable,
+      videoId: observable,
       subState: observable,
       subDelay: observable,
-      videoId: observable,
       volume: observable,
 
       setQueue: action,
@@ -32,11 +32,13 @@ export default class Player {
       setVolume: action,
 
       isPlaying: computed,
+      isStopped: computed,
     });
 
     eventDispatcher.observe(
       {
-        PlayerStateUpdated: (e) => this.onPlayerStateUpdated(e),
+        PlayerStateUpdated: (e) => this.setState(e.new_state),
+        PlayerVideoUpdated: (e) => this.setVideoId(e.new_video_id),
         VolumeUpdated: (e) => this.setVolume(e.volume),
         SubtitleStateUpdated: (e) => this.setSubState(e.state),
         SubtitleDelayUpdated: (e) => this.setSubDelay(e.delay),
@@ -45,10 +47,6 @@ export default class Player {
     );
   }
 
-  onPlayerStateUpdated(e) {
-    this.setState(e.new);
-    this.setVideoId(e.video_id);
-  }
   setQueue(playlist_id) {
     this.queue = playlist_id;
   }

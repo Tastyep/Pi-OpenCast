@@ -106,24 +106,25 @@ class Player(Entity):
 
         old_state = self._data.state
         self._data.state = state
-        self._record(
-            Evt.PlayerStateUpdated, old_state, self._data.state, self._data.video_id
-        )
+        self._record(Evt.PlayerStateUpdated, old_state, self._data.state)
 
     def play(self, video_id: Id):
         if self._data.state is not State.STOPPED:
             raise DomainError("the player is already started")
 
-        self._data.video_id = video_id
         self.state = State.PLAYING
+        self._data.video_id = video_id
+        self._record(Evt.PlayerVideoUpdated, None, self._data.video_id)
 
     def stop(self):
         if self._data.state is State.STOPPED:
             raise DomainError("the player is not started")
 
         self.state = State.STOPPED
+        old_video_id = self._data.video_id
         self._data.video_id = None
         self._data.sub_delay = 0
+        self._record(Evt.PlayerVideoUpdated, old_video_id, self._data.video_id)
 
     def toggle_pause(self):
         if self._data.state is State.PLAYING:

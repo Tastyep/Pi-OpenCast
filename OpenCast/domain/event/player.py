@@ -18,9 +18,14 @@ class PlayerCreated(Event):
 
 @dataclass
 class PlayerStateUpdated(Event):
-    old: State
-    new: State
-    video_id: ModelId
+    old_state: State
+    new_state: State
+
+
+@dataclass
+class PlayerVideoUpdated(Event):
+    old_video_id: State
+    new_video_id: State
 
 
 @dataclass

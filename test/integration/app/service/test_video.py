@@ -99,8 +99,7 @@ class VideoServiceTest(ServiceTestCase):
             player.id,
             PlayerState.PLAYING,
             PlayerState.STOPPED,
-            video_id,
-        ).expect(
+        ).expect(PlayerEvt.PlayerVideoUpdated, player.id, video_id, None,).expect(
             PlaylistEvt.PlaylistContentUpdated,
             player.queue,
             [IdentityService.id_video("source2")],

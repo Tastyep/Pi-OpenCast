@@ -28,7 +28,7 @@ class PlayerTest(ModelTestCase):
         self.player.play(video_id)
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.assertEqual(video_id, self.player.video_id)
-        self.expect_events(self.player, Evt.PlayerStateUpdated)
+        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerVideoUpdated)
 
     def test_play_already_playing(self):
         video_id = IdentityService.id_video("source")
@@ -44,7 +44,7 @@ class PlayerTest(ModelTestCase):
         self.player.stop()
         self.assertEqual(PlayerState.STOPPED, self.player.state)
         self.assertEqual(None, self.player.video_id)
-        self.expect_events(self.player, Evt.PlayerStateUpdated)
+        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerVideoUpdated)
 
     def test_stop_not_started(self):
         with self.assertRaises(DomainError) as ctx:
@@ -54,9 +54,11 @@ class PlayerTest(ModelTestCase):
     def test_toggle_pause(self):
         video_id = IdentityService.id_video("source")
         self.player.play(video_id)
+        self.player.release_events()
+
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PAUSED, self.player.state)
-        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerStateUpdated)
+        self.expect_events(self.player, Evt.PlayerStateUpdated)
 
     def test_toggle_pause_not_started(self):
         with self.assertRaises(DomainError) as ctx:
@@ -66,12 +68,13 @@ class PlayerTest(ModelTestCase):
     def test_toggle_pause_twice(self):
         video_id = IdentityService.id_video("source")
         self.player.play(video_id)
+        self.player.release_events()
+
         self.player.toggle_pause()
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.expect_events(
             self.player,
-            Evt.PlayerStateUpdated,
             Evt.PlayerStateUpdated,
             Evt.PlayerStateUpdated,
         )
@@ -92,8 +95,10 @@ class PlayerTest(ModelTestCase):
     def test_seek_video(self):
         video_id = IdentityService.id_video("source")
         self.player.play(video_id)
+        self.player.release_events()
+
         self.player.seek_video()
-        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.VideoSeeked)
+        self.expect_events(self.player, Evt.VideoSeeked)
 
     def test_seek_video_not_started(self):
         with self.assertRaises(DomainError) as ctx:
