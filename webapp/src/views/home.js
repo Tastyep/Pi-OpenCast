@@ -67,98 +67,127 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   }),
 });
 
-const MediaItem = observer(({ children, video, index }) => {
-  const store = useAppStore();
-  const isPlayerPlaying = store.player.isPlaying;
-  const playingVideo = store.playingVideo;
+const PlayingMediaAvatar = observer(({ isPlaying }) => {
+  return <Avatar>{isPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}</Avatar>;
+});
 
-  const onMediaClicked = (media) => {
-    if (!playingVideo || media.id !== playingVideo.id) {
-      playerAPI.playMedia(media.id).catch(snackBarHandler(store));
+const MediaItem = observer((props) => {
+  const store = useAppStore();
+  const { video, isActive, isLast, provided, snapshot } = props;
+
+  console.log("MEDIAITEM ", video.id, isActive);
+
+  const onMediaClicked = () => {
+    if (isActive === false) {
+      playerAPI.playMedia(video.id).catch(snackBarHandler(store));
       return;
     }
     playerAPI.pauseMedia().catch(snackBarHandler(store));
   };
 
-  const renderAvatarState = (video) => {
-    if (!playingVideo || video.id !== playingVideo.id) {
-      return <Avatar alt={video.title} src={video.thumbnail} />;
-    }
-    const icon = isPlayerPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />;
-    return <Avatar>{icon}</Avatar>;
-  };
-
   const downloadRatio = video.downloadRatio;
+  let activeMediaProps = {};
+  if (isActive === true) {
+    activeMediaProps = {
+      autoFocus: true,
+      sx: { backgroundColor: "rgba(246,250,254,1)" },
+    };
+  }
   return (
-    <Draggable draggableId={video.id} index={index}>
-      {(provided, snapshot) => (
-        <>
-          <ListItem
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            style={getItemStyle(
-              snapshot.isDragging,
-              provided.draggableProps.style
-            )}
-            button
-            disableRipple
-            autoFocus={playingVideo && video.id === playingVideo.id}
-            onClick={() => onMediaClicked(video)}
-            sx={
-              playingVideo && video.id === playingVideo.id
-                ? { backgroundColor: "rgba(246,250,254,1)" }
-                : {}
-            }
-          >
-            <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
-              <Stack direction="row" alignItems="center">
-                <ListItemAvatar>{renderAvatarState(video)}</ListItemAvatar>
-                <ListItemText primary={video.title} />
-                <ListItemText
-                  primary={durationToHMS(video.duration)}
-                  sx={{
-                    textAlign: "right",
-                    minWidth: "max-content",
-                    marginLeft: "8px",
-                  }}
-                />
-              </Stack>
-              {downloadRatio > 0 && downloadRatio < 1 && (
-                <LinearProgress
-                  value={downloadRatio * 100}
-                  variant="determinate"
-                />
+    <>
+      <ListItem
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+        button
+        disableRipple
+        {...activeMediaProps}
+        onClick={onMediaClicked}
+      >
+        <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
+          <Stack direction="row" alignItems="center">
+            <ListItemAvatar>
+              {isActive ? (
+                <PlayingMediaAvatar isPlaying={store.player.isPlaying} />
+              ) : (
+                <Avatar alt={video.title} src={video.thumbnail} />
               )}
-            </Stack>
-          </ListItem>
-          {children}
-        </>
+            </ListItemAvatar>
+            <ListItemText primary={video.title} />
+            <ListItemText
+              primary={durationToHMS(video.duration)}
+              sx={{
+                textAlign: "right",
+                minWidth: "max-content",
+                marginLeft: "8px",
+              }}
+            />
+          </Stack>
+          {downloadRatio > 0 && downloadRatio < 1 && (
+            <LinearProgress value={downloadRatio * 100} variant="determinate" />
+          )}
+        </Stack>
+      </ListItem>
+      {!isLast && <Divider />}
+    </>
+  );
+});
+
+const DraggableMediaItem = observer((props) => {
+  return (
+    <Draggable draggableId={props.video.id} index={props.index}>
+      {(provided, snapshot) => (
+        <MediaItem {...props} provided={provided} snapshot={snapshot} />
       )}
     </Draggable>
   );
 });
 
-const PlayingMediaThumbnail = observer(() => {
+const Playlist = observer(({ playlistId, provided }) => {
   const store = useAppStore();
-  const video = store.playingVideo;
+  const videos = store.playlistVideos(playlistId);
 
-  if (!video) {
-    return null;
-  }
+  const emptyPlaylist = () => {
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: [] })
+      .catch(snackBarHandler(store));
+  };
 
   return (
-    <LargeThumbnail
-      src={video.thumbnail === null ? noPreview : video.thumbnail}
-      alt={video.title}
-    />
+    <List
+      ref={provided.innerRef}
+      subheader={
+        <ListSubheader>
+          <Stack direction="row" alignItems="center">
+            <Typography sx={{ color: "#666666" }}>UP NEXT</Typography>
+            <IconButton
+              sx={{ marginLeft: "auto", paddingRight: "0px" }}
+              onClick={emptyPlaylist}
+            >
+              <ClearAllIcon />
+            </IconButton>
+          </Stack>
+        </ListSubheader>
+      }
+      sx={{ width: "100%", overflow: "auto" }}
+    >
+      {videos.map((video, index) => (
+        <DraggableMediaItem
+          video={video}
+          index={index}
+          key={video.id}
+          isActive={video.id === store.player.videoId}
+          isLast={index + 1 === videos.length}
+        />
+      ))}
+      {provided.placeholder}
+    </List>
   );
 });
 
-const MainPlaylist = observer(() => {
+const DroppablePlaylist = ({ playlistId }) => {
   const store = useAppStore();
-  const playlistId = store.player.queue;
-  const videos = store.playlistVideos(playlistId);
 
   const onDragEnd = useCallback(
     (result) => {
@@ -180,24 +209,12 @@ const MainPlaylist = observer(() => {
       );
 
       const destPlaylist = store.playlists[destination.droppableId];
-      const srcPlaylist = store.playlists[source.droppableId];
       playlistAPI
         .update(destination.droppableId, { ids: destPlaylist.ids })
         .catch(snackBarHandler(store));
-      if (destination.dropppableId !== source.droppableId) {
-        playlistAPI
-          .update(source.droppableId, { ids: srcPlaylist.ids })
-          .catch(snackBarHandler(store));
-      }
     },
     [store]
   );
-
-  const emptyPlaylist = () => {
-    playlistAPI
-      .update(store.playerPlaylist.id, { ids: [] })
-      .catch(snackBarHandler(store));
-  };
 
   if (!playlistId) {
     return null;
@@ -207,37 +224,33 @@ const MainPlaylist = observer(() => {
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId={playlistId}>
         {(provided, _) => (
-          <List
-            ref={provided.innerRef}
-            subheader={
-              <ListSubheader>
-                <Stack direction="row" alignItems="center">
-                  <Typography sx={{ color: "#666666" }}>UP NEXT</Typography>
-                  <IconButton
-                    sx={{ marginLeft: "auto", paddingRight: "0px" }}
-                    onClick={emptyPlaylist}
-                  >
-                    <ClearAllIcon />
-                  </IconButton>
-                </Stack>
-              </ListSubheader>
-            }
-            sx={{ width: "100%", overflow: "auto" }}
-          >
-            {videos.map((video, index) => (
-              <MediaItem video={video} index={index} key={video.id}>
-                {index < videos.length - 1 && <Divider />}
-              </MediaItem>
-            ))}
-            {provided.placeholder}
-          </List>
+          <Playlist playlistId={playlistId} provided={provided} />
         )}
       </Droppable>
     </DragDropContext>
   );
+};
+
+const PlayingMediaThumbnail = observer(() => {
+  const store = useAppStore();
+  const video = store.videos[store.player.videoId];
+
+  if (!video) {
+    return null;
+  }
+
+  return (
+    <LargeThumbnail
+      src={video.thumbnail === null ? noPreview : video.thumbnail}
+      alt={video.title}
+    />
+  );
 });
 
-const HomePage = () => {
+const HomePage = observer(() => {
+  const store = useAppStore();
+  const playlistId = store.player.queue;
+
   return (
     <PageContainer>
       <MediaQuery minWidth={SIZES.large.min}>
@@ -269,7 +282,7 @@ const HomePage = () => {
                       backgroundColor: "#F0F0F0",
                     }}
                   />
-                  <MainPlaylist />
+                  <DroppablePlaylist playlistId={playlistId} />
                 </Stack>
               </Grid>
             </Grid>
@@ -286,13 +299,13 @@ const HomePage = () => {
               >
                 <StreamInput />
               </div>
-              <MainPlaylist />
+              <Playlist playlistId={playlistId} />
             </Stack>
           )
         }
       </MediaQuery>
     </PageContainer>
   );
-};
+});
 
 export default HomePage;

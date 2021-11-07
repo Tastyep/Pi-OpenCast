@@ -155,12 +155,6 @@ export class AppStore {
   removeVideo(id) {
     delete this.videos[id];
   }
-  get playingVideo() {
-    if (!this.player.videoId || this.player.isStopped) {
-      return null;
-    }
-    return this.videos[this.player.videoId];
-  }
 
   albums() {
     return computed(() => {
