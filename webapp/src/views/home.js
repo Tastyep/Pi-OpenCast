@@ -67,15 +67,17 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   }),
 });
 
-const PlayingMediaAvatar = observer(({ isPlaying }) => {
-  return <Avatar>{isPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}</Avatar>;
+const PlayingMediaAvatar = observer(({ media, isPlaying }) => {
+  return (
+    <Avatar alt={media.title}>
+      {isPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}
+    </Avatar>
+  );
 });
 
 const MediaItem = observer((props) => {
   const store = useAppStore();
   const { video, isActive, isLast, provided, snapshot } = props;
-
-  console.log("MEDIAITEM ", video.id, isActive);
 
   const onMediaClicked = () => {
     if (isActive === false) {
@@ -109,7 +111,10 @@ const MediaItem = observer((props) => {
           <Stack direction="row" alignItems="center">
             <ListItemAvatar>
               {isActive ? (
-                <PlayingMediaAvatar isPlaying={store.player.isPlaying} />
+                <PlayingMediaAvatar
+                  media={video}
+                  isPlaying={store.player.isPlaying}
+                />
               ) : (
                 <Avatar alt={video.title} src={video.thumbnail} />
               )}

@@ -63,8 +63,6 @@ const HeaderTabs = () => {
 const App = () => {
   const store = useAppStore();
 
-  console.log("APP");
-
   useEffect(() => {
     store.load();
   }, [store]);

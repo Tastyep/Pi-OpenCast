@@ -32,11 +32,10 @@ import { styled } from "@mui/material/styles";
 
 import { Link } from "react-router-dom";
 
-import MediaQuery from "react-responsive";
+import { useMediaQuery } from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { observer } from "mobx-react-lite";
-import { computed } from "mobx";
 
 import { durationToHMS } from "services/duration";
 import { queueNext, queueLast } from "services/playlist";
@@ -61,9 +60,7 @@ const playVideo = (video, store) => {
   const playerPlaylist = store.playerPlaylist;
 
   if (playerPlaylist.ids.includes(video.id)) {
-    const playingVideo = store.playingVideo;
-
-    if (playingVideo && video.id === playingVideo.id) {
+    if (video.id === store.player.videoId) {
       playerAPI.pauseMedia(video.id).catch(snackBarHandler(store));
     } else {
       playerAPI.playMedia(video.id).catch(snackBarHandler(store));
@@ -211,25 +208,9 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const MediaAvatar = observer(({ video }) => {
+const PlayingMediaAvatar = observer(({ video, isPlaying }) => {
   const store = useAppStore();
-  const isMediaActive = computed(() => {
-    const playingVideo = store.playingVideo;
-    return playingVideo && video.id === playingVideo.id;
-  }).get();
 
-  if (!isMediaActive) {
-    return (
-      <IconButton
-        sx={{ marginRight: "8px" }}
-        onClick={() => playVideo(video, store)}
-      >
-        <Avatar alt={video.title} src={video.thumbnail} />
-      </IconButton>
-    );
-  }
-
-  const isPlayerPlaying = store.player.isPlaying;
   return (
     <IconButton
       sx={{ marginRight: "8px" }}
@@ -238,13 +219,26 @@ const MediaAvatar = observer(({ video }) => {
       }}
     >
       <Avatar alt={video.title}>
-        {isPlayerPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}
+        {isPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}
       </Avatar>
     </IconButton>
   );
 });
 
-const MediaItem = ({ playlist, video }) => {
+const MediaAvatar = ({ video }) => {
+  const store = useAppStore();
+
+  return (
+    <IconButton
+      sx={{ marginRight: "8px" }}
+      onClick={() => playVideo(video, store)}
+    >
+      <Avatar alt={video.title} src={video.thumbnail} />
+    </IconButton>
+  );
+};
+
+const MediaItem = observer(({ playlist, video, isActive }) => {
   const store = useAppStore();
 
   const [isHover, setHover] = useState(false);
@@ -253,6 +247,10 @@ const MediaItem = ({ playlist, video }) => {
 
   const [anchorPl, setAnchorPl] = useState(null);
   const isPlMenuOpen = Boolean(anchorPl);
+
+  const isLargeDevice = useMediaQuery({
+    minWidth: SIZES.large.min,
+  });
 
   const closeMenu = () => {
     setAnchor(null);
@@ -329,103 +327,113 @@ const MediaItem = ({ playlist, video }) => {
         setHover(false);
       }}
     >
-      <MediaQuery minWidth={SIZES.large.min}>
-        {(matches) =>
-          matches ? (
-            <Grid container>
-              <Grid item xs={5}>
-                <Stack direction="row" alignItems="center">
-                  <MediaAvatar video={video} />
-                  <StyledLink to="#" onClick={() => playVideo(video, store)}>
-                    <ListItemText>{video.title}</ListItemText>
-                  </StyledLink>
-                </Stack>
-              </Grid>
-              <Grid item xs alignSelf="center">
-                {video.artist ? (
-                  <StyledLink
-                    to={`/library/artists/${video.artist}`}
-                    color="inherit"
-                    underline="none"
-                  >
-                    <ListItemText sx={{ color: "#505050" }}>
-                      {video.artist}
-                    </ListItemText>
-                  </StyledLink>
-                ) : (
-                  <Divider sx={{ width: "24px" }} />
-                )}
-              </Grid>
-              <Grid item xs alignSelf="center">
-                {video.album ? (
-                  <StyledLink
-                    to={`/library/albums/${video.album}`}
-                    color="inherit"
-                    underline="none"
-                  >
-                    <ListItemText sx={{ color: "#505050" }}>
-                      {video.album}
-                    </ListItemText>
-                  </StyledLink>
-                ) : (
-                  <Divider sx={{ width: "24px" }} />
-                )}
-              </Grid>
-              <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
-                {isHover || isMenuOpen || isPlMenuOpen ? (
-                  <IconButton
-                    aria-controls="media-menu"
-                    aria-haspopup="true"
-                    aria-expanded={isMenuOpen ? "true" : undefined}
-                    onClick={(e) => setAnchor(e.currentTarget)}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                ) : (
-                  <ListItemText
-                    primary={durationToHMS(video.duration)}
-                    sx={{ color: "#505050" }}
-                  />
-                )}
-              </Grid>
-            </Grid>
-          ) : (
-            <Grid container alignItems="center" flexWrap="nowrap">
-              <Grid
-                item
-                container
-                xs
-                zeroMinWidth
-                direction="row"
-                flexWrap="nowrap"
-              >
+      {isLargeDevice ? (
+        <Grid container>
+          <Grid item xs={5}>
+            <Stack direction="row" alignItems="center">
+              {isActive ? (
+                <PlayingMediaAvatar
+                  video={video}
+                  isPlaying={store.player.isPlaying}
+                />
+              ) : (
                 <MediaAvatar video={video} />
-                <Stack sx={{ minWidth: "0px" }}>
-                  <StyledLink
-                    to="#"
-                    color="inherit"
-                    underline="none"
-                    onClick={() => playVideo(video, store)}
-                  >
-                    <Typography noWrap>{video.title}</Typography>
-                  </StyledLink>
-                  {renderMediaSecondaryData(video)}
-                </Stack>
-              </Grid>
-              <Grid item alignSelf="center">
-                <IconButton
-                  aria-controls="media-menu"
-                  aria-haspopup="true"
-                  aria-expanded={isMenuOpen ? "true" : undefined}
-                  onClick={(e) => setAnchor(e.currentTarget)}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </Grid>
-            </Grid>
-          )
-        }
-      </MediaQuery>
+              )}
+              <StyledLink to="#" onClick={() => playVideo(video, store)}>
+                <ListItemText>{video.title}</ListItemText>
+              </StyledLink>
+            </Stack>
+          </Grid>
+          <Grid item xs alignSelf="center">
+            {video.artist ? (
+              <StyledLink
+                to={`/library/artists/${video.artist}`}
+                color="inherit"
+                underline="none"
+              >
+                <ListItemText sx={{ color: "#505050" }}>
+                  {video.artist}
+                </ListItemText>
+              </StyledLink>
+            ) : (
+              <Divider sx={{ width: "24px" }} />
+            )}
+          </Grid>
+          <Grid item xs alignSelf="center">
+            {video.album ? (
+              <StyledLink
+                to={`/library/albums/${video.album}`}
+                color="inherit"
+                underline="none"
+              >
+                <ListItemText sx={{ color: "#505050" }}>
+                  {video.album}
+                </ListItemText>
+              </StyledLink>
+            ) : (
+              <Divider sx={{ width: "24px" }} />
+            )}
+          </Grid>
+          <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
+            {isHover || isMenuOpen || isPlMenuOpen ? (
+              <IconButton
+                aria-controls="media-menu"
+                aria-haspopup="true"
+                aria-expanded={isMenuOpen ? "true" : undefined}
+                onClick={(e) => setAnchor(e.currentTarget)}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            ) : (
+              <ListItemText
+                primary={durationToHMS(video.duration)}
+                sx={{ color: "#505050" }}
+              />
+            )}
+          </Grid>
+        </Grid>
+      ) : (
+        <Grid container alignItems="center" flexWrap="nowrap">
+          <Grid
+            item
+            container
+            xs
+            zeroMinWidth
+            direction="row"
+            flexWrap="nowrap"
+          >
+            {isActive ? (
+              <PlayingMediaAvatar
+                video={video}
+                isPlaying={store.player.isPlaying}
+              />
+            ) : (
+              <MediaAvatar video={video} />
+            )}
+            <Stack sx={{ minWidth: "0px" }}>
+              <StyledLink
+                to="#"
+                color="inherit"
+                underline="none"
+                onClick={() => playVideo(video, store)}
+              >
+                <Typography noWrap>{video.title}</Typography>
+              </StyledLink>
+              {renderMediaSecondaryData(video)}
+            </Stack>
+          </Grid>
+          <Grid item alignSelf="center">
+            <IconButton
+              aria-controls="media-menu"
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen ? "true" : undefined}
+              onClick={(e) => setAnchor(e.currentTarget)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      )}
       <div>
         <Menu
           id="media-menu"
@@ -482,6 +490,6 @@ const MediaItem = ({ playlist, video }) => {
       </div>
     </ListItem>
   );
-};
+});
 
 export default MediaItem;

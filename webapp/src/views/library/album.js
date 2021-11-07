@@ -66,7 +66,11 @@ const AlbumPage = observer(() => {
       >
         <List sx={{ height: "100%", width: "100%", padding: "0px" }}>
           {album.videos.map((video) => (
-            <MediaItem key={video.id} video={video} />
+            <MediaItem
+              key={video.id}
+              video={video}
+              isActive={video.id === store.player.videoId}
+            />
           ))}
         </List>
       </Box>
