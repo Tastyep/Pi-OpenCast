@@ -304,7 +304,7 @@ const HomePage = observer(() => {
               >
                 <StreamInput />
               </div>
-              <Playlist playlistId={playlistId} />
+              <DroppablePlaylist playlistId={playlistId} />
             </Stack>
           )
         }
