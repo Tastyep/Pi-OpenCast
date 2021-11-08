@@ -4,6 +4,9 @@ import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import videoAPI from "services/api/video";
 import snackBarHandler from "services/api/error";
+import { UpdateMediaTime } from "tasks/player";
+
+let tasks = [];
 
 export class AppStore {
   player = {};
@@ -43,6 +46,8 @@ export class AppStore {
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
     });
+
+    tasks.push(new UpdateMediaTime(this, eventDispatcher));
   }
 
   load() {

@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 
 import ControlBar from "components/control_bar";
+import PlayerProgress from "components/player_progress";
 import Notifier from "components/notifier";
 import HomePage from "views/home";
 import LibraryPage from "views/library";
@@ -104,6 +105,7 @@ const App = () => {
         </Grid>
         <>
           <Divider sx={{ borderColor: "#CECECE" }} />
+          <PlayerProgress />
           <ControlBar />
         </>
       </Router>

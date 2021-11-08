@@ -25,6 +25,8 @@ export default class Video {
   subtitle = "";
   downloadRatio = 0;
 
+  playTime = 0;
+
   constructor(state, eventDispatcher) {
     this.id = state.id;
     this.source = state.source;
@@ -47,10 +49,13 @@ export default class Video {
       totalPlayingDuration: observable,
       lastPlay: observable,
       downloadRatio: observable,
+      playTime: observable,
 
       setState: action,
       setTotalPlayingDuration: action,
       setLastPlay: action,
+
+      setPlayTime: action,
       _setDownloadRatio: action,
     });
 
@@ -61,6 +66,9 @@ export default class Video {
           this.setState(e.new_state);
           this.setTotalPlayingDuration(e.total_playing_duration);
           this.setLastPlay(e.last_play);
+          if (e.new_state === VideoState.PLAYING) {
+            this.setPlayTime(0);
+          }
         },
       },
       this.id
@@ -75,6 +83,9 @@ export default class Video {
   }
   setLastPlay(lastPlay) {
     this.lastPlay = lastPlay;
+  }
+  setPlayTime(playTime) {
+    this.playTime = Math.max(0, Math.min(this.duration, playTime));
   }
 
   _setDownloadRatio(e) {
