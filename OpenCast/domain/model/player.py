@@ -112,15 +112,17 @@ class Player(Entity):
         if self._data.state is not State.STOPPED:
             raise DomainError("the player is already started")
 
-        self.state = State.PLAYING
         self._data.video_id = video_id
         self._record(Evt.PlayerVideoUpdated, None, self._data.video_id)
+
+        self.state = State.PLAYING
 
     def stop(self):
         if self._data.state is State.STOPPED:
             raise DomainError("the player is not started")
 
         self.state = State.STOPPED
+
         old_video_id = self._data.video_id
         self._data.video_id = None
         self._data.sub_delay = 0

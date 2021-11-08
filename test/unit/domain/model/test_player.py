@@ -28,7 +28,11 @@ class PlayerTest(ModelTestCase):
         self.player.play(video_id)
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.assertEqual(video_id, self.player.video_id)
-        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerVideoUpdated)
+        self.expect_events(
+            self.player,
+            Evt.PlayerVideoUpdated,
+            Evt.PlayerStateUpdated,
+        )
 
     def test_play_already_playing(self):
         video_id = IdentityService.id_video("source")
