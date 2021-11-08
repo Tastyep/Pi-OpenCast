@@ -30,7 +30,7 @@ class PlayerVideoUpdated(Event):
 
 @dataclass
 class VideoSeeked(Event):
-    pass
+    duration: int
 
 
 @dataclass

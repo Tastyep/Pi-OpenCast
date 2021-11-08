@@ -136,7 +136,7 @@ class Player(Entity):
         else:
             raise DomainError("the player is not started")
 
-    def seek_video(self):
+    def seek_video(self, duration):
         if self._data.state is State.STOPPED:
             raise DomainError("the player is not started")
-        self._record(Evt.VideoSeeked)
+        self._record(Evt.VideoSeeked, duration)

@@ -114,7 +114,7 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.VideoSeeked, self.player_id).from_(
+        self.evt_expecter.expect(Evt.VideoSeeked, self.player_id, 1).from_(
             Cmd.SeekVideo, self.player_id, 1
         )
 

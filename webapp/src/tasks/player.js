@@ -9,6 +9,7 @@ class UpdateMediaTime {
 
     eventDispatcher.observe({
       PlayerStateUpdated: (e) => this.onPlayerStateUpdated(e),
+      VideoSeeked: (e) => this.onVideoSeeked(e),
     });
   }
 
@@ -26,8 +27,7 @@ class UpdateMediaTime {
           return;
         }
 
-        const delta = 1 / rps / (video.duration / 100);
-        video.setPlayTime(video.playTime + delta);
+        video.setPlayTime(video.playTime + 1 / rps);
       }, 1000 / rps);
       return;
     }
@@ -38,6 +38,20 @@ class UpdateMediaTime {
 
     clearInterval(this.task);
     this.task = null;
+  }
+
+  onVideoSeeked(e) {
+    const videoId = this.store.player.videoId;
+    if (!videoId) {
+      return;
+    }
+
+    let video = this.store.videos[videoId];
+    if (!video) {
+      return;
+    }
+
+    video.setPlayTime(video.playTime + e.duration / 1000);
   }
 }
 

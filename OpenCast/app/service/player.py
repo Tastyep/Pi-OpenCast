@@ -74,7 +74,7 @@ class PlayerService(Service):
 
     def _seek_video(self, cmd):
         def impl(model):
-            model.seek_video()
+            model.seek_video(cmd.duration)
             self._player.seek(cmd.duration)
 
         self._update(cmd.id, impl)

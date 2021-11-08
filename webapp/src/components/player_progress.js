@@ -7,11 +7,16 @@ const PlayerProgress = observer(() => {
   const store = useAppStore();
   const media = store.videos[store.player.videoId];
 
-  if (!media) {
+  if (!media || media.duration === 0) {
     return null;
   }
 
-  return <LinearProgress variant="determinate" value={media.playTime} />;
+  return (
+    <LinearProgress
+      variant="determinate"
+      value={(100 * media.playTime) / media.duration}
+    />
+  );
 });
 
 export default PlayerProgress;

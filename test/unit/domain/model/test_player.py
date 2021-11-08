@@ -101,10 +101,10 @@ class PlayerTest(ModelTestCase):
         self.player.play(video_id)
         self.player.release_events()
 
-        self.player.seek_video()
+        self.player.seek_video(Player.LONG_TIME_STEP)
         self.expect_events(self.player, Evt.VideoSeeked)
 
     def test_seek_video_not_started(self):
         with self.assertRaises(DomainError) as ctx:
-            self.player.seek_video()
+            self.player.seek_video(Player.LONG_TIME_STEP)
         self.assertEqual("the player is not started", str(ctx.exception))
