@@ -214,10 +214,18 @@ const DroppablePlaylist = ({ playlistId }) => {
     (result) => {
       const { destination, source, draggableId } = result;
 
+      if (!destination) {
+        const playlist = store.playlists[source.droppableId];
+        store.removePlaylistVideo(playlist.id, draggableId);
+        playlistAPI
+          .update(playlist.id, { ids: playlist.ids })
+          .catch(snackBarHandler(store));
+        return;
+      }
+
       if (
-        !destination ||
-        (destination.droppableId === source.droppableId &&
-          destination.index === source.index)
+        destination.droppableId === source.droppableId &&
+        destination.index === source.index
       ) {
         return;
       }
