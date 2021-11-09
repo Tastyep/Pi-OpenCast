@@ -47,8 +47,12 @@ class SourceService:
                     if alt_field in data:
                         metadata[field.name] = data[alt_field]
                         break
+
+        for field in METADATA_FIELDS:
             if metadata[field.name] and field.post_processor:
-                metadata[field.name] = field.post_processor(metadata[field.name])
+                metadata[field.name] = field.post_processor(
+                    metadata[field.name], metadata
+                )
 
         return metadata
 

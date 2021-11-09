@@ -1,10 +1,29 @@
+from test.util import TestCase
+
 import OpenCast.domain.event.video as Evt
 from OpenCast.domain.error import DomainError
 from OpenCast.domain.model.video import State as VideoState
-from OpenCast.domain.model.video import Video, timedelta
+from OpenCast.domain.model.video import (
+    Video,
+    artist_processor,
+    timedelta,
+    title_processor,
+)
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
+
+
+class MetadataProcessors(TestCase):
+    def test_title_processor(self):
+        artist = "toto"
+        title = f"{artist} - title"
+        metadata = {"artist": artist, "title": title}
+        self.assertEqual("title", title_processor()(title, metadata))
+
+    def test_artist_processor(self):
+        artist = "tata, other"
+        self.assertEqual("tata", artist_processor()(artist, {}))
 
 
 class VideoTest(ModelTestCase):

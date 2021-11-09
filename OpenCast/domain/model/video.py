@@ -61,13 +61,27 @@ T = TypeVar("T")
 @dataclass
 class Metadata(Generic[T]):
     name: str
-    post_processor: Optional[Callable[[T], T]] = None
+    post_processor: Optional[Callable[[T, dict], T]] = None
+
+
+def title_processor():
+    def impl(title: str, metadata: dict):
+        artist = metadata["artist"]
+        if artist is None:
+            return title
+
+        if title[0 : len(artist) + 3] == f"{artist} - ":
+            return title[len(artist) + 3 :]
+
+        return title
+
+    return impl
 
 
 def artist_processor():
     pattern = reg_compile(r"[,]")
 
-    def impl(artist: str):
+    def impl(artist: str, _):
         return pattern.split(artist)[0]
 
     return impl
@@ -76,7 +90,7 @@ def artist_processor():
 METADATA_FIELDS = [
     Metadata[str]("artist", artist_processor()),
     Metadata[str]("album"),
-    Metadata[str]("title"),
+    Metadata[str]("title", title_processor()),
     Metadata[int]("duration"),
     Metadata[str]("source_protocol"),
     Metadata[str]("thumbnail"),
