@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 import { Divider, Grid, Tabs, Tab } from "@mui/material";
+import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 
 import {
@@ -103,11 +104,11 @@ const App = () => {
             sx={{ backgroundColor: "#F2F2F2" }}
           ></Grid>
         </Grid>
-        <>
+        <Box>
           <Divider sx={{ borderColor: "#CECECE" }} />
           <PlayerProgress />
           <ControlBar />
-        </>
+        </Box>
       </Router>
     </div>
   );

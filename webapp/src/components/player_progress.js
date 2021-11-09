@@ -15,7 +15,6 @@ const PlayerProgress = observer(() => {
     <LinearProgress
       variant="determinate"
       value={(100 * media.playTime) / media.duration}
-      sx={{ height: "8px" }}
     />
   );
 });
