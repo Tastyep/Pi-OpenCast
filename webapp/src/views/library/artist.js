@@ -115,7 +115,7 @@ const ArtistPage = observer(() => {
 
   const artist = store.artists()[name];
 
-  const shufflePlayNext = (playlist) => {
+  const shufflePlayNext = () => {
     const ids = artist.videos.map((video) => {
       return video.id;
     });
@@ -185,7 +185,7 @@ const ArtistPage = observer(() => {
               variant="contained"
               startIcon={<ShuffleIcon />}
               sx={{ alignItems: "flex-start", marginRight: "8px" }}
-              onClick={() => shufflePlayNext(artist)}
+              onClick={() => shufflePlayNext()}
             >
               Shuffle
             </Button>

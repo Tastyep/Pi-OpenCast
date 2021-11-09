@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
+import { humanReadableDuration } from "services/duration";
+
 import { useAppStore } from "components/app_context";
 import MediaItem from "components/media_item";
 
@@ -13,6 +15,16 @@ const AlbumPage = observer(() => {
   const store = useAppStore();
   const { name } = useParams();
   const album = store.albums()[name];
+
+  const totalDuration = () => {
+    let total = 0;
+
+    for (const video of album.videos) {
+      total += video.duration;
+    }
+
+    return humanReadableDuration(total);
+  };
 
   if (!album) {
     return null;
@@ -54,6 +66,7 @@ const AlbumPage = observer(() => {
           <Typography>
             {pluralize("media", album.videos.length, true)}
           </Typography>
+          <Typography>{totalDuration()}</Typography>{" "}
         </Box>
       </Box>
       <Divider />
