@@ -15,11 +15,13 @@ import {
   LinearProgress,
   Stack,
 } from "@mui/material";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import ClearAllIcon from "@mui/icons-material/ClearAll";
+import ClearIcon from "@mui/icons-material/Clear";
+import ShuffleIcon from "@mui/icons-material/Shuffle";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -33,6 +35,7 @@ import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
+import { queueNext, queueLast, shuffleIds } from "services/playlist";
 
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
@@ -153,6 +156,17 @@ const Playlist = observer(({ playlistId, provided }) => {
   const store = useAppStore();
   const videos = store.playlistVideos(playlistId);
 
+  const shufflePlaylist = () => {
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      shuffleIds(store.playerPlaylist.ids)
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .catch(snackBarHandler(store));
+  };
+
   const emptyPlaylist = () => {
     playlistAPI
       .update(store.playerPlaylist.id, { ids: [] })
@@ -166,12 +180,14 @@ const Playlist = observer(({ playlistId, provided }) => {
         <ListSubheader>
           <Stack direction="row" alignItems="center">
             <Typography sx={{ color: "#666666" }}>UP NEXT</Typography>
-            <IconButton
-              sx={{ marginLeft: "auto", paddingRight: "0px" }}
-              onClick={emptyPlaylist}
-            >
-              <ClearAllIcon />
-            </IconButton>
+            <Box sx={{ marginLeft: "auto", marginRight: "-8px" }}>
+              <IconButton onClick={shufflePlaylist}>
+                <ShuffleIcon />
+              </IconButton>
+              <IconButton onClick={emptyPlaylist}>
+                <ClearIcon />
+              </IconButton>
+            </Box>
           </Stack>
         </ListSubheader>
       }
