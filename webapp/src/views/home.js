@@ -61,15 +61,6 @@ const LargeThumbnail = styled("img")({
   paddingBottom: "16px",
 });
 
-const getItemStyle = (isDragging, draggableStyle) => ({
-  // styles we need to apply on draggables
-  ...draggableStyle,
-
-  ...(isDragging && {
-    backgroundColor: "#C5C5C5",
-  }),
-});
-
 const PlayingMediaAvatar = observer(({ media, isPlaying }) => {
   return (
     <Avatar alt={media.title}>
@@ -91,23 +82,34 @@ const MediaItem = observer((props) => {
   };
 
   const downloadRatio = video.downloadRatio;
-  let activeMediaProps = {};
+  let conditionalProps = {};
   if (isActive === true) {
-    activeMediaProps = {
+    conditionalProps = {
       autoFocus: true,
       sx: { backgroundColor: "rgba(246,250,254,1)" },
     };
   }
+
+  if (snapshot.isDragging) {
+    let bgcolor = "rgba(200, 200, 200)";
+    if (snapshot.draggingOver === null) {
+      bgcolor = "rgba(211, 87, 87, 0.7)";
+    }
+    conditionalProps = {
+      ...conditionalProps,
+      ...{ sx: { backgroundColor: bgcolor } },
+    };
+  }
+
   return (
     <>
       <ListItem
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
         button
         disableRipple
-        {...activeMediaProps}
+        {...conditionalProps}
         onClick={onMediaClicked}
       >
         <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
