@@ -210,7 +210,7 @@ class Video(Entity):
         )
 
     def streamable(self):
-        return self._data.source_protocol in ["m3u8"]
+        return self._data.source_protocol in ["m3u8", "m3u8_native"]
 
     def from_disk(self):
         return Path(self._data.source).is_file()
