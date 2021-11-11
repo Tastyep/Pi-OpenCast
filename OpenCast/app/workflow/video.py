@@ -36,6 +36,7 @@ class VideoWorkflow(Workflow):
         RETRIEVING = auto()
         PARSING = auto()
         SUB_RETRIEVING = auto()
+        FINALIZING = auto()
         COMPLETED = auto()
         DELETING = auto()
         ABORTED = auto()
@@ -45,11 +46,12 @@ class VideoWorkflow(Workflow):
         ["_create",                 States.INITIAL,        States.COMPLETED,  "is_complete"],  # noqa: E501
         ["_create",                 States.INITIAL,        States.CREATING],
         ["_video_created",          States.CREATING,       States.RETRIEVING],
-        ["_video_retrieved",        States.RETRIEVING,     States.COMPLETED,  "is_stream"],  # noqa: E501
+        ["_video_retrieved",        States.RETRIEVING,     States.FINALIZING,  "is_stream"],  # noqa: E501
         ["_video_retrieved",        States.RETRIEVING,     States.PARSING],
-        ["_video_parsed",           States.PARSING,        States.COMPLETED,  "subtitle_disabled"],  # noqa: E501
+        ["_video_parsed",           States.PARSING,        States.FINALIZING,  "subtitle_disabled"],  # noqa: E501
         ["_video_parsed",           States.PARSING,        States.SUB_RETRIEVING],
-        ["_video_subtitle_fetched", States.SUB_RETRIEVING, States.COMPLETED],
+        ["_video_subtitle_fetched", States.SUB_RETRIEVING, States.FINALIZING],
+        ["_video_state_updated",    States.FINALIZING,     States.COMPLETED],
 
         ["_operation_error",        States.CREATING,       States.ABORTED],
         ["_operation_error",        '*',                   States.DELETING],
@@ -98,6 +100,13 @@ class VideoWorkflow(Workflow):
             Cmd.FetchVideoSubtitle,
             self._video.id,
             settings["subtitle.language"],
+        )
+
+    def on_enter_FINALIZING(self, _):
+        self._observe_dispatch(
+            VideoEvt.VideoStateUpdated,
+            Cmd.SetVideoReady,
+            self._video.id,
         )
 
     def on_enter_DELETING(self, _):

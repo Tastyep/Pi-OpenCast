@@ -66,7 +66,7 @@ class VideoTest(ModelTestCase):
 
     def test_parse(self):
         self.video.streams = {}
-        self.expect_events(self.video, Evt.VideoParsed, Evt.VideoStateUpdated)
+        self.expect_events(self.video, Evt.VideoParsed)
 
     def test_set_subtitles(self):
         self.video.subtitle = "/tmp/toto.srt"

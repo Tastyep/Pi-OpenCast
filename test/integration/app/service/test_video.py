@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -219,3 +220,16 @@ class VideoServiceTest(ServiceTestCase):
         self.evt_expecter.expect(
             VideoEvt.VideoSubtitleFetched, video_id, Path(source_subtitle)
         ).from_(Cmd.FetchVideoSubtitle, video_id, subtitle_language)
+
+    def test_set_video_ready(self):
+        self.data_producer.video("source").populate(self.data_facade)
+
+        video_id = IdentityService.id_video("source")
+        self.evt_expecter.expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.CREATED,
+            VideoState.READY,
+            timedelta(),
+            None,
+        ).from_(Cmd.SetVideoReady, video_id)

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 import OpenCast.app.command.video as Cmd
@@ -63,7 +64,7 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_retrieving_to_deleting(self):
         event = Evt.VideoCreated(
-            None,
+            IdentityService.random(),
             *self.video.to_tuple(),
             "artist",
             "album",
@@ -80,9 +81,9 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_retrieving_to_completed(self):
+    def test_retrieving_to_finalizing(self):
         event = Evt.VideoCreated(
-            None,
+            IdentityService.random(),
             *self.video.to_tuple(),
             "artist",
             "album",
@@ -110,11 +111,11 @@ class VideoWorkflowTest(WorkflowTestCase):
             self.video.id,
             "https://url.m3u8",
         )
-        self.assertTrue(self.workflow.is_COMPLETED())
+        self.assertTrue(self.workflow.is_FINALIZING())
 
     def test_retrieving_to_parsing(self):
         event = Evt.VideoCreated(
-            None,
+            IdentityService.random(),
             *self.video.to_tuple(),
             "artist",
             "album",
@@ -138,17 +139,21 @@ class VideoWorkflowTest(WorkflowTestCase):
 
     def test_parsing_to_deleting(self):
         event = Evt.VideoRetrieved(
-            None, self.video.id, f"{settings['downloader.output_directory']}/video.mp4"
+            IdentityService.random(),
+            self.video.id,
+            f"{settings['downloader.output_directory']}/video.mp4",
         )
         self.workflow.to_PARSING(event)
         cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_parsing_to_completed(self):
+    def test_parsing_to_finalizing(self):
         settings["subtitle.enabled"] = False
         event = Evt.VideoRetrieved(
-            None, self.video.id, f"{settings['downloader.output_directory']}/video.mp4"
+            IdentityService.random(),
+            self.video.id,
+            f"{settings['downloader.output_directory']}/video.mp4",
         )
         self.workflow.to_PARSING(event)
         cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
@@ -158,11 +163,13 @@ class VideoWorkflowTest(WorkflowTestCase):
             self.video.id,
             {},
         )
-        self.assertTrue(self.workflow.is_COMPLETED())
+        self.assertTrue(self.workflow.is_FINALIZING())
 
     def test_parsing_to_sub_fetching(self):
         event = Evt.VideoRetrieved(
-            None, self.video.id, f"{settings['downloader.output_directory']}/video.mp4"
+            IdentityService.random(),
+            self.video.id,
+            f"{settings['downloader.output_directory']}/video.mp4",
         )
         self.workflow.to_PARSING(event)
         cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
@@ -183,7 +190,7 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_sub_fetching_to_completed(self):
+    def test_sub_fetching_to_finalizing(self):
         event = Evt.VideoParsed(None, self.video.id, {})
         self.workflow.to_SUB_RETRIEVING(event)
         cmd = self.expect_dispatch(
@@ -195,10 +202,28 @@ class VideoWorkflowTest(WorkflowTestCase):
             self.video.id,
             Path(settings["downloader.output_directory"]) / "video.srt",
         )
-        self.assertTrue(self.workflow.is_COMPLETED())
+        self.assertTrue(self.workflow.is_FINALIZING())
+
+    def test_finalizing_to_completed(self):
+        event = Evt.VideoSubtitleFetched(
+            IdentityService.random(), self.video.id, Path()
+        )
+        self.workflow.to_FINALIZING(event)
+        cmd = self.expect_dispatch(Cmd.SetVideoReady, self.video.id)
+        self.raise_event(
+            Evt.VideoStateUpdated,
+            cmd.id,
+            self.video.id,
+            VideoState.CREATED,
+            VideoState.READY,
+            timedelta(),
+            None,
+        )
 
     def test_deleting_to_aborted(self):
-        cmd = Cmd.CreateVideo(None, self.video.id, "source", collection_id=None)
+        cmd = Cmd.CreateVideo(
+            IdentityService.random(), self.video.id, "source", collection_id=None
+        )
         error = OperationError(cmd, "")
         self.workflow.to_DELETING(error)
         cmd = self.expect_dispatch(Cmd.DeleteVideo, self.video.id)

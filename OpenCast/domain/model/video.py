@@ -186,8 +186,6 @@ class Video(Entity):
     def streams(self, streams: List[Stream]):
         self._data.streams = streams
         self._record(Evt.VideoParsed, self._data.streams)
-        # TODO: This should probably be set by the workflow on completion
-        self.state = State.READY
 
     @subtitle.setter
     def subtitle(self, subtitle: str):

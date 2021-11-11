@@ -119,6 +119,14 @@ class VideoService(Service):
 
         self._start_transaction(self._video_repo, cmd.id, impl)
 
+    def _set_video_ready(self, cmd):
+        def impl(ctx):
+            video = self._video_repo.get(cmd.model_id)
+            video.state = VideoState.READY
+            ctx.update(video)
+
+        self._start_transaction(self._video_repo, cmd.id, impl)
+
     # Event handler implementation
 
     def start_video(self, ctx, video_id):
