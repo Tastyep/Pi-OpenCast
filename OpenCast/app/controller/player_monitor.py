@@ -1,9 +1,14 @@
 """ Player capabilities monitoring routes """
 
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
 import structlog
 from aiohttp_apispec import docs
 
 from OpenCast.app.command import player as Cmd
+from OpenCast.app.notification import Notification
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
@@ -89,25 +94,35 @@ class PlayerMonitController(MonitorController):
         playlist_id = self._player_repo.get_player().queue
 
         if self._source_service.is_playlist(source):
-            sources = self._source_service.unfold(source)
-            if not sources:
-                return self._internal_error("Could not unfold the playlist URL")
-
             collection_id = IdentityService.random()
-            videos = [
-                Video(IdentityService.id_video(source), source, collection_id)
-                for source in sources
-            ]
-
-            workflow_id = IdentityService.id_workflow(StreamPlaylistWorkflow, video_id)
-            self._start_workflow(
-                StreamPlaylistWorkflow,
-                workflow_id,
-                self._data_facade,
-                videos,
-                playlist_id,
+            self._evt_dispatcher.dispatch(
+                Notification(collection_id, "unfolding playlist")
             )
-            return self._no_content()
+
+            loop = asyncio.get_running_loop()
+            with ThreadPoolExecutor() as pool:
+                sources = await loop.run_in_executor(
+                    pool, partial(self._source_service.unfold, source)
+                )
+                if not sources:
+                    return self._internal_error("Could not unfold the playlist URL")
+
+                videos = [
+                    Video(IdentityService.id_video(source), source, collection_id)
+                    for source in sources
+                ]
+
+                workflow_id = IdentityService.id_workflow(
+                    StreamPlaylistWorkflow, video_id
+                )
+                self._start_workflow(
+                    StreamPlaylistWorkflow,
+                    workflow_id,
+                    self._data_facade,
+                    videos,
+                    playlist_id,
+                )
+                return self._no_content()
 
         video = Video(video_id, source, collection_id=None)
         self._start_workflow(
@@ -141,25 +156,35 @@ class PlayerMonitController(MonitorController):
         playlist_id = self._player_repo.get_player().queue
 
         if self._source_service.is_playlist(source):
-            sources = self._source_service.unfold(source)
-            if not sources:
-                return self._internal_error("Could not unfold the playlist URL")
-
             collection_id = IdentityService.random()
-            videos = [
-                Video(IdentityService.id_video(source), source, collection_id)
-                for source in sources
-            ]
-
-            workflow_id = IdentityService.id_workflow(QueuePlaylistWorkflow, video_id)
-            self._start_workflow(
-                QueuePlaylistWorkflow,
-                workflow_id,
-                self._data_facade,
-                videos,
-                playlist_id,
+            self._evt_dispatcher.dispatch(
+                Notification(collection_id, "unfolding playlist")
             )
-            return self._no_content()
+
+            loop = asyncio.get_running_loop()
+            with ThreadPoolExecutor() as pool:
+                sources = await loop.run_in_executor(
+                    pool, partial(self._source_service.unfold, source)
+                )
+                if not sources:
+                    return self._internal_error("Could not unfold the playlist URL")
+
+                videos = [
+                    Video(IdentityService.id_video(source), source, collection_id)
+                    for source in sources
+                ]
+
+                workflow_id = IdentityService.id_workflow(
+                    QueuePlaylistWorkflow, video_id
+                )
+                self._start_workflow(
+                    QueuePlaylistWorkflow,
+                    workflow_id,
+                    self._data_facade,
+                    videos,
+                    playlist_id,
+                )
+                return self._no_content()
 
         video = Video(video_id, source, collection_id=None)
         self._start_workflow(

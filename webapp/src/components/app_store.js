@@ -45,6 +45,13 @@ export class AppStore {
       VideoDeleted: (e) => this.removeVideo(e.model_id),
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
+      Notification: (e) =>
+        this.enqueueSnackbar({
+          message: e.message,
+          options: {
+            variant: "info",
+          },
+        }),
     });
 
     tasks.push(new UpdateMediaTime(this, eventDispatcher));
