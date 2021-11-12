@@ -17,17 +17,67 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+import { Link } from "react-router-dom";
+
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import VolumeControl from "components/volume_control";
 
+import { durationToHMS } from "services/duration";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
 import "./player_control.css";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
+
+const StyledLink = styled(Link)({
+  color: "inherit",
+  textDecoration: "none",
+});
+
+const renderMediaSecondaryData = (video) => {
+  const artist = video.artist ? (
+    <StyledLink to={`/library/artists/${video.artist}`}>
+      {video.artist}
+    </StyledLink>
+  ) : (
+    "Artist"
+  );
+
+  const album = video.album ? (
+    <StyledLink to={`/library/albums/${video.album}`}>{video.album}</StyledLink>
+  ) : (
+    "Album"
+  );
+
+  const duration = durationToHMS(video.duration);
+
+  return (
+    <Grid
+      container
+      direction="row"
+      sx={{ flexWrap: "nowrap", color: "#505050", minWidth: "0px" }}
+    >
+      <Grid item zeroMinWidth>
+        <Typography noWrap>{artist}</Typography>
+      </Grid>
+      <Grid item zeroMinWidth>
+        <Stack direction="row">
+          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
+          <Typography noWrap>{album}</Typography>
+        </Stack>
+      </Grid>
+      <Grid item>
+        <Stack direction="row">
+          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
+          <Typography noWrap>{duration}</Typography>
+        </Stack>
+      </Grid>
+    </Grid>
+  );
+};
 
 const BarContainer = styled(Stack)({
   backgroundColor: "#F2F2F2",
@@ -189,9 +239,7 @@ const ControlBar = observer(() => {
                 }}
               >
                 <Typography noWrap> {activeVideo.title}</Typography>
-                <Typography>
-                  {activeVideo.album || "Artist • Album • Date"}
-                </Typography>
+                {renderMediaSecondaryData(activeVideo)}
               </Stack>
             </Stack>
 
@@ -322,9 +370,6 @@ const ControlBar = observer(() => {
                 >
                   <Typography noWrap variant="body2">
                     {activeVideo.title}
-                  </Typography>
-                  <Typography variant="caption">
-                    {activeVideo.album || "Artist • Album • Date"}
                   </Typography>
                 </Stack>
               </Stack>
