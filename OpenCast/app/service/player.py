@@ -113,19 +113,17 @@ class PlayerService(Service):
         self._init_player(evt.volume)
 
     def _video_deleted(self, evt):
-        self._stop_player(evt)
-
-    # Private
-    def _player_model(self):
-        return self._player_repo.get_player()
+        player = self._player_repo.get_player()
+        if evt.model_id == player.video_id:
+            self._stop_player(evt)
 
     def _init_player(self, volume):
         self._player.set_volume(volume)
 
     def _update(self, cmd_id, mutator, *args):
         def impl(ctx):
-            model = self._player_model()
-            mutator(model, *args)
-            ctx.update(model)
+            player = self._player_repo.get_player()
+            mutator(player, *args)
+            ctx.update(player)
 
         self._start_transaction(self._player_repo, cmd_id, impl)
