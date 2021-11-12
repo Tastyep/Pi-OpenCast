@@ -4,6 +4,7 @@ from enum import Enum
 from test.util import TestCase
 
 from OpenCast.app.command.video import CreateVideo
+from OpenCast.app.notification import Notification
 from OpenCast.app.tool.json_encoder import (
     EnhancedJSONEncoder,
     EventEncoder,
@@ -15,6 +16,7 @@ from OpenCast.domain.model.video import Path
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Stream, Video
 from OpenCast.domain.service.identity import IdentityService
+from OpenCast.infra.event.downloader import DownloadInfo
 
 
 class EnhancedEncoderTest(TestCase):
@@ -47,7 +49,7 @@ class ModelEncoderTest(TestCase):
         player_id = IdentityService.id_player()
         queue_id = IdentityService.id_playlist()
         player = Player(player_id, queue_id)
-        json.dumps({"id": IdentityService.random(), "player": player}, cls=ModelEncoder)
+        json.dumps(player, cls=ModelEncoder)
 
     def test_encode_video(self):
         video_id = IdentityService.id_video("source")
@@ -68,11 +70,15 @@ class ModelEncoderTest(TestCase):
         video.location = "/tmp/video.mp4"
         video.streams = [Stream(0, "audio", "en")]
         video.subtitle = Path("/tmp/video.srt")
-        json.dumps({"id": IdentityService.random(), "video": video}, cls=ModelEncoder)
+        json.dumps(video, cls=ModelEncoder)
 
 
 class EventEncoderTest(TestCase):
-    def test_encode_event(self):
+    def test_encode_app_notification(self):
+        notif = Notification(IdentityService.random(), "message")
+        json.dumps(notif, cls=EventEncoder)
+
+    def test_encode_domain_event(self):
         video_id = IdentityService.id_video("source")
         collection_id = None
         cmd_id = IdentityService.id_command(CreateVideo, video_id)
@@ -89,4 +95,8 @@ class EventEncoderTest(TestCase):
             "thumbnail",
             VideoState.CREATED,
         )
-        json.dumps({"id": IdentityService.random(), "event": event}, cls=EventEncoder)
+        json.dumps(event, cls=EventEncoder)
+
+    def test_encode_infra_event(self):
+        event = DownloadInfo(IdentityService.random(), IdentityService.random(), 0, 0)
+        json.dumps(event, cls=EventEncoder)
