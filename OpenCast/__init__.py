@@ -83,9 +83,8 @@ def main(argv=None):
     )
 
     io_factory = IoFactory()
-    media_factory = MediaFactory(
-        VlcInstance(), ThreadPoolExecutor(settings["downloader.max_concurrency"])
-    )
+    downloader_executor = ThreadPoolExecutor(settings["downloader.max_concurrency"])
+    media_factory = MediaFactory(VlcInstance(), downloader_executor)
     infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory)
 
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)

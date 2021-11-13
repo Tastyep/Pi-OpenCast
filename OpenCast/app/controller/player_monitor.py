@@ -8,6 +8,7 @@ import structlog
 from aiohttp_apispec import docs
 
 from OpenCast.app.command import player as Cmd
+from OpenCast.app.notification import Level as NotifLevel
 from OpenCast.app.notification import Notification
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
@@ -96,7 +97,7 @@ class PlayerMonitController(MonitorController):
         if self._source_service.is_playlist(source):
             collection_id = IdentityService.random()
             self._evt_dispatcher.dispatch(
-                Notification(collection_id, "unfolding playlist")
+                Notification(collection_id, NotifLevel.INFO, "unfolding playlist")
             )
 
             loop = asyncio.get_running_loop()
@@ -158,7 +159,7 @@ class PlayerMonitController(MonitorController):
         if self._source_service.is_playlist(source):
             collection_id = IdentityService.random()
             self._evt_dispatcher.dispatch(
-                Notification(collection_id, "unfolding playlist")
+                Notification(collection_id, NotifLevel.INFO, "unfolding playlist")
             )
 
             loop = asyncio.get_running_loop()

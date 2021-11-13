@@ -4,6 +4,7 @@ from enum import Enum
 from test.util import TestCase
 
 from OpenCast.app.command.video import CreateVideo
+from OpenCast.app.notification import Level as NotifLevel
 from OpenCast.app.notification import Notification
 from OpenCast.app.tool.json_encoder import (
     EnhancedJSONEncoder,
@@ -75,7 +76,7 @@ class ModelEncoderTest(TestCase):
 
 class EventEncoderTest(TestCase):
     def test_encode_app_notification(self):
-        notif = Notification(IdentityService.random(), "message")
+        notif = Notification(IdentityService.random(), NotifLevel.INFO, "message")
         json.dumps(notif, cls=EventEncoder)
 
     def test_encode_domain_event(self):

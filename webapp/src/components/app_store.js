@@ -49,7 +49,7 @@ export class AppStore {
         this.enqueueSnackbar({
           message: e.message,
           options: {
-            variant: "info",
+            variant: e.level.toLowerCase(),
           },
         }),
     });

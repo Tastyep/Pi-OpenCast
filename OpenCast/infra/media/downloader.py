@@ -69,20 +69,16 @@ class Downloader:
         self._dl_logger = Logger(self._logger)
 
     def download_video(self, op_id: Id, video_id: Id, source: str, dest: str):
-        def impl():
-            def dispatch_dl_events(data):
-                status = data.get("status")
-                total = data.get("total_bytes")
-                downloaded = data.get("downloaded_bytes")
-                if (
-                    status == "downloading"
-                    and downloaded is not None
-                    and total is not None
-                ):
-                    self._evt_dispatcher.dispatch(
-                        DownloadInfo(op_id, video_id, total, downloaded)
-                    )
+        def dispatch_dl_events(data):
+            status = data.get("status")
+            total = data.get("total_bytes")
+            downloaded = data.get("downloaded_bytes")
+            if status == "downloading" and downloaded is not None and total is not None:
+                self._evt_dispatcher.dispatch(
+                    DownloadInfo(op_id, video_id, total, downloaded)
+                )
 
+        def impl():
             self._logger.info("Downloading", video=dest)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
@@ -157,7 +153,7 @@ class Downloader:
             # Causes ydl to return None on error
             "ignoreerrors": True,
             "quiet": True,
-            "progress_hooks": [self._dl_logger.log_download_progress],
+            "progress_hooks": [],
         }
         ydl = YoutubeDL(options)
         with ydl:

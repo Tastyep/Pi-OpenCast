@@ -8,6 +8,9 @@ from typing import Optional
 import structlog
 
 from OpenCast.app.command import video as Cmd
+from OpenCast.app.notification import Level as NotifLevel
+from OpenCast.app.notification import Notification
+from OpenCast.app.service.error import OperationError
 from OpenCast.config import settings
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id
@@ -109,13 +112,18 @@ class VideoWorkflow(Workflow):
             self._video.id,
         )
 
-    def on_enter_DELETING(self, _):
+    def on_enter_DELETING(self, evt):
+        self._evt_dispatcher.dispatch(Notification(evt.id, NotifLevel.ERROR, evt.error))
         self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
     def on_enter_COMPLETED(self, *_):
         self._complete(self._video.id)
 
-    def on_enter_ABORTED(self, _):
+    def on_enter_ABORTED(self, evt):
+        if isinstance(evt, OperationError):
+            self._evt_dispatcher.dispatch(
+                Notification(evt.id, NotifLevel.ERROR, evt.error)
+            )
         self._cancel(self._video.id)
 
     # Conditions
