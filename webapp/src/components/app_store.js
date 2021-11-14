@@ -259,6 +259,7 @@ export class AppStore {
   }
 
   enqueueSnackbar(note) {
+    note.message = note.message.charAt(0).toUpperCase() + note.message.slice(1);
     this.notifications.push({
       key: new Date().getTime() + Math.random(),
       ...note,
