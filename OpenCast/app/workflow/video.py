@@ -97,7 +97,10 @@ class VideoWorkflow(Workflow):
             self._video.id,
         )
 
-    def on_enter_SUB_RETRIEVING(self, _):
+    def on_enter_SUB_RETRIEVING(self, evt):
+        self._evt_dispatcher.dispatch(
+            Notification(evt.id, NotifLevel.INFO, "Fetching subtitles")
+        )
         self._observe_dispatch(
             VideoEvt.VideoSubtitleFetched,
             Cmd.FetchVideoSubtitle,
