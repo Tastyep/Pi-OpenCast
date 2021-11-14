@@ -70,7 +70,7 @@ const App = () => {
   }, [store]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Notifier />
       <Router>
         <HeaderTabs />

@@ -390,7 +390,10 @@ const ControlBar = observer(() => {
                 <IconButton size="small" onClick={playNext}>
                   <SkipNextIcon />
                 </IconButton>
-                <IconButton size="small" onClick={() => setExpanded(!expanded)}>
+                <IconButton
+                  size="medium"
+                  onClick={() => setExpanded(!expanded)}
+                >
                   {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </IconButton>
               </Stack>
