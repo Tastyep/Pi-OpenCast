@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import {
   Avatar,
+  Box,
   Button,
   Divider,
   IconButton,
@@ -238,7 +239,7 @@ const MediaAvatar = ({ video }) => {
   );
 };
 
-const MediaItem = observer(({ playlist, video, isActive }) => {
+const MediaItem = observer(({ video, isActive, playlist }) => {
   const store = useAppStore();
 
   const [isHover, setHover] = useState(false);
@@ -328,53 +329,67 @@ const MediaItem = observer(({ playlist, video, isActive }) => {
       }}
     >
       {isLargeDevice ? (
-        <Grid container>
-          <Grid item xs={5}>
-            <Stack direction="row" alignItems="center">
-              {isActive ? (
-                <PlayingMediaAvatar
-                  video={video}
-                  isPlaying={store.player.isPlaying}
-                />
-              ) : (
-                <MediaAvatar video={video} />
-              )}
+        <Box
+          direction="row"
+          alignItems="center"
+          sx={{ display: "flex", flex: "1 1 auto" }}
+        >
+          <Box sx={{ flex: "none" }}>
+            {isActive ? (
+              <PlayingMediaAvatar
+                video={video}
+                isPlaying={store.player.isPlaying}
+              />
+            ) : (
+              <MediaAvatar video={video} />
+            )}
+          </Box>
+          <Box sx={{ display: "flex", flex: "1 1 0%" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flex: "6 1 0",
+                justifyContent: "space-between",
+              }}
+            >
               <StyledLink to="#" onClick={() => playVideo(video, store)}>
                 <ListItemText>{video.title}</ListItemText>
               </StyledLink>
-            </Stack>
-          </Grid>
-          <Grid item xs alignSelf="center">
-            {video.artist ? (
-              <StyledLink
-                to={`/library/artists/${video.artist}`}
-                color="inherit"
-                underline="none"
-              >
-                <ListItemText sx={{ color: "#505050" }}>
-                  {video.artist}
-                </ListItemText>
-              </StyledLink>
-            ) : (
-              <Divider sx={{ width: "24px" }} />
-            )}
-          </Grid>
-          <Grid item xs alignSelf="center">
-            {video.album ? (
-              <StyledLink
-                to={`/library/albums/${video.album}`}
-                color="inherit"
-                underline="none"
-              >
-                <ListItemText sx={{ color: "#505050" }}>
-                  {video.album}
-                </ListItemText>
-              </StyledLink>
-            ) : (
-              <Divider sx={{ width: "24px" }} />
-            )}
-          </Grid>
-          <Grid item alignSelf="center" xs={1} sx={{ textAlign: "right" }}>
+            </Box>
+            <Box sx={{ display: "flex", flex: "9 1 0", alignItems: "center" }}>
+              <Box sx={{ flex: "1 1 0%" }}>
+                {video.artist ? (
+                  <StyledLink
+                    to={`/library/artists/${video.artist}`}
+                    color="inherit"
+                    underline="none"
+                  >
+                    <ListItemText sx={{ color: "#505050" }}>
+                      {video.artist}
+                    </ListItemText>
+                  </StyledLink>
+                ) : (
+                  <Divider sx={{ width: "24px" }} />
+                )}
+              </Box>
+              <Box sx={{ flex: "1 1 0%" }}>
+                {video.album ? (
+                  <StyledLink
+                    to={`/library/albums/${video.album}`}
+                    color="inherit"
+                    underline="none"
+                  >
+                    <ListItemText sx={{ color: "#505050" }}>
+                      {video.album}
+                    </ListItemText>
+                  </StyledLink>
+                ) : (
+                  <Divider sx={{ width: "24px" }} />
+                )}
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ width: "40px" }}>
             {isHover || isMenuOpen || isPlMenuOpen ? (
               <IconButton
                 aria-controls="media-menu"
@@ -384,14 +399,20 @@ const MediaItem = observer(({ playlist, video, isActive }) => {
               >
                 <MoreVertIcon />
               </IconButton>
-            ) : (
-              <ListItemText
-                primary={durationToHMS(video.duration)}
-                sx={{ color: "#505050" }}
-              />
-            )}
-          </Grid>
-        </Grid>
+            ) : null}
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <ListItemText
+              primary={durationToHMS(video.duration)}
+              sx={{
+                width: "54px",
+                color: "#505050",
+                marginRight: "8px",
+                textAlign: "end",
+              }}
+            />
+          </Box>
+        </Box>
       ) : (
         <Grid container alignItems="center" flexWrap="nowrap">
           <Grid
