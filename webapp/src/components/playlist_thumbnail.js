@@ -28,7 +28,7 @@ const PlaylistThumbnail = ({ videos }) => {
       {popVideos.length > 0 ? (
         <ImageList cols={2} gap={0} sx={{ width: "100%", height: "100%" }}>
           {[0, 1, 2, 3].map((index) => (
-            <ImageListItem key={index}>
+            <ImageListItem key={index} sx={{ aspectRatio: "1/1" }}>
               <img
                 src={popVideos[index % popVideos.length].thumbnail}
                 alt={popVideos[index % popVideos.length].title}
