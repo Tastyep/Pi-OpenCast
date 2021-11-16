@@ -209,31 +209,37 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const PlayingMediaAvatar = observer(({ video, isPlaying }) => {
+const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
   const store = useAppStore();
 
   return (
-    <IconButton
-      sx={{ marginRight: "8px" }}
-      onClick={() => {
-        playerAPI.pauseMedia().catch(snackBarHandler(store));
-      }}
-    >
-      <Avatar alt={video.title}>
-        {isPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}
-      </Avatar>
+    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
+      <Avatar alt={video.title} src={video.thumbnail} />
+      <Box
+        justifyContent="center"
+        alignItems="center"
+        sx={{
+          display: "flex",
+          height: "40px",
+          width: "40px",
+          position: "absolute",
+          backgroundColor: "rgba(0,0,0,0.33)",
+          borderRadius: "100%",
+        }}
+      >
+        {isPlaying ? (
+          <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
+        ) : (
+          <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
+        )}
+      </Box>
     </IconButton>
   );
 });
 
-const MediaAvatar = ({ video, isHover }) => {
-  const store = useAppStore();
-
+const MediaAvatar = ({ video, isHover, onClick }) => {
   return (
-    <IconButton
-      sx={{ marginRight: "8px" }}
-      onClick={() => playVideo(video, store)}
-    >
+    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
       <Avatar alt={video.title} src={video.thumbnail} />
       {isHover && (
         <Box
@@ -355,9 +361,16 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
               <PlayingMediaAvatar
                 video={video}
                 isPlaying={store.player.isPlaying}
+                onClick={() => {
+                  playerAPI.pauseMedia().catch(snackBarHandler(store));
+                }}
               />
             ) : (
-              <MediaAvatar video={video} isHover={isHover} />
+              <MediaAvatar
+                video={video}
+                isHover={isHover}
+                onClick={() => playVideo(video, store)}
+              />
             )}
           </Box>
           <Box sx={{ display: "flex", flex: "1 1 0%" }}>
@@ -443,9 +456,16 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
               <PlayingMediaAvatar
                 video={video}
                 isPlaying={store.player.isPlaying}
+                onClick={() => {
+                  playerAPI.pauseMedia().catch(snackBarHandler(store));
+                }}
               />
             ) : (
-              <MediaAvatar video={video} />
+              <MediaAvatar
+                video={video}
+                isHover={isHover}
+                onClick={() => playVideo(video, store)}
+              />
             )}
             <Stack sx={{ minWidth: "0px" }}>
               <StyledLink
@@ -529,4 +549,4 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
   );
 });
 
-export default MediaItem;
+export { MediaItem, MediaAvatar, PlayingMediaAvatar };

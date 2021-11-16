@@ -29,7 +29,7 @@ import { humanReadableDuration } from "services/duration";
 
 import { useAppStore } from "components/app_context";
 import ArtistThumbnail from "components/artist_thumbnail";
-import MediaItem from "components/media_item";
+import { MediaItem } from "components/media_item";
 
 const pluralize = require("pluralize");
 

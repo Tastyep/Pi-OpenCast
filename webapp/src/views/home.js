@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 import { styled } from "@mui/material/styles";
 
@@ -39,6 +39,7 @@ import { queueNext, queueLast, shuffleIds } from "services/playlist";
 
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
+import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
 
 const PageContainer = styled("div")({
   display: "flex",
@@ -61,17 +62,11 @@ const LargeThumbnail = styled("img")({
   paddingBottom: "16px",
 });
 
-const PlayingMediaAvatar = observer(({ media, isPlaying }) => {
-  return (
-    <Avatar alt={media.title}>
-      {isPlaying ? <VolumeUpIcon /> : <PlayArrowIcon />}
-    </Avatar>
-  );
-});
-
 const MediaItem = observer((props) => {
   const store = useAppStore();
   const { video, isActive, isLast, provided, snapshot } = props;
+
+  const [isHover, setHover] = useState(false);
 
   const onMediaClicked = () => {
     if (isActive === false) {
@@ -110,18 +105,25 @@ const MediaItem = observer((props) => {
         button
         disableRipple
         {...conditionalProps}
+        sx={{ paddingLeft: "8px" }}
         onClick={onMediaClicked}
+        onMouseEnter={() => {
+          setHover(true);
+        }}
+        onMouseLeave={() => {
+          setHover(false);
+        }}
       >
         <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
           <Stack direction="row" alignItems="center">
             <ListItemAvatar>
               {isActive ? (
                 <PlayingMediaAvatar
-                  media={video}
+                  video={video}
                   isPlaying={store.player.isPlaying}
                 />
               ) : (
-                <Avatar alt={video.title} src={video.thumbnail} />
+                <MediaAvatar video={video} isHover={isHover} />
               )}
             </ListItemAvatar>
             <ListItemText primary={video.title} />

@@ -28,7 +28,7 @@ import snackBarHandler from "services/api/error";
 import { humanReadableDuration } from "services/duration";
 
 import { useAppStore } from "components/app_context";
-import MediaItem from "components/media_item";
+import { MediaItem } from "components/media_item";
 
 const pluralize = require("pluralize");
 
