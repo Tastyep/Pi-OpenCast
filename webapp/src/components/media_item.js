@@ -226,7 +226,7 @@ const PlayingMediaAvatar = observer(({ video, isPlaying }) => {
   );
 });
 
-const MediaAvatar = ({ video }) => {
+const MediaAvatar = ({ video, isHover }) => {
   const store = useAppStore();
 
   return (
@@ -235,6 +235,22 @@ const MediaAvatar = ({ video }) => {
       onClick={() => playVideo(video, store)}
     >
       <Avatar alt={video.title} src={video.thumbnail} />
+      {isHover && (
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            display: "flex",
+            height: "40px",
+            width: "40px",
+            position: "absolute",
+            backgroundColor: "rgba(0,0,0,0.33)",
+            borderRadius: "100%",
+          }}
+        >
+          <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
+        </Box>
+      )}
     </IconButton>
   );
 };
@@ -341,7 +357,7 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
                 isPlaying={store.player.isPlaying}
               />
             ) : (
-              <MediaAvatar video={video} />
+              <MediaAvatar video={video} isHover={isHover} />
             )}
           </Box>
           <Box sx={{ display: "flex", flex: "1 1 0%" }}>
