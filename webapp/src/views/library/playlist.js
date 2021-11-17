@@ -1,18 +1,26 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { Box, Button, Divider, List, Stack, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
+import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 
 import EditIcon from "@mui/icons-material/Edit";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -182,6 +190,81 @@ const PlaylistMenu = (props) => {
   );
 };
 
+const SuggestionPlaylist = React.memo(({ playlistId, blacklist }) => {
+  const store = useAppStore();
+  const videos = shuffleIds(
+    Object.values(store.videos).filter(
+      (video) =>
+        !blacklist.find((playlistVideo) => playlistVideo.id === video.id)
+    )
+  ).slice(0, 10);
+
+  const addToPlaylist = (video) => {
+    blacklist.push(video)
+    const playlistIds = blacklist.map((video) => video.id)
+    playlistAPI.update(playlistId, { ids: playlistIds }).catch(snackBarHandler(store));
+  }
+
+  return <List sx={{ padding: "0px" }}>
+    {videos.map((video) => (
+      <MediaItem
+        key={video.id}
+        video={video}
+        isActive={video.id === store.player.videoId}
+      >
+        <IconButton onClick={() => addToPlaylist(video)}>
+          <PlaylistAddIcon />
+        </IconButton>
+      </MediaItem>
+    ))}
+  </List>
+})
+
+const Suggestions = ({ playlistId, blacklist }) => {
+  const [expanded, setExpanded] = useState(true);
+
+  return (
+    <>
+      <Stack direction="row" alignItems="center" sx={{ marginTop: "8px" }}>
+        <Typography variant="h6" sx={{ margin: "0px 8px" }}>
+          Suggestions
+        </Typography>
+        <IconButton onClick={() => setExpanded(!expanded)}>
+          {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+        </IconButton>
+      </Stack>
+      <Collapse
+        in={expanded}
+        timeout="auto"
+        sx={{
+          flex: expanded ? "1 1 0" : "0 1 0",
+          overflow: "auto",
+          borderStyle: "solid hidden",
+          borderWidth: "1px",
+          borderColor: "#E0E0E0",
+        }}
+      >
+        <SuggestionPlaylist playlistId={playlistId} blacklist={blacklist} />
+      </Collapse>
+    </>
+  );
+};
+
+const Playlist = observer(({ playlist, videos }) => {
+  const store = useAppStore();
+
+  return <List sx={{ padding: "0px" }}>
+    {videos.map((video) => (
+      <MediaItem
+        key={video.id}
+        playlist={playlist}
+        video={video}
+        isActive={video.id === store.player.videoId}
+      />
+    ))}
+  </List>
+})
+
 const PlaylistPage = observer(() => {
   const store = useAppStore();
   const { id } = useParams();
@@ -283,25 +366,20 @@ const PlaylistPage = observer(() => {
           />
         </Stack>
       </Box>
-      <Divider />
-      <Box
-        sx={{
-          height: "100%",
-          width: "100%",
-          overflow: "auto",
-        }}
-      >
-        <List sx={{ height: "100%", width: "100%", padding: "0px" }}>
-          {videos.map((video) => (
-            <MediaItem
-              key={video.id}
-              playlist={playlist}
-              video={video}
-              isActive={video.id === store.player.videoId}
-            />
-          ))}
-        </List>
-      </Box>
+      <Stack sx={{ flex: "1", minHeight: "0px" }}>
+        <Box
+          sx={{
+            flex: "1.5 1 0",
+            overflow: "auto",
+            borderStyle: "solid hidden",
+            borderWidth: "1px",
+            borderColor: "#E0E0E0",
+          }}
+        >
+          <Playlist playlist={playlist} videos={videos} />
+        </Box>
+        <Suggestions playlistId={id} blacklist={videos} />
+      </Stack>
     </Stack>
   );
 });

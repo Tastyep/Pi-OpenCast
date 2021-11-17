@@ -10,7 +10,6 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar,
-  Avatar,
   ListSubheader,
   LinearProgress,
   Stack,
@@ -18,8 +17,6 @@ import {
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import ClearIcon from "@mui/icons-material/Clear";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 
@@ -35,7 +32,7 @@ import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
-import { queueNext, queueLast, shuffleIds } from "services/playlist";
+import { queueNext, shuffleIds } from "services/playlist";
 
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";

@@ -210,8 +210,6 @@ const PlaylistMenu = (props) => {
 };
 
 const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
-  const store = useAppStore();
-
   return (
     <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
       <Avatar alt={video.title} src={video.thumbnail} />
@@ -261,7 +259,7 @@ const MediaAvatar = ({ video, isHover, onClick }) => {
   );
 };
 
-const MediaItem = observer(({ video, isActive, playlist }) => {
+const MediaItem = observer(({ children, video, isActive, playlist }) => {
   const store = useAppStore();
 
   const [isHover, setHover] = useState(false);
@@ -418,17 +416,17 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
               </Box>
             </Box>
           </Box>
-          <Box sx={{ width: "40px" }}>
-            {isHover || isMenuOpen || isPlMenuOpen ? (
-              <IconButton
-                aria-controls="media-menu"
-                aria-haspopup="true"
-                aria-expanded={isMenuOpen ? "true" : undefined}
-                onClick={(e) => setAnchor(e.currentTarget)}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            ) : null}
+          <Box sx={{ flex: "0 1 auto" }}>
+            <IconButton
+              aria-controls="media-menu"
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen ? "true" : undefined}
+              sx={!(isHover || isMenuOpen || isPlMenuOpen) ? { visibility: "hidden" } : {}}
+              onClick={(e) => setAnchor(e.currentTarget)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            {children}
           </Box>
           <Box sx={{ display: "flex" }}>
             <ListItemText
@@ -480,6 +478,7 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
             </Stack>
           </Grid>
           <Grid item alignSelf="center">
+          {children}
             <IconButton
               aria-controls="media-menu"
               aria-haspopup="true"
@@ -490,7 +489,8 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
             </IconButton>
           </Grid>
         </Grid>
-      )}
+      )
+      }
       <div>
         <Menu
           id="media-menu"
@@ -545,7 +545,7 @@ const MediaItem = observer(({ video, isActive, playlist }) => {
           onItemClicked={addToPlaylist}
         />
       </div>
-    </ListItem>
+    </ListItem >
   );
 });
 
