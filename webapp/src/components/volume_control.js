@@ -9,16 +9,6 @@ import playerAPI from "services/api/player";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
-function ValueLabelComponent(props) {
-  const { children, open, value } = props;
-
-  return (
-    <Tooltip open={open} enterTouchDelay={0} placement="top" title={value}>
-      {children}
-    </Tooltip>
-  );
-}
-
 const VolumeControl = observer(() => {
   const store = useAppStore();
   const theme = useTheme();
@@ -30,14 +20,22 @@ const VolumeControl = observer(() => {
 
   const handleClick = () => {
     if (store.player.volume === 0) {
-      store.player.setVolume(oldVolume);
-      playerAPI.updateVolume(oldVolume);
+      let volume = oldVolume      
+      if (!oldVolume) {
+        volume = 50;
+      }
+      store.player.setVolume(volume);
+      playerAPI.updateVolume(volume);
       return;
     }
     setOldVolume(store.player.volume);
     store.player.setVolume(0);
     playerAPI.updateVolume(0);
   };
+
+  if (store.player.volume === undefined) {
+    return null;
+  }
 
   return (
     <Stack
@@ -49,9 +47,7 @@ const VolumeControl = observer(() => {
       <Slider
         size="small"
         value={store.player.volume}
-        components={{
-          ValueLabel: ValueLabelComponent,
-        }}
+        valueLabelDisplay="auto"
         aria-labelledby="continuous-slider"
         sx={{
           color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
