@@ -37,6 +37,14 @@ const StyledLink = styled(Link)({
   textDecoration: "none",
 });
 
+const BarContainer = styled(Stack)({
+  backgroundColor: "#F2F2F2",
+  alignItems: "center",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  height: "56px",
+});
+
 const renderMediaSecondaryData = (video) => {
   const artist = video.artist ? (
     <StyledLink to={`/library/artists/${video.artist}`}>
@@ -79,31 +87,90 @@ const renderMediaSecondaryData = (video) => {
   );
 };
 
-const BarContainer = styled(Stack)({
-  backgroundColor: "#F2F2F2",
-  alignItems: "center",
-  flexDirection: "row",
-  justifyContent: "space-between",
-  height: "56px",
-  overflow: "clip",
-});
+const updatePlayer = (store, update, ...args) => {
+  update(...args).catch(snackBarHandler(store));
+};
 
-const ControlBar = observer(() => {
+const PausePlayIcon = observer(() => {
   const store = useAppStore();
   const isPlayerPlaying = store.player.isPlaying;
-  const activeVideo = store.videos[store.player.videoId];
 
-  const [expanded, setExpanded] = useState(false);
+  return (
+    <IconButton
+      size="small"
+      onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
+    >
+      {isPlayerPlaying ? (
+        <PauseIcon fontSize="large" />
+      ) : (
+        <PlayArrowIcon fontSize="large" />
+      )}
+    </IconButton>
+  );
+});
+
+const ActiveMediaData = observer(({ variant }) => {
+  const store = useAppStore();
+  const activeVideo = store.videos[store.player.videoId];
 
   if (!activeVideo) {
     return null;
   }
 
-  const updatePlayer = (update, ...args) => {
-    update(...args).catch(snackBarHandler(store));
-  };
+  if (variant === "big") {
+    return (
+      <>
+        <img
+          src={activeVideo.thumbnail}
+          alt={activeVideo.title}
+          style={{ height: "100%" }}
+        />
+        <Stack
+          sx={{
+            marginLeft: "8px",
+            minWidth: "0px",
+            overflow: "hidden",
+          }}
+        >
+          <Typography noWrap> {activeVideo.title}</Typography>
+          {renderMediaSecondaryData(activeVideo)}
+        </Stack>
+      </>
+    );
+  }
+  return (
+    <>
+      <img
+        src={activeVideo.thumbnail}
+        alt={activeVideo.title}
+        style={{
+          height: "100%",
+          aspectRatio: "1/1",
+          objectFit: "cover",
+        }}
+      />
+      <Stack
+        sx={{
+          marginLeft: "8px",
+          minWidth: "0px",
+          overflow: "hidden",
+        }}
+      >
+        <Typography noWrap variant="body2">
+          {activeVideo.title}
+        </Typography>
+      </Stack>
+    </>
+  );
+});
+
+const ControlBar = observer(() => {
+  const store = useAppStore();
+
+  const [expanded, setExpanded] = useState(false);
 
   const playNext = () => {
+    const activeVideo = store.videos[store.player.videoId];
     if (!activeVideo) {
       store.enqueueSnackbar({
         message: "no active media",
@@ -131,6 +198,7 @@ const ControlBar = observer(() => {
   };
 
   const playPrev = () => {
+    const activeVideo = store.videos[store.player.videoId];
     if (!activeVideo) {
       store.enqueueSnackbar({
         message: "no active media",
@@ -167,21 +235,12 @@ const ControlBar = observer(() => {
               <IconButton size="small" onClick={playPrev}>
                 <SkipPreviousIcon />
               </IconButton>
-              <IconButton
-                size="small"
-                onClick={() => updatePlayer(playerAPI.pauseMedia)}
-              >
-                {isPlayerPlaying ? (
-                  <PauseIcon fontSize="large" />
-                ) : (
-                  <PlayArrowIcon fontSize="large" />
-                )}
-              </IconButton>
+              <PausePlayIcon />
               <IconButton
                 size="small"
                 disableFocusRipple
                 disableRipple
-                onClick={() => updatePlayer(playerAPI.stopMedia)}
+                onClick={() => updatePlayer(store, playerAPI.stopMedia)}
               >
                 <StopIcon />
               </IconButton>
@@ -191,26 +250,34 @@ const ControlBar = observer(() => {
 
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.seekMedia, false, true)}
+                onClick={() =>
+                  updatePlayer(store, playerAPI.seekMedia, false, true)
+                }
                 sx={{ marginLeft: "16px" }}
               >
                 <FastRewindIcon />
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.seekMedia, false, false)}
+                onClick={() =>
+                  updatePlayer(store, playerAPI.seekMedia, false, false)
+                }
               >
                 <ArrowLeftIcon />
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.seekMedia, true, false)}
+                onClick={() =>
+                  updatePlayer(store, playerAPI.seekMedia, true, false)
+                }
               >
                 <ArrowRightIcon />
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.seekMedia, true, true)}
+                onClick={() =>
+                  updatePlayer(store, playerAPI.seekMedia, true, true)
+                }
               >
                 <FastForwardIcon />
               </IconButton>
@@ -226,40 +293,30 @@ const ControlBar = observer(() => {
                 overflow: "hidden",
               }}
             >
-              <img
-                src={activeVideo.thumbnail}
-                alt={activeVideo.title}
-                style={{ height: "100%" }}
-              />
-              <Stack
-                sx={{
-                  marginLeft: "8px",
-                  minWidth: "0px",
-                  overflow: "hidden",
-                }}
-              >
-                <Typography noWrap> {activeVideo.title}</Typography>
-                {renderMediaSecondaryData(activeVideo)}
-              </Stack>
+              <ActiveMediaData variant="big" />
             </Stack>
 
             <Stack direction="row">
               <VolumeControl />
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}
+                onClick={() =>
+                  updatePlayer(store, playerAPI.seekSubtitle, false)
+                }
               >
                 <RemoveCircleOutlineIcon />
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.toggleSubtitle)}
+                onClick={() => updatePlayer(store, playerAPI.toggleSubtitle)}
               >
                 <ClosedCaptionIcon />
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => updatePlayer(playerAPI.seekSubtitle, true)}
+                onClick={() =>
+                  updatePlayer(store, playerAPI.seekSubtitle, true)
+                }
               >
                 <AddCircleOutlineIcon />
               </IconButton>
@@ -286,7 +343,7 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(playerAPI.seekMedia, false, true)
+                      updatePlayer(store, playerAPI.seekMedia, false, true)
                     }
                   >
                     <FastRewindIcon />
@@ -294,7 +351,7 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(playerAPI.seekMedia, false, false)
+                      updatePlayer(store, playerAPI.seekMedia, false, false)
                     }
                   >
                     <ArrowLeftIcon />
@@ -303,14 +360,14 @@ const ControlBar = observer(() => {
                     size="small"
                     disableFocusRipple
                     disableRipple
-                    onClick={() => updatePlayer(playerAPI.stopMedia)}
+                    onClick={() => updatePlayer(store, playerAPI.stopMedia)}
                   >
                     <StopIcon />
                   </IconButton>
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(playerAPI.seekMedia, true, false)
+                      updatePlayer(store, playerAPI.seekMedia, true, false)
                     }
                   >
                     <ArrowRightIcon />
@@ -318,7 +375,7 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(playerAPI.seekMedia, true, true)
+                      updatePlayer(store, playerAPI.seekMedia, true, true)
                     }
                   >
                     <FastForwardIcon />
@@ -327,19 +384,25 @@ const ControlBar = observer(() => {
                 <Grid item container xs={6} justifyContent="flex-end">
                   <IconButton
                     size="small"
-                    onClick={() => updatePlayer(playerAPI.seekSubtitle, false)}
+                    onClick={() =>
+                      updatePlayer(store, playerAPI.seekSubtitle, false)
+                    }
                   >
                     <RemoveCircleOutlineIcon />
                   </IconButton>
                   <IconButton
                     size="small"
-                    onClick={() => updatePlayer(playerAPI.toggleSubtitle)}
+                    onClick={() =>
+                      updatePlayer(store, playerAPI.toggleSubtitle)
+                    }
                   >
                     <ClosedCaptionIcon />
                   </IconButton>
                   <IconButton
                     size="small"
-                    onClick={() => updatePlayer(playerAPI.seekSubtitle, true)}
+                    onClick={() =>
+                      updatePlayer(store, playerAPI.seekSubtitle, true)
+                    }
                   >
                     <AddCircleOutlineIcon />
                   </IconButton>
@@ -352,26 +415,7 @@ const ControlBar = observer(() => {
                 alignItems="center"
                 style={{ height: "100%", minWidth: "0px" }}
               >
-                <img
-                  src={activeVideo.thumbnail}
-                  alt={activeVideo.title}
-                  style={{
-                    height: "100%",
-                    aspectRatio: "1/1",
-                    objectFit: "cover",
-                  }}
-                />
-                <Stack
-                  sx={{
-                    marginLeft: "8px",
-                    minWidth: "0px",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Typography noWrap variant="body2">
-                    {activeVideo.title}
-                  </Typography>
-                </Stack>
+                <ActiveMediaData variant="small" />
               </Stack>
               <Stack direction="row">
                 <IconButton size="small" onClick={playPrev}>
@@ -379,7 +423,7 @@ const ControlBar = observer(() => {
                 </IconButton>
                 <IconButton
                   size="small"
-                  onClick={() => updatePlayer(playerAPI.pauseMedia)}
+                  onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
                 >
                   {store.player.state !== "PAUSED" ? (
                     <PauseIcon fontSize="large" />

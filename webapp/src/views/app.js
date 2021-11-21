@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 
 import { Divider, Grid, Tabs, Tab } from "@mui/material";
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
 import { styled } from "@mui/material/styles";
 
 import {
@@ -11,6 +12,8 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
+
+import { observer } from "mobx-react-lite";
 
 import ControlBar from "components/control_bar";
 import PlayerProgress from "components/player_progress";
@@ -62,6 +65,23 @@ const HeaderTabs = () => {
   );
 };
 
+const CollapsableControlBar = observer(() => {
+  const store = useAppStore();
+
+  if (store.player.isStopped === undefined) {
+    return null;
+  }
+
+  return (
+    <Box>
+      <Collapse in={!store.player.isStopped} timeout="auto">
+        <PlayerProgress />
+        <ControlBar />
+      </Collapse>
+    </Box>
+  );
+});
+
 const App = () => {
   const store = useAppStore();
 
@@ -81,12 +101,7 @@ const App = () => {
             flexGrow: 1,
           }}
         >
-          <Grid
-            item
-            xs={false}
-            sm={1}
-            sx={{ backgroundColor: "#F2F2F2" }}
-          ></Grid>
+          <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
           <Grid item xs={12} sm={10} sx={{ height: "100%" }}>
             <Switch>
               <Route exact path="/">
@@ -97,18 +112,9 @@ const App = () => {
               </Route>
             </Switch>
           </Grid>
-          <Grid
-            item
-            xs={false}
-            sm={1}
-            sx={{ backgroundColor: "#F2F2F2" }}
-          ></Grid>
+          <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
         </Grid>
-        <Box>
-          <Divider sx={{ borderColor: "#CECECE" }} />
-          <PlayerProgress />
-          <ControlBar />
-        </Box>
+        <CollapsableControlBar />
       </Router>
     </div>
   );

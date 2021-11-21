@@ -20,7 +20,7 @@ const VolumeControl = observer(() => {
 
   const handleClick = () => {
     if (store.player.volume === 0) {
-      let volume = oldVolume      
+      let volume = oldVolume;
       if (!oldVolume) {
         volume = 50;
       }
