@@ -281,6 +281,10 @@ const HomePage = observer(() => {
   const store = useAppStore();
   const playlistId = store.player.queue;
 
+  if (!playlistId) {
+    return null;
+  }
+
   return (
     <PageContainer>
       <MediaQuery minWidth={SIZES.large.min}>

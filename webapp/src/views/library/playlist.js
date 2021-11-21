@@ -20,7 +20,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -200,38 +200,47 @@ const SuggestionPlaylist = React.memo(({ playlistId, blacklist }) => {
   ).slice(0, 10);
 
   const addToPlaylist = (video) => {
-    blacklist.push(video)
-    const playlistIds = blacklist.map((video) => video.id)
-    playlistAPI.update(playlistId, { ids: playlistIds }).catch(snackBarHandler(store));
-  }
+    blacklist.push(video);
+    const playlistIds = blacklist.map((video) => video.id);
+    playlistAPI
+      .update(playlistId, { ids: playlistIds })
+      .catch(snackBarHandler(store));
+  };
 
-  return <List sx={{ padding: "0px" }}>
-    {videos.map((video) => (
-      <MediaItem
-        key={video.id}
-        video={video}
-        isActive={video.id === store.player.videoId}
-      >
-        <IconButton onClick={() => addToPlaylist(video)}>
-          <PlaylistAddIcon />
-        </IconButton>
-      </MediaItem>
-    ))}
-  </List>
-})
+  return (
+    <List sx={{ padding: "0px" }}>
+      {videos.map((video) => (
+        <MediaItem
+          key={video.id}
+          video={video}
+          isActive={video.id === store.player.videoId}
+        >
+          <IconButton onClick={() => addToPlaylist(video)}>
+            <PlaylistAddIcon />
+          </IconButton>
+        </MediaItem>
+      ))}
+    </List>
+  );
+});
 
 const Suggestions = ({ playlistId, blacklist }) => {
   const [expanded, setExpanded] = useState(true);
 
   return (
     <>
-      <Stack direction="row" alignItems="center" sx={{ marginTop: "8px" }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        sx={{ marginTop: "8px", cursor: "pointer" }}
+        onClick={() => setExpanded(!expanded)}
+      >
         <Typography variant="h6" sx={{ margin: "0px 8px" }}>
           Suggestions
         </Typography>
-        <IconButton onClick={() => setExpanded(!expanded)}>
+        <Box sx={{ marginLeft: "auto", color: "#606060" }}>
           {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
+        </Box>
       </Stack>
       <Collapse
         in={expanded}
@@ -253,17 +262,19 @@ const Suggestions = ({ playlistId, blacklist }) => {
 const Playlist = observer(({ playlist, videos }) => {
   const store = useAppStore();
 
-  return <List sx={{ padding: "0px" }}>
-    {videos.map((video) => (
-      <MediaItem
-        key={video.id}
-        playlist={playlist}
-        video={video}
-        isActive={video.id === store.player.videoId}
-      />
-    ))}
-  </List>
-})
+  return (
+    <List sx={{ padding: "0px" }}>
+      {videos.map((video) => (
+        <MediaItem
+          key={video.id}
+          playlist={playlist}
+          video={video}
+          isActive={video.id === store.player.videoId}
+        />
+      ))}
+    </List>
+  );
+});
 
 const PlaylistPage = observer(() => {
   const store = useAppStore();
