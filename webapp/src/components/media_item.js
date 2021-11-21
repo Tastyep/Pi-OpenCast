@@ -57,6 +57,10 @@ const StyledLink = styled(Link)({
   textDecoration: "none",
 });
 
+const ClickableBox = styled(Box)({
+  cursor: "pointer",
+});
+
 const playVideo = (video, store) => {
   const playerPlaylist = store.playerPlaylist;
 
@@ -379,9 +383,9 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
                 justifyContent: "space-between",
               }}
             >
-              <StyledLink to="#" onClick={() => playVideo(video, store)}>
+              <ClickableBox onClick={() => playVideo(video, store)}>
                 <ListItemText>{video.title}</ListItemText>
-              </StyledLink>
+              </ClickableBox>
             </Box>
             <Box sx={{ display: "flex", flex: "9 1 0", alignItems: "center" }}>
               <Box sx={{ flex: "1 1 0%" }}>
@@ -421,7 +425,11 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
               aria-controls="media-menu"
               aria-haspopup="true"
               aria-expanded={isMenuOpen ? "true" : undefined}
-              sx={!(isHover || isMenuOpen || isPlMenuOpen) ? { visibility: "hidden" } : {}}
+              sx={
+                !(isHover || isMenuOpen || isPlMenuOpen)
+                  ? { visibility: "hidden" }
+                  : {}
+              }
               onClick={(e) => setAnchor(e.currentTarget)}
             >
               <MoreVertIcon />
@@ -466,19 +474,14 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
               />
             )}
             <Stack sx={{ minWidth: "0px" }}>
-              <StyledLink
-                to="#"
-                color="inherit"
-                underline="none"
-                onClick={() => playVideo(video, store)}
-              >
+              <ClickableBox onClick={() => playVideo(video, store)}>
                 <Typography noWrap>{video.title}</Typography>
-              </StyledLink>
+              </ClickableBox>
               {renderMediaSecondaryData(video)}
             </Stack>
           </Grid>
           <Grid item alignSelf="center">
-          {children}
+            {children}
             <IconButton
               aria-controls="media-menu"
               aria-haspopup="true"
@@ -489,8 +492,7 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
             </IconButton>
           </Grid>
         </Grid>
-      )
-      }
+      )}
       <div>
         <Menu
           id="media-menu"
@@ -545,7 +547,7 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
           onItemClicked={addToPlaylist}
         />
       </div>
-    </ListItem >
+    </ListItem>
   );
 });
 
