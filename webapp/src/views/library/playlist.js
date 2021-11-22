@@ -190,41 +190,83 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const SuggestionPlaylist = React.memo(({ playlistId, blacklist }) => {
+const SuggestionMediaItem = observer(({children, video}) => {
   const store = useAppStore();
-  const videos = shuffleIds(
-    Object.values(store.videos).filter(
-      (video) =>
-        !blacklist.find((playlistVideo) => playlistVideo.id === video.id)
-    )
-  ).slice(0, 10);
+  
+  return <MediaItem
+          video={video}
+          isActive={video.id === store.player.videoId}
+        >
+    {children}
+        </MediaItem>
+
+})
+
+const SuggestionPlaylist = React.memo(({ playlist }) => {
+  const store = useAppStore();
+
+  const playlistVideos = store.playlistVideos(playlist.id);
+  const artistWeights = new Map();
+  const albumWeights = new Map();
+  for (const video of playlistVideos) {
+    if (video.artist) {
+      if (!artistWeights.has(video.artist)) {
+        artistWeights.set(video.artist, 1);
+      }
+    }
+    if (video.album) {
+      if (!albumWeights.has(video.album)) {
+        albumWeights.set(video.album, 1);
+      }
+    }
+  }
+
+  let suggestedVideos = Object.values(store.videos).filter(
+    (video) => !playlist.ids.find((videoId) => videoId === video.id)
+  );
+  suggestedVideos = suggestedVideos
+    .sort((first, second) => {
+      const accumulateWeigths = (video) => {
+        let weight = Math.random();
+        if (artistWeights.has(video.artist)) {
+          weight += artistWeights.get(video.artist);
+        }
+        if (albumWeights.has(video.album)) {
+          weight += albumWeights.get(video.album);
+        }
+        return weight;
+      };
+      let firstWeight = accumulateWeigths(first);
+      let secondWeight = accumulateWeigths(second);
+
+      return (
+        Math.random() ** (1 / (firstWeight / 3)) <
+        Math.random() ** (1 / (secondWeight / 3))
+      );
+    })
+    .slice(0, 20);
 
   const addToPlaylist = (video) => {
-    blacklist.push(video);
-    const playlistIds = blacklist.map((video) => video.id);
+    playlist.ids.push(video.id);
     playlistAPI
-      .update(playlistId, { ids: playlistIds })
+      .update(playlist.id, { ids: playlist.ids })
       .catch(snackBarHandler(store));
   };
 
   return (
     <List sx={{ padding: "0px" }}>
-      {videos.map((video) => (
-        <MediaItem
-          key={video.id}
-          video={video}
-          isActive={video.id === store.player.videoId}
-        >
+      {suggestedVideos.map((video) => (
+        <SuggestionMediaItem key={video.id} video={video}>
           <IconButton onClick={() => addToPlaylist(video)}>
             <PlaylistAddIcon />
           </IconButton>
-        </MediaItem>
+          </SuggestionMediaItem>
       ))}
     </List>
   );
 });
 
-const Suggestions = ({ playlistId, blacklist }) => {
+const Suggestions = ({ playlist }) => {
   const [expanded, setExpanded] = useState(true);
 
   return (
@@ -253,7 +295,7 @@ const Suggestions = ({ playlistId, blacklist }) => {
           borderColor: "#E0E0E0",
         }}
       >
-        <SuggestionPlaylist playlistId={playlistId} blacklist={blacklist} />
+        <SuggestionPlaylist playlist={playlist} />
       </Collapse>
     </>
   );
@@ -389,7 +431,7 @@ const PlaylistPage = observer(() => {
         >
           <Playlist playlist={playlist} videos={videos} />
         </Box>
-        <Suggestions playlistId={id} blacklist={videos} />
+        <Suggestions playlist={playlist} />
       </Stack>
     </Stack>
   );
