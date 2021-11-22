@@ -263,8 +263,10 @@ const MediaAvatar = ({ video, isHover, onClick }) => {
   );
 };
 
-const MediaItem = observer(({ children, video, isActive, playlist }) => {
+const MediaItem = observer((props) => {
   const store = useAppStore();
+
+  const { children, video, isActive, playlist, showOptions = true } = props;
 
   const [isHover, setHover] = useState(false);
   const [anchor, setAnchor] = useState(null);
@@ -332,7 +334,7 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
   };
 
   const removePlaylistVideo = (playlist, video) => {
-    closePlMenu();
+    closeMenu();
     playlist.ids.splice(playlist.ids.indexOf(video.id), 1);
     playlistAPI.update(playlist.id, { ids: playlist.ids });
   };
@@ -421,19 +423,21 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
             </Box>
           </Box>
           <Box sx={{ flex: "0 1 auto" }}>
-            <IconButton
-              aria-controls="media-menu"
-              aria-haspopup="true"
-              aria-expanded={isMenuOpen ? "true" : undefined}
-              sx={
-                !(isHover || isMenuOpen || isPlMenuOpen)
-                  ? { visibility: "hidden" }
-                  : {}
-              }
-              onClick={(e) => setAnchor(e.currentTarget)}
-            >
-              <MoreVertIcon />
-            </IconButton>
+            {showOptions && (
+              <IconButton
+                aria-controls="media-menu"
+                aria-haspopup="true"
+                aria-expanded={isMenuOpen ? "true" : undefined}
+                sx={
+                  !(isHover || isMenuOpen || isPlMenuOpen)
+                    ? { visibility: "hidden" }
+                    : {}
+                }
+                onClick={(e) => setAnchor(e.currentTarget)}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            )}
             {children}
           </Box>
           <Box sx={{ display: "flex" }}>
@@ -482,14 +486,16 @@ const MediaItem = observer(({ children, video, isActive, playlist }) => {
           </Grid>
           <Grid item alignSelf="center">
             {children}
-            <IconButton
-              aria-controls="media-menu"
-              aria-haspopup="true"
-              aria-expanded={isMenuOpen ? "true" : undefined}
-              onClick={(e) => setAnchor(e.currentTarget)}
-            >
-              <MoreVertIcon />
-            </IconButton>
+            {showOptions && (
+              <IconButton
+                aria-controls="media-menu"
+                aria-haspopup="true"
+                aria-expanded={isMenuOpen ? "true" : undefined}
+                onClick={(e) => setAnchor(e.currentTarget)}
+              >
+                <MoreVertIcon />
+              </IconButton>
+            )}
           </Grid>
         </Grid>
       )}

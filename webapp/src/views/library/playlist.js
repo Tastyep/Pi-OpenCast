@@ -29,6 +29,7 @@ import { styled } from "@mui/material/styles";
 import { useParams } from "react-router-dom";
 
 import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
 
 import { observer } from "mobx-react-lite";
 
@@ -192,11 +193,15 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const SuggestionMediaItem = observer(({ children, video }) => {
+const SuggestionMediaItem = observer(({ children, video, isSmallDevice }) => {
   const store = useAppStore();
 
   return (
-    <MediaItem video={video} isActive={video.id === store.player.videoId}>
+    <MediaItem
+      video={video}
+      isActive={video.id === store.player.videoId}
+      showOptions={!isSmallDevice}
+    >
       {children}
     </MediaItem>
   );
@@ -204,6 +209,10 @@ const SuggestionMediaItem = observer(({ children, video }) => {
 
 const SuggestionPlaylist = React.memo(({ playlist }) => {
   const store = useAppStore();
+
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
 
   const playlistVideos = store.playlistVideos(playlist.id);
   const artistWeights = new Map();
@@ -256,7 +265,11 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
   return (
     <List sx={{ padding: "0px" }}>
       {suggestedVideos.map((video) => (
-        <SuggestionMediaItem key={video.id} video={video}>
+        <SuggestionMediaItem
+          key={video.id}
+          video={video}
+          isSmallDevice={isSmallDevice}
+        >
           <IconButton onClick={() => addToPlaylist(video)}>
             <PlaylistAddIcon />
           </IconButton>
