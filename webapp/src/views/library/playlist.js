@@ -190,17 +190,15 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const SuggestionMediaItem = observer(({children, video}) => {
+const SuggestionMediaItem = observer(({ children, video }) => {
   const store = useAppStore();
-  
-  return <MediaItem
-          video={video}
-          isActive={video.id === store.player.videoId}
-        >
-    {children}
-        </MediaItem>
 
-})
+  return (
+    <MediaItem video={video} isActive={video.id === store.player.videoId}>
+      {children}
+    </MediaItem>
+  );
+});
 
 const SuggestionPlaylist = React.memo(({ playlist }) => {
   const store = useAppStore();
@@ -260,7 +258,7 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
           <IconButton onClick={() => addToPlaylist(video)}>
             <PlaylistAddIcon />
           </IconButton>
-          </SuggestionMediaItem>
+        </SuggestionMediaItem>
       ))}
     </List>
   );
@@ -268,18 +266,29 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
 
 const Suggestions = ({ playlist }) => {
   const [expanded, setExpanded] = useState(true);
+  const [refresh, setRefresh] = useState(false);
 
   return (
     <>
       <Stack
         direction="row"
         alignItems="center"
-        sx={{ marginTop: "8px", cursor: "pointer" }}
+        sx={{ margin: "8px 0px", cursor: "pointer" }}
         onClick={() => setExpanded(!expanded)}
       >
         <Typography variant="h6" sx={{ margin: "0px 8px" }}>
           Suggestions
         </Typography>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            setRefresh(!refresh);
+          }}
+        >
+          Refresh
+        </Button>
         <Box sx={{ marginLeft: "auto", color: "#606060" }}>
           {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
         </Box>
@@ -295,7 +304,7 @@ const Suggestions = ({ playlist }) => {
           borderColor: "#E0E0E0",
         }}
       >
-        <SuggestionPlaylist playlist={playlist} />
+        <SuggestionPlaylist playlist={playlist} refresh={refresh} />
       </Collapse>
     </>
   );
