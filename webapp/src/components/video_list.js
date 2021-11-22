@@ -79,6 +79,7 @@ const VideoList = observer(({ videos, count }) => {
               backgroundSize: "cover",
               borderRadius: "8px",
               overflow: "hidden",
+              cursor: "pointer",
             }}
           >
             <img
