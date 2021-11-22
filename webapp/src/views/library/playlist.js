@@ -28,6 +28,8 @@ import { styled } from "@mui/material/styles";
 
 import { useParams } from "react-router-dom";
 
+import { useMediaQuery } from "react-responsive";
+
 import { observer } from "mobx-react-lite";
 
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
@@ -265,7 +267,10 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
 });
 
 const Suggestions = ({ playlist }) => {
-  const [expanded, setExpanded] = useState(true);
+  const isFreeSpaceAvailable = useMediaQuery({
+    minHeight: 2 * playlist.ids.length * 72,
+  });
+  const [expanded, setExpanded] = useState(isFreeSpaceAvailable);
   const [refresh, setRefresh] = useState(false);
 
   return (
