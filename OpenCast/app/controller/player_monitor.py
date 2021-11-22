@@ -108,6 +108,13 @@ class PlayerMonitController(MonitorController):
                 if not sources:
                     return self._internal_error("Could not unfold the playlist URL")
 
+                self._evt_dispatcher.dispatch(
+                    Notification(
+                        collection_id,
+                        NotifLevel.INFO,
+                        f"preparing {len(sources)} media",
+                    )
+                )
                 videos = [
                     Video(IdentityService.id_video(source), source, collection_id)
                     for source in sources
@@ -170,6 +177,13 @@ class PlayerMonitController(MonitorController):
                 if not sources:
                     return self._internal_error("Could not unfold the playlist URL")
 
+                self._evt_dispatcher.dispatch(
+                    Notification(
+                        collection_id,
+                        NotifLevel.INFO,
+                        f"preparing {len(sources)} media",
+                    )
+                )
                 videos = [
                     Video(IdentityService.id_video(source), source, collection_id)
                     for source in sources
