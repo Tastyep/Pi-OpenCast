@@ -208,7 +208,6 @@ const PlaylistsPage = observer(() => {
           flexDirection: "row",
           flexWrap: "wrap",
           gap: "8px 16px",
-          width: "92%",
         }}
       >
         <PlaylistItemContainer>

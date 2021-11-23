@@ -14,7 +14,7 @@ const MediasPage = observer(() => {
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
-  let style = { height: `calc(100% - 16px)`, width: "100%" };
+  let style = { flex: 1, width: "100%", minHeight: "0px" };
   if (!isSmallDevice) {
     style["width"] = "92%";
   }

@@ -127,10 +127,7 @@ const ArtistItem = ({ artist }) => {
 
   return (
     <ArtistItemContainer>
-      <Link
-        to={`/artists/${artist.name}`}
-        style={{ width: "100%", aspectRatio: "1/1" }}
-      >
+      <Link to={artist.name} style={{ width: "100%", aspectRatio: "1/1" }}>
         <ArtistThumbnail albums={artist.albums} />
       </Link>
       <ArtistItemBar>

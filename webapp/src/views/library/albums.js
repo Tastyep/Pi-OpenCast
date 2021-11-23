@@ -124,7 +124,7 @@ const AlbumItem = ({ album }) => {
   return (
     <AlbumItemContainer>
       <Link
-        to={`/albums/${album.name}`}
+        to={album.name}
         style={{
           display: "flex",
           height: "100%",

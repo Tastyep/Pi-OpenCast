@@ -150,7 +150,7 @@ const ArtistPage = observer(() => {
   }
 
   return (
-    <Stack sx={{ height: "100%" }}>
+    <Stack sx={{ height: "100%", width: "100%" }}>
       <Box
         sx={{
           marginTop: "32px",

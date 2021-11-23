@@ -67,7 +67,7 @@ const LibraryLayout = () => {
   const displayTabs = count < 3;
 
   return (
-    <Stack direction="column" alignItems="center" sx={{ flex: "1 1 auto" }}>
+    <Stack direction="column" alignItems="center" sx={{ height: "100%" }}>
       {displayTabs && (
         <Box sx={pageLayout}>
           <Tabs
@@ -109,7 +109,7 @@ const LibraryLayout = () => {
           <Divider />
         </Box>
       )}
-      <Stack alignItems="center" sx={{ flex: 1, overflow: "auto" }}>
+      <Stack alignItems="center" sx={{ overflow: "auto", width: "100%", height: "100%" }}>
         <Outlet />
       </Stack>
     </Stack>

@@ -388,7 +388,7 @@ const PlaylistPage = observer(() => {
   }
 
   return (
-    <Stack sx={{ height: "100%" }}>
+    <Stack sx={{ flex: 1, width: "100%" }}>
       <UpdateModal
         open={isModalOpen}
         close={() => setModalOpen(false)}
@@ -447,7 +447,7 @@ const PlaylistPage = observer(() => {
           />
         </Stack>
       </Box>
-      <Stack sx={{ flex: "1", minHeight: "0px" }}>
+      <Stack sx={{ flex: 1, minHeight: "0px" }}>
         <Box
           sx={{
             flex: "1.5 1 0",

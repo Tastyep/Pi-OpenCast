@@ -103,7 +103,7 @@ const Layout = () => {
         container
         sx={{
           minHeight: "0px", // Set minHeight of flex item to 0 otherwise it defaults to the content's height
-          flexGrow: 1,
+          flex: 1,
         }}
       >
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
