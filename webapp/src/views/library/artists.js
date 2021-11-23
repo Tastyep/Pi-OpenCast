@@ -17,7 +17,7 @@ import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 
 import { styled } from "@mui/material/styles";
 
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -57,8 +57,6 @@ const ArtistItem = ({ artist }) => {
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
-
-  const { url } = useRouteMatch();
 
   const closeMenu = () => {
     setAnchor(null);
@@ -130,7 +128,7 @@ const ArtistItem = ({ artist }) => {
   return (
     <ArtistItemContainer>
       <Link
-        to={`${url}/${artist.name}`}
+        to={`/artists/${artist.name}`}
         style={{ width: "100%", aspectRatio: "1/1" }}
       >
         <ArtistThumbnail albums={artist.albums} />
@@ -203,6 +201,7 @@ const ArtistsPage = observer(() => {
           flexDirection: "row",
           flexWrap: "wrap",
           gap: "8px 16px",
+          width: "92%",
         }}
       >
         {artists.map((artist, _) => (

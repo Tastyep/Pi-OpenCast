@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import {
+  Box,
   IconButton,
   List,
   ListItem,
@@ -20,7 +21,7 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 
 import { styled } from "@mui/material/styles";
 
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useMatch } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -61,8 +62,6 @@ const PlaylistItem = ({ playlist }) => {
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
-
-  const { url } = useRouteMatch();
 
   const closeMenu = () => {
     setAnchor(null);
@@ -130,10 +129,7 @@ const PlaylistItem = ({ playlist }) => {
 
   return (
     <PlaylistItemContainer>
-      <Link
-        to={`${url}/${playlist.id}`}
-        style={{ width: "100%", aspectRatio: "1/1" }}
-      >
+      <Link to={playlist.id} style={{ width: "100%", aspectRatio: "1/1" }}>
         <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
       </Link>
       <PlaylistItemBar>
@@ -204,7 +200,7 @@ const PlaylistsPage = observer(() => {
     return a.name.localeCompare(b.name);
   });
   return (
-    <>
+    <Stack sx={{ width: "92%" }}>
       <PlaylistModal open={open} close={() => setOpen(false)} />
       <List
         sx={{
@@ -212,6 +208,7 @@ const PlaylistsPage = observer(() => {
           flexDirection: "row",
           flexWrap: "wrap",
           gap: "8px 16px",
+          width: "92%",
         }}
       >
         <PlaylistItemContainer>
@@ -234,7 +231,7 @@ const PlaylistsPage = observer(() => {
           <PlaylistItem key={playlist.id} playlist={playlist} />
         ))}
       </List>
-    </>
+    </Stack>
   );
 });
 

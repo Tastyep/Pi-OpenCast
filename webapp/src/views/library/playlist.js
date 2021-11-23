@@ -26,7 +26,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import { styled } from "@mui/material/styles";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { useMediaQuery } from "react-responsive";
 import { SIZES } from "constants.js";
@@ -110,6 +110,7 @@ const UpdateModal = (props) => {
 const PlaylistMenu = (props) => {
   const store = useAppStore();
   const { open, anchorEl, playlist, closeMenu } = props;
+  const navigate = useNavigate();
 
   const playNext = (playlist) => {
     closeMenu();
@@ -154,7 +155,7 @@ const PlaylistMenu = (props) => {
     playlistAPI
       .delete_(playlist.id)
       .then((_) => {
-        window.location.href = "/library/playlists";
+        navigate("/library/playlists");
       })
       .catch(snackBarHandler(store));
   };

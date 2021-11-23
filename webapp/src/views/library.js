@@ -1,15 +1,8 @@
 import React from "react";
 
 import { Box, Divider, Stack, Tabs, Tab, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
 
-import {
-  Switch,
-  Route,
-  Link,
-  useLocation,
-  useRouteMatch,
-} from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -20,19 +13,9 @@ import AlbumsPage from "views/library/albums";
 import ArtistsPage from "views/library/artists";
 import MediasPage from "views/library/medias";
 import PlaylistsPage from "views/library/playlists";
-import PlaylistPage from "views/library/playlist";
-import ArtistPage from "views/library/artist";
-import AlbumPage from "views/library/album";
 
 import { useAppStore } from "components/app_context";
 import VideoList from "components/video_list";
-
-const SubPageContainer = styled((props) => <Box {...props} />)({
-  display: "flex",
-  height: `calc(100% - 50px)`,
-  justifyContent: "center",
-  overflow: "auto",
-});
 
 const listLastPlayedVideos = (videos) => {
   return Object.values(videos)
@@ -50,11 +33,11 @@ const listPopularVideos = (videos) => {
     .slice(0, 10);
 };
 
-const LibraryMainSubPage = observer(() => {
+const LibraryPage = observer(() => {
   const store = useAppStore();
 
   return (
-    <>
+    <Box sx={{ width: "92%" }}>
       <Typography variant="h6" sx={{ paddingTop: "32px" }}>
         Recent activity
       </Typography>
@@ -66,106 +49,78 @@ const LibraryMainSubPage = observer(() => {
       />
       <Typography variant="h6">Most played</Typography>
       <VideoList videos={listPopularVideos(store.videos)} count={10} />
-    </>
+    </Box>
   );
 });
 
-const LibrarySubPages = () => {
-  let { path, url } = useRouteMatch();
-  let location = useLocation();
+const LibraryLayout = () => {
+  const location = useLocation();
 
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
   const pageLayout = { width: isSmallDevice ? "100%" : "92%" };
-  const subPageLayout = { width: isSmallDevice ? "92%" : "100%" };
+
+  let count = 0;
+  const pathname = location.pathname;
+  for (let i = 0; i < pathname.length; count += pathname[i++] === "/");
+  const displayTabs = count < 3;
 
   return (
-    <Stack direction="column" alignItems="center" sx={{ height: "100%" }}>
-      <Box sx={pageLayout}>
-        <Tabs
-          value={location.pathname}
-          variant="scrollable"
-          allowScrollButtonsMobile
-        >
-          <Tab label="Overview" value={url} to={`${url}`} component={Link} />
-          <Tab
-            label="Playlists"
-            value={`${url}/playlists`}
-            to={`${url}/playlists`}
-            component={Link}
-          />
-          <Tab
-            label="Artists"
-            value={`${url}/artists`}
-            to={`${url}/artists`}
-            component={Link}
-          />
-          <Tab
-            label="Albums"
-            value={`${url}/albums`}
-            to={`${url}/albums`}
-            component={Link}
-          />
-          <Tab
-            label="Titles"
-            value={`${url}/medias`}
-            to={`${url}/medias`}
-            component={Link}
-          />
-        </Tabs>
-        <Divider />
-      </Box>
-      <SubPageContainer sx={pageLayout}>
-        <Switch>
-          <Route exact path={path}>
-            <Box sx={subPageLayout}>
-              <LibraryMainSubPage />
-            </Box>
-          </Route>
-          <Route exact path={`${path}/playlists`}>
-            <Box sx={subPageLayout}>
-              <PlaylistsPage />
-            </Box>
-          </Route>
-          <Route exact path={`${path}/artists`}>
-            <Box sx={subPageLayout}>
-              <ArtistsPage />
-            </Box>
-          </Route>
-          <Route exact path={`${path}/albums`}>
-            <Box sx={subPageLayout}>
-              <AlbumsPage />
-            </Box>
-          </Route>
-          <Route exact path={`${path}/medias`}>
-            <MediasPage />
-          </Route>
-        </Switch>
-      </SubPageContainer>
+    <Stack direction="column" alignItems="center" sx={{ flex: "1 1 auto" }}>
+      {displayTabs && (
+        <Box sx={pageLayout}>
+          <Tabs
+            value={location.pathname}
+            variant="scrollable"
+            allowScrollButtonsMobile
+          >
+            <Tab
+              label="Overview"
+              value={"/library"}
+              to={"/library"}
+              component={Link}
+            />
+            <Tab
+              label="Playlists"
+              value={"/library/playlists"}
+              to={"playlists"}
+              component={Link}
+            />
+            <Tab
+              label="Artists"
+              value={"/library/artists"}
+              to={"artists"}
+              component={Link}
+            />
+            <Tab
+              label="Albums"
+              value={"/library/albums"}
+              to={"albums"}
+              component={Link}
+            />
+            <Tab
+              label="Titles"
+              value={"/library/medias"}
+              to={"medias"}
+              component={Link}
+            />
+          </Tabs>
+          <Divider />
+        </Box>
+      )}
+      <Stack alignItems="center" sx={{ flex: 1, overflow: "auto" }}>
+        <Outlet />
+      </Stack>
     </Stack>
   );
 };
 
-const LibraryPage = () => {
-  const { path } = useRouteMatch();
-
-  return (
-    <Switch>
-      <Route path={`${path}/playlists/:id`}>
-        <PlaylistPage />
-      </Route>
-      <Route path={`${path}/artists/:name`}>
-        <ArtistPage />
-      </Route>
-      <Route path={`${path}/albums/:name`}>
-        <AlbumPage />
-      </Route>
-      <Route path="/library">
-        <LibrarySubPages />
-      </Route>
-    </Switch>
-  );
+export {
+  LibraryLayout,
+  LibraryPage,
+  PlaylistsPage,
+  ArtistsPage,
+  AlbumsPage,
+  MediasPage,
 };
-
-export default LibraryPage;
