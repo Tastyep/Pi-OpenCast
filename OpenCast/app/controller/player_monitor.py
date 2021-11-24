@@ -405,7 +405,7 @@ class PlayerMonitController(MonitorController):
             channel.send(self._ok(player))
 
         def on_error(evt):
-            channel.send(self._internal_error(evt.error))
+            channel.send(self._internal_error(evt.error, evt.details))
 
         evtcls_handler = {evt_cls: on_success, OperationError: on_error}
         return evtcls_handler, channel

@@ -57,7 +57,7 @@ class PlaylistMonitController(MonitorController):
             channel.send(self._ok(playlist))
 
         def on_error(evt):
-            channel.send(self._internal_error(evt.error))
+            channel.send(self._internal_error(evt.error, evt.details))
 
         self._observe_dispatch(
             {PlaylistEvt.PlaylistCreated: on_success, OperationError: on_error},
@@ -188,7 +188,7 @@ class PlaylistMonitController(MonitorController):
                 channel.send(self._ok(playlist))
 
         def on_error(evt):
-            channel.send(self._internal_error(evt.error))
+            channel.send(self._internal_error(evt.error, evt.details))
 
         def update_field(field, cmd_cls, evt_cls):
             self._observe_dispatch(
@@ -227,6 +227,7 @@ class PlaylistMonitController(MonitorController):
         ],
         responses={
             204: {"description": "Successful operation"},
+            403: {"description": "Forbidden operation"},
             404: {"description": "Playlist not found"},
         },
     )
@@ -241,7 +242,7 @@ class PlaylistMonitController(MonitorController):
             channel.send(self._no_content())
 
         def on_error(evt):
-            channel.send(self._forbidden(evt.error))
+            channel.send(self._forbidden(evt.error, evt.details))
 
         self._observe_dispatch(
             {PlaylistEvt.PlaylistDeleted: on_success, OperationError: on_error},

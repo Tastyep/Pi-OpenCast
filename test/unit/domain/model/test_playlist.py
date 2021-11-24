@@ -41,7 +41,7 @@ class PlaylistTest(ModelTestCase):
         with self.assertRaises(DomainError) as ctx:
             self.playlist.remove(video_id)
         self.assertEqual(
-            f"video '{video_id}' not in playlist '{self.playlist.id}'",
+            "video not in playlist",
             str(ctx.exception),
         )
 

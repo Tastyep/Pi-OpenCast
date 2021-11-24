@@ -110,7 +110,7 @@ class Player(Entity):
 
     def play(self, video_id: Id):
         if self._data.state is not State.STOPPED:
-            raise DomainError("the player is already started")
+            raise DomainError("the player is already started", state=self._data.state)
 
         self._data.video_id = video_id
         self._record(Evt.PlayerVideoUpdated, None, self._data.video_id)

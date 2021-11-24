@@ -60,11 +60,11 @@ class Playlist(Entity):
     def remove(self, video_id):
         if video_id not in self.ids:
             # TODO: update domain error to contain a dict
-            raise DomainError(f"video '{video_id}' not in playlist '{self.id}'")
+            raise DomainError(f"video not in playlist", name=self.name)
         self._data.ids.remove(video_id)
         self._record(Evt.PlaylistContentUpdated, self._data.ids)
 
     def delete(self):
         if self.generated:
-            raise DomainError("cannot delete generated playlists")
+            raise DomainError("cannot delete generated playlists", name=self.name)
         self._record(Evt.PlaylistDeleted, self._data.name, self._data.ids)

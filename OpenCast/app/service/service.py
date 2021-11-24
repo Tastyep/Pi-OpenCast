@@ -4,6 +4,7 @@ import inspect
 import traceback
 from functools import partial
 
+from OpenCast.domain.error import DomainError
 from OpenCast.infra import Id
 from OpenCast.infra.data.repo.error import RepoError
 from OpenCast.util.naming import name_handler_method
@@ -43,6 +44,11 @@ class Service:
                 # TODO: Reaching outside of the loop should trigger an error
                 self._logger.error("Repo error", cmd=cmd, error=e)
                 try_count -= 1
+            except DomainError as e:
+                self._abort_operation(
+                    cmd.id, str(e), e.details, cmd=cmd, traceback=traceback.format_exc()
+                )
+                return
             except Exception as e:
                 self._abort_operation(
                     cmd.id, str(e), {}, cmd=cmd, traceback=traceback.format_exc()
@@ -54,6 +60,10 @@ class Service:
         try:
             getattr(self, handler_name)(evt)
             return
+        except DomainError as e:
+            self._abort_operation(
+                evt.id, str(e), e.details, evt=evt, traceback=traceback.format_exc()
+            )
         except Exception as e:
             self._abort_operation(
                 evt.id, str(e), {}, evt=evt, traceback=traceback.format_exc()

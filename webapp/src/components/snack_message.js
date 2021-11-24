@@ -119,7 +119,7 @@ const SnackMessage = forwardRef((props, ref) => {
             <Paper sx={{ borderRadius: "0px" }}>
               <List>
                 {Object.entries(details).map(([key, value]) => (
-                  <ListItem>
+                  <ListItem key={key}>
                     <Stack
                       direction="row"
                       alignItems="center"
