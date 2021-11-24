@@ -9,6 +9,7 @@
     "@mui/material": "^5.1.1",
     "@mui/styles": "^5.1.1",
     "axios": "^0.24.0",
+    "clsx": "^1.1.1",
     "mobx-react": "^7.2.1",
     "notistack": "^2.0.3",
     "npm": "^8.1.4",

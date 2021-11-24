@@ -6,6 +6,8 @@ import videoAPI from "services/api/video";
 import snackBarHandler from "services/api/error";
 import { UpdateMediaTime } from "tasks/player";
 
+import SnackMessage from "components/snack_message";
+
 let tasks = [];
 
 export class AppStore {
@@ -46,12 +48,15 @@ export class AppStore {
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
       Notification: (e) =>
-        this.enqueueSnackbar({
-          message: e.message,
-          options: {
-            variant: e.level.toLowerCase(),
+        this.enqueueSnackbar(
+          {
+            message: e.message,
+            options: {
+              variant: e.level.toLowerCase(),
+            },
           },
-        }),
+          e.details
+        ),
     });
 
     tasks.push(new UpdateMediaTime(this, eventDispatcher));
@@ -258,8 +263,20 @@ export class AppStore {
     }).get();
   }
 
-  enqueueSnackbar(note) {
+  enqueueSnackbar(note, details) {
     note.message = note.message.charAt(0).toUpperCase() + note.message.slice(1);
+    if (!note.options.content) {
+      note.options.content = (key) => {
+        return (
+          <SnackMessage
+            key={key}
+            message={note.message}
+            options={note.options}
+            details={details}
+          />
+        );
+      };
+    }
     this.notifications.push({
       key: new Date().getTime() + Math.random(),
       ...note,
