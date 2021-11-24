@@ -97,7 +97,12 @@ class PlayerMonitController(MonitorController):
         if self._source_service.is_playlist(source):
             collection_id = IdentityService.random()
             self._evt_dispatcher.dispatch(
-                Notification(collection_id, NotifLevel.INFO, "unfolding playlist")
+                Notification(
+                    collection_id,
+                    NotifLevel.INFO,
+                    "unfolding playlist",
+                    {"source": source},
+                )
             )
 
             loop = asyncio.get_running_loop()
@@ -113,6 +118,7 @@ class PlayerMonitController(MonitorController):
                         collection_id,
                         NotifLevel.INFO,
                         f"preparing {len(sources)} media",
+                        {"source": source},
                     )
                 )
                 videos = [
@@ -166,7 +172,12 @@ class PlayerMonitController(MonitorController):
         if self._source_service.is_playlist(source):
             collection_id = IdentityService.random()
             self._evt_dispatcher.dispatch(
-                Notification(collection_id, NotifLevel.INFO, "unfolding playlist")
+                Notification(
+                    collection_id,
+                    NotifLevel.INFO,
+                    "unfolding playlist",
+                    {"source": source},
+                )
             )
 
             loop = asyncio.get_running_loop()
@@ -182,6 +193,7 @@ class PlayerMonitController(MonitorController):
                         collection_id,
                         NotifLevel.INFO,
                         f"preparing {len(sources)} media",
+                        {"source": source},
                     )
                 )
                 videos = [

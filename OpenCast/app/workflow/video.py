@@ -98,8 +98,11 @@ class VideoWorkflow(Workflow):
         )
 
     def on_enter_SUB_RETRIEVING(self, evt):
+        video = self._video_repo.get(self._video.id)
         self._evt_dispatcher.dispatch(
-            Notification(evt.id, NotifLevel.INFO, "fetching subtitles")
+            Notification(
+                evt.id, NotifLevel.INFO, "fetching subtitles", {"video": video.title}
+            )
         )
         self._observe_dispatch(
             VideoEvt.VideoSubtitleFetched,
@@ -116,7 +119,9 @@ class VideoWorkflow(Workflow):
         )
 
     def on_enter_DELETING(self, evt):
-        self._evt_dispatcher.dispatch(Notification(evt.id, NotifLevel.ERROR, evt.error))
+        self._evt_dispatcher.dispatch(
+            Notification(evt.id, NotifLevel.ERROR, evt.error, evt.details)
+        )
         self._observe_dispatch(VideoEvt.VideoDeleted, Cmd.DeleteVideo, self._video.id)
 
     def on_enter_COMPLETED(self, *_):
@@ -125,7 +130,7 @@ class VideoWorkflow(Workflow):
     def on_enter_ABORTED(self, evt):
         if isinstance(evt, OperationError):
             self._evt_dispatcher.dispatch(
-                Notification(evt.id, NotifLevel.ERROR, evt.error)
+                Notification(evt.id, NotifLevel.ERROR, evt.error, evt.details)
             )
         self._cancel(self._video.id)
 

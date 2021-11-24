@@ -84,9 +84,9 @@ class VideoServiceTest(ServiceTestCase):
         metadata = None
         self.downloader.download_metadata.return_value = metadata
 
-        self.evt_expecter.expect(OperationError, "Unavailable metadata").from_(
-            Cmd.CreateVideo, video_id, source, collection_id=None
-        )
+        self.evt_expecter.expect(
+            OperationError, "Unavailable metadata", {"source": source}
+        ).from_(Cmd.CreateVideo, video_id, source, collection_id=None)
 
     def test_delete_video(self):
         self.data_producer.player().video("source").video("source2").play(
@@ -142,17 +142,18 @@ class VideoServiceTest(ServiceTestCase):
 
     def test_retrieve_video_from_stream_error(self):
         video_id = IdentityService.id_video("http://url")
-        self.data_producer.video("http://url", source_protocol="m3u8").populate(
-            self.data_facade
-        )
+        title = "title"
+        self.data_producer.video(
+            "http://url", title=title, source_protocol="m3u8"
+        ).populate(self.data_facade)
 
         metadata = {}
         self.downloader.download_metadata.return_value = metadata
 
         output_dir = settings["downloader.output_directory"]
-        self.evt_expecter.expect(OperationError, "Unavailable stream URL").from_(
-            Cmd.RetrieveVideo, video_id, output_dir
-        )
+        self.evt_expecter.expect(
+            OperationError, "Unavailable stream URL", {"title": title}
+        ).from_(Cmd.RetrieveVideo, video_id, output_dir)
 
     def test_retrieve_video_download_success(self):
         video_id = IdentityService.id_video("source")

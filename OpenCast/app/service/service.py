@@ -45,7 +45,7 @@ class Service:
                 try_count -= 1
             except Exception as e:
                 self._abort_operation(
-                    cmd.id, str(e), cmd=cmd, traceback=traceback.format_exc()
+                    cmd.id, str(e), {}, cmd=cmd, traceback=traceback.format_exc()
                 )
                 return
 
@@ -56,12 +56,12 @@ class Service:
             return
         except Exception as e:
             self._abort_operation(
-                evt.id, str(e), evt=evt, traceback=traceback.format_exc()
+                evt.id, str(e), {}, evt=evt, traceback=traceback.format_exc()
             )
 
-    def _abort_operation(self, cmd_id: Id, error: str, **logging_attrs):
+    def _abort_operation(self, cmd_id: Id, error: str, details: dict, **logging_attrs):
         self._logger.error(error, **logging_attrs)
-        self._evt_dispatcher.dispatch(OperationError(cmd_id, error))
+        self._evt_dispatcher.dispatch(OperationError(cmd_id, error, details))
 
     def _start_transaction(self, repo, cmd_id, impl, *args):
         context = repo.make_context()

@@ -39,7 +39,9 @@ class VideoService(Service):
             metadata = self._source_service.pick_stream_metadata(cmd.source)
 
         if metadata is None:
-            self._abort_operation(cmd.id, "Unavailable metadata", cmd=cmd)
+            self._abort_operation(
+                cmd.id, "Unavailable metadata", {"source": cmd.source}, cmd=cmd
+            )
             return
 
         if metadata["duration"]:
@@ -69,7 +71,12 @@ class VideoService(Service):
             if video.streamable():
                 link = self._source_service.fetch_stream_link(video.source)
                 if link is None:
-                    self._abort_operation(cmd.id, "Unavailable stream URL", cmd=cmd)
+                    self._abort_operation(
+                        cmd.id,
+                        "Unavailable stream URL",
+                        {"title": video.title},
+                        cmd=cmd,
+                    )
                     return
 
                 video.location = link
@@ -88,7 +95,7 @@ class VideoService(Service):
                 self._start_transaction(self._video_repo, cmd.id, impl)
 
             def abort_operation(evt):
-                self._abort_operation(cmd.id, evt.error, cmd=cmd)
+                self._abort_operation(cmd.id, evt.error, {}, cmd=cmd)
 
             self._evt_dispatcher.observe_result(
                 cmd.id,
