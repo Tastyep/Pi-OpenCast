@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Stack, Slider, Tooltip, Button } from "@mui/material";
+import { Stack, Slider, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import VolumeUp from "@mui/icons-material/VolumeUp";
 import VolumeOff from "@mui/icons-material/VolumeOff";

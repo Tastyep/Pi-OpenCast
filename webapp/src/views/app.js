@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 
-import { Divider, Grid, Tabs, Tab } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
 import { styled } from "@mui/material/styles";
