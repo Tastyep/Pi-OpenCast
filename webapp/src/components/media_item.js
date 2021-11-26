@@ -6,14 +6,12 @@ import {
   Button,
   Divider,
   IconButton,
-  Grid,
   ListItem,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
   Paper,
-  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -130,30 +128,6 @@ const MediaSecondaryData = ({ video }) => {
         <Typography noWrap> • {duration}</Typography>
       </Stack>
     </Stack>
-  );
-
-  return (
-    <Grid
-      container
-      direction="row"
-      sx={{ flexWrap: "nowrap", color: "#505050", minWidth: "0px" }}
-    >
-      <Grid item zeroMinWidth>
-        <Typography noWrap>{artist}</Typography>
-      </Grid>
-      <Grid item zeroMinWidth>
-        <Stack direction="row">
-          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
-          <Typography noWrap>{album}</Typography>
-        </Stack>
-      </Grid>
-      <Grid item>
-        <Stack direction="row">
-          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
-          <Typography noWrap>{duration}</Typography>
-        </Stack>
-      </Grid>
-    </Grid>
   );
 };
 
