@@ -21,6 +21,9 @@ import { useParams } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
+import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
+
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
@@ -114,6 +117,10 @@ const ArtistPage = observer(() => {
   const isMenuOpen = Boolean(anchor);
 
   const artist = store.artists()[name];
+
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
 
   const shufflePlayNext = () => {
     const ids = artist.videos.map((video) => {
@@ -218,6 +225,7 @@ const ArtistPage = observer(() => {
           {artist.videos.map((video) => (
             <MediaItem
               key={video.id}
+              isSmallDevice={isSmallDevice}
               video={video}
               isActive={video.id === store.player.videoId}
             />

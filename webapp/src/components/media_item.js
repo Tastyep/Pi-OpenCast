@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState, useCallback } from "react";
 
 import {
   Avatar,
@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   Paper,
+  Skeleton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -33,9 +34,6 @@ import { styled } from "@mui/material/styles";
 
 import { Link } from "react-router-dom";
 
-import { useMediaQuery } from "react-responsive";
-import { SIZES } from "constants.js";
-
 import { observer } from "mobx-react-lite";
 
 import { durationToHMS } from "services/duration";
@@ -52,7 +50,7 @@ import PlaylistModal from "components/playlist_modal";
 
 const pluralize = require("pluralize");
 
-const StyledLink = styled(Link)({
+const StyledLink = styled((props) => <Link {...props} />)({
   color: "inherit",
   textDecoration: "none",
 });
@@ -81,22 +79,58 @@ const playVideo = (video, store) => {
   }
 };
 
-const renderMediaSecondaryData = (video) => {
+const MediaSecondaryData = ({ video }) => {
   const artist = video.artist ? (
-    <StyledLink to={`/library/artists/${video.artist}`}>
+    <StyledLink
+      to={`/library/artists/${video.artist}`}
+      style={{ whiteSpace: "nowrap" }}
+    >
       {video.artist}
     </StyledLink>
   ) : (
-    "Artist"
+    <div style={{ whiteSpace: "nowrap" }}>Artist</div>
   );
 
   const album = video.album ? (
-    <StyledLink to={`/library/albums/${video.album}`}>{video.album}</StyledLink>
+    <StyledLink
+      to={`/library/albums/${video.album}`}
+      style={{ whiteSpace: "nowrap" }}
+    >
+      • {video.album}
+    </StyledLink>
   ) : (
-    "Album"
+    <div style={{ whiteSpace: "nowrap" }}>• Album</div>
   );
 
   const duration = durationToHMS(video.duration);
+
+  return (
+    <Stack direction="row" sx={{ minWidth: "0px", color: "#505050" }}>
+      <Box
+        sx={{
+          marginRight: "4px",
+          minWidth: "0px",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {artist}
+      </Box>
+      <Box
+        sx={{
+          marginRight: "4px",
+          minWidth: "0px",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {album}
+      </Box>
+      <Stack direction="row">
+        <Typography noWrap> • {duration}</Typography>
+      </Stack>
+    </Stack>
+  );
 
   return (
     <Grid
@@ -126,8 +160,17 @@ const renderMediaSecondaryData = (video) => {
 const PlaylistMenu = (props) => {
   const store = useAppStore();
 
-  const { open, anchorEl, video, closeMenu, onItemClicked } = props;
+  const { anchorEl, video, closeMenu } = props;
   const [modalOpen, setModalOpen] = useState(false);
+  const open = Boolean(anchorEl);
+
+  const addToPlaylist = (playlist, video) => {
+    closeMenu();
+    playlist.ids.push(video.id);
+    playlistAPI
+      .update(playlist.id, { ids: playlist.ids })
+      .catch(snackBarHandler(store));
+  };
 
   return (
     <>
@@ -161,7 +204,7 @@ const PlaylistMenu = (props) => {
                 {Object.values(store.playlists).map((playlist) => (
                   <MenuItem
                     key={playlist.id}
-                    onClick={() => onItemClicked(playlist, video)}
+                    onClick={() => addToPlaylist(playlist, video)}
                   >
                     <div
                       style={{
@@ -213,79 +256,10 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
-  return (
-    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
-      <Avatar alt={video.title} src={video.thumbnail} />
-      <Box
-        justifyContent="center"
-        alignItems="center"
-        sx={{
-          display: "flex",
-          height: "40px",
-          width: "40px",
-          position: "absolute",
-          backgroundColor: "rgba(0,0,0,0.33)",
-          borderRadius: "100%",
-        }}
-      >
-        {isPlaying ? (
-          <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
-        ) : (
-          <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
-        )}
-      </Box>
-    </IconButton>
-  );
-});
-
-const MediaAvatar = ({ video, isHover, onClick }) => {
-  return (
-    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
-      <Avatar alt={video.title} src={video.thumbnail} />
-      {isHover && (
-        <Box
-          justifyContent="center"
-          alignItems="center"
-          sx={{
-            display: "flex",
-            height: "40px",
-            width: "40px",
-            position: "absolute",
-            backgroundColor: "rgba(0,0,0,0.33)",
-            borderRadius: "100%",
-          }}
-        >
-          <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
-        </Box>
-      )}
-    </IconButton>
-  );
-};
-
-const MediaItem = observer((props) => {
+const MediaItemMenu = (props) => {
   const store = useAppStore();
-
-  const { children, video, isActive, playlist, showOptions = true } = props;
-
-  const [isHover, setHover] = useState(false);
-  const [anchor, setAnchor] = useState(null);
-  const isMenuOpen = Boolean(anchor);
-
-  const [anchorPl, setAnchorPl] = useState(null);
-  const isPlMenuOpen = Boolean(anchorPl);
-
-  const isLargeDevice = useMediaQuery({
-    minWidth: SIZES.large.min,
-  });
-
-  const closeMenu = () => {
-    setAnchor(null);
-  };
-
-  const closePlMenu = () => {
-    setAnchorPl(null);
-  };
+  const { anchorEl, setAnchorPl, playlist, video, closeMenu } = props;
+  const isOpen = Boolean(anchorEl);
 
   const playNext = (video) => {
     closeMenu();
@@ -321,16 +295,8 @@ const MediaItem = observer((props) => {
   };
 
   const selectPlaylist = () => {
-    setAnchorPl(anchor);
+    setAnchorPl(anchorEl);
     closeMenu();
-  };
-
-  const addToPlaylist = (playlist, video) => {
-    closePlMenu();
-    playlist.ids.push(video.id);
-    playlistAPI
-      .update(playlist.id, { ids: playlist.ids })
-      .catch(snackBarHandler(store));
   };
 
   const removePlaylistVideo = (playlist, video) => {
@@ -340,21 +306,158 @@ const MediaItem = observer((props) => {
   };
 
   const removeVideo = (video) => {
-    closePlMenu();
+    closeMenu();
     videoAPI.delete_(video.id);
   };
-
   return (
-    <ListItem
-      sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}
-      onMouseEnter={() => {
-        setHover(true);
+    <Menu
+      id="media-menu"
+      anchorEl={anchorEl}
+      open={isOpen}
+      onClose={closeMenu}
+      MenuListProps={{
+        "aria-labelledby": "basic-button",
       }}
-      onMouseLeave={() => {
-        setHover(false);
-      }}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      {isLargeDevice ? (
+      <MenuItem onClick={() => playNext(video)}>
+        <ListItemIcon>
+          <PlaylistPlayIcon />
+        </ListItemIcon>
+        <ListItemText>Play next</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={() => queue(video)}>
+        <ListItemIcon>
+          <QueueMusicIcon />
+        </ListItemIcon>
+        <ListItemText>Add to queue</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={selectPlaylist}>
+        <ListItemIcon>
+          <PlaylistAddIcon />
+        </ListItemIcon>
+        <ListItemText>Add to playlist</ListItemText>
+      </MenuItem>
+      {playlist ? (
+        <MenuItem onClick={() => removePlaylistVideo(playlist, video)}>
+          <ListItemIcon>
+            <DeleteOutlineIcon />
+          </ListItemIcon>
+          <ListItemText>Remove from playlist</ListItemText>
+        </MenuItem>
+      ) : (
+        <MenuItem onClick={() => removeVideo(video)}>
+          <ListItemIcon>
+            <DeleteOutlineIcon />
+          </ListItemIcon>
+          <ListItemText>Delete video</ListItemText>
+        </MenuItem>
+      )}
+    </Menu>
+  );
+};
+
+const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
+  return (
+    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
+      <Avatar alt={video.title} src={video.thumbnail} />
+      <Box
+        justifyContent="center"
+        alignItems="center"
+        sx={{
+          display: "flex",
+          height: "40px",
+          width: "40px",
+          position: "absolute",
+          backgroundColor: "rgba(0,0,0,0.33)",
+          borderRadius: "100%",
+        }}
+      >
+        {isPlaying ? (
+          <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
+        ) : (
+          <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
+        )}
+      </Box>
+    </IconButton>
+  );
+});
+
+const MediaAvatar = memo(({ video, isHover, onClick }) => {
+  return (
+    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
+      <Avatar alt={video.title} src={video.thumbnail} />
+      {isHover && (
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            display: "flex",
+            height: "40px",
+            width: "40px",
+            position: "absolute",
+            backgroundColor: "rgba(0,0,0,0.33)",
+            borderRadius: "100%",
+          }}
+        >
+          <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
+        </Box>
+      )}
+    </IconButton>
+  );
+});
+
+const MediaItem = observer((props) => {
+  const store = useAppStore();
+
+  const {
+    children,
+    isSmallDevice,
+    video,
+    isActive,
+    playlist,
+    showOptions = true,
+  } = props;
+
+  const [isHover, setHover] = useState(false);
+  const [anchor, setAnchor] = useState(null);
+  const isMenuOpen = Boolean(anchor);
+
+  const [anchorPl, setAnchorPl] = useState(null);
+  const isPlMenuOpen = Boolean(anchorPl);
+
+  const closeMenu = useCallback(() => {
+    setAnchor(null);
+  }, []);
+
+  const closePlMenu = useCallback(() => {
+    setAnchorPl(null);
+  }, []);
+
+  const playVideoCallback = useCallback(
+    () => playVideo(video, store),
+    [video, store]
+  );
+
+  const pauseMedia = useCallback(
+    () => playerAPI.pauseMedia().catch(snackBarHandler(store)),
+    [store]
+  );
+
+  const openMenu = useCallback((e) => setAnchor(e.currentTarget), [setAnchor]);
+
+  if (!isSmallDevice) {
+    return (
+      <ListItem
+        sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}
+        onMouseEnter={() => {
+          setHover(true);
+        }}
+        onMouseLeave={() => {
+          setHover(false);
+        }}
+      >
         <Box
           direction="row"
           alignItems="center"
@@ -365,15 +468,13 @@ const MediaItem = observer((props) => {
               <PlayingMediaAvatar
                 video={video}
                 isPlaying={store.player.isPlaying}
-                onClick={() => {
-                  playerAPI.pauseMedia().catch(snackBarHandler(store));
-                }}
+                onClick={pauseMedia}
               />
             ) : (
               <MediaAvatar
                 video={video}
                 isHover={isHover}
-                onClick={() => playVideo(video, store)}
+                onClick={playVideoCallback}
               />
             )}
           </Box>
@@ -423,20 +524,19 @@ const MediaItem = observer((props) => {
             </Box>
           </Box>
           <Box sx={{ flex: "0 1 auto" }}>
-            {showOptions && (
+            {showOptions && (isHover || isMenuOpen || isPlMenuOpen) ? (
               <IconButton
                 aria-controls="media-menu"
                 aria-haspopup="true"
                 aria-expanded={isMenuOpen ? "true" : undefined}
-                sx={
-                  !(isHover || isMenuOpen || isPlMenuOpen)
-                    ? { visibility: "hidden" }
-                    : {}
-                }
-                onClick={(e) => setAnchor(e.currentTarget)}
+                onClick={openMenu}
               >
                 <MoreVertIcon />
               </IconButton>
+            ) : (
+              <div
+                style={{ height: "40px", width: "40px", visibility: "hidden" }}
+              />
             )}
             {children}
           </Box>
@@ -452,106 +552,86 @@ const MediaItem = observer((props) => {
             />
           </Box>
         </Box>
-      ) : (
-        <Grid container alignItems="center" flexWrap="nowrap">
-          <Grid
-            item
-            container
-            xs
-            zeroMinWidth
-            direction="row"
-            flexWrap="nowrap"
-          >
-            {isActive ? (
-              <PlayingMediaAvatar
-                video={video}
-                isPlaying={store.player.isPlaying}
-                onClick={() => {
-                  playerAPI.pauseMedia().catch(snackBarHandler(store));
-                }}
-              />
-            ) : (
-              <MediaAvatar
-                video={video}
-                isHover={isHover}
-                onClick={() => playVideo(video, store)}
-              />
-            )}
-            <Stack sx={{ minWidth: "0px" }}>
-              <ClickableBox onClick={() => playVideo(video, store)}>
-                <Typography noWrap>{video.title}</Typography>
-              </ClickableBox>
-              {renderMediaSecondaryData(video)}
-            </Stack>
-          </Grid>
-          <Grid item alignSelf="center">
-            {children}
-            {showOptions && (
-              <IconButton
-                aria-controls="media-menu"
-                aria-haspopup="true"
-                aria-expanded={isMenuOpen ? "true" : undefined}
-                onClick={(e) => setAnchor(e.currentTarget)}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            )}
-          </Grid>
-        </Grid>
-      )}
-      <div>
-        <Menu
-          id="media-menu"
-          anchorEl={anchor}
-          open={isMenuOpen}
-          onClose={closeMenu}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        >
-          <MenuItem onClick={() => playNext(video)}>
-            <ListItemIcon>
-              <PlaylistPlayIcon />
-            </ListItemIcon>
-            <ListItemText>Play next</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={() => queue(video)}>
-            <ListItemIcon>
-              <QueueMusicIcon />
-            </ListItemIcon>
-            <ListItemText>Add to queue</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={selectPlaylist}>
-            <ListItemIcon>
-              <PlaylistAddIcon />
-            </ListItemIcon>
-            <ListItemText>Add to playlist</ListItemText>
-          </MenuItem>
-          {playlist ? (
-            <MenuItem onClick={() => removePlaylistVideo(playlist, video)}>
-              <ListItemIcon>
-                <DeleteOutlineIcon />
-              </ListItemIcon>
-              <ListItemText>Remove from playlist</ListItemText>
-            </MenuItem>
-          ) : (
-            <MenuItem onClick={() => removeVideo(video)}>
-              <ListItemIcon>
-                <DeleteOutlineIcon />
-              </ListItemIcon>
-              <ListItemText>Delete video</ListItemText>
-            </MenuItem>
+        <div>
+          {anchor && (
+            <MediaItemMenu
+              anchorEl={anchor}
+              setAnchorPl={setAnchorPl}
+              playlist={playlist}
+              video={video}
+              closeMenu={closeMenu}
+            />
           )}
-        </Menu>
-        <PlaylistMenu
-          open={isPlMenuOpen}
-          anchorEl={anchorPl}
-          video={video}
-          closeMenu={closePlMenu}
-          onItemClicked={addToPlaylist}
-        />
+          {anchorPl && (
+            <PlaylistMenu
+              anchorEl={anchorPl}
+              video={video}
+              closeMenu={closePlMenu}
+            />
+          )}
+        </div>
+      </ListItem>
+    );
+  }
+
+  return (
+    <ListItem sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        flexWrap="nowrap"
+        sx={{ minWidth: "0px", flex: 1 }}
+      >
+        {isActive ? (
+          <PlayingMediaAvatar
+            video={video}
+            isPlaying={store.player.isPlaying}
+            onClick={pauseMedia}
+          />
+        ) : (
+          <MediaAvatar
+            video={video}
+            isHover={isHover}
+            onClick={playVideoCallback}
+          />
+        )}
+        <Box sx={{ flex: 1, minWidth: "0px" }}>
+          <ClickableBox onClick={() => playVideo(video, store)}>
+            <Typography noWrap>{video.title}</Typography>
+          </ClickableBox>
+          <MediaSecondaryData video={video} />
+        </Box>
+        <div>
+          {children}
+          {showOptions && (
+            <IconButton
+              aria-controls="media-menu"
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen ? "true" : undefined}
+              onClick={openMenu}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          )}
+        </div>
+      </Stack>
+      <div>
+        {anchor && (
+          <MediaItemMenu
+            anchorEl={anchor}
+            setAnchorPl={setAnchorPl}
+            playlist={playlist}
+            video={video}
+            closeMenu={closeMenu}
+          />
+        )}
+        {anchorPl && (
+          <PlaylistMenu
+            anchorEl={anchorPl}
+            video={video}
+            closeMenu={closePlMenu}
+          />
+        )}
       </div>
     </ListItem>
   );

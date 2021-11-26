@@ -200,6 +200,7 @@ const SuggestionMediaItem = observer(({ children, video, isSmallDevice }) => {
   return (
     <MediaItem
       video={video}
+      isSmallDevice={isSmallDevice}
       isActive={video.id === store.player.videoId}
       showOptions={!isSmallDevice}
     >
@@ -332,11 +333,16 @@ const Suggestions = ({ playlist }) => {
 const Playlist = observer(({ playlist, videos }) => {
   const store = useAppStore();
 
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
+
   return (
     <List sx={{ padding: "0px" }}>
       {videos.map((video) => (
         <MediaItem
           key={video.id}
+          isSmallDevice={isSmallDevice}
           playlist={playlist}
           video={video}
           isActive={video.id === store.player.videoId}

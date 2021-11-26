@@ -109,7 +109,10 @@ const LibraryLayout = () => {
           <Divider />
         </Box>
       )}
-      <Stack alignItems="center" sx={{ overflow: "auto", width: "100%", height: "100%" }}>
+      <Stack
+        alignItems="center"
+        sx={{ overflow: "auto", width: "100%", height: "100%" }}
+      >
         <Outlet />
       </Stack>
     </Stack>

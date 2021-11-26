@@ -21,6 +21,9 @@ import { useParams } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
+import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
+
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
@@ -55,7 +58,7 @@ const AlbumMenu = (props) => {
       .catch(snackBarHandler(store));
   };
 
-  const queue = (playlist) => {
+  const queue = () => {
     closeMenu();
 
     const ids = album.videos.map((video) => video.id);
@@ -89,13 +92,13 @@ const AlbumMenu = (props) => {
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      <MenuItem onClick={() => playNext()}>
+      <MenuItem onClick={playNext}>
         <ListItemIcon>
           <PlaylistPlayIcon />
         </ListItemIcon>
         <ListItemText>Play next</ListItemText>
       </MenuItem>
-      <MenuItem onClick={() => queue()}>
+      <MenuItem onClick={queue}>
         <ListItemIcon>
           <QueueMusicIcon />
         </ListItemIcon>
@@ -113,6 +116,10 @@ const AlbumPage = observer(() => {
   const isMenuOpen = Boolean(anchor);
 
   const album = store.albums()[name];
+
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
 
   const shufflePlayNext = () => {
     const ids = album.videos.map((video) => {
@@ -225,6 +232,7 @@ const AlbumPage = observer(() => {
           {album.videos.map((video) => (
             <MediaItem
               key={video.id}
+              isSmallDevice={isSmallDevice}
               video={video}
               isActive={video.id === store.player.videoId}
             />
