@@ -70,7 +70,7 @@ def title_processor():
         if artist is None:
             return title
 
-        if title[0 : len(artist) + 3] == f"{artist} - ":
+        if title[0 : len(artist) + 3].lower() == f"{artist} - ".lower():
             return title[len(artist) + 3 :]
 
         return title
