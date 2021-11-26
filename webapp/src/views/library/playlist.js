@@ -29,7 +29,6 @@ import { styled } from "@mui/material/styles";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { useMediaQuery } from "react-responsive";
-import { SIZES } from "constants.js";
 
 import { observer } from "mobx-react-lite";
 

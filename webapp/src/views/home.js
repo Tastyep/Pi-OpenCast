@@ -5,12 +5,10 @@ import { styled } from "@mui/material/styles";
 import {
   Container,
   Grid,
-  List,
   Divider,
   ListItem,
   ListItemText,
   ListItemAvatar,
-  ListSubheader,
   LinearProgress,
   Stack,
 } from "@mui/material";
@@ -37,6 +35,7 @@ import { queueNext, shuffleIds } from "services/playlist";
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
 import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
+import { Virtuoso } from "react-virtuoso";
 
 const PageContainer = styled("div")({
   display: "flex",
@@ -61,7 +60,7 @@ const LargeThumbnail = styled("img")({
 
 const MediaItem = observer((props) => {
   const store = useAppStore();
-  const { video, isActive, isLast, provided, snapshot } = props;
+  const { video, isActive, isLast, provided, isDragging, draggingOver } = props;
 
   const [isHover, setHover] = useState(false);
 
@@ -82,9 +81,9 @@ const MediaItem = observer((props) => {
     };
   }
 
-  if (snapshot.isDragging) {
-    let bgcolor = "rgba(200, 200, 200)";
-    if (snapshot.draggingOver === null) {
+  if (isDragging) {
+    let bgcolor = "rgba(200, 200, 200, 0.5)";
+    if (draggingOver === null) {
       bgcolor = "rgba(211, 87, 87, 0.7)";
     }
     conditionalProps = {
@@ -102,7 +101,6 @@ const MediaItem = observer((props) => {
         button
         disableRipple
         {...conditionalProps}
-        sx={{ paddingLeft: "8px" }}
         onClick={onMediaClicked}
         onMouseEnter={() => {
           setHover(true);
@@ -144,71 +142,62 @@ const MediaItem = observer((props) => {
 });
 
 const DraggableMediaItem = observer((props) => {
+  const { video, index } = props;
+
   return (
-    <Draggable draggableId={props.video.id} index={props.index}>
-      {(provided, snapshot) => (
-        <MediaItem {...props} provided={provided} snapshot={snapshot} />
+    <Draggable draggableId={video.id} index={index}>
+      {(provided, _) => (
+        <MediaItem
+          {...props}
+          provided={provided}
+          isDragging={false}
+          draggingOver={null}
+        />
       )}
     </Draggable>
   );
 });
 
-const Playlist = observer(({ playlistId, provided }) => {
+const Playlist = observer(({ videos, provided }) => {
   const store = useAppStore();
-  const videos = store.playlistVideos(playlistId);
 
-  const shufflePlaylist = () => {
-    const playlistIds = queueNext(
-      store.playerPlaylist,
-      store.player.videoId,
-      shuffleIds(store.playerPlaylist.ids)
-    );
-    playlistAPI
-      .update(store.playerPlaylist.id, { ids: playlistIds })
-      .catch(snackBarHandler(store));
-  };
+  const itemContent = (index, video) => (
+    <DraggableMediaItem
+      video={video}
+      index={index}
+      key={video.id}
+      isActive={video.id === store.player.videoId}
+      isLast={index + 1 === videos.length}
+    />
+  );
 
-  const emptyPlaylist = () => {
-    playlistAPI
-      .update(store.playerPlaylist.id, { ids: [] })
-      .catch(snackBarHandler(store));
-  };
+  const Components = React.useMemo(() => {
+    return {
+      HeightPreservingItem: ({ children, ...props }) => {
+        return (
+          // the height is necessary to prevent the item container from collapsing, which confuses Virtuoso measurements
+          <div
+            {...props}
+            style={{ height: props["data-known-size"] || undefined }}
+          >
+            {children}
+          </div>
+        );
+      },
+    };
+  }, []);
 
   return (
-    <List
-      ref={provided.innerRef}
-      subheader={
-        <ListSubheader>
-          <Stack direction="row" alignItems="center">
-            <Typography sx={{ color: "#666666" }}>UP NEXT</Typography>
-            <Box sx={{ marginLeft: "auto", marginRight: "-8px" }}>
-              <IconButton onClick={shufflePlaylist}>
-                <ShuffleIcon />
-              </IconButton>
-              <IconButton onClick={emptyPlaylist}>
-                <ClearIcon />
-              </IconButton>
-            </Box>
-          </Stack>
-        </ListSubheader>
-      }
-      sx={{ width: "100%", overflow: "auto" }}
-    >
-      {videos.map((video, index) => (
-        <DraggableMediaItem
-          video={video}
-          index={index}
-          key={video.id}
-          isActive={video.id === store.player.videoId}
-          isLast={index + 1 === videos.length}
-        />
-      ))}
-      {provided.placeholder}
-    </List>
+    <Virtuoso
+      data={videos}
+      scrollerRef={provided.innerRef}
+      itemContent={itemContent}
+      components={{ Item: Components.HeightPreservingItem }}
+    />
   );
 });
 
-const DroppablePlaylist = ({ playlistId }) => {
+const DroppablePlaylist = observer(({ playlistId }) => {
   const store = useAppStore();
 
   const onDragEnd = useCallback(
@@ -245,21 +234,67 @@ const DroppablePlaylist = ({ playlistId }) => {
     },
     [store]
   );
+  const shufflePlaylist = () => {
+    const playlistIds = queueNext(
+      store.playerPlaylist,
+      store.player.videoId,
+      shuffleIds(store.playerPlaylist.ids)
+    );
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: playlistIds })
+      .catch(snackBarHandler(store));
+  };
 
-  if (!playlistId) {
+  const emptyPlaylist = () => {
+    playlistAPI
+      .update(store.playerPlaylist.id, { ids: [] })
+      .catch(snackBarHandler(store));
+  };
+
+  const videos = store.playlistVideos(playlistId);
+  if (!playlistId || videos.length === 0) {
     return null;
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId={playlistId}>
-        {(provided, _) => (
-          <Playlist playlistId={playlistId} provided={provided} />
-        )}
-      </Droppable>
-    </DragDropContext>
+    <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
+      <Stack direction="row" alignItems="center" sx={{ margin: "16px" }}>
+        <Typography sx={{ color: "#666666", marginLeft: "8px" }}>
+          UP NEXT
+        </Typography>
+        <Box sx={{ marginLeft: "auto", marginRight: "-8px" }}>
+          <IconButton onClick={shufflePlaylist}>
+            <ShuffleIcon />
+          </IconButton>
+          <IconButton onClick={emptyPlaylist}>
+            <ClearIcon />
+          </IconButton>
+        </Box>
+      </Stack>
+      <Box sx={{ flex: 1 }}>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable
+            droppableId={playlistId}
+            mode="virtual"
+            renderClone={(provided, snapshot, rubric) => {
+              return (
+                <MediaItem
+                  video={videos[rubric.source.index]}
+                  provided={provided}
+                  isDragging={snapshot.isDragging}
+                  draggingOver={snapshot.draggingOver}
+                />
+              );
+            }}
+            style={{ width: "100%" }}
+          >
+            {(provided) => <Playlist videos={videos} provided={provided} />}
+          </Droppable>
+        </DragDropContext>
+      </Box>
+    </Stack>
   );
-};
+});
 
 const PlayingMediaThumbnail = observer(() => {
   const store = useAppStore();

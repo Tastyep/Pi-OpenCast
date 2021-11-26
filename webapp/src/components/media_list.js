@@ -16,8 +16,6 @@ const VirtualizedMediaList = observer((props) => {
   const store = useAppStore();
   const { children, videos, style, mediaProps, mediaOptions = null } = props;
 
-  console.log("VIDEOS: ", videos);
-
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
