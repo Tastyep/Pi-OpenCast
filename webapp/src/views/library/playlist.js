@@ -42,6 +42,7 @@ import { humanReadableDuration } from "services/duration";
 import { useAppStore } from "components/app_context";
 import PlaylistThumbnail from "components/playlist_thumbnail";
 import { MediaItem } from "components/media_item";
+import { VirtualizedMediaList } from "components/media_list";
 
 const pluralize = require("pluralize");
 
@@ -194,27 +195,8 @@ const PlaylistMenu = (props) => {
   );
 };
 
-const SuggestionMediaItem = observer(({ children, video, isSmallDevice }) => {
-  const store = useAppStore();
-
-  return (
-    <MediaItem
-      video={video}
-      isSmallDevice={isSmallDevice}
-      isActive={video.id === store.player.videoId}
-      showOptions={!isSmallDevice}
-    >
-      {children}
-    </MediaItem>
-  );
-});
-
 const SuggestionPlaylist = React.memo(({ playlist }) => {
   const store = useAppStore();
-
-  const isSmallDevice = useMediaQuery({
-    maxWidth: SIZES.small.max,
-  });
 
   const playlistVideos = store.playlistVideos(playlist.id);
   const artistWeights = new Map();
@@ -267,15 +249,16 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
   return (
     <List sx={{ padding: "0px" }}>
       {suggestedVideos.map((video) => (
-        <SuggestionMediaItem
+        <MediaItem
           key={video.id}
+          isSmallDevice={false}
           video={video}
-          isSmallDevice={isSmallDevice}
+          isActive={video.id === store.player.videoId}
         >
           <IconButton onClick={() => addToPlaylist(video)}>
             <PlaylistAddIcon />
           </IconButton>
-        </SuggestionMediaItem>
+        </MediaItem>
       ))}
     </List>
   );
@@ -316,6 +299,9 @@ const Suggestions = ({ playlist }) => {
       <Collapse
         in={expanded}
         timeout="auto"
+        classes={{
+          wrapper: { height: "100%" },
+        }}
         sx={{
           flex: expanded ? "1 1 0" : "0 1 0",
           overflow: "auto",
@@ -329,28 +315,6 @@ const Suggestions = ({ playlist }) => {
     </>
   );
 };
-
-const Playlist = observer(({ playlist, videos }) => {
-  const store = useAppStore();
-
-  const isSmallDevice = useMediaQuery({
-    maxWidth: SIZES.small.max,
-  });
-
-  return (
-    <List sx={{ padding: "0px" }}>
-      {videos.map((video) => (
-        <MediaItem
-          key={video.id}
-          isSmallDevice={isSmallDevice}
-          playlist={playlist}
-          video={video}
-          isActive={video.id === store.player.videoId}
-        />
-      ))}
-    </List>
-  );
-});
 
 const PlaylistPage = observer(() => {
   const store = useAppStore();
@@ -463,7 +427,10 @@ const PlaylistPage = observer(() => {
             borderColor: "#E0E0E0",
           }}
         >
-          <Playlist playlist={playlist} videos={videos} />
+          <VirtualizedMediaList
+            videos={videos}
+            mediaProps={{ playlist: playlist }}
+          />
         </Box>
         <Suggestions playlist={playlist} />
       </Stack>

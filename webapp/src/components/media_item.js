@@ -390,7 +390,7 @@ const MediaItem = observer((props) => {
     isSmallDevice,
     video,
     isActive,
-    playlist,
+    playlist = null,
     showOptions = true,
   } = props;
 
@@ -497,7 +497,7 @@ const MediaItem = observer((props) => {
               </Box>
             </Box>
           </Box>
-          <Box sx={{ flex: "0 1 auto" }}>
+          <Box sx={{ display: "inline-flex", flex: "0 1 auto" }}>
             {showOptions && (isHover || isMenuOpen || isPlMenuOpen) ? (
               <IconButton
                 aria-controls="media-menu"
@@ -509,7 +509,11 @@ const MediaItem = observer((props) => {
               </IconButton>
             ) : (
               <div
-                style={{ height: "40px", width: "40px", visibility: "hidden" }}
+                style={{
+                  height: "40px",
+                  width: "40px",
+                  visibility: "hidden",
+                }}
               />
             )}
             {children}

@@ -4,7 +4,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
@@ -21,9 +20,6 @@ import { useParams } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
-import { useMediaQuery } from "react-responsive";
-import { SIZES } from "constants.js";
-
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
@@ -32,7 +28,7 @@ import { humanReadableDuration } from "services/duration";
 
 import { useAppStore } from "components/app_context";
 import ArtistThumbnail from "components/artist_thumbnail";
-import { MediaItem } from "components/media_item";
+import { VirtualizedMediaList } from "components/media_list";
 
 const pluralize = require("pluralize");
 
@@ -117,10 +113,6 @@ const ArtistPage = observer(() => {
   const isMenuOpen = Boolean(anchor);
 
   const artist = store.artists()[name];
-
-  const isSmallDevice = useMediaQuery({
-    maxWidth: SIZES.small.max,
-  });
 
   const shufflePlayNext = () => {
     const ids = artist.videos.map((video) => {
@@ -221,16 +213,7 @@ const ArtistPage = observer(() => {
           overflow: "auto",
         }}
       >
-        <List sx={{ height: "100%", width: "100%", padding: "0px" }}>
-          {artist.videos.map((video) => (
-            <MediaItem
-              key={video.id}
-              isSmallDevice={isSmallDevice}
-              video={video}
-              isActive={video.id === store.player.videoId}
-            />
-          ))}
-        </List>
+        <VirtualizedMediaList videos={artist.videos} />
       </Box>
     </Stack>
   );
