@@ -14,7 +14,7 @@ import { MediaItem } from "components/media_item";
 
 const VirtualizedMediaList = observer((props) => {
   const store = useAppStore();
-  const { children, videos, style, mediaProps, mediaOptions = null } = props;
+  const { videos, style, mediaProps, mediaOptions = null } = props;
 
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
@@ -46,7 +46,6 @@ const VirtualizedMediaList = observer((props) => {
       {...mediaProps}
     >
       {mediaOptions && mediaOptions(video)}
-      {children}
     </MediaItem>
   );
 
