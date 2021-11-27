@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { styled } from "@mui/material/styles";
 
@@ -164,7 +164,31 @@ const DraggableMediaItem = observer((props) => {
 
 const Playlist = observer(({ videos, provided }) => {
   const store = useAppStore();
+  const virtuoso = useRef(null);
   const activeVideoId = store.player.videoId;
+
+  useEffect(() => {
+    if (virtuoso === null) {
+      return;
+    }
+
+    let index = 0;
+    for (; index < videos.length; index++) {
+      if (videos[index].id === activeVideoId) {
+        break;
+      }
+    }
+
+    if (index === videos.length) {
+      return;
+    }
+
+    virtuoso.current.scrollToIndex({
+      index: index,
+      align: "start",
+      behavior: "smooth",
+    });
+  }, [virtuoso, activeVideoId, videos]);
 
   const itemContent = (index, video) => (
     <DraggableMediaItem
@@ -192,10 +216,23 @@ const Playlist = observer(({ videos, provided }) => {
     };
   }, []);
 
+  let activeVideoIndex = 0;
+  for (; activeVideoIndex < videos.length; activeVideoIndex++) {
+    if (videos[activeVideoIndex].id === activeVideoId) {
+      break;
+    }
+  }
+
+  if (activeVideoIndex === videos.length) {
+    activeVideoIndex = 0;
+  }
+
   return (
     <Virtuoso
       data={videos}
+      ref={virtuoso}
       scrollerRef={provided.innerRef}
+      initialTopMostItemIndex={activeVideoIndex}
       itemContent={itemContent}
       components={{ Item: Components.HeightPreservingItem }}
     />
@@ -273,7 +310,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   };
 
   const videos = filter(store.playlistVideos(playlistId));
-  if (!playlistId) {
+  if (!playlistId || videos.length === 0) {
     return null;
   }
 
