@@ -13,10 +13,14 @@ import {
   Stack,
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+
+import SearchIcon from "@mui/icons-material/Search";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -200,8 +204,10 @@ const Playlist = observer(({ videos, provided }) => {
 const DroppablePlaylist = observer(({ playlistId }) => {
   const store = useAppStore();
 
+  const [input, setInput] = useState("");
+
   const onDragEnd = useCallback(
-    (result) => {
+    (result, videos) => {
       const { destination, source, draggableId } = result;
 
       if (!destination) {
@@ -220,11 +226,15 @@ const DroppablePlaylist = observer(({ playlistId }) => {
         return;
       }
 
+      const playlist = store.playlists[destination.droppableId];
+      const nextVideo = videos[destination.index];
+      const realIndex = playlist.ids.indexOf(nextVideo.id);
+
       store.removePlaylistVideo(source.droppableId, draggableId);
       store.insertPlaylistVideo(
-        destination.droppableId,
+        playlist.id,
         draggableId,
-        destination.index
+        realIndex
       );
 
       const destPlaylist = store.playlists[destination.droppableId];
@@ -251,28 +261,74 @@ const DroppablePlaylist = observer(({ playlistId }) => {
       .catch(snackBarHandler(store));
   };
 
-  const videos = store.playlistVideos(playlistId);
-  if (!playlistId || videos.length === 0) {
+  const updateInputContent = (e) => {
+    setInput(e.target.value);
+  };
+
+  const filter = (videos) => {
+    if (input === "") {
+      return videos;
+    }
+    const lowerInput = input.toLowerCase();
+    return videos.filter((video) =>
+      video.title.toLowerCase().includes(lowerInput)
+    );
+  };
+
+  const videos = filter(store.playlistVideos(playlistId));
+  if (!playlistId) {
     return null;
   }
 
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
-      <Stack direction="row" alignItems="center" sx={{ margin: "16px" }}>
-        <Typography sx={{ color: "#666666", marginLeft: "8px" }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        sx={{ margin: "8px 4px 4px 16px" }}
+      >
+        <Typography
+          sx={{
+            flex: "1",
+            color: "#666666",
+            whiteSpace: "nowrap",
+            margin: "0px 8px",
+          }}
+        >
           UP NEXT
         </Typography>
-        <Box sx={{ marginLeft: "auto", marginRight: "-8px" }}>
-          <IconButton onClick={shufflePlaylist}>
+        <Stack direction="row" justifyContent="end" sx={{ flex: "3" }}>
+          <TextField
+            fullWidth
+            variant="standard"
+            label="Filter"
+            size="small"
+            value={input}
+            onChange={updateInputContent}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              flex: "1",
+              transform: "translateY(-8px)",
+              maxWidth: "200px",
+              margin: "0px 8px",
+            }}
+          />
+          <IconButton sx={{ flex: 0 }} onClick={shufflePlaylist}>
             <ShuffleIcon />
           </IconButton>
-          <IconButton onClick={emptyPlaylist}>
+          <IconButton sx={{ flex: 0 }} onClick={emptyPlaylist}>
             <ClearIcon />
           </IconButton>
-        </Box>
+        </Stack>
       </Stack>
       <Box sx={{ flex: 1 }}>
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext onDragEnd={(result) => onDragEnd(result, videos)}>
           <Droppable
             droppableId={playlistId}
             mode="virtual"

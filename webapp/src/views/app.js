@@ -126,8 +126,6 @@ const App = () => {
     store.load();
   }, [store]);
 
-  console.log("APP");
-
   return (
     <Router>
       <Routes>

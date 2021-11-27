@@ -20,7 +20,16 @@ const MediasPage = observer(() => {
 
   const videos = Object.values(store.videos);
   const [input, setInput] = useState("");
-  const filter = () => {
+
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
+  let contentStyle = { flex: 1, width: "100%" };
+  if (!isSmallDevice) {
+    contentStyle["width"] = "92%";
+  }
+
+  const filter = (videos) => {
     if (input === "") {
       return videos;
     }
@@ -32,14 +41,6 @@ const MediasPage = observer(() => {
         (video.album && video.album.toLowerCase().includes(lowerInput))
     );
   };
-
-  const isSmallDevice = useMediaQuery({
-    maxWidth: SIZES.small.max,
-  });
-  let contentStyle = { flex: 1, width: "100%" };
-  if (!isSmallDevice) {
-    contentStyle["width"] = "92%";
-  }
 
   const updateInputContent = (e) => {
     setInput(e.target.value);
