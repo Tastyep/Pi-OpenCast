@@ -164,13 +164,14 @@ const DraggableMediaItem = observer((props) => {
 
 const Playlist = observer(({ videos, provided }) => {
   const store = useAppStore();
+  const activeVideoId = store.player.videoId;
 
   const itemContent = (index, video) => (
     <DraggableMediaItem
       video={video}
       index={index}
       key={video.id}
-      isActive={video.id === store.player.videoId}
+      isActive={video.id === activeVideoId}
       isLast={index + 1 === videos.length}
     />
   );
@@ -231,11 +232,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
       const realIndex = playlist.ids.indexOf(nextVideo.id);
 
       store.removePlaylistVideo(source.droppableId, draggableId);
-      store.insertPlaylistVideo(
-        playlist.id,
-        draggableId,
-        realIndex
-      );
+      store.insertPlaylistVideo(playlist.id, draggableId, realIndex);
 
       const destPlaylist = store.playlists[destination.droppableId];
       playlistAPI
@@ -333,12 +330,15 @@ const DroppablePlaylist = observer(({ playlistId }) => {
             droppableId={playlistId}
             mode="virtual"
             renderClone={(provided, snapshot, rubric) => {
+              const video = videos[rubric.source.index];
               return (
                 <MediaItem
-                  video={videos[rubric.source.index]}
+                  video={video}
                   provided={provided}
                   isDragging={snapshot.isDragging}
                   draggingOver={snapshot.draggingOver}
+                  isActive={video.id === store.player.videoId}
+                  isLast={rubric.source.index + 1 === videos.length}
                 />
               );
             }}
