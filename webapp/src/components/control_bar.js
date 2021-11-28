@@ -421,16 +421,7 @@ const ControlBar = observer(() => {
                 <IconButton size="small" onClick={playPrev}>
                   <SkipPreviousIcon />
                 </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
-                >
-                  {store.player.state !== "PAUSED" ? (
-                    <PauseIcon fontSize="large" />
-                  ) : (
-                    <PlayArrowIcon fontSize="large" />
-                  )}
-                </IconButton>
+                <PausePlayIcon />
                 <IconButton size="small" onClick={playNext}>
                   <SkipNextIcon />
                 </IconButton>
