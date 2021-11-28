@@ -50,6 +50,12 @@ const StreamInput = () => {
     );
   };
 
+  const updateBlur = (evt) => {
+    if (evt.key === "Enter") {
+      evt.target.blur();
+    }
+  };
+
   return (
     <Box>
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
@@ -59,6 +65,7 @@ const StreamInput = () => {
             label="Media's URL"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            onKeyPress={updateBlur}
           />
           <Button
             size="medium"

@@ -4,8 +4,10 @@ import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 
 import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import { observer } from "mobx-react-lite";
 
@@ -45,6 +47,28 @@ const MediasPage = observer(() => {
   const updateInputContent = (e) => {
     setInput(e.target.value);
   };
+
+  const updateBlur = (evt) => {
+    if (evt.key === "Enter") {
+      evt.target.blur();
+    }
+  };
+
+  const endAdornment =
+    input.length > 0 ? (
+      <InputAdornment position="end">
+        <IconButton onClick={() => setInput("")}>
+          <ClearIcon />
+        </IconButton>
+      </InputAdornment>
+    ) : (
+      <InputAdornment position="end">
+        <IconButton>
+          <SearchIcon />
+        </IconButton>
+      </InputAdornment>
+    );
+
   return (
     <Stack style={contentStyle}>
       <Box
@@ -62,12 +86,9 @@ const MediasPage = observer(() => {
           size="small"
           value={input}
           onChange={updateInputContent}
+          onKeyPress={updateBlur}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchIcon />
-              </InputAdornment>
-            ),
+            endAdornment: endAdornment,
           }}
         />
       </Box>

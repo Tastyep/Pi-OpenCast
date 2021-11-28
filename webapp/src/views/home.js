@@ -80,7 +80,6 @@ const MediaItem = observer((props) => {
   let conditionalProps = {};
   if (isActive === true) {
     conditionalProps = {
-      autoFocus: true,
       sx: { backgroundColor: "rgba(246,250,254,1)" },
     };
   }
@@ -296,7 +295,14 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   };
 
   const updateInputContent = (e) => {
+    console.log(e);
     setInput(e.target.value);
+  };
+
+  const updateBlur = (evt) => {
+    if (evt.key === "Enter") {
+      evt.target.blur();
+    }
   };
 
   const filter = (videos) => {
@@ -310,9 +316,24 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   };
 
   const videos = filter(store.playlistVideos(playlistId));
-  if (!playlistId || videos.length === 0) {
+  if (!playlistId) {
     return null;
   }
+
+  const endAdornment =
+    input.length > 0 ? (
+      <InputAdornment position="end">
+        <IconButton onClick={() => setInput("")}>
+          <ClearIcon />
+        </IconButton>
+      </InputAdornment>
+    ) : (
+      <InputAdornment position="end">
+        <IconButton>
+          <SearchIcon />
+        </IconButton>
+      </InputAdornment>
+    );
 
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
@@ -339,12 +360,9 @@ const DroppablePlaylist = observer(({ playlistId }) => {
             size="small"
             value={input}
             onChange={updateInputContent}
+            onKeyPress={updateBlur}
             InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
+              endAdornment: endAdornment,
             }}
             sx={{
               flex: "1",
@@ -362,28 +380,30 @@ const DroppablePlaylist = observer(({ playlistId }) => {
         </Stack>
       </Stack>
       <Box sx={{ flex: 1 }}>
-        <DragDropContext onDragEnd={(result) => onDragEnd(result, videos)}>
-          <Droppable
-            droppableId={playlistId}
-            mode="virtual"
-            renderClone={(provided, snapshot, rubric) => {
-              const video = videos[rubric.source.index];
-              return (
-                <MediaItem
-                  video={video}
-                  provided={provided}
-                  isDragging={snapshot.isDragging}
-                  draggingOver={snapshot.draggingOver}
-                  isActive={video.id === store.player.videoId}
-                  isLast={rubric.source.index + 1 === videos.length}
-                />
-              );
-            }}
-            style={{ width: "100%" }}
-          >
-            {(provided) => <Playlist videos={videos} provided={provided} />}
-          </Droppable>
-        </DragDropContext>
+        {videos.length === 0 ? null : (
+          <DragDropContext onDragEnd={(result) => onDragEnd(result, videos)}>
+            <Droppable
+              droppableId={playlistId}
+              mode="virtual"
+              renderClone={(provided, snapshot, rubric) => {
+                const video = videos[rubric.source.index];
+                return (
+                  <MediaItem
+                    video={video}
+                    provided={provided}
+                    isDragging={snapshot.isDragging}
+                    draggingOver={snapshot.draggingOver}
+                    isActive={video.id === store.player.videoId}
+                    isLast={rubric.source.index + 1 === videos.length}
+                  />
+                );
+              }}
+              style={{ width: "100%" }}
+            >
+              {(provided) => <Playlist videos={videos} provided={provided} />}
+            </Droppable>
+          </DragDropContext>
+        )}
       </Box>
     </Stack>
   );
