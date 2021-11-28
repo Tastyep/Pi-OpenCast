@@ -85,7 +85,7 @@ class VideoServiceTest(ServiceTestCase):
         self.downloader.download_metadata.return_value = metadata
 
         self.evt_expecter.expect(
-            OperationError, "Unavailable metadata", {"source": source}
+            OperationError, "no media found", {"source": source}
         ).from_(Cmd.CreateVideo, video_id, source, collection_id=None)
 
     def test_delete_video(self):

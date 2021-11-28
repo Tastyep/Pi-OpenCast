@@ -40,7 +40,7 @@ class VideoService(Service):
 
         if metadata is None:
             self._abort_operation(
-                cmd.id, "Unavailable metadata", {"source": cmd.source}, cmd=cmd
+                cmd.id, "no media found", {"source": cmd.source}, cmd=cmd
             )
             return
 
