@@ -28,9 +28,10 @@ import { styled } from "@mui/material/styles";
 
 import { useParams, useNavigate } from "react-router-dom";
 
-import { useMediaQuery } from "react-responsive";
-
 import { observer } from "mobx-react-lite";
+
+import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
 
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
@@ -238,6 +239,10 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
     })
     .slice(0, 20);
 
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
+
   const addToPlaylist = (video) => {
     playlist.ids.push(video.id);
     playlistAPI
@@ -250,7 +255,7 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
       {suggestedVideos.map((video) => (
         <MediaItem
           key={video.id}
-          isSmallDevice={false}
+          isSmallDevice={isSmallDevice}
           video={video}
           isActive={video.id === store.player.videoId}
         >
