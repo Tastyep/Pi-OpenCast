@@ -103,7 +103,11 @@ const MediaSecondaryData = ({ video }) => {
   const duration = durationToHMS(video.duration);
 
   return (
-    <Stack direction="row" sx={{ minWidth: "0px", color: "#505050" }}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      sx={{ minWidth: "0px", color: "#505050" }}
+    >
       <Box
         sx={{
           marginRight: "4px",
@@ -124,8 +128,8 @@ const MediaSecondaryData = ({ video }) => {
       >
         {album}
       </Box>
-      <Stack direction="row">
-        <Typography noWrap> • {duration}</Typography>
+      <Stack direction="row" sx={{ whiteSpace: "nowrap" }}>
+        • {duration}
       </Stack>
     </Stack>
   );
@@ -557,7 +561,6 @@ const MediaItem = observer((props) => {
       <Stack
         direction="row"
         alignItems="center"
-        flexWrap="nowrap"
         sx={{ minWidth: "0px", flex: 1 }}
       >
         {isActive ? (
