@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
 from re import compile as reg_compile
+from re import search as reg_search
 from typing import Callable, Generic, List, Optional, TypeVar
 
 from marshmallow import Schema, fields
@@ -70,10 +71,11 @@ def title_processor():
         if artist is None:
             return title
 
-        if title[0 : len(artist) + 3].lower() == f"{artist} - ".lower():
-            return title[len(artist) + 3 :]
+        match = reg_search(f"^{artist}.* - ", title)
+        if not match:
+            return title
 
-        return title
+        return title[match.end() :]
 
     return impl
 
