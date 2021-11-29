@@ -3,6 +3,10 @@ import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 
 const ArtistThumbnail = ({ albums }) => {
+  if (albums.length === 0) {
+    return null;
+  }
+
   return (
     <Box
       sx={{
