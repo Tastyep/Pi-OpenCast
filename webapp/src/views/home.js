@@ -77,11 +77,9 @@ const MediaItem = observer((props) => {
   };
 
   const downloadRatio = video.downloadRatio;
-  let conditionalProps = {};
+  let styles = { margin: "0px" };
   if (isActive === true) {
-    conditionalProps = {
-      sx: { backgroundColor: "rgba(246,250,254,1)" },
-    };
+    styles["backgroundColor"] = "rgba(246,250,254,1)";
   }
 
   if (isDragging) {
@@ -89,10 +87,7 @@ const MediaItem = observer((props) => {
     if (draggingOver === null) {
       bgcolor = "rgba(211, 87, 87, 0.7)";
     }
-    conditionalProps = {
-      ...conditionalProps,
-      ...{ sx: { backgroundColor: bgcolor } },
-    };
+    styles["backgroundColor"] = bgcolor;
   }
 
   return (
@@ -103,7 +98,7 @@ const MediaItem = observer((props) => {
         {...provided.dragHandleProps}
         button
         disableRipple
-        {...conditionalProps}
+        sx={styles}
         onClick={onMediaClicked}
         onMouseEnter={() => {
           setHover(true);
@@ -112,8 +107,17 @@ const MediaItem = observer((props) => {
           setHover(false);
         }}
       >
-        <Stack direction="column" spacing={1} sx={{ width: "100%" }}>
-          <Stack direction="row" alignItems="center">
+        <Stack
+          direction="column"
+          spacing={1}
+          justifyContent="center"
+          sx={{ width: "100%", height: "64px" }}
+        >
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ flex: 1, height: "100%" }}
+          >
             <ListItemAvatar>
               {isActive ? (
                 <PlayingMediaAvatar
@@ -124,7 +128,10 @@ const MediaItem = observer((props) => {
                 <MediaAvatar video={video} isHover={isHover} />
               )}
             </ListItemAvatar>
-            <ListItemText primary={video.title} />
+            <ListItemText
+              primary={video.title}
+              sx={{ maxHeight: "100%", overflow: "hidden" }}
+            />
             <ListItemText
               primary={durationToHMS(video.duration)}
               sx={{
