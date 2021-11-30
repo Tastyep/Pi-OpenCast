@@ -38,6 +38,7 @@ const PlaylistItemContainer = styled(ListItem)({
   flowShrink: 1,
   flexBasis: "256px",
   flexDirection: "column",
+  minWidth: "0px",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
   padding: "0px 0px",
 });
