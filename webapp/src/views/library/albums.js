@@ -10,12 +10,16 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import { styled } from "@mui/material/styles";
 
 import { Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
+
+import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
 
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
@@ -48,7 +52,89 @@ const AlbumItemBar = styled((props) => <Stack {...props} />)({
   overflow: "hidden",
 });
 
-const AlbumItem = ({ album }) => {
+const ThumbnailPlayButton = styled(IconButton)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "absolute",
+  bottom: "52px",
+  right: "14px",
+  background: "rgba(0,0,0,0.33)",
+  "&:hover": {
+    background: "rgba(0,0,0,0.6)",
+    transform: "scale(1.3)",
+  },
+});
+
+const AlbumItemThumbnail = (props) => {
+  const { album, isSmallDevice, isMenuOpen, menuClick, playNext } = props;
+  const [hover, setHover] = useState(isSmallDevice || isMenuOpen);
+
+  const onMenuClick = (evt) => {
+    menuClick(evt);
+    evt.preventDefault();
+  };
+
+  const playAlbum = (evt) => {
+    playNext(true);
+    evt.preventDefault();
+  };
+
+  return (
+    <Link
+      to={album.name}
+      onMouseEnter={() => {
+        setHover(true);
+      }}
+      onMouseLeave={() => {
+        setHover(isMenuOpen);
+      }}
+      style={{
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        borderRadius: "8px",
+        overflow: "hidden",
+      }}
+    >
+      <img
+        src={album.thumbnail}
+        alt={album.name}
+        style={{
+          height: "100%",
+          width: "100%",
+          objectFit: "cover",
+          aspectRatio: "1/1",
+        }}
+      />
+      {hover && (
+        <Stack
+          justifyContent="right"
+          sx={{
+            height: "100%",
+            width: "100%",
+            position: "absolute",
+            borderRadius: "8px 8px 0px 0px",
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 100%)",
+          }}
+        >
+          <IconButton
+            sx={{ position: "absolute", top: "8px", right: "8px" }}
+            onClick={onMenuClick}
+          >
+            <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
+          </IconButton>
+          <ThumbnailPlayButton onClick={playAlbum}>
+            <PlayArrowIcon sx={{ color: "#F5F5F5", marginTop: "auto" }} />
+          </ThumbnailPlayButton>
+        </Stack>
+      )}
+    </Link>
+  );
+};
+
+const AlbumItem = ({ album, isSmallDevice }) => {
   const store = useAppStore();
 
   const [anchor, setAnchor] = useState(null);
@@ -78,7 +164,7 @@ const AlbumItem = ({ album }) => {
       .catch(snackBarHandler(store));
   };
 
-  const playNext = () => {
+  const playNext = (forcePlay = false) => {
     closeMenu();
 
     let videoIds = [];
@@ -91,8 +177,8 @@ const AlbumItem = ({ album }) => {
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
-        if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+        if (forcePlay || store.player.isStopped) {
+          playerAPI.playMedia(videoIds[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -123,52 +209,27 @@ const AlbumItem = ({ album }) => {
 
   return (
     <AlbumItemContainer>
-      <Link
-        to={album.name}
-        style={{
-          display: "flex",
-          height: "100%",
-          width: "100%",
-          borderRadius: "8px",
-          overflow: "hidden",
+      <AlbumItemThumbnail
+        album={album}
+        isSmallDevice={isSmallDevice}
+        isMenuOpen={isMenuOpen}
+        menuClick={(e) => {
+          setAnchor(e.currentTarget);
         }}
-      >
-        <img
-          src={album.thumbnail}
-          alt={album.name}
-          style={{
-            height: "100%",
-            width: "100%",
-            objectFit: "cover",
-            aspectRatio: "1/1",
-          }}
-        />
-      </Link>
+        playNext={playNext}
+      />
       <AlbumItemBar>
-        <div
-          style={{
-            width: "40px",
-            marginRight: "auto",
-            visibility: "hidden",
-          }}
-        ></div>
         <Typography
           sx={{
             color: "#FFFFFF",
             whiteSpace: "nowrap",
             overflow: "hidden",
+            textOverflow: "ellipsis",
+            margin: "0px 8px",
           }}
         >
           {album.name}
         </Typography>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={(e) => {
-            setAnchor(e.currentTarget);
-          }}
-        >
-          <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
-        </IconButton>
       </AlbumItemBar>
       <Menu
         id="album-menu"
@@ -207,6 +268,9 @@ const AlbumItem = ({ album }) => {
 const AlbumsPage = observer(() => {
   const store = useAppStore();
   const albums = Object.values(store.albums());
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
 
   if (albums.length === 0) {
     return null;
@@ -226,7 +290,11 @@ const AlbumsPage = observer(() => {
       }}
     >
       {albums.map((album, _) => (
-        <AlbumItem key={album.name} album={album} />
+        <AlbumItem
+          key={album.name}
+          album={album}
+          isSmallDevice={isSmallDevice}
+        />
       ))}
     </List>
   );
