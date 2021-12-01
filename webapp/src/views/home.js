@@ -21,6 +21,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import SearchIcon from "@mui/icons-material/Search";
+import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -421,7 +422,31 @@ const PlayingMediaThumbnail = observer(() => {
   const video = store.videos[store.player.videoId];
 
   if (!video) {
-    return null;
+    return (
+      <Stack
+        alignItems="center"
+        justifyContent="center"
+        sx={{
+          width: "100%",
+          aspectRatio: "16/9",
+          maxHeight: "100%",
+          objectFit: "contain",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          paddingBottom: "16px",
+          background:
+            "linear-gradient(to bottom right, #9796f0 0%, #fbc7d4 100%)",
+          borderRadius: "16px",
+          overflow: "hidden",
+        }}
+      >
+        <MusicVideoIcon
+          sx={{ height: "50%", width: "50%", color: "rgba(0,0,0,0.6)" }}
+        />
+      </Stack>
+    );
   }
 
   return (
