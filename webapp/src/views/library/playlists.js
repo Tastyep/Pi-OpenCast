@@ -213,7 +213,7 @@ const PlaylistsPage = observer(() => {
     return a.name.localeCompare(b.name);
   });
   return (
-    <Stack sx={{ width: "92%" }}>
+    <Stack sx={{ width: "92%", caretColor: "transparent" }}>
       <PlaylistModal open={open} close={() => setOpen(false)} />
       <List
         sx={{

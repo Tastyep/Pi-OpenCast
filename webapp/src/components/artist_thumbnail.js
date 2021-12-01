@@ -30,7 +30,12 @@ const ArtistThumbnail = ({ albums }) => {
   if (albums.length === 0) {
     return (
       <ArtTrackIcon
-        sx={{ height: "64%", width: "64%", color: "rgba(0,0,0,0.6)" }}
+        sx={{
+          height: "64%",
+          width: "64%",
+          color: "rgba(0,0,0,0.6)",
+          caretColor: "transparent",
+        }}
       />
     );
   }

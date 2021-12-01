@@ -158,17 +158,21 @@ const ArtistPage = observer(() => {
         }}
       >
         <Stack direction="row" alignItems="center">
-          <Box
+          <Stack
+            justifyContent="center"
+            alignItems="center"
             sx={{
               width: "128px",
               height: "128px",
               marginRight: "32px",
               borderRadius: "8px",
               overflow: "hidden",
+              background:
+                "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
             }}
           >
             <ArtistThumbnail albums={artist.albums} />
-          </Box>
+          </Stack>
           <Box>
             <Typography variant="h4">{name}</Typography>
             <Typography>

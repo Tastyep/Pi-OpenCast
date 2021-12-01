@@ -440,6 +440,7 @@ const PlayingMediaThumbnail = observer(() => {
             "linear-gradient(to bottom right, #9796f0 0%, #fbc7d4 100%)",
           borderRadius: "16px",
           overflow: "hidden",
+          caretColor: "transparent",
         }}
       >
         <MusicVideoIcon
