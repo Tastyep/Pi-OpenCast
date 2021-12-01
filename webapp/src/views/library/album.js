@@ -167,8 +167,9 @@ const AlbumPage = observer(() => {
         <Stack direction="row" alignItems="center">
           <Box
             sx={{
-              width: "128px",
-              height: "128px",
+              minWidth: "64px",
+              maxWidth: "128px",
+              aspectRatio: "1/1",
               marginRight: "32px",
               borderRadius: "8px",
               overflow: "hidden",
@@ -184,13 +185,18 @@ const AlbumPage = observer(() => {
               }}
             />
           </Box>
-          <Box>
-            <Typography variant="h4">{name}</Typography>
+          <div>
+            <Typography
+              variant="h5"
+              sx={{ maxHeight: "60px", overflow: "hidden" }}
+            >
+              {name}
+            </Typography>
             <Typography>
               {pluralize("media", album.videos.length, true)}
             </Typography>
             <Typography>{totalDuration()}</Typography>
-          </Box>
+          </div>
         </Stack>
         <Stack direction="row" sx={{ marginTop: "16px" }}>
           <Box>

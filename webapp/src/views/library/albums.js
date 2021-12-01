@@ -11,6 +11,7 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import AlbumIcon from "@mui/icons-material/Album";
 
 import { styled } from "@mui/material/styles";
 
@@ -34,6 +35,7 @@ const AlbumItemContainer = styled(ListItem)({
   width: "256px",
   flexDirection: "column",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
+  aspectRatio: "1/1",
   padding: "0px 0px",
 });
 
@@ -82,7 +84,7 @@ const AlbumItemThumbnail = (props) => {
 
   return (
     <Link
-      to={album.name}
+      to={encodeURIComponent(album.name)}
       onMouseEnter={() => {
         setHover(true);
       }}
@@ -93,20 +95,30 @@ const AlbumItemThumbnail = (props) => {
         display: "flex",
         height: "100%",
         width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
         borderRadius: "8px",
         overflow: "hidden",
+        background:
+          "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
       }}
     >
-      <img
-        src={album.thumbnail}
-        alt={album.name}
-        style={{
-          height: "100%",
-          width: "100%",
-          objectFit: "cover",
-          aspectRatio: "1/1",
-        }}
-      />
+      {album.thumbnail ? (
+        <img
+          src={album.thumbnail}
+          alt={album.name}
+          style={{
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+            aspectRatio: "1/1",
+          }}
+        />
+      ) : (
+        <AlbumIcon
+          sx={{ height: "64%", width: "64%", color: "rgba(0,0,0,0.6)" }}
+        />
+      )}
       {hover && (
         <Stack
           justifyContent="right"
