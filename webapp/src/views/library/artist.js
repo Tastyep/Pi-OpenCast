@@ -27,7 +27,7 @@ import snackBarHandler from "services/api/error";
 import { humanReadableDuration } from "services/duration";
 
 import { useAppStore } from "components/app_context";
-import ArtistThumbnail from "components/artist_thumbnail";
+import { ArtistThumbnail } from "components/artist_thumbnail";
 import { VirtualizedMediaList } from "components/media_list";
 
 const pluralize = require("pluralize");
@@ -55,7 +55,7 @@ const ArtistMenu = (props) => {
       .catch(snackBarHandler(store));
   };
 
-  const queue = (playlist) => {
+  const queue = () => {
     closeMenu();
 
     const ids = artist.videos.map((video) => video.id);
@@ -89,13 +89,13 @@ const ArtistMenu = (props) => {
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      <MenuItem onClick={() => playNext()}>
+      <MenuItem onClick={playNext}>
         <ListItemIcon>
           <PlaylistPlayIcon />
         </ListItemIcon>
         <ListItemText>Play next</ListItemText>
       </MenuItem>
-      <MenuItem onClick={() => queue()}>
+      <MenuItem onClick={queue}>
         <ListItemIcon>
           <QueueMusicIcon />
         </ListItemIcon>

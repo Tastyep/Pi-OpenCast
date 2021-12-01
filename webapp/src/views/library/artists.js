@@ -10,16 +10,16 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 
 import { styled } from "@mui/material/styles";
 
-import { Link } from "react-router-dom";
-
 import { observer } from "mobx-react-lite";
+
+import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
 
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
@@ -27,15 +27,16 @@ import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "components/app_context";
-import ArtistThumbnail from "components/artist_thumbnail";
+import { ArtistMenuThumbnail } from "components/artist_thumbnail";
 
 const ArtistItemContainer = styled(ListItem)({
   flexGrow: 0,
   flowShrink: 1,
-  flexBasis: "256px",
+  width: "256px",
   flexDirection: "column",
   minWidth: "0px",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
+  aspectRatio: "1/1",
   padding: "0px 0px",
 });
 
@@ -53,7 +54,7 @@ const ArtistItemBar = styled((props) => <Stack {...props} />)({
   borderBottomRightRadius: "8px",
 });
 
-const ArtistItem = ({ artist }) => {
+const ArtistItem = ({ artist, isSmallDevice }) => {
   const store = useAppStore();
 
   const [anchor, setAnchor] = useState(null);
@@ -83,7 +84,7 @@ const ArtistItem = ({ artist }) => {
       .catch(snackBarHandler(store));
   };
 
-  const playNext = () => {
+  const playNext = (forcePlay = false) => {
     closeMenu();
 
     let videoIds = [];
@@ -96,8 +97,8 @@ const ArtistItem = ({ artist }) => {
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
-        if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+        if (forcePlay || store.player.isStopped) {
+          playerAPI.playMedia(videoIds[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -128,26 +129,27 @@ const ArtistItem = ({ artist }) => {
 
   return (
     <ArtistItemContainer>
-      <Link to={artist.name} style={{ width: "100%", aspectRatio: "1/1" }}>
-        <ArtistThumbnail albums={artist.albums} />
-      </Link>
+      <ArtistMenuThumbnail
+        artist={artist}
+        isSmallDevice={isSmallDevice}
+        isMenuOpen={isMenuOpen}
+        menuClick={(e) => {
+          setAnchor(e.currentTarget);
+        }}
+        playNext={playNext}
+      />
       <ArtistItemBar>
-        <div
-          style={{ width: "40px", marginRight: "auto", visibility: "hidden" }}
-        ></div>
         <Typography
-          sx={{ color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden" }}
+          sx={{
+            color: "#FFFFFF",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            margin: "0px 8px",
+          }}
         >
           {artist.name}
         </Typography>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={(e) => {
-            setAnchor(e.currentTarget);
-          }}
-        >
-          <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
-        </IconButton>
       </ArtistItemBar>
       <Menu
         id="artist-menu"
@@ -186,27 +188,32 @@ const ArtistItem = ({ artist }) => {
 const ArtistsPage = observer(() => {
   const store = useAppStore();
   const artists = Object.values(store.artists());
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
 
   if (artists.length === 0) {
     return null;
   }
 
   return (
-    <>
-      <List
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: "8px 16px",
-          width: "92%",
-        }}
-      >
-        {artists.map((artist, _) => (
-          <ArtistItem key={artist.name} artist={artist} />
-        ))}
-      </List>
-    </>
+    <List
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: "8px 16px",
+        width: "92%",
+      }}
+    >
+      {artists.map((artist, _) => (
+        <ArtistItem
+          key={artist.name}
+          artist={artist}
+          isSmallDevice={isSmallDevice}
+        />
+      ))}
+    </List>
   );
 });
 
