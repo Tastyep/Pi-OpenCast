@@ -16,6 +16,7 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import { Link } from "react-router-dom";
 
@@ -120,11 +121,34 @@ const ActiveMediaData = observer(({ variant }) => {
   if (variant === "big") {
     return (
       <>
-        <img
-          src={activeVideo.thumbnail}
-          alt={activeVideo.title}
-          style={{ height: "100%" }}
-        />
+        {activeVideo.thumbnail ? (
+          <img
+            src={activeVideo.thumbnail}
+            alt={activeVideo.title}
+            style={{ height: "100%" }}
+          />
+        ) : (
+          <div
+            style={{
+              height: "100%",
+              aspectRatio: "16/9",
+              background:
+                "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+            }}
+          >
+            <Stack
+              justifyContent="center"
+              alignItems="center"
+              style={{
+                height: "100%",
+                width: "100%",
+                background: "rgba(0,0,0,0.3)",
+              }}
+            >
+              <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
+            </Stack>
+          </div>
+        )}
         <Stack
           sx={{
             marginLeft: "8px",
@@ -140,15 +164,38 @@ const ActiveMediaData = observer(({ variant }) => {
   }
   return (
     <>
-      <img
-        src={activeVideo.thumbnail}
-        alt={activeVideo.title}
-        style={{
-          height: "100%",
-          aspectRatio: "1/1",
-          objectFit: "cover",
-        }}
-      />
+      {activeVideo.thumbnail ? (
+        <img
+          src={activeVideo.thumbnail}
+          alt={activeVideo.title}
+          style={{
+            height: "100%",
+            aspectRatio: "1/1",
+            objectFit: "cover",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            height: "100%",
+            aspectRatio: "1/1",
+            background:
+              "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+          }}
+        >
+          <Stack
+            justifyContent="center"
+            alignItems="center"
+            style={{
+              height: "100%",
+              width: "100%",
+              background: "rgba(0,0,0,0.3)",
+            }}
+          >
+            <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
+          </Stack>
+        </div>
+      )}
       <Stack
         sx={{
           marginLeft: "8px",

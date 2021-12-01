@@ -421,7 +421,7 @@ const PlayingMediaThumbnail = observer(() => {
   const store = useAppStore();
   const video = store.videos[store.player.videoId];
 
-  if (!video) {
+  if (!video || !video.thumbnail) {
     return (
       <Stack
         alignItems="center"

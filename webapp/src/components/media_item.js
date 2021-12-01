@@ -23,6 +23,7 @@ import AddIcon from "@mui/icons-material/Add";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 
 import Popper from "@mui/material/Popper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
@@ -339,7 +340,26 @@ const MediaItemMenu = (props) => {
 const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
   return (
     <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
-      <Avatar alt={video.title} src={video.thumbnail} />
+      {video.thumbnail ? (
+        <Avatar
+          alt={video.title}
+          src={video.thumbnail}
+          sx={{
+            background:
+              "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+          }}
+        />
+      ) : (
+        <Avatar
+          alt={video.title}
+          sx={{
+            background:
+              "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+          }}
+        >
+          <AudiotrackIcon />
+        </Avatar>
+      )}
       <Box
         justifyContent="center"
         alignItems="center"
@@ -364,8 +384,32 @@ const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
 
 const MediaAvatar = memo(({ video, isHover, onClick }) => {
   return (
-    <IconButton sx={{ marginRight: "8px" }} onClick={onClick}>
-      <Avatar alt={video.title} src={video.thumbnail} />
+    <IconButton
+      sx={{
+        marginRight: "8px",
+      }}
+      onClick={onClick}
+    >
+      {video.thumbnail ? (
+        <Avatar
+          alt={video.title}
+          src={video.thumbnail}
+          sx={{
+            background:
+              "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+          }}
+        />
+      ) : (
+        <Avatar
+          alt={video.title}
+          sx={{
+            background:
+              "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+          }}
+        >
+          <AudiotrackIcon />
+        </Avatar>
+      )}
       {isHover && (
         <Box
           justifyContent="center"
