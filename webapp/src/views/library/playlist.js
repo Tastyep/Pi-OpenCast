@@ -40,7 +40,7 @@ import snackBarHandler from "services/api/error";
 import { humanReadableDuration } from "services/duration";
 
 import { useAppStore } from "components/app_context";
-import PlaylistThumbnail from "components/playlist_thumbnail";
+import { PlaylistThumbnail } from "components/playlist_thumbnail";
 import { MediaItem } from "components/media_item";
 import { VirtualizedMediaList } from "components/media_list";
 
@@ -376,7 +376,15 @@ const PlaylistPage = observer(() => {
         }}
       >
         <Stack direction="row" alignItems="center">
-          <Box sx={{ marginRight: "32px", height: 128, width: 128 }}>
+          <Box
+            sx={{
+              width: "128px",
+              height: "128px",
+              marginRight: "32px",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
             <PlaylistThumbnail videos={videos} />
           </Box>
           <Box>

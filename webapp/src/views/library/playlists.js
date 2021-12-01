@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
@@ -24,22 +23,26 @@ import { Link } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
+import { useMediaQuery } from "react-responsive";
+import { SIZES } from "constants.js";
+
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "components/app_context";
-import PlaylistThumbnail from "components/playlist_thumbnail";
+import { PlaylistMenuThumbnail } from "components/playlist_thumbnail";
 import PlaylistModal from "components/playlist_modal";
 
 const PlaylistItemContainer = styled(ListItem)({
   flexGrow: 0,
   flowShrink: 1,
-  flexBasis: "256px",
+  width: "256px",
   flexDirection: "column",
   minWidth: "0px",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
+  aspectRatio: "1/1",
   padding: "0px 0px",
 });
 
@@ -57,7 +60,7 @@ const PlaylistItemBar = styled((props) => <Stack {...props} />)({
   borderBottomRightRadius: "8px",
 });
 
-const PlaylistItem = ({ playlist }) => {
+const PlaylistItem = ({ playlist, isSmallDevice }) => {
   const store = useAppStore();
 
   const [anchor, setAnchor] = useState(null);
@@ -85,7 +88,7 @@ const PlaylistItem = ({ playlist }) => {
       .catch(snackBarHandler(store));
   };
 
-  const playNext = () => {
+  const playNext = (forcePlay = false) => {
     closeMenu();
     const playlistIds = queueNext(
       store.playerPlaylist,
@@ -95,7 +98,7 @@ const PlaylistItem = ({ playlist }) => {
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
-        if (store.player.isStopped) {
+        if (forcePlay || store.player.isStopped) {
           playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
         }
       })
@@ -129,26 +132,33 @@ const PlaylistItem = ({ playlist }) => {
 
   return (
     <PlaylistItemContainer>
-      <Link to={playlist.id} style={{ width: "100%", aspectRatio: "1/1" }}>
-        <PlaylistThumbnail videos={store.playlistVideos(playlist.id)} />
+      <Link
+        to={playlist.id}
+        style={{
+          width: "100%",
+          aspectRatio: "1/1",
+          borderRadius: "8px",
+          overflow: "hidden",
+          background:
+            "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+        }}
+      >
+        <PlaylistMenuThumbnail
+          videos={store.playlistVideos(playlist.id)}
+          isSmallDevice={isSmallDevice}
+          isMenuOpen={isMenuOpen}
+          menuClick={(e) => {
+            setAnchor(e.currentTarget);
+          }}
+          playNext={playNext}
+        />
       </Link>
       <PlaylistItemBar>
-        <div
-          style={{ width: "40px", marginRight: "auto", visibility: "hidden" }}
-        ></div>
         <Typography
           sx={{ color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden" }}
         >
           {playlist.name}
         </Typography>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={(e) => {
-            setAnchor(e.currentTarget);
-          }}
-        >
-          <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
-        </IconButton>
       </PlaylistItemBar>
       <Menu
         id="media-menu"
@@ -195,6 +205,9 @@ const PlaylistsPage = observer(() => {
   const playlists = Object.values(store.playlists);
 
   const [open, setOpen] = useState(false);
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
 
   playlists.sort((a, b) => {
     return a.name.localeCompare(b.name);
@@ -227,7 +240,11 @@ const PlaylistsPage = observer(() => {
           </PlaylistItemBar>
         </PlaylistItemContainer>
         {playlists.map((playlist, _) => (
-          <PlaylistItem key={playlist.id} playlist={playlist} />
+          <PlaylistItem
+            key={playlist.id}
+            playlist={playlist}
+            isSmallDevice={isSmallDevice}
+          />
         ))}
       </List>
     </Stack>
