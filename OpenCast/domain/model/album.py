@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 from marshmallow import Schema, fields
@@ -12,15 +12,17 @@ class AlbumSchema(Schema):
     id = fields.UUID()
     name = fields.String()
     ids = fields.List(fields.UUID())
-    thumbnail = fields.String()
+    thumbnail = fields.String(allow_none=True)
 
 
 class Album(Entity):
+    Schema = AlbumSchema
+
     @dataclass
     class Data:
         id: Id
         name: str
-        ids: List[Id]
+        ids: List[Id] = field(default_factory=list)
         thumbnail: Optional[str] = None
 
     def __init__(self, *args, **kwargs):
