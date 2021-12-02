@@ -145,7 +145,7 @@ const ActiveMediaData = observer(({ variant }) => {
                 background: "rgba(0,0,0,0.3)",
               }}
             >
-              <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
+              <VolumeUpIcon sx={{ color: "rgba(0,0,0,0.5)" }} />
             </Stack>
           </div>
         )}
@@ -192,7 +192,7 @@ const ActiveMediaData = observer(({ variant }) => {
               background: "rgba(0,0,0,0.3)",
             }}
           >
-            <VolumeUpIcon sx={{ color: "#F5F5F5" }} />
+            <VolumeUpIcon sx={{ color: "rgba(0,0,0,0.6)" }} />
           </Stack>
         </div>
       )}

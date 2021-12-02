@@ -407,7 +407,7 @@ const MediaAvatar = memo(({ video, isHover, onClick }) => {
               "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
           }}
         >
-          <AudiotrackIcon />
+          <AudiotrackIcon sx={{ color: "rgba(0,0,0,0.5)" }} />
         </Avatar>
       )}
       {isHover && (

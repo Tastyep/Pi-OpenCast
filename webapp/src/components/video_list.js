@@ -3,7 +3,7 @@ import React from "react";
 import { ImageList, ImageListItem, ImageListItemBar } from "@mui/material";
 import Stack from "@mui/material/Stack";
 
-import noPreview from "images/no-preview.png";
+import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 
 import { observer } from "mobx-react-lite";
 
@@ -81,18 +81,37 @@ const VideoList = observer(({ videos, count }) => {
               overflow: "hidden",
               cursor: "pointer",
             }}
+            onClick={() => playMedia(media)}
           >
-            <img
-              src={media.thumbnail === null ? noPreview : media.thumbnail}
-              alt={media.title}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                backgroundColor: "rgba(0,0,0,0.66)",
-              }}
-              onClick={() => playMedia(media)}
-            />
+            {media.thumbnail ? (
+              <img
+                src={media.thumbnail}
+                alt={media.title}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  backgroundColor: "rgba(0,0,0,0.66)",
+                }}
+              />
+            ) : (
+              <Stack
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  background:
+                    "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+                  caretColor: "transparent",
+                }}
+              >
+                <MusicVideoIcon
+                  sx={{ height: "50%", width: "50%", color: "rgba(0,0,0,0.6)" }}
+                />
+              </Stack>
+            )}
             <ImageListItemBar
               title={media.title}
               sx={{ textAlign: "center" }}

@@ -430,7 +430,6 @@ const PlayingMediaThumbnail = observer(() => {
           width: "100%",
           aspectRatio: "16/9",
           maxHeight: "100%",
-          objectFit: "contain",
           position: "absolute",
           top: "50%",
           left: "50%",
