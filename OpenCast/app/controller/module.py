@@ -1,10 +1,12 @@
 """ Module in charge of registering application controllers """
 
-from .player import PlayerController
-from .player_monitor import PlayerMonitController
-from .playlist_monitor import PlaylistMonitController
-from .root_monitor import RootMonitController
-from .video_monitor import VideoMonitController
+from OpenCast.app.controller.player import PlayerController
+from OpenCast.app.controller.player_monitor import PlayerMonitController
+from OpenCast.app.controller.playlist_monitor import PlaylistMonitController
+from OpenCast.app.controller.root_monitor import RootMonitController
+from OpenCast.app.controller.video_monitor import VideoMonitController
+
+from OpenCast.app.controller.album_monitor import AlbumMonitController  # isort: skip
 
 
 class ControllerModule:
@@ -17,6 +19,9 @@ class ControllerModule:
             app_facade, infra_facade, data_facade
         )
         self._playlist_monitor = PlaylistMonitController(
+            app_facade, infra_facade, data_facade
+        )
+        self._album_monitor = AlbumMonitController(
             app_facade, infra_facade, data_facade
         )
         self._player_controller = PlayerController(
