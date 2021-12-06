@@ -7,3 +7,4 @@ class DataFacadeMock(Mock):
         self.player_repo = Mock()
         self.video_repo = Mock()
         self.playlist_repo = Mock()
+        self.album_repo = Mock()
