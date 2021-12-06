@@ -92,6 +92,8 @@ class DataProducer:
             return VideoProducer(self._population)
         if cls is Playlist:
             return PlaylistProducer(self._population)
+        if cls is Album:
+            return AlbumProducer(self._population)
         return None
 
     def populate(self, data_facade):
