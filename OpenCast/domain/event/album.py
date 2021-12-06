@@ -9,8 +9,8 @@ from OpenCast.domain.event.event import Event, ModelId
 @dataclass
 class AlbumCreated(Event):
     name: str
-    thumbnail: str
     ids: List[ModelId]
+    thumbnail: str
 
 
 @dataclass
@@ -19,5 +19,5 @@ class AlbumDeleted(Event):
 
 
 @dataclass
-class AlbumVideosUpdated:
+class AlbumVideosUpdated(Event):
     ids: List[ModelId]
