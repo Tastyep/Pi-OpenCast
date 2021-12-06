@@ -24,11 +24,27 @@ class AlbumTest(ModelTestCase):
         self.album.delete()
         self.expect_events(self.album, Evt.AlbumDeleted)
 
+    def test_add(self):
+        first = IdentityService.random()
+        self.album.add(first)
+        self.assertListEqual([first], self.album.ids)
+
+        second = IdentityService.random()
+        self.album.add(second)
+        self.assertListEqual([first, second], self.album.ids)
+
+        self.expect_events(self.album, Evt.AlbumVideosUpdated, Evt.AlbumVideosUpdated)
+
+    def test_add_already_contained(self):
+        video_id = IdentityService.random()
+        self.album.add(video_id)
+        with self.assertRaises(DomainError) as ctx:
+            self.album.add(video_id)
+        self.assertEqual("video already in album", str(ctx.exception))
+
     def test_remove(self):
-        self.album.ids = [
-            IdentityService.id_video("source1"),
-            IdentityService.id_video("source2"),
-        ]
+        self.album.add(IdentityService.id_video("source1"))
+        self.album.add(IdentityService.id_video("source2"))
         self.album.release_events()
         self.album.remove(IdentityService.id_video("source1"))
         self.expect_events(self.album, Evt.AlbumVideosUpdated)

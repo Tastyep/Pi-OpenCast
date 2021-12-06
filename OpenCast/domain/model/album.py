@@ -42,14 +42,17 @@ class Album(Entity):
     def ids(self):
         return self._data.ids
 
-    @ids.setter
-    def ids(self, ids: List[Id]):
-        self._data.ids = ids
+    def add(self, video_id):
+        if video_id in self.ids:
+            raise DomainError(
+                "video already in album", name=self.name, video_id=video_id
+            )
+        self._data.ids.append(video_id)
         self._record(Evt.AlbumVideosUpdated, self._data.ids)
 
     def remove(self, video_id):
         if video_id not in self.ids:
-            raise DomainError("video not in album", name=self.name)
+            raise DomainError("video not in album", name=self.name, video_id=video_id)
         self._data.ids.remove(video_id)
         self._record(Evt.AlbumVideosUpdated, self._data.ids)
 
