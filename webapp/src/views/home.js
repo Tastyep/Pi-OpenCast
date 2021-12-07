@@ -436,14 +436,18 @@ const PlayingMediaThumbnail = observer(() => {
           transform: "translate(-50%, -50%)",
           paddingBottom: "16px",
           background:
-            "linear-gradient(to bottom right, #9796f0 0%, #fbc7d4 100%)",
+            "linear-gradient(to bottom right, #333536 0%, #515355 50%, #333536 100%)",
           borderRadius: "16px",
           overflow: "hidden",
           caretColor: "transparent",
         }}
       >
         <MusicVideoIcon
-          sx={{ height: "50%", width: "50%", color: "rgba(0,0,0,0.6)" }}
+          sx={{
+            height: "50%",
+            width: "50%",
+            color: "#000000",
+          }}
         />
       </Stack>
     );

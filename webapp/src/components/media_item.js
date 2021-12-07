@@ -368,7 +368,7 @@ const PlayingMediaAvatar = observer(({ video, isPlaying, onClick }) => {
           height: "40px",
           width: "40px",
           position: "absolute",
-          backgroundColor: "rgba(0,0,0,0.33)",
+          backgroundColor: "rgba(0,0,0,0.3)",
           borderRadius: "100%",
         }}
       >

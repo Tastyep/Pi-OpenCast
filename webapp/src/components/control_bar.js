@@ -133,7 +133,7 @@ const ActiveMediaData = observer(({ variant }) => {
               height: "100%",
               aspectRatio: "16/9",
               background:
-                "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+                "linear-gradient(to bottom right, #444647 0%, #626466 50%, #444647 100%)",
             }}
           >
             <Stack
@@ -189,10 +189,10 @@ const ActiveMediaData = observer(({ variant }) => {
             style={{
               height: "100%",
               width: "100%",
-              background: "rgba(0,0,0,0.3)",
+              background: "rgba(0,0,0,0.25)",
             }}
           >
-            <VolumeUpIcon sx={{ color: "rgba(0,0,0,0.6)" }} />
+            <VolumeUpIcon sx={{ color: "rgba(255,255,255,1)" }} />
           </Stack>
         </div>
       )}
