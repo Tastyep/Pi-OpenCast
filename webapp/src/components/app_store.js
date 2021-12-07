@@ -4,6 +4,7 @@ import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import videoAPI from "services/api/video";
 import albumAPI from "services/api/album";
+import artistAPI from "services/api/artist";
 import snackBarHandler from "services/api/error";
 import { UpdateMediaTime } from "tasks/player";
 
@@ -16,6 +17,7 @@ export class AppStore {
   playlists = {};
   videos = {};
   albums = {};
+  artists = {};
   notifications = [];
 
   constructor(eventDispatcher, modelFactory) {
@@ -24,12 +26,14 @@ export class AppStore {
       playlists: observable,
       videos: observable,
       albums: observable,
+      artists: observable,
       notifications: observable,
 
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
       setAlbums: action,
+      setArtists: action,
       insertPlaylistVideo: action,
       removePlaylistVideo: action,
 
@@ -41,6 +45,9 @@ export class AppStore {
 
       addAlbum: action,
       removeAlbum: action,
+
+      addArtist: action,
+      removeArtist: action,
 
       enqueueSnackbar: action,
       removeSnackbar: action,
@@ -56,6 +63,8 @@ export class AppStore {
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
       AlbumCreated: (e) => this.onAlbumCreated(e),
       AlbumDeleted: (e) => this.removeAlbum(e.model_id),
+      ArtistCreated: (e) => this.onArtistCreated(e),
+      ArtistDeleted: (e) => this.removeArtist(e.model_id),
       Notification: (e) =>
         this.enqueueSnackbar(
           {
@@ -76,6 +85,7 @@ export class AppStore {
     this.loadVideos();
     this.loadPlaylists();
     this.loadAlbums();
+    this.loadArtists();
   }
 
   loadPlayer() {
@@ -107,6 +117,14 @@ export class AppStore {
       .list()
       .then((response) => {
         this.setAlbums(response.data.albums);
+      })
+      .catch(snackBarHandler(this));
+  }
+  loadArtists() {
+    artistAPI
+      .list()
+      .then((response) => {
+        this.setArtists(response.data.artists);
       })
       .catch(snackBarHandler(this));
   }
@@ -216,60 +234,16 @@ export class AppStore {
     delete this.albums[id];
   }
 
-  artists() {
-    return computed(() => {
-      let artists = {};
-      for (const video of Object.values(this.videos)) {
-        if (!video.artist) {
-          continue;
-        }
-        if (!artists[video.artist]) {
-          artists[video.artist] = {
-            videos: [video],
-            name: video.artist,
-          };
-        } else {
-          artists[video.artist].videos.push(video);
-        }
-      }
-
-      for (let artist of Object.values(artists)) {
-        let albums = {};
-
-        for (const video of artist.videos) {
-          if (!video.album) {
-            continue;
-          }
-          if (!albums[video.album]) {
-            albums[video.album] = {
-              name: video.album,
-              thumbnails: { [video.thumbnail]: 1 },
-              count: 1,
-            };
-          } else {
-            let thumbnail_count =
-              albums[video.album].thumbnails[video.thumbnail];
-            albums[video.album].thumbnails[video.thumbnail] =
-              (thumbnail_count || 0) + 1;
-            albums[video.album].count += 1;
-          }
-        }
-
-        albums = Object.values(albums).sort((a, b) => b.count - a.count);
-        for (let album of albums) {
-          delete album.count;
-          // Sort by count, take the thumbnail of the most found
-          album.thumbnail = Object.keys(album.thumbnails).sort(
-            (a, b) => album.thumbnails[b] - album.thumbnails[a]
-          )[0];
-          delete album.thumbnails;
-        }
-
-        artist.albums = albums;
-      }
-
-      return artists;
-    }).get();
+  setArtists(artists) {
+    for (const artist of artists) {
+      this.addArtist(artist);
+    }
+  }
+  addArtist(artist) {
+    this.artists[artist.id] = this.modelFactory.makeArtist(artist);
+  }
+  removeArtist(id) {
+    delete this.artists[id];
   }
 
   enqueueSnackbar(note, details) {

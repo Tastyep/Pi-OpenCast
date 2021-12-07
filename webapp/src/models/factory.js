@@ -2,6 +2,7 @@ import Playlist from "./playlist";
 import Video from "./video";
 import Player from "./player";
 import Album from "./album";
+import Artist from "./artist";
 
 export default class ModelFactory {
   constructor(eventDispatcher) {
@@ -19,5 +20,8 @@ export default class ModelFactory {
   }
   makeAlbum(state) {
     return new Album(state, this.eventDispatcher);
+  }
+  makeArtist(state) {
+    return new Artist(state, this.eventDispatcher);
   }
 }
