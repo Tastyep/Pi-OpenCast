@@ -20,6 +20,16 @@ class AlbumTest(ModelTestCase):
         album = Album(id, name, ids, thumbnail)
         self.expect_events(album, Evt.AlbumCreated)
 
+    def test_shallow(self):
+        self.assertTrue(self.album.shallow())
+        self.album = Album(
+            IdentityService.id_album("name"),
+            "name",
+            [IdentityService.random()],
+            "thumbnail",
+        )
+        self.assertFalse(self.album.shallow())
+
     def test_delete(self):
         self.album.delete()
         self.expect_events(self.album, Evt.AlbumDeleted)

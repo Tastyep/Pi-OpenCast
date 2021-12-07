@@ -61,6 +61,10 @@ class AlbumService(Service):
             albums = self._album_repo.list_containing(evt.model_id)
             for album in albums:
                 album.remove(evt.model_id)
-                ctx.update(album)
+                if album.shallow():
+                    album.delete()
+                    ctx.delete(album)
+                else:
+                    ctx.update(album)
 
         self._start_transaction(self._album_repo, evt.id, impl)

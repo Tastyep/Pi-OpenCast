@@ -42,6 +42,9 @@ class Album(Entity):
     def ids(self):
         return self._data.ids
 
+    def shallow(self):
+        return len(self.ids) == 0
+
     def add(self, video_id):
         if video_id in self.ids:
             raise DomainError(

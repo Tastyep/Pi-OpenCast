@@ -54,7 +54,9 @@ class AlbumServiceTest(ServiceTestCase):
         video_id_2 = IdentityService.id_video("source2")
         album_id = IdentityService.id_album("album")
         self.data_producer.video("source2", album="album").populate(self.data_facade)
-        self.data_producer.album(album_id, "album").video("source", album="album").populate(self.data_facade)
+        self.data_producer.album(album_id, "album").video(
+            "source", album="album"
+        ).populate(self.data_facade)
 
         self.evt_expecter.expect(
             Evt.AlbumVideosUpdated, album_id, [video_id_1, video_id_2]
@@ -74,12 +76,27 @@ class AlbumServiceTest(ServiceTestCase):
 
     def test_delete_video_updates_album(self):
         album_id = IdentityService.id_album("album")
-        video_id = IdentityService.id_video("source")
-        self.data_producer.album(album_id, "album").video("source", album="album").populate(self.data_facade)
+        video_id_1 = IdentityService.id_video("source1")
+        video_id_2 = IdentityService.id_video("source2")
+        self.data_producer.album(album_id, "album").video(
+            "source1", album="album"
+        ).video("source2", album="album").populate(self.data_facade)
 
         self.evt_expecter.expect(
-            Evt.AlbumVideosUpdated, album_id, []
+            Evt.AlbumVideosUpdated, album_id, [video_id_2]
         ).from_event(
+            VideoEvt.VideoDeleted,
+            video_id_1,
+        )
+
+    def test_delete_video_deletes_album(self):
+        album_id = IdentityService.id_album("album")
+        video_id = IdentityService.id_video("source")
+        self.data_producer.album(album_id, "album").video(
+            "source", album="album"
+        ).populate(self.data_facade)
+
+        self.evt_expecter.expect(Evt.AlbumDeleted, album_id, []).from_event(
             VideoEvt.VideoDeleted,
             video_id,
         )
