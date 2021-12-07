@@ -1,14 +1,14 @@
-""" Album repository """
+""" Artist repository """
 
-from OpenCast.domain.model.album import Album
+from OpenCast.domain.model.artist import Artist
 from OpenCast.infra import Id
 
 from .repository import Repository
 
 
-class AlbumRepo(Repository):
+class ArtistRepo(Repository):
     def __init__(self, database, db_lock):
-        super().__init__(database, db_lock, Album)
+        super().__init__(database, db_lock, Artist)
 
     def list_containing(self, video_id: Id):
         with self._lock:

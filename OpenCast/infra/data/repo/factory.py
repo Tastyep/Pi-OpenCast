@@ -2,6 +2,7 @@
 
 
 from .album import AlbumRepo
+from .artist import ArtistRepo
 from .player import PlayerRepo
 from .playlist import PlaylistRepo
 from .video import VideoRepo
@@ -19,3 +20,6 @@ class RepoFactory:
 
     def make_album_repo(self, *args):
         return AlbumRepo(*args)
+
+    def make_artist_repo(self, *args):
+        return ArtistRepo(*args)

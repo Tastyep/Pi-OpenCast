@@ -1,6 +1,7 @@
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.album import Album
+from OpenCast.domain.model.artist import Artist
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.playlist import Playlist
 from OpenCast.domain.model.video import State as VideoState
@@ -55,6 +56,7 @@ class Population:
         register(data_facade.video_repo, self._entities.get(Video, {}))
         register(data_facade.playlist_repo, self._entities.get(Playlist, {}))
         register(data_facade.album_repo, self._entities.get(Album, {}))
+        register(data_facade.artist_repo, self._entities.get(Artist, {}))
 
     def _update_attrs(self, entity, attrs):
         for attr, value in attrs.items():
@@ -84,6 +86,9 @@ class DataProducer:
     def album(self, *args, **attrs):
         return AlbumProducer(self._population).album(*args, **attrs)
 
+    def artist(self, *args, **attrs):
+        return ArtistProducer(self._population).album(*args, **attrs)
+
     def select(self, cls, id: Id):
         self._population.select(cls, id)
         if cls is Player:
@@ -94,6 +99,8 @@ class DataProducer:
             return PlaylistProducer(self._population)
         if cls is Album:
             return AlbumProducer(self._population)
+        if cls is Artist:
+            return ArtistProducer(self._population)
         return None
 
     def populate(self, data_facade):
@@ -161,4 +168,15 @@ class AlbumProducer(DataProducer):
     def video(self, *args, **attrs):
         VideoProducer(self._population).video(*args, **attrs)
         self._population.last(Album).ids.append(self._population.last(Video).id)
+        return self
+
+
+class ArtistProducer(DataProducer):
+    def artist(self, id: Id, *args, **attrs):
+        self._population.add(Artist, id, *args, **attrs)
+        return self
+
+    def video(self, *args, **attrs):
+        VideoProducer(self._population).video(*args, **attrs)
+        self._population.last(Artist).ids.append(self._population.last(Video).id)
         return self

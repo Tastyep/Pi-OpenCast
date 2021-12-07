@@ -4,5 +4,5 @@ from .command import Command, command
 
 
 @command
-class DeleteAlbum(Command):
+class DeleteArtist(Command):
     pass
