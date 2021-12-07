@@ -84,7 +84,7 @@ const AlbumItemThumbnail = (props) => {
 
   return (
     <Link
-      to={encodeURIComponent(album.name)}
+      to={album.id}
       onMouseEnter={() => {
         setHover(true);
       }}
@@ -101,6 +101,7 @@ const AlbumItemThumbnail = (props) => {
         overflow: "hidden",
         background:
           "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+        caretColor: "transparent",
       }}
     >
       {album.thumbnail ? (
@@ -159,12 +160,10 @@ const AlbumItem = ({ album, isSmallDevice }) => {
   const shufflePlayNext = () => {
     closeMenu();
 
-    let videoIds = [];
-    album.videos.map((video) => videoIds.push(video.id));
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      shuffleIds(videoIds)
+      shuffleIds(album.ids)
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
@@ -179,18 +178,16 @@ const AlbumItem = ({ album, isSmallDevice }) => {
   const playNext = (forcePlay = false) => {
     closeMenu();
 
-    let videoIds = [];
-    album.videos.map((video) => videoIds.push(video.id));
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      videoIds
+      album.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (forcePlay || store.player.isStopped) {
-          playerAPI.playMedia(videoIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(album.ids[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -199,12 +196,10 @@ const AlbumItem = ({ album, isSmallDevice }) => {
   const queue = () => {
     closeMenu();
 
-    let videoIds = [];
-    album.videos.map((video) => videoIds.push(video.id));
     const playlistIds = queueLast(
       store.playerPlaylist,
       store.player.videoId,
-      videoIds
+      album.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
@@ -279,7 +274,7 @@ const AlbumItem = ({ album, isSmallDevice }) => {
 
 const AlbumsPage = observer(() => {
   const store = useAppStore();
-  const albums = Object.values(store.albums());
+  const albums = Object.values(store.albums);
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });

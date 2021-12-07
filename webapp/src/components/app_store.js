@@ -3,6 +3,7 @@ import { action, makeObservable, observable, computed } from "mobx";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import videoAPI from "services/api/video";
+import albumAPI from "services/api/album";
 import snackBarHandler from "services/api/error";
 import { UpdateMediaTime } from "tasks/player";
 
@@ -14,6 +15,7 @@ export class AppStore {
   player = {};
   playlists = {};
   videos = {};
+  albums = {};
   notifications = [];
 
   constructor(eventDispatcher, modelFactory) {
@@ -21,11 +23,13 @@ export class AppStore {
       player: observable,
       playlists: observable,
       videos: observable,
+      albums: observable,
       notifications: observable,
 
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
+      setAlbums: action,
       insertPlaylistVideo: action,
       removePlaylistVideo: action,
 
@@ -34,6 +38,9 @@ export class AppStore {
 
       addPlaylist: action,
       removePlaylist: action,
+
+      addAlbum: action,
+      removeAlbum: action,
 
       enqueueSnackbar: action,
       removeSnackbar: action,
@@ -47,6 +54,8 @@ export class AppStore {
       VideoDeleted: (e) => this.removeVideo(e.model_id),
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
+      AlbumCreated: (e) => this.onAlbumCreated(e),
+      AlbumDeleted: (e) => this.removeAlbum(e.model_id),
       Notification: (e) =>
         this.enqueueSnackbar(
           {
@@ -66,6 +75,7 @@ export class AppStore {
     this.loadPlayer();
     this.loadVideos();
     this.loadPlaylists();
+    this.loadAlbums();
   }
 
   loadPlayer() {
@@ -92,6 +102,14 @@ export class AppStore {
       })
       .catch(snackBarHandler(this));
   }
+  loadAlbums() {
+    albumAPI
+      .list()
+      .then((response) => {
+        this.setAlbums(response.data.albums);
+      })
+      .catch(snackBarHandler(this));
+  }
 
   onVideoCreated(evt) {
     videoAPI
@@ -107,6 +125,15 @@ export class AppStore {
       .get(evt.model_id)
       .then((response) => {
         this.addPlaylist(response.data);
+      })
+      .catch(snackBarHandler(this));
+  }
+
+  onAlbumCreated(evt) {
+    albumAPI
+      .get(evt.model_id)
+      .then((response) => {
+        this.addAlbum(response.data);
       })
       .catch(snackBarHandler(this));
   }
@@ -143,20 +170,24 @@ export class AppStore {
     return this.playlists[this.player.queue];
   }
 
+  filterVideos(ids) {
+    let videos = [];
+    for (const id of ids) {
+      const video = this.videos[id];
+      if (video) {
+        videos.push(this.videos[id]);
+      }
+    }
+    return videos;
+  }
+
   playlistVideos(id) {
     return computed(() => {
       if (!Object.keys(this.playlists).includes(id)) {
         return [];
       }
       const playlist = this.playlists[id];
-      let videos = [];
-      for (const id of playlist.ids) {
-        const video = this.videos[id];
-        if (video) {
-          videos.push(this.videos[id]);
-        }
-      }
-      return videos;
+      return this.filterVideos(playlist.ids);
     }).get();
   }
 
@@ -173,38 +204,16 @@ export class AppStore {
     delete this.videos[id];
   }
 
-  albums() {
-    return computed(() => {
-      let albums = {};
-      for (const video of Object.values(this.videos)) {
-        if (!video.album) {
-          continue;
-        }
-        if (!albums[video.album]) {
-          albums[video.album] = {
-            videos: [video],
-            name: video.album,
-          };
-        } else {
-          albums[video.album].videos.push(video);
-        }
-      }
-
-      for (const [albumName, album] of Object.entries(albums)) {
-        let counts = {};
-        let maxCount = 0;
-
-        for (const video of album.videos) {
-          counts[video.thumbnail] = (counts[video.thumbnail] || 0) + 1;
-          if (counts[video.thumbnail] > maxCount) {
-            maxCount = counts[video.thumbnail];
-            albums[albumName]["thumbnail"] = video.thumbnail;
-          }
-        }
-      }
-
-      return albums;
-    }).get();
+  setAlbums(albums) {
+    for (const album of albums) {
+      this.addAlbum(album);
+    }
+  }
+  addAlbum(album) {
+    this.albums[album.id] = this.modelFactory.makeAlbum(album);
+  }
+  removeAlbum(id) {
+    delete this.albums[id];
   }
 
   artists() {

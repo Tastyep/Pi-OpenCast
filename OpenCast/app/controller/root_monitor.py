@@ -7,6 +7,7 @@ from aiohttp_apispec import docs
 
 from OpenCast.app.controller.monitor import MonitorController
 from OpenCast.app.notification import Notification
+from OpenCast.domain.event import album as AlbumEvt
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
@@ -41,6 +42,7 @@ class RootMonitController(MonitorController):
         self._observe(PlayerEvt, handler_factory)
         self._observe(PlaylistEvt, handler_factory)
         self._observe(VideoEvt, handler_factory)
+        self._observe(AlbumEvt, handler_factory)
         self._evt_dispatcher.observe({DownloadInfo: channel.send})
         self._evt_dispatcher.observe({Notification: channel.send})
 

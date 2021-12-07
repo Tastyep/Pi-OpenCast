@@ -16,6 +16,7 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AlbumIcon from "@mui/icons-material/Album";
 
 import { useParams } from "react-router-dom";
 
@@ -42,11 +43,10 @@ const AlbumMenu = (props) => {
   const playNext = () => {
     closeMenu();
 
-    const ids = album.videos.map((video) => video.id);
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      ids
+      album.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
@@ -61,11 +61,10 @@ const AlbumMenu = (props) => {
   const queue = () => {
     closeMenu();
 
-    const ids = album.videos.map((video) => video.id);
     const playlistIds = queueLast(
       store.playerPlaylist,
       store.player.videoId,
-      ids
+      album.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
@@ -110,32 +109,34 @@ const AlbumMenu = (props) => {
 
 const AlbumPage = observer(() => {
   const store = useAppStore();
-  const { name } = useParams();
+  const { id } = useParams();
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
-
-  const album = store.albums()[name];
 
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
 
-  const shufflePlayNext = () => {
-    const ids = album.videos.map((video) => {
-      return video.id;
-    });
+  const album = store.albums[id];
+  if (!album) {
+    return null;
+  }
 
+  const albumVideos = store.filterVideos(album.ids);
+
+  const shufflePlayNext = () => {
+    const shuffledIds = shuffleIds(album.ids);
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      shuffleIds(ids)
+      shuffledIds
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -144,7 +145,7 @@ const AlbumPage = observer(() => {
   const totalDuration = () => {
     let total = 0;
 
-    for (const video of album.videos) {
+    for (const video of albumVideos) {
       total += video.duration;
     }
 
@@ -167,33 +168,45 @@ const AlbumPage = observer(() => {
         <Stack direction="row" alignItems="center">
           <Box
             sx={{
+              display: "flex",
               minWidth: "64px",
               maxWidth: "128px",
               aspectRatio: "1/1",
+              justifyContent: "center",
+              alignItems: "center",
               marginRight: "32px",
               borderRadius: "8px",
               overflow: "hidden",
+              background:
+                "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
+              caretColor: "transparent",
             }}
           >
-            <img
-              src={album.thumbnail}
-              alt={name}
-              style={{
-                height: "100%",
-                width: "100%",
-                objectFit: "cover",
-              }}
-            />
+            {album.thumbnail ? (
+              <img
+                src={album.thumbnail}
+                alt={album.name}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <AlbumIcon
+                sx={{ height: "64%", width: "64%", color: "rgba(0,0,0,0.6)" }}
+              />
+            )}
           </Box>
           <div>
             <Typography
               variant="h5"
               sx={{ maxHeight: "60px", overflow: "hidden" }}
             >
-              {name}
+              {album.name}
             </Typography>
             <Typography>
-              {pluralize("media", album.videos.length, true)}
+              {pluralize("media", albumVideos.length, true)}
             </Typography>
             <Typography>{totalDuration()}</Typography>
           </div>
@@ -235,7 +248,7 @@ const AlbumPage = observer(() => {
         }}
       >
         <List sx={{ height: "100%", width: "100%", padding: "0px" }}>
-          {album.videos.map((video) => (
+          {albumVideos.map((video) => (
             <MediaItem
               key={video.id}
               isSmallDevice={isSmallDevice}
