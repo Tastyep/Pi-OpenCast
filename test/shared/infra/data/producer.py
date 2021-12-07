@@ -87,7 +87,7 @@ class DataProducer:
         return AlbumProducer(self._population).album(*args, **attrs)
 
     def artist(self, *args, **attrs):
-        return ArtistProducer(self._population).album(*args, **attrs)
+        return ArtistProducer(self._population).artist(*args, **attrs)
 
     def select(self, cls, id: Id):
         self._population.select(cls, id)

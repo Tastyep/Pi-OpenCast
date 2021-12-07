@@ -7,6 +7,7 @@ from OpenCast.app.controller.root_monitor import RootMonitController
 from OpenCast.app.controller.video_monitor import VideoMonitController
 
 from OpenCast.app.controller.album_monitor import AlbumMonitController  # isort: skip
+from OpenCast.app.controller.artist_monitor import ArtistMonitController  # isort: skip
 
 
 class ControllerModule:
@@ -22,6 +23,9 @@ class ControllerModule:
             app_facade, infra_facade, data_facade
         )
         self._album_monitor = AlbumMonitController(
+            app_facade, infra_facade, data_facade
+        )
+        self._artist_monitor = ArtistMonitController(
             app_facade, infra_facade, data_facade
         )
         self._player_controller = PlayerController(
