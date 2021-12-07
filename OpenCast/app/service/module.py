@@ -1,6 +1,7 @@
 """ Module in charge of registering application services """
 
 from OpenCast.app.service.album import AlbumService
+from OpenCast.app.service.artist import ArtistService
 from OpenCast.app.service.player import PlayerService
 from OpenCast.app.service.playlist import PlaylistService
 from OpenCast.app.service.video import VideoService
@@ -18,3 +19,4 @@ class ServiceModule:
             app_facade, service_factory, data_facade
         )
         self._album_service = AlbumService(app_facade, service_factory, data_facade)
+        self._artist_service = ArtistService(app_facade, service_factory, data_facade)
