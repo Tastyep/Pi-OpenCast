@@ -42,7 +42,7 @@ class Album(Entity):
     def ids(self):
         return self._data.ids
 
-    def shallow(self):
+    def empty(self):
         return len(self.ids) == 0
 
     def add(self, video_id):
