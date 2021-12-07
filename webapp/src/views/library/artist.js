@@ -39,17 +39,16 @@ const ArtistMenu = (props) => {
   const playNext = () => {
     closeMenu();
 
-    const ids = artist.videos.map((video) => video.id);
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      ids
+      artist.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(artist.ids[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -58,11 +57,10 @@ const ArtistMenu = (props) => {
   const queue = () => {
     closeMenu();
 
-    const ids = artist.videos.map((video) => video.id);
     const playlistIds = queueLast(
       store.playerPlaylist,
       store.player.videoId,
-      ids
+      artist.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
@@ -107,28 +105,30 @@ const ArtistMenu = (props) => {
 
 const ArtistPage = observer(() => {
   const store = useAppStore();
-  const { name } = useParams();
+  const { id } = useParams();
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
 
-  const artist = store.artists()[name];
+  const artist = store.artists[id];
+  if (!artist) {
+    return null;
+  }
+
+  const artistVideos = store.filterVideos(artist.ids);
 
   const shufflePlayNext = () => {
-    const ids = artist.videos.map((video) => {
-      return video.id;
-    });
-
+    const shuffledIds = shuffleIds(artist.ids);
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      shuffleIds(ids)
+      shuffledIds
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -137,7 +137,7 @@ const ArtistPage = observer(() => {
   const totalDuration = () => {
     let total = 0;
 
-    for (const video of artist.videos) {
+    for (const video of artistVideos) {
       total += video.duration;
     }
 
@@ -171,12 +171,12 @@ const ArtistPage = observer(() => {
                 "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
             }}
           >
-            <ArtistThumbnail albums={artist.albums} />
+            <ArtistThumbnail artist={artist} />
           </Stack>
           <Box>
-            <Typography variant="h4">{name}</Typography>
+            <Typography variant="h4">{artist.name}</Typography>
             <Typography>
-              {pluralize("media", artist.videos.length, true)}
+              {pluralize("media", artistVideos.length, true)}
             </Typography>
             <Typography>{totalDuration()}</Typography>
           </Box>
@@ -217,7 +217,7 @@ const ArtistPage = observer(() => {
           overflow: "auto",
         }}
       >
-        <VirtualizedMediaList videos={artist.videos} />
+        <VirtualizedMediaList videos={artistVideos} />
       </Box>
     </Stack>
   );

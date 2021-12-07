@@ -52,7 +52,7 @@ const AlbumMenu = (props) => {
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(album.ids[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));

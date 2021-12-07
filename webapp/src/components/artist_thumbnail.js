@@ -26,8 +26,8 @@ const ThumbnailPlayButton = styled(IconButton)({
   },
 });
 
-const ArtistThumbnail = ({ albums }) => {
-  if (albums.length === 0) {
+const ArtistThumbnail = ({ artist }) => {
+  if (!artist.thumbnail) {
     return (
       <ArtTrackIcon
         sx={{
@@ -40,23 +40,7 @@ const ArtistThumbnail = ({ albums }) => {
     );
   }
 
-  return (
-    <ImageList
-      cols={2}
-      gap={0}
-      sx={{ width: "100%", height: "100%", aspectRatio: "1/1", margin: "0px" }}
-    >
-      {[0, 1, 2, 3].map((index) => (
-        <ImageListItem key={index}>
-          <img
-            src={albums[index % albums.length].thumbnail}
-            alt={albums[index % albums.length].name}
-            loading="lazy"
-          />
-        </ImageListItem>
-      ))}
-    </ImageList>
-  );
+  return <img alt={artist.name} src={artist.thumbnail} />;
 };
 
 const ArtistMenuThumbnail = (props) => {
@@ -75,7 +59,7 @@ const ArtistMenuThumbnail = (props) => {
 
   return (
     <Link
-      to={encodeURIComponent(artist.name)}
+      to={artist.id}
       onMouseEnter={() => {
         setHover(true);
       }}
@@ -94,7 +78,7 @@ const ArtistMenuThumbnail = (props) => {
           "linear-gradient(to bottom right, #C6FFDD 0%, #FBD786 50%, #F7797D 100%)",
       }}
     >
-      <ArtistThumbnail albums={artist.albums} />
+      <ArtistThumbnail artist={artist} />
       {hover && (
         <Stack
           justifyContent="right"

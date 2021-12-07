@@ -66,18 +66,17 @@ const ArtistItem = ({ artist, isSmallDevice }) => {
   const shufflePlayNext = () => {
     closeMenu();
 
-    let videoIds = [];
-    artist.videos.map((video) => videoIds.push(video.id));
+    const shuffledIds = shuffleIds(artist.ids);
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      shuffleIds(videoIds)
+      shuffledIds
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -86,18 +85,16 @@ const ArtistItem = ({ artist, isSmallDevice }) => {
   const playNext = (forcePlay = false) => {
     closeMenu();
 
-    let videoIds = [];
-    artist.videos.map((video) => videoIds.push(video.id));
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      videoIds
+      artist.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (forcePlay || store.player.isStopped) {
-          playerAPI.playMedia(videoIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(artist.ids[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -106,12 +103,10 @@ const ArtistItem = ({ artist, isSmallDevice }) => {
   const queue = () => {
     closeMenu();
 
-    let videoIds = [];
-    artist.videos.map((video) => videoIds.push(video.id));
     const playlistIds = queueLast(
       store.playerPlaylist,
       store.player.videoId,
-      videoIds
+      artist.ids
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
@@ -186,7 +181,7 @@ const ArtistItem = ({ artist, isSmallDevice }) => {
 
 const ArtistsPage = observer(() => {
   const store = useAppStore();
-  const artists = Object.values(store.artists());
+  const artists = Object.values(store.artists);
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
