@@ -1,6 +1,7 @@
 """ Parse, download and extract a media with its metadata """
 
 
+from datetime import timedelta
 from pathlib import Path
 from typing import List
 
@@ -10,6 +11,7 @@ from yt_dlp import YoutubeDL
 from yt_dlp.utils import ISO639Utils
 
 from OpenCast.infra import Id
+from OpenCast.infra.data.cache import TimeBasedCache
 from OpenCast.infra.event.downloader import DownloadError, DownloadInfo, DownloadSuccess
 
 
@@ -67,6 +69,7 @@ class Downloader:
         self._evt_dispatcher = evt_dispatcher
         self._logger = structlog.get_logger(__name__)
         self._dl_logger = Logger(self._logger)
+        self._cache = TimeBasedCache(max_duration=timedelta(minutes=2))
 
     def download_video(self, op_id: Id, video_id: Id, source: str, dest: str):
         def dispatch_dl_events(data):
@@ -145,7 +148,16 @@ class Downloader:
         return None
 
     def download_metadata(self, url: str, process_ie_data: bool):
-        self._logger.debug("Downloading metadata", url=url)
+        self._cache.clean()
+        cache_key = f"{url}{process_ie_data}"
+        cached_data = self._cache.get(cache_key)
+
+        self._logger.debug(
+            "Downloading metadata", url=url, cached=cached_data is not None
+        )
+        if cached_data:
+            return cached_data
+
         options = {
             # Allow getting the _type value set to URL when passing a playlist entry
             "noplaylist": True,
@@ -158,7 +170,11 @@ class Downloader:
         ydl = YoutubeDL(options)
         with ydl:
             try:
-                return ydl.extract_info(url, download=False, process=process_ie_data)
+                metadata = ydl.extract_info(
+                    url, download=False, process=process_ie_data
+                )
+                self._cache.register(cache_key, metadata)
+                return metadata
             except Exception as e:
                 self._logger.error("Downloading metadata error", url=url, error=e)
         return None
