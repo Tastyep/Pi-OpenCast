@@ -46,22 +46,20 @@ const BarContainer = styled(Stack)({
   height: "56px",
 });
 
-const renderMediaSecondaryData = (video) => {
-  const artist = video.artist ? (
-    <StyledLink to={`/library/artists/${video.artist}`}>
-      {video.artist}
-    </StyledLink>
+const renderMediaSecondaryData = (artist, album, duration) => {
+  const artistBloc = artist ? (
+    <StyledLink to={`/library/artists/${artist.id}`}>{artist.name}</StyledLink>
   ) : (
     "Artist"
   );
 
-  const album = video.album ? (
-    <StyledLink to={`/library/albums/${video.album}`}>{video.album}</StyledLink>
+  const albumBloc = album ? (
+    <StyledLink to={`/library/albums/${album.id}`}>{album.name}</StyledLink>
   ) : (
     "Album"
   );
 
-  const duration = durationToHMS(video.duration);
+  const HMSDuration = durationToHMS(duration);
 
   return (
     <Grid
@@ -70,18 +68,18 @@ const renderMediaSecondaryData = (video) => {
       sx={{ flexWrap: "nowrap", color: "#505050", minWidth: "0px" }}
     >
       <Grid item zeroMinWidth>
-        <Typography noWrap>{artist}</Typography>
+        <Typography noWrap>{artistBloc}</Typography>
       </Grid>
       <Grid item zeroMinWidth>
         <Stack direction="row">
           <Typography sx={{ padding: "0px 4px" }}>•</Typography>
-          <Typography noWrap>{album}</Typography>
+          <Typography noWrap>{albumBloc}</Typography>
         </Stack>
       </Grid>
       <Grid item>
         <Stack direction="row">
           <Typography sx={{ padding: "0px 4px" }}>•</Typography>
-          <Typography noWrap>{duration}</Typography>
+          <Typography noWrap>{HMSDuration}</Typography>
         </Stack>
       </Grid>
     </Grid>
@@ -117,6 +115,9 @@ const ActiveMediaData = observer(({ variant }) => {
   if (!activeVideo) {
     return null;
   }
+
+  const activeArtist = store.artists[activeVideo.artist_id];
+  const activeAlbum = store.albums[activeVideo.album_id];
 
   if (variant === "big") {
     return (
@@ -157,7 +158,11 @@ const ActiveMediaData = observer(({ variant }) => {
           }}
         >
           <Typography noWrap> {activeVideo.title}</Typography>
-          {renderMediaSecondaryData(activeVideo)}
+          {renderMediaSecondaryData(
+            activeArtist,
+            activeAlbum,
+            activeVideo.duration
+          )}
         </Stack>
       </>
     );

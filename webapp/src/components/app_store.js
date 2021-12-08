@@ -156,6 +156,15 @@ export class AppStore {
       .catch(snackBarHandler(this));
   }
 
+  onArtistCreated(evt) {
+    artistAPI
+      .get(evt.model_id)
+      .then((response) => {
+        this.addArtist(response.data);
+      })
+      .catch(snackBarHandler(this));
+  }
+
   setPlayer(player) {
     this.player = this.modelFactory.makePlayer(player);
   }

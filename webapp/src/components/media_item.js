@@ -78,31 +78,30 @@ const playVideo = (video, store) => {
   }
 };
 
-const MediaSecondaryData = ({ video }) => {
-  const artist = video.artist ? (
+const MediaSecondaryData = ({ artist, album, duration }) => {
+  const artistBloc = artist ? (
     <StyledLink
-      to={`/library/artists/${video.artist}`}
+      to={`/library/artists/${artist.id}`}
       style={{ whiteSpace: "nowrap" }}
     >
-      {video.artist}
+      {artist.name}
     </StyledLink>
   ) : (
     <div style={{ whiteSpace: "nowrap" }}>Artist</div>
   );
 
-  const album = video.album ? (
+  const albumBloc = album ? (
     <StyledLink
-      to={`/library/albums/${video.album}`}
+      to={`/library/albums/${album.id}`}
       style={{ whiteSpace: "nowrap" }}
     >
-      • {video.album}
+      • {album.name}
     </StyledLink>
   ) : (
     <div style={{ whiteSpace: "nowrap" }}>• Album</div>
   );
 
-  const duration = durationToHMS(video.duration);
-
+  const HMSDuration = durationToHMS(duration);
   return (
     <Stack
       direction="row"
@@ -117,7 +116,7 @@ const MediaSecondaryData = ({ video }) => {
           textOverflow: "ellipsis",
         }}
       >
-        {artist}
+        {artistBloc}
       </Box>
       <Box
         sx={{
@@ -127,10 +126,10 @@ const MediaSecondaryData = ({ video }) => {
           textOverflow: "ellipsis",
         }}
       >
-        {album}
+        {albumBloc}
       </Box>
       <Stack direction="row" sx={{ whiteSpace: "nowrap" }}>
-        • {duration}
+        • {HMSDuration}
       </Stack>
     </Stack>
   );
@@ -449,6 +448,9 @@ const MediaItem = observer((props) => {
   const [anchorPl, setAnchorPl] = useState(null);
   const isPlMenuOpen = Boolean(anchorPl);
 
+  const artist = store.artists[video.artist_id];
+  const album = store.albums[video.album_id];
+
   const closeMenu = useCallback(() => {
     setAnchor(null);
   }, []);
@@ -514,14 +516,14 @@ const MediaItem = observer((props) => {
             </Box>
             <Box sx={{ display: "flex", flex: "9 1 0", alignItems: "center" }}>
               <Box sx={{ flex: "1 1 0%" }}>
-                {video.artist ? (
+                {artist ? (
                   <StyledLink
-                    to={`/library/artists/${video.artist}`}
+                    to={`/library/artists/${artist.id}`}
                     color="inherit"
                     underline="none"
                   >
                     <ListItemText sx={{ color: "#505050" }}>
-                      {video.artist}
+                      {artist.name}
                     </ListItemText>
                   </StyledLink>
                 ) : (
@@ -529,14 +531,14 @@ const MediaItem = observer((props) => {
                 )}
               </Box>
               <Box sx={{ flex: "1 1 0%" }}>
-                {video.album ? (
+                {album ? (
                   <StyledLink
-                    to={`/library/albums/${video.album}`}
+                    to={`/library/albums/${album.id}`}
                     color="inherit"
                     underline="none"
                   >
                     <ListItemText sx={{ color: "#505050" }}>
-                      {video.album}
+                      {album.name}
                     </ListItemText>
                   </StyledLink>
                 ) : (
@@ -624,7 +626,11 @@ const MediaItem = observer((props) => {
           <ClickableBox onClick={() => playVideo(video, store)}>
             <Typography noWrap>{video.title}</Typography>
           </ClickableBox>
-          <MediaSecondaryData video={video} />
+          <MediaSecondaryData
+            artist={artist}
+            album={album}
+            duration={video.duration}
+          />
         </Box>
         <div>
           {children}

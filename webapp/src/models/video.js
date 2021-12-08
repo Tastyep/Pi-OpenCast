@@ -17,8 +17,8 @@ export default class Video {
   totalPlayingDuration = 0;
   lastPlay = null;
   collectionId = null;
-  artist = "";
-  album = "";
+  artist_id = null;
+  album_id = null;
   thumbnail = "";
   location = "";
   streams = {};
@@ -36,8 +36,8 @@ export default class Video {
     this.totalPlayingDuration = state.total_playing_duration;
     this.lastPlay = state.last_play;
     this.collectionId = state.collection_id;
-    this.artist = state.artist;
-    this.album = state.album;
+    this.artist_id = state.artist_id;
+    this.album_id = state.album_id;
     this.thumbnail = state.thumbnail;
     this.location = state.location;
     this.streams = state.streams;
