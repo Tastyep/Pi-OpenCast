@@ -47,8 +47,8 @@ class VideoSchema(Schema):
     total_playing_duration = fields.TimeDelta()
     last_play = fields.DateTime(allow_none=True)
     collection_id = fields.UUID(allow_none=True)
-    artist = fields.String(allow_none=True)
-    album = fields.String(allow_none=True)
+    artist_id = fields.UUID(allow_none=True)
+    album_id = fields.UUID(allow_none=True)
     thumbnail = fields.String(allow_none=True)
     location = fields.String(allow_none=True)
     streams = fields.Nested(StreamSchema(many=True))
@@ -107,8 +107,8 @@ class Video(Entity):
         id: Id
         source: str
         collection_id: Optional[Id] = None
-        artist: Optional[str] = None
-        album: Optional[str] = None
+        artist_id: Optional[Id] = None
+        album_id: Optional[Id] = None
         title: Optional[str] = None
         duration: Optional[timedelta] = None
         total_playing_duration: timedelta = timedelta()
@@ -126,8 +126,8 @@ class Video(Entity):
             Evt.VideoCreated,
             self._data.source,
             self._data.collection_id,
-            self._data.artist,
-            self._data.album,
+            self._data.artist_id,
+            self._data.album_id,
             self._data.title,
             self.duration,
             self._data.source_protocol,
@@ -144,12 +144,12 @@ class Video(Entity):
         return self._data.collection_id
 
     @property
-    def artist(self):
-        return self._data.artist
+    def artist_id(self):
+        return self._data.artist_id
 
     @property
-    def album(self):
-        return self._data.album
+    def album_id(self):
+        return self._data.album_id
 
     @property
     def title(self):

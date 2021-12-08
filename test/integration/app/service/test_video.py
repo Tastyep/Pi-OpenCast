@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -41,12 +42,15 @@ class VideoServiceTest(ServiceTestCase):
         }
         self.downloader.download_metadata.return_value = metadata
 
+        attrs = deepcopy(metadata)
+        attrs["artist_id"] = IdentityService.id_artist(attrs.pop("artist"))
+        attrs["album_id"] = IdentityService.id_album(attrs.pop("album"))
         self.evt_expecter.expect(
             VideoEvt.VideoCreated,
             video_id,
             source,
             collection_id,
-            **metadata,
+            **attrs,
             state=VideoState.CREATED,
         ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
@@ -67,13 +71,18 @@ class VideoServiceTest(ServiceTestCase):
             "thumbnail": None,
         }
         path_inst.stem = metadata["title"]
+        attrs = deepcopy(metadata)
+        attrs["artist_id"] = None
+        attrs["album_id"] = None
+        del attrs["artist"]
+        del attrs["album"]
 
         self.evt_expecter.expect(
             VideoEvt.VideoCreated,
             video_id,
             source,
             collection_id,
-            **metadata,
+            **attrs,
             state=VideoState.CREATED,
         ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 

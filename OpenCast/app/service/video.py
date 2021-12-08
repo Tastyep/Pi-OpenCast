@@ -8,6 +8,7 @@ from OpenCast.app.command import video as video_cmds
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Video, timedelta
+from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
 
 from .service import Service
@@ -46,6 +47,12 @@ class VideoService(Service):
 
         if metadata["duration"]:
             metadata["duration"] = timedelta(seconds=metadata["duration"])
+        if metadata["artist"]:
+            metadata["artist_id"] = IdentityService.id_artist(metadata["artist"])
+        if metadata["album"]:
+            metadata["album_id"] = IdentityService.id_album(metadata["album"])
+        del metadata["artist"]
+        del metadata["album"]
 
         self._start_transaction(self._video_repo, cmd.id, impl, metadata)
 

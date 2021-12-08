@@ -30,9 +30,21 @@ class ArtistServiceTest(ServiceTestCase):
 
     def test_create_artist(self):
         video_id = IdentityService.id_video("source")
-        self.data_producer.video("source", artist="artist").populate(self.data_facade)
-
         artist_id = IdentityService.id_artist("artist")
+        self.data_producer.video("source", artist_id=artist_id).populate(
+            self.data_facade
+        )
+
+        metadata = {
+            "title": "title",
+            "duration": 300,
+            "source_protocol": "http",
+            "artist": "artist",
+            "album": "album",
+            "thumbnail": "thumbnail_url",
+        }
+        self.downloader.download_metadata.return_value = metadata
+
         self.evt_expecter.expect(
             Evt.ArtistCreated, artist_id, "artist", [video_id], None
         ).from_event(
@@ -40,8 +52,8 @@ class ArtistServiceTest(ServiceTestCase):
             video_id,
             "source",
             None,
-            "album",
-            "artist",
+            artist_id,
+            None,
             "title",
             300,
             "http",
@@ -53,9 +65,11 @@ class ArtistServiceTest(ServiceTestCase):
         video_id_1 = IdentityService.id_video("source")
         video_id_2 = IdentityService.id_video("source2")
         artist_id = IdentityService.id_artist("artist")
-        self.data_producer.video("source2", artist="artist").populate(self.data_facade)
+        self.data_producer.video("source2", artist_id=artist_id).populate(
+            self.data_facade
+        )
         self.data_producer.artist(artist_id, "artist").video(
-            "source", artist="artist"
+            "source", artist_id=artist_id
         ).populate(self.data_facade)
 
         self.evt_expecter.expect(
@@ -65,8 +79,8 @@ class ArtistServiceTest(ServiceTestCase):
             video_id_2,
             "source2",
             None,
-            "album",
-            "artist",
+            artist_id,
+            None,
             "title",
             300,
             "http",
@@ -79,8 +93,8 @@ class ArtistServiceTest(ServiceTestCase):
         video_id_1 = IdentityService.id_video("source1")
         video_id_2 = IdentityService.id_video("source2")
         self.data_producer.artist(artist_id, "artist").video(
-            "source1", artist="artist"
-        ).video("source2", artist="artist").populate(self.data_facade)
+            "source1", artist_id=artist_id
+        ).video("source2", artist_id=artist_id).populate(self.data_facade)
 
         self.evt_expecter.expect(
             Evt.ArtistVideosUpdated, artist_id, [video_id_2]
@@ -93,7 +107,7 @@ class ArtistServiceTest(ServiceTestCase):
         artist_id = IdentityService.id_artist("artist")
         video_id = IdentityService.id_video("source")
         self.data_producer.artist(artist_id, "artist").video(
-            "source", artist="artist"
+            "source", artist_id=artist_id
         ).populate(self.data_facade)
 
         self.evt_expecter.expect(Evt.ArtistDeleted, artist_id, []).from_event(

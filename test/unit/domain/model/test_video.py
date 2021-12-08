@@ -33,12 +33,14 @@ class VideoTest(ModelTestCase):
 
     def test_construction(self):
         collection_id = IdentityService.random()
+        artist_id = (IdentityService.id_artist("artist"),)
+        album_id = (IdentityService.id_album("album_name"),)
         video = Video(
             IdentityService.random(),
             "source",
             collection_id,
-            "artist",
-            "album_name",
+            artist_id,
+            album_id,
             "title",
             timedelta(seconds=300),
             timedelta(),
@@ -51,8 +53,8 @@ class VideoTest(ModelTestCase):
         )
         self.assertEqual("source", video.source)
         self.assertEqual(collection_id, video.collection_id)
-        self.assertEqual("artist", video.artist)
-        self.assertEqual("album_name", video.album)
+        self.assertEqual(artist_id, video.artist_id)
+        self.assertEqual(album_id, video.album_id)
         self.assertEqual("title", video.title)
         self.assertEqual(300, video.duration)
         self.assertEqual("/tmp/file", video.location)
