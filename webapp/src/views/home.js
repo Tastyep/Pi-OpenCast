@@ -143,7 +143,11 @@ const MediaItem = observer((props) => {
             />
           </Stack>
           {downloadRatio > 0 && downloadRatio < 1 && (
-            <LinearProgress value={downloadRatio * 100} variant="determinate" />
+            <LinearProgress
+              value={downloadRatio * 100}
+              variant="determinate"
+              sx={{ minHeight: "4px" }}
+            />
           )}
         </Stack>
       </ListItem>

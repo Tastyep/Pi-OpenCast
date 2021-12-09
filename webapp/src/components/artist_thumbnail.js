@@ -40,7 +40,13 @@ const ArtistThumbnail = ({ artist }) => {
     );
   }
 
-  return <img alt={artist.name} src={artist.thumbnail} />;
+  return (
+    <img
+      alt={artist.name}
+      src={artist.thumbnail}
+      style={{ width: "100%", height: "100%" }}
+    />
+  );
 };
 
 const ArtistMenuThumbnail = (props) => {
