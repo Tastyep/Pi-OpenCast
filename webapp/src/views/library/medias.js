@@ -36,12 +36,15 @@ const MediasPage = observer(() => {
       return videos;
     }
     const lowerInput = input.toLowerCase();
-    return videos.filter(
-      (video) =>
+    return videos.filter((video) => {
+      const artist = store.artists[video.artist_id];
+      const album = store.albums[video.album_id];
+      return (
         video.title.toLowerCase().includes(lowerInput) ||
-        (video.artist && video.artist.toLowerCase().includes(lowerInput)) ||
-        (video.album && video.album.toLowerCase().includes(lowerInput))
-    );
+        (artist && artist.name.toLowerCase().includes(lowerInput)) ||
+        (album && album.name.toLowerCase().includes(lowerInput))
+      );
+    });
   };
 
   const updateInputContent = (e) => {
