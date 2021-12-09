@@ -1,7 +1,5 @@
 """ Parse, download and extract a media with its metadata """
 
-
-from datetime import timedelta
 from pathlib import Path
 from typing import List
 
@@ -11,7 +9,6 @@ from yt_dlp import YoutubeDL
 from yt_dlp.utils import ISO639Utils
 
 from OpenCast.infra import Id
-from OpenCast.infra.data.cache import TimeBasedCache
 from OpenCast.infra.event.downloader import DownloadError, DownloadInfo, DownloadSuccess
 
 
@@ -64,12 +61,12 @@ class Logger:
 
 
 class Downloader:
-    def __init__(self, executor, evt_dispatcher):
+    def __init__(self, executor, cache, evt_dispatcher):
         self._executor = executor
+        self._cache = cache
         self._evt_dispatcher = evt_dispatcher
         self._logger = structlog.get_logger(__name__)
         self._dl_logger = Logger(self._logger)
-        self._cache = TimeBasedCache(max_duration=timedelta(minutes=2))
 
     def download_video(self, op_id: Id, video_id: Id, source: str, dest: str):
         def dispatch_dl_events(data):

@@ -16,7 +16,6 @@ class TimeBasedCache:
         self._cache = {}
 
     def get(self, key: str):
-        print(f"CACHE {key} {self._cache}")
         entry = self._cache.get(key)
         if entry is None:
             return entry
@@ -29,5 +28,4 @@ class TimeBasedCache:
         now = datetime.now()
         for key in list(self._cache.keys()):
             if now - self._cache[key].creation_time > self._max_duration:
-                print(f"REMOVE {key}")
                 del self._cache[key]

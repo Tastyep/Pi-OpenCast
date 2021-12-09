@@ -2,6 +2,7 @@
 
 import traceback
 from concurrent.futures import ThreadPoolExecutor
+from datetime import timedelta
 from queue import SimpleQueue
 
 import structlog
@@ -14,6 +15,7 @@ from .app.tool.json_encoder import ModelEncoder
 from .config import settings
 from .domain.service.factory import ServiceFactory
 from .domain.service.identity import IdentityService
+from .infra.data.cache import TimeBasedCache
 from .infra.data.manager import DataManager, StorageType
 from .infra.data.repo.factory import RepoFactory
 from .infra.facade import InfraFacade
@@ -84,7 +86,8 @@ def main(argv=None):
 
     io_factory = IoFactory()
     downloader_executor = ThreadPoolExecutor(settings["downloader.max_concurrency"])
-    media_factory = MediaFactory(VlcInstance(), downloader_executor)
+    media_cache = TimeBasedCache(max_duration=timedelta(minutes=2))
+    media_factory = MediaFactory(VlcInstance(), downloader_executor, media_cache)
     infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory)
 
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)

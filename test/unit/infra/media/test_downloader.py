@@ -102,8 +102,10 @@ class DownloaderTest(TestCase):
 
         self.executor = Mock()
         self.executor.submit = Mock(side_effect=execute_handler)
+        self.cache = Mock()
+        self.cache.get.return_value = None
         self.dispatcher = Mock()
-        self.downloader = Downloader(self.executor, self.dispatcher)
+        self.downloader = Downloader(self.executor, self.cache, self.dispatcher)
 
     @patch("OpenCast.infra.media.downloader.Path")
     def test_download_video(self, path_cls):
