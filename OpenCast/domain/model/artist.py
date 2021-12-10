@@ -42,6 +42,15 @@ class Artist(Entity):
     def ids(self):
         return self._data.ids
 
+    @property
+    def thumbnail(self):
+        return self._data.thumbnail
+
+    @thumbnail.setter
+    def thumbnail(self, value):
+        self._data.thumbnail = value
+        self._record(Evt.ArtistThumbnailUpdated, self._data.thumbnail)
+
     def empty(self):
         return len(self.ids) == 0
 

@@ -14,6 +14,11 @@ class ArtistCreated(Event):
 
 
 @dataclass
+class ArtistThumbnailUpdated(Event):
+    thumbnail: str
+
+
+@dataclass
 class ArtistDeleted(Event):
     ids: List[ModelId]
 

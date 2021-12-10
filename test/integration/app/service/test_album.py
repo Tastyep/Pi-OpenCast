@@ -43,8 +43,11 @@ class AlbumServiceTest(ServiceTestCase):
         }
         self.downloader.download_metadata.return_value = metadata
 
+        deezer_data = [{"album": {"cover_medium": "cover_url"}}]
+        self.deezer.search.return_value = deezer_data
+
         self.evt_expecter.expect(
-            Evt.AlbumCreated, album_id, "album", [video_id], None
+            Evt.AlbumCreated, album_id, "album", [video_id], "cover_url"
         ).from_event(
             VideoEvt.VideoCreated,
             video_id,
@@ -55,7 +58,40 @@ class AlbumServiceTest(ServiceTestCase):
             "title",
             300,
             "http",
-            "thumbnail",
+            "thumbnail_url",
+            VideoState.CREATED,
+        )
+
+    def test_create_album_no_deezer_data(self):
+        video_id = IdentityService.id_video("source")
+        album_id = IdentityService.id_album("album")
+        self.data_producer.video("source", album_id=album_id).populate(self.data_facade)
+
+        metadata = {
+            "title": "title",
+            "duration": 300,
+            "source_protocol": "http",
+            "artist": "artist",
+            "album": "album",
+            "thumbnail": "thumbnail_url",
+        }
+        self.downloader.download_metadata.return_value = metadata
+
+        self.deezer.search.return_value = []
+
+        self.evt_expecter.expect(
+            Evt.AlbumCreated, album_id, "album", [video_id], "thumbnail_url"
+        ).from_event(
+            VideoEvt.VideoCreated,
+            video_id,
+            "source",
+            None,
+            None,
+            album_id,
+            "title",
+            300,
+            "http",
+            "thumbnail_url",
             VideoState.CREATED,
         )
 

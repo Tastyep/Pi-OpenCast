@@ -24,6 +24,7 @@ class AlbumService(Service):
         self._source_service = service_factory.make_source_service(
             self._downloader, media_factory.make_video_parser()
         )
+        self._deezer = media_factory.make_deezer_service()
 
     # Command handler implementation
     def _delete_album(self, cmd):
@@ -37,8 +38,12 @@ class AlbumService(Service):
     # Event handler implementation
 
     def _video_created(self, evt):
-        def create_album(ctx, metadata):
-            album = Album(evt.album_id, metadata["album"], [evt.model_id], None)
+        def create_album(ctx, metadata, deezer_data):
+            thumbnail = evt.thumbnail
+            if len(deezer_data) > 0:
+                album_data = deezer_data[0].get("album", {})
+                thumbnail = album_data.get("cover_medium", thumbnail)
+            album = Album(evt.album_id, metadata["album"], [evt.model_id], thumbnail)
             ctx.add(album)
 
         def update_album(ctx, album):
@@ -54,7 +59,12 @@ class AlbumService(Service):
             if metadata is None or metadata.get("album") is None:
                 return
 
-            self._start_transaction(self._album_repo, evt.id, create_album, metadata)
+            deezer_data = self._deezer.search(
+                artist=metadata["artist"], album=metadata["album"]
+            )
+            self._start_transaction(
+                self._album_repo, evt.id, create_album, metadata, deezer_data
+            )
         else:
             self._start_transaction(self._album_repo, evt.id, update_album, album)
 

@@ -45,6 +45,43 @@ class ArtistServiceTest(ServiceTestCase):
         }
         self.downloader.download_metadata.return_value = metadata
 
+        deezer_data = [{"artist": {"picture_medium": "picture"}}]
+        self.deezer.search.return_value = deezer_data
+
+        self.evt_expecter.expect(
+            Evt.ArtistCreated, artist_id, "artist", [video_id], "picture"
+        ).from_event(
+            VideoEvt.VideoCreated,
+            video_id,
+            "source",
+            None,
+            artist_id,
+            None,
+            "title",
+            300,
+            "http",
+            "thumbnail_url",
+            VideoState.CREATED,
+        )
+
+    def test_create_artist_no_deezer_data(self):
+        video_id = IdentityService.id_video("source")
+        artist_id = IdentityService.id_artist("artist")
+        self.data_producer.video("source", artist_id=artist_id).populate(
+            self.data_facade
+        )
+
+        metadata = {
+            "title": "title",
+            "duration": 300,
+            "source_protocol": "http",
+            "artist": "artist",
+            "album": "album",
+            "thumbnail": "thumbnail_url",
+        }
+        self.downloader.download_metadata.return_value = metadata
+        self.deezer.search.return_value = []
+
         self.evt_expecter.expect(
             Evt.ArtistCreated, artist_id, "artist", [video_id], None
         ).from_event(
@@ -57,7 +94,7 @@ class ArtistServiceTest(ServiceTestCase):
             "title",
             300,
             "http",
-            "thumbnail",
+            "thumbnail_url",
             VideoState.CREATED,
         )
 
@@ -68,13 +105,53 @@ class ArtistServiceTest(ServiceTestCase):
         self.data_producer.video("source2", artist_id=artist_id).populate(
             self.data_facade
         )
-        self.data_producer.artist(artist_id, "artist").video(
+        self.data_producer.artist(artist_id, "artist", thumbnail="thumbnail").video(
             "source", artist_id=artist_id
         ).populate(self.data_facade)
 
         self.evt_expecter.expect(
             Evt.ArtistVideosUpdated, artist_id, [video_id_1, video_id_2]
         ).from_event(
+            VideoEvt.VideoCreated,
+            video_id_2,
+            "source2",
+            None,
+            artist_id,
+            None,
+            "title",
+            300,
+            "http",
+            "thumbnail",
+            VideoState.CREATED,
+        )
+
+    def test_add_video_updates_artist_thumbnail(self):
+        video_id_1 = IdentityService.id_video("source")
+        video_id_2 = IdentityService.id_video("source2")
+        artist_id = IdentityService.id_artist("artist")
+        self.data_producer.video("source2", artist_id=artist_id).populate(
+            self.data_facade
+        )
+        self.data_producer.artist(artist_id, "artist", thumbnail=None).video(
+            "source", artist_id=artist_id
+        ).populate(self.data_facade)
+
+        metadata = {
+            "title": "title",
+            "duration": 300,
+            "source_protocol": "http",
+            "artist": "artist",
+            "album": "album",
+            "thumbnail": "thumbnail_url",
+        }
+        self.downloader.download_metadata.return_value = metadata
+
+        deezer_data = [{"artist": {"picture_medium": "picture"}}]
+        self.deezer.search.return_value = deezer_data
+
+        self.evt_expecter.expect(
+            Evt.ArtistVideosUpdated, artist_id, [video_id_1, video_id_2]
+        ).expect(Evt.ArtistThumbnailUpdated, artist_id, "picture").from_event(
             VideoEvt.VideoCreated,
             video_id_2,
             "source2",

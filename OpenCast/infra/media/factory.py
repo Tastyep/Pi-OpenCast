@@ -1,5 +1,6 @@
 """ Factory for creating media processing objects """
 
+from .deezer import Deezer
 from .downloader import Downloader
 from .parser import VideoParser
 from .player_wrapper import PlayerWrapper
@@ -19,3 +20,6 @@ class MediaFactory:
 
     def make_video_parser(self, *args):
         return VideoParser(self._vlc, *args)
+
+    def make_deezer_service(self, *args):
+        return Deezer(*args)

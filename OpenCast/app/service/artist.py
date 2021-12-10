@@ -24,6 +24,7 @@ class ArtistService(Service):
         self._source_service = service_factory.make_source_service(
             self._downloader, media_factory.make_video_parser()
         )
+        self._deezer = media_factory.make_deezer_service()
 
     # Command handler implementation
     def _delete_artist(self, cmd):
@@ -37,12 +38,23 @@ class ArtistService(Service):
     # Event handler implementation
 
     def _video_created(self, evt):
-        def create_artist(ctx, metadata):
-            artist = Artist(evt.artist_id, metadata["artist"], [evt.model_id], None)
+        def create_artist(ctx, metadata, deezer_data):
+            thumbnail = None
+            if len(deezer_data) > 0:
+                artist_data = deezer_data[0].get("artist", {})
+                thumbnail = artist_data.get("picture_medium", thumbnail)
+            artist = Artist(
+                evt.artist_id, metadata["artist"], [evt.model_id], thumbnail
+            )
             ctx.add(artist)
 
-        def update_artist(ctx, artist):
+        def update_artist(ctx, artist, deezer_data):
             artist.add(evt.model_id)
+            if deezer_data:
+                artist_data = deezer_data[0].get("artist", {})
+                thumbnail = artist_data.get("picture_medium", None)
+                if thumbnail:
+                    artist.thumbnail = thumbnail
             ctx.update(artist)
 
         if not evt.artist_id:
@@ -53,10 +65,25 @@ class ArtistService(Service):
             metadata = self._source_service.pick_stream_metadata(evt.source)
             if metadata is None or metadata.get("artist") is None:
                 return
-
-            self._start_transaction(self._artist_repo, evt.id, create_artist, metadata)
+            deezer_data = self._deezer.search(
+                artist=metadata["artist"], album=metadata["album"]
+            )
+            self._start_transaction(
+                self._artist_repo, evt.id, create_artist, metadata, deezer_data
+            )
         else:
-            self._start_transaction(self._artist_repo, evt.id, update_artist, artist)
+            deezer_data = None
+            if artist.thumbnail is None:
+                metadata = self._source_service.pick_stream_metadata(evt.source)
+                if metadata is None or metadata.get("artist") is None:
+                    return
+                deezer_data = self._deezer.search(
+                    artist=metadata["artist"], album=metadata["album"]
+                )
+
+            self._start_transaction(
+                self._artist_repo, evt.id, update_artist, artist, deezer_data
+            )
 
     def _video_deleted(self, evt):
         def impl(ctx):

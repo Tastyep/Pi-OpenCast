@@ -31,7 +31,11 @@ class SourceService:
             return []
 
         entries = data.get("entries", [])
-        return [entry["webpage_url"] for entry in entries if "webpage_url" in entry]
+        return [
+            entry["webpage_url"]
+            for entry in entries
+            if entry and "webpage_url" in entry
+        ]
 
     def pick_stream_metadata(self, source: str) -> Optional[dict]:
         data = self._downloader.download_metadata(source, process_ie_data=True)

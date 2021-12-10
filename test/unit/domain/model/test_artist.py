@@ -34,6 +34,10 @@ class ArtistTest(ModelTestCase):
         self.artist.delete()
         self.expect_events(self.artist, Evt.ArtistDeleted)
 
+    def test_set_thumbnail(self):
+        self.artist.thumbnail = "new_value"
+        self.expect_events(self.artist, Evt.ArtistThumbnailUpdated)
+
     def test_add(self):
         first = IdentityService.random()
         self.artist.add(first)

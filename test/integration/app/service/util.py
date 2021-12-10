@@ -29,6 +29,7 @@ class ServiceTestCase(TestCase):
         self.media_player = Mock()
         self.downloader = Mock()
         self.video_parser = Mock()
+        self.deezer = Mock()
         self.file_service = Mock()
         self.infra_facade = InfraFacadeMock()
         self.infra_facade.media_factory.make_player.return_value = self.media_player
@@ -36,6 +37,7 @@ class ServiceTestCase(TestCase):
         self.infra_facade.media_factory.make_video_parser.return_value = (
             self.video_parser
         )
+        self.infra_facade.media_factory.make_deezer_service.return_value = self.deezer
         self.infra_facade.service_factory.make_file_service.return_value = (
             self.file_service
         )
