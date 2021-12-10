@@ -1,6 +1,7 @@
 import { PlayerState } from "models/player";
 
 class UpdateMediaTime {
+  RPS = 3;
   video_id = null;
   task = null;
 
@@ -14,21 +15,8 @@ class UpdateMediaTime {
   }
 
   onPlayerStateUpdated(e) {
-    const rps = 3;
     if (e.new_state === PlayerState.PLAYING) {
-      this.task = setInterval(() => {
-        const videoId = this.store.player.videoId;
-        if (!videoId) {
-          return;
-        }
-
-        let video = this.store.videos[videoId];
-        if (!video || video.duration === 0) {
-          return;
-        }
-
-        video.setPlayTime(video.playTime + 1 / rps);
-      }, 1000 / rps);
+      this._startTask();
       return;
     }
 
@@ -52,6 +40,25 @@ class UpdateMediaTime {
     }
 
     video.setPlayTime(e.duration / 1000);
+    if (!this.task) {
+      this._startTask();
+    }
+  }
+
+  _startTask() {
+    this.task = setInterval(() => {
+      const videoId = this.store.player.videoId;
+      if (!videoId) {
+        return;
+      }
+
+      let video = this.store.videos[videoId];
+      if (!video || video.duration === 0) {
+        return;
+      }
+
+      video.setPlayTime(video.playTime + 1 / this.RPS);
+    }, 1000 / this.RPS);
   }
 }
 
