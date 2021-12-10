@@ -18,7 +18,7 @@ import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AlbumIcon from "@mui/icons-material/Album";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -113,6 +113,7 @@ const AlbumPage = observer(() => {
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
+  let navigate = useNavigate();
 
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
@@ -121,6 +122,10 @@ const AlbumPage = observer(() => {
   const album = store.albums[id];
   if (!album) {
     return null;
+  }
+  
+  if (album.ids.length === 0) {
+    navigate("/library");
   }
 
   const albumVideos = store.filterVideos(album.ids);

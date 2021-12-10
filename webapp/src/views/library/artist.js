@@ -16,7 +16,7 @@ import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
 
@@ -109,10 +109,15 @@ const ArtistPage = observer(() => {
 
   const [anchor, setAnchor] = useState(null);
   const isMenuOpen = Boolean(anchor);
+  let navigate = useNavigate();
 
   const artist = store.artists[id];
   if (!artist) {
     return null;
+  }
+
+  if (artist.ids.length === 0) {
+    navigate("/library");
   }
 
   const artistVideos = store.filterVideos(artist.ids);
