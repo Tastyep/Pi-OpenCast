@@ -1,7 +1,7 @@
 """ Parse, download and extract a media with its metadata """
 
 from pathlib import Path
-from typing import List
+from typing import Callable, List, Optional
 
 import structlog
 from hurry.filesize import alternative, size
@@ -68,7 +68,14 @@ class Downloader:
         self._logger = structlog.get_logger(__name__)
         self._dl_logger = Logger(self._logger)
 
-    def download_video(self, op_id: Id, video_id: Id, source: str, dest: str):
+    def download_video(
+        self,
+        op_id: Id,
+        video_id: Id,
+        source: str,
+        dest: str,
+        on_dl_starting: Optional[Callable[[Logger], None]] = None,
+    ):
         def dispatch_dl_events(data):
             status = data.get("status")
             total = data.get("total_bytes")
@@ -79,7 +86,8 @@ class Downloader:
                 )
 
         def impl():
-            self._logger.info("Downloading", video=dest)
+            if on_dl_starting:
+                on_dl_starting(self._logger)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
                 "bestvideo+bestaudio/best",

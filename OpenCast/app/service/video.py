@@ -5,6 +5,8 @@ from pathlib import Path
 import structlog
 
 from OpenCast.app.command import video as video_cmds
+from OpenCast.app.notification import Level as NotifLevel
+from OpenCast.app.notification import Notification
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Video, timedelta
@@ -109,8 +111,20 @@ class VideoService(Service):
                 {DownloadSuccess: video_downloaded, DownloadError: abort_operation},
                 times=1,
             )
+
+            def on_dl_starting(_):
+                self._evt_dispatcher.dispatch(
+                    Notification(
+                        cmd.id,
+                        NotifLevel.INFO,
+                        "starting download",
+                        {"video": video.title},
+                    )
+                )
+
+            # TODO: Move this part out of the repo transaction
             self._downloader.download_video(
-                cmd.id, video.id, video.source, video_location
+                cmd.id, video.id, video.source, video_location, on_dl_starting
             )
 
         video = self._video_repo.get(cmd.model_id)
