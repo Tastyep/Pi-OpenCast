@@ -9,13 +9,16 @@ export default class Artist {
 
     makeObservable(this, {
       ids: observable,
+      thumbnail: observable,
 
       setIds: action,
+      setThumbnail: action,
     });
 
     eventDispatcher.observe(
       {
         ArtistVideosUpdated: (e) => this.setIds(e.ids),
+        ArtistThumbnailUpdated: (e) => this.setThumbnail(e.thumbnail),
       },
       this.id
     );
@@ -23,5 +26,9 @@ export default class Artist {
 
   setIds(ids) {
     this.ids = ids;
+  }
+
+  setThumbnail(thumbnail) {
+    this.thumbnail = thumbnail;
   }
 }

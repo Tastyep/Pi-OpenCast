@@ -2,8 +2,6 @@ import { useState } from "react";
 
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
 import { styled } from "@mui/material/styles";
 
 import ArtTrackIcon from "@mui/icons-material/ArtTrack";
@@ -11,6 +9,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import { Link } from "react-router-dom";
+import { observer } from "mobx-react";
 
 const ThumbnailPlayButton = styled(IconButton)({
   display: "flex",
@@ -26,7 +25,7 @@ const ThumbnailPlayButton = styled(IconButton)({
   },
 });
 
-const ArtistThumbnail = ({ artist }) => {
+const ArtistThumbnail = observer(({ artist }) => {
   if (!artist.thumbnail) {
     return (
       <ArtTrackIcon
@@ -47,7 +46,7 @@ const ArtistThumbnail = ({ artist }) => {
       style={{ width: "100%", height: "100%" }}
     />
   );
-};
+});
 
 const ArtistMenuThumbnail = (props) => {
   const { artist, isSmallDevice, isMenuOpen, menuClick, playNext } = props;
