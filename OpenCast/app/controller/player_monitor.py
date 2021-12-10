@@ -299,16 +299,9 @@ class PlayerMonitController(MonitorController):
         parameters=[
             {
                 "in": "query",
-                "name": "forward",
-                "description": "True to advance in the media, False otherwise",
-                "type": "boolean",
-                "required": True,
-            },
-            {
-                "in": "query",
-                "name": "long",
-                "description": "True to use the highest seeking step, False otherwise",
-                "type": "boolean",
+                "name": "duration",
+                "description": "The time in ms to seek the media to",
+                "type": "integer",
                 "required": True,
             },
         ],
@@ -318,12 +311,9 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def seek(self, req):
-        forward = str_to_bool(req.query["forward"])
-        long = str_to_bool(req.query["long"])
-        side = 1 if forward is True else -1
-        step = Player.LONG_TIME_STEP if long is True else Player.SHORT_TIME_STEP
+        duration = int(req.query["duration"])
         handlers, channel = self._make_default_handlers(PlayerEvt.VideoSeeked)
-        self._observe_dispatch(handlers, Cmd.SeekVideo, side * step)
+        self._observe_dispatch(handlers, Cmd.SeekVideo, duration)
 
         return await channel.receive()
 

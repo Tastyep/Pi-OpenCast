@@ -68,9 +68,7 @@ class PlayerWrapper:
         self._player.audio_set_volume(volume)
 
     def seek(self, duration):
-        current_time = self._player.get_time()
-        if current_time != -1:
-            self._player.set_time(current_time + duration)
+        self._player.set_time(duration)
 
     def _on_media_end(self, event):
         evt = e.MediaEndReached(None)

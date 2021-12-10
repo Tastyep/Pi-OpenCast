@@ -333,80 +333,19 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         )
 
     @unittest_run_loop
-    async def test_seek_forward_short(self):
+    async def test_seek(self):
+        duration = 100
         self.expect_and_raise(
-            make_cmd(PlayerCmd.SeekVideo, self.player_id, Player.SHORT_TIME_STEP),
+            make_cmd(PlayerCmd.SeekVideo, self.player_id, duration),
             [
                 {
                     "type": PlayerEvt.VideoSeeked,
-                    "args": {"duration": Player.SHORT_TIME_STEP},
+                    "args": {"duration": duration},
                 }
             ],
         )
 
-        resp = await self.client.post(
-            "/api/player/seek", params={"forward": "true", "long": "false"}
-        )
-        body = await resp.json()
-        player = self.data_facade.player_repo.get_player()
-        self.assertEqual(200, resp.status)
-        self.assertEqual(player.to_dict(), body)
-
-    @unittest_run_loop
-    async def test_seek_forward_long(self):
-        self.expect_and_raise(
-            make_cmd(PlayerCmd.SeekVideo, self.player_id, Player.LONG_TIME_STEP),
-            [
-                {
-                    "type": PlayerEvt.VideoSeeked,
-                    "args": {"duration": Player.LONG_TIME_STEP},
-                }
-            ],
-        )
-
-        resp = await self.client.post(
-            "/api/player/seek", params={"forward": "true", "long": "true"}
-        )
-        body = await resp.json()
-        player = self.data_facade.player_repo.get_player()
-        self.assertEqual(200, resp.status)
-        self.assertEqual(player.to_dict(), body)
-
-    @unittest_run_loop
-    async def test_seek_backward_short(self):
-        self.expect_and_raise(
-            make_cmd(PlayerCmd.SeekVideo, self.player_id, -Player.SHORT_TIME_STEP),
-            [
-                {
-                    "type": PlayerEvt.VideoSeeked,
-                    "args": {"duration": -Player.SHORT_TIME_STEP},
-                }
-            ],
-        )
-
-        resp = await self.client.post(
-            "/api/player/seek", params={"forward": "false", "long": "false"}
-        )
-        body = await resp.json()
-        player = self.data_facade.player_repo.get_player()
-        self.assertEqual(200, resp.status)
-        self.assertEqual(player.to_dict(), body)
-
-    @unittest_run_loop
-    async def test_seek_backward_long(self):
-        self.expect_and_raise(
-            make_cmd(PlayerCmd.SeekVideo, self.player_id, -Player.LONG_TIME_STEP),
-            [
-                {
-                    "type": PlayerEvt.VideoSeeked,
-                    "args": {"duration": -Player.LONG_TIME_STEP},
-                }
-            ],
-        )
-
-        resp = await self.client.post(
-            "/api/player/seek", params={"forward": "false", "long": "true"}
-        )
+        resp = await self.client.post("/api/player/seek", params={"duration": duration})
         body = await resp.json()
         player = self.data_facade.player_repo.get_player()
         self.assertEqual(200, resp.status)
@@ -414,14 +353,13 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_seek_error(self):
+        duration = 100
         self.expect_and_error(
-            make_cmd(PlayerCmd.SeekVideo, self.player_id, -Player.SHORT_TIME_STEP),
+            make_cmd(PlayerCmd.SeekVideo, self.player_id, duration),
             error="Error message",
         )
 
-        resp = await self.client.post(
-            "/api/player/seek", params={"forward": "false", "long": "false"}
-        )
+        resp = await self.client.post("/api/player/seek", params={"duration": duration})
         body = await resp.json()
         self.assertEqual(500, resp.status)
         self.assertEqual(

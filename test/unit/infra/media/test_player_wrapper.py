@@ -83,7 +83,5 @@ class PlayerWrapperTest(TestCase):
 
     def test_seek(self):
         duration = 5
-        current_time = 1
-        self.player_impl.get_time.return_value = current_time
         self.player.seek(duration)
-        self.player_impl.set_time.assert_called_once_with(current_time + duration)
+        self.player_impl.set_time.assert_called_once_with(duration)
