@@ -26,9 +26,9 @@ async function pauseMedia() {
   return await API.post("/player/pause");
 }
 
-async function seekMedia(forward, long) {
+async function seekMedia(duration) {
   return await API.post("/player/seek", null, {
-    params: { forward: forward, long: long },
+    params: { duration: duration },
   });
 }
 

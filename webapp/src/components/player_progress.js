@@ -1,7 +1,10 @@
-import LinearProgress from "@mui/material/LinearProgress";
+import Slider from "@mui/material/Slider";
+
+import { observer } from "mobx-react-lite";
 
 import { useAppStore } from "./app_context";
-import { observer } from "mobx-react-lite";
+import playerAPI from "services/api/player";
+import snackBarHandler from "services/api/error";
 
 const PlayerProgress = observer(() => {
   const store = useAppStore();
@@ -11,10 +14,17 @@ const PlayerProgress = observer(() => {
     return null;
   }
 
+  const updateMediaTime = (_, value) => {
+    playerAPI.seekMedia(1000 * value).catch(snackBarHandler(store));
+  };
+
   return (
-    <LinearProgress
-      variant="determinate"
-      value={(100 * media.playTime) / media.duration}
+    <Slider
+      min={0}
+      step={1}
+      max={media.duration}
+      value={media.playTime}
+      onChange={updateMediaTime}
     />
   );
 });

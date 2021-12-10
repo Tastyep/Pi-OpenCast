@@ -123,7 +123,7 @@ const AlbumPage = observer(() => {
   if (!album) {
     return null;
   }
-  
+
   if (album.ids.length === 0) {
     navigate("/library");
   }

@@ -51,7 +51,7 @@ class UpdateMediaTime {
       return;
     }
 
-    video.setPlayTime(video.playTime + e.duration / 1000);
+    video.setPlayTime(e.duration / 1000);
   }
 }
 
