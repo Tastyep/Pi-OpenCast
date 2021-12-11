@@ -85,7 +85,7 @@ export default class Video {
     this.lastPlay = lastPlay;
   }
   setPlayTime(playTime) {
-    this.playTime = Math.min(Math.max(playTime, 0), this.duration);
+    this.playTime = Math.min(Math.max(playTime, 0), this.duration *1000);
   }
 
   _setDownloadRatio(e) {

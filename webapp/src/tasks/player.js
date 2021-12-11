@@ -39,7 +39,7 @@ class UpdateMediaTime {
       return;
     }
 
-    video.setPlayTime(e.duration / 1000);
+    video.setPlayTime(e.duration);
     if (!this.task) {
       this._startTask();
     }
@@ -57,7 +57,7 @@ class UpdateMediaTime {
         return;
       }
 
-      video.setPlayTime(video.playTime + 1 / this.RPS);
+      video.setPlayTime(video.playTime + 1000 / this.RPS);
     }, 1000 / this.RPS);
   }
 }

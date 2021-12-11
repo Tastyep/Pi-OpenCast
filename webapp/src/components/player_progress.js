@@ -15,7 +15,7 @@ const PlayerProgress = observer(() => {
   }
 
   const updateMediaTime = (_, value) => {
-    media.setPlayTime(value);
+    media.setPlayTime(1000 * value);
   };
 
   const seekMedia = (_, value) => {
@@ -27,7 +27,7 @@ const PlayerProgress = observer(() => {
       min={0}
       step={1}
       max={media.duration}
-      value={media.playTime}
+      value={media.playTime / 1000}
       onChange={updateMediaTime}
       onChangeCommitted={seekMedia}
       sx={{

@@ -220,9 +220,9 @@ const ControlBar = observer(() => {
   const store = useAppStore();
 
   const [expanded, setExpanded] = useState(false);
+  const activeVideo = store.videos[store.player.videoId];
 
   const playNext = () => {
-    const activeVideo = store.videos[store.player.videoId];
     if (!activeVideo) {
       store.enqueueSnackbar({
         message: "no active media",
@@ -250,7 +250,6 @@ const ControlBar = observer(() => {
   };
 
   const playPrev = () => {
-    const activeVideo = store.videos[store.player.videoId];
     if (!activeVideo) {
       store.enqueueSnackbar({
         message: "no active media",
@@ -275,6 +274,11 @@ const ControlBar = observer(() => {
     }
 
     playerAPI.playMedia(playlist.ids[idx - 1]).catch(snackBarHandler(store));
+  };
+
+  const seekStep = {
+    small: 5000,
+    big: 30000,
   };
 
   // Highlight subtitle button when on
@@ -303,7 +307,11 @@ const ControlBar = observer(() => {
               <IconButton
                 size="small"
                 onClick={() =>
-                  updatePlayer(store, playerAPI.seekMedia, false, true)
+                  updatePlayer(
+                    store,
+                    playerAPI.seekMedia,
+                    Math.round(activeVideo.playTime - seekStep.big)
+                  )
                 }
                 sx={{ marginLeft: "16px" }}
               >
@@ -312,7 +320,11 @@ const ControlBar = observer(() => {
               <IconButton
                 size="small"
                 onClick={() =>
-                  updatePlayer(store, playerAPI.seekMedia, false, false)
+                  updatePlayer(
+                    store,
+                    playerAPI.seekMedia,
+                    Math.round(activeVideo.playTime - seekStep.small)
+                  )
                 }
               >
                 <ArrowLeftIcon />
@@ -320,7 +332,11 @@ const ControlBar = observer(() => {
               <IconButton
                 size="small"
                 onClick={() =>
-                  updatePlayer(store, playerAPI.seekMedia, true, false)
+                  updatePlayer(
+                    store,
+                    playerAPI.seekMedia,
+                    Math.round(activeVideo.playTime + seekStep.small)
+                  )
                 }
               >
                 <ArrowRightIcon />
@@ -328,7 +344,11 @@ const ControlBar = observer(() => {
               <IconButton
                 size="small"
                 onClick={() =>
-                  updatePlayer(store, playerAPI.seekMedia, true, true)
+                  updatePlayer(
+                    store,
+                    playerAPI.seekMedia,
+                    Math.round(activeVideo.playTime + seekStep.big)
+                  )
                 }
               >
                 <FastForwardIcon />
@@ -395,7 +415,11 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(store, playerAPI.seekMedia, false, true)
+                      updatePlayer(
+                        store,
+                        playerAPI.seekMedia,
+                        Math.round(activeVideo.playTime - seekStep.big)
+                      )
                     }
                   >
                     <FastRewindIcon />
@@ -403,7 +427,11 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(store, playerAPI.seekMedia, false, false)
+                      updatePlayer(
+                        store,
+                        playerAPI.seekMedia,
+                        Math.round(activeVideo.playTime - seekStep.small)
+                      )
                     }
                   >
                     <ArrowLeftIcon />
@@ -419,7 +447,11 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(store, playerAPI.seekMedia, true, false)
+                      updatePlayer(
+                        store,
+                        playerAPI.seekMedia,
+                        Math.round(activeVideo.playTime + seekStep.small)
+                      )
                     }
                   >
                     <ArrowRightIcon />
@@ -427,7 +459,11 @@ const ControlBar = observer(() => {
                   <IconButton
                     size="small"
                     onClick={() =>
-                      updatePlayer(store, playerAPI.seekMedia, true, true)
+                      updatePlayer(
+                        store,
+                        playerAPI.seekMedia,
+                        Math.round(activeVideo.playTime + seekStep.big)
+                      )
                     }
                   >
                     <FastForwardIcon />
