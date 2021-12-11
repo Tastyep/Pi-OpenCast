@@ -202,14 +202,14 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
   const artistWeights = new Map();
   const albumWeights = new Map();
   for (const video of playlistVideos) {
-    if (video.artist) {
-      if (!artistWeights.has(video.artist)) {
-        artistWeights.set(video.artist, 1);
+    if (video.artist_id) {
+      if (!artistWeights.has(video.artist_id)) {
+        artistWeights.set(video.artist_id, 1);
       }
     }
-    if (video.album) {
-      if (!albumWeights.has(video.album)) {
-        albumWeights.set(video.album, 1);
+    if (video.album_id) {
+      if (!albumWeights.has(video.album_id)) {
+        albumWeights.set(video.album_id, 1);
       }
     }
   }
@@ -221,11 +221,11 @@ const SuggestionPlaylist = React.memo(({ playlist }) => {
     .sort((first, second) => {
       const accumulateWeigths = (video) => {
         let weight = Math.random();
-        if (artistWeights.has(video.artist)) {
-          weight += artistWeights.get(video.artist);
+        if (artistWeights.has(video.artist_id)) {
+          weight += artistWeights.get(video.artist_id);
         }
-        if (albumWeights.has(video.album)) {
-          weight += albumWeights.get(video.album);
+        if (albumWeights.has(video.album_id)) {
+          weight += albumWeights.get(video.album_id);
         }
         return weight;
       };
