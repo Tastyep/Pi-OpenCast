@@ -7,12 +7,12 @@ class SocketEventDispatcher {
 
   onEvent(event) {
     const data = JSON.parse(event.data);
-    console.log(
-      "Received Event",
-      data.name,
-      this.eventsToHandlers.hasOwnProperty(data.name),
-      event.data
-    );
+    // console.log(
+    //   "Received Event",
+    //   data.name,
+    //   this.eventsToHandlers.hasOwnProperty(data.name),
+    //   event.data
+    // );
     if (this.eventsToHandlers.hasOwnProperty(data.name)) {
       const handlers = this.eventsToHandlers[data.name];
       for (const handler of handlers) {
