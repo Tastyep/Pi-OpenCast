@@ -41,6 +41,7 @@ class VideoServiceTest(ServiceTestCase):
             "thumbnail": "thumbnail_url",
         }
         self.downloader.download_metadata.return_value = metadata
+        self.deezer.search.return_value = []
 
         attrs = deepcopy(metadata)
         attrs["artist_id"] = IdentityService.id_artist(attrs.pop("artist"))

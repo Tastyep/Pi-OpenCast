@@ -70,6 +70,9 @@ class PlayerWrapper:
     def seek(self, duration):
         self._player.set_time(duration)
 
+    def play_time(self):
+        return self._player.get_time()
+
     def _on_media_end(self, event):
         evt = e.MediaEndReached(None)
         self._evt_dispatcher.dispatch(evt)

@@ -4,12 +4,13 @@ from .io.server import make_server
 
 
 class InfraFacade:
-    def __init__(self, io_factory, media_factory, service_factory):
+    def __init__(self, io_factory, media_factory, service_factory, player):
         self._io_factory = io_factory
         self._media_factory = media_factory
         self._service_factory = service_factory
 
         self._server = make_server()
+        self._player = player
 
     # IO objects
 
@@ -24,6 +25,10 @@ class InfraFacade:
     @property
     def server(self):
         return self._server
+
+    @property
+    def player(self):
+        return self._player
 
     # Media objects
 

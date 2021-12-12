@@ -41,6 +41,7 @@ class ServiceTestCase(TestCase):
         self.infra_facade.service_factory.make_file_service.return_value = (
             self.file_service
         )
+        self.infra_facade.player = self.media_player
 
         self.service_factory = ServiceFactory(self.infra_facade.service_factory)
 

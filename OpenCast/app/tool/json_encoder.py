@@ -5,7 +5,7 @@ from enum import Enum
 from json import JSONEncoder
 from pathlib import PosixPath
 
-from OpenCast.app.notification import Notification
+from OpenCast.app.notification import NotificationBase
 from OpenCast.domain.event.event import Event as DomainEvent
 from OpenCast.domain.model.entity import Entity
 from OpenCast.infra import Id
@@ -37,7 +37,7 @@ class EventEncoder(EnhancedJSONEncoder):
         if (
             isinstance(obj, DomainEvent)
             or isinstance(obj, InfraEvent)
-            or isinstance(obj, Notification)
+            or isinstance(obj, NotificationBase)
         ):
             return obj.to_dict()
         return super().default(obj)

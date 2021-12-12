@@ -1,6 +1,7 @@
 from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import playlist as PlaylistCmd
+from OpenCast.app.notification import WSResponse
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.service.identity import IdentityService
 
@@ -35,3 +36,12 @@ class RootMonitorControllerTest(MonitorControllerTestCase):
             self.evt_dispatcher.dispatch(created_evt)
             self.evt_dispatcher.dispatch(updated_evt)
             await self.expect_ws_events(ws, [created_evt, updated_evt])
+
+    @unittest_run_loop
+    async def test_ws_message(self):
+        async with self.client.ws_connect("/api/events") as ws:
+            self.infra_facade.player.play_time.return_value = 1000
+            await ws.send_str("play_time")
+            await self.expect_ws_events(
+                ws, [WSResponse(None, "play_time", {"play_time": 1000})]
+            )

@@ -6,5 +6,6 @@ class InfraFacadeMock(Mock):
         super(InfraFacadeMock, self).__init__()
         self.io_factory = Mock()
         self.server = Mock()
+        self.player = Mock()
         self.media_factory = Mock()
         self.service_factory = Mock()

@@ -3,10 +3,11 @@
 import asyncio
 
 import structlog
+from aiohttp import WSMsgType
 from aiohttp_apispec import docs
 
 from OpenCast.app.controller.monitor import MonitorController
-from OpenCast.app.notification import Notification
+from OpenCast.app.notification import Notification, WSResponse
 from OpenCast.domain.event import album as AlbumEvt
 from OpenCast.domain.event import artist as ArtistEvt
 from OpenCast.domain.event import player as PlayerEvt
@@ -21,6 +22,8 @@ class RootMonitController(MonitorController):
     def __init__(self, app_facade, infra_facade):
         logger = structlog.get_logger(__name__)
         super().__init__(logger, app_facade, infra_facade, "")
+
+        self._player = infra_facade.player
 
         self._route("GET", "/events", self.stream_events)
 
@@ -48,10 +51,32 @@ class RootMonitController(MonitorController):
         self._evt_dispatcher.observe({DownloadInfo: channel.send})
         self._evt_dispatcher.observe({Notification: channel.send})
 
-        while True:
-            event = await channel.receive()
-            await self._send_ws_event(ws, event)
-            channel.task_done()
+        ws_open = True
+
+        async def listen_ws():
+            async for msg in ws:
+                if msg.type == WSMsgType.TEXT and msg.data == "play_time":
+                    await self._send_ws_event(
+                        ws,
+                        WSResponse(
+                            None, msg.data, {"play_time": self._player.play_time()}
+                        ),
+                    )
+                elif msg.type in (WSMsgType.CLOSE, WSMsgType.ERROR):
+                    nonlocal ws_open
+                    ws_open = False
+                    break
+
+        async def listen_events():
+            while ws_open:
+                event = await channel.receive()
+                await self._send_ws_event(ws, event)
+                channel.task_done()
+
+        await asyncio.gather(
+            listen_ws(),
+            listen_events(),
+        )
 
     async def _send_ws_event(self, ws, event):
         event_name = type(event).__name__
