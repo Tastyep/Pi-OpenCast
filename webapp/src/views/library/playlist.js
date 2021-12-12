@@ -127,7 +127,7 @@ const PlaylistMenu = (props) => {
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
+          playerAPI.playMedia(playlist.ids[0]).catch(snackBarHandler(store));
         }
       })
       .catch(snackBarHandler(store));
@@ -485,8 +485,8 @@ const PlaylistPage = observer(() => {
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
         if (store.player.videoId !== shuffledIds[0]) {
-        playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
-          }
+          playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
+        }
       })
       .catch(snackBarHandler(store));
   };
