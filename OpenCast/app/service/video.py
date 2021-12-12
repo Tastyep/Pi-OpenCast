@@ -112,15 +112,18 @@ class VideoService(Service):
                 times=1,
             )
 
-            def on_dl_starting(_):
-                self._evt_dispatcher.dispatch(
-                    Notification(
-                        cmd.id,
-                        NotifLevel.INFO,
-                        "starting download",
-                        {"video": video.title},
+            def on_dl_starting(logger):
+                if not video.collection_id:
+                    self._evt_dispatcher.dispatch(
+                        Notification(
+                            cmd.id,
+                            NotifLevel.INFO,
+                            "starting download",
+                            {"video": video.title},
+                        )
                     )
-                )
+                else:
+                    logger.info("starting download", {"video": video.title})
 
             # TODO: Move this part out of the repo transaction
             self._downloader.download_video(

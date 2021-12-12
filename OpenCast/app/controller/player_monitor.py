@@ -117,8 +117,8 @@ class PlayerMonitController(MonitorController):
                     Notification(
                         collection_id,
                         NotifLevel.INFO,
-                        f"preparing {len(sources)} media",
-                        {"source": source},
+                        "downloading playlist",
+                        {"source": source, "count": f"{len(sources)} media"},
                     )
                 )
                 videos = [
@@ -192,8 +192,8 @@ class PlayerMonitController(MonitorController):
                     Notification(
                         collection_id,
                         NotifLevel.INFO,
-                        f"preparing {len(sources)} media",
-                        {"source": source},
+                        "downloading playlist",
+                        {"source": source, "count": f"{len(sources)} media"},
                     )
                 )
                 videos = [
