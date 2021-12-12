@@ -1,10 +1,8 @@
 class SocketEventDispatcher {
-  constructor(websockets) {
+  constructor(websocket) {
     this.eventsToHandlers = {};
 
-    for (const i in websockets) {
-      websockets[i].addEventListener("message", (evt) => this.onEvent(evt));
-    }
+    websocket.addEventListener("message", (evt) => this.onEvent(evt));
   }
 
   onEvent(event) {

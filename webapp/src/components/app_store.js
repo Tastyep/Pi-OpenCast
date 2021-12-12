@@ -20,7 +20,7 @@ export class AppStore {
   artists = {};
   notifications = [];
 
-  constructor(eventDispatcher, modelFactory) {
+  constructor(webSocket, eventDispatcher, modelFactory) {
     makeObservable(this, {
       player: observable,
       playlists: observable,
@@ -53,6 +53,7 @@ export class AppStore {
       removeSnackbar: action,
     });
 
+    this.webSocket = webSocket;
     this.modelFactory = modelFactory;
     this.eventDispatcher = eventDispatcher;
 
@@ -93,6 +94,7 @@ export class AppStore {
       .get()
       .then((response) => {
         this.setPlayer(response.data);
+        this.webSocket.send("play_time");
       })
       .catch(snackBarHandler(this));
   }
