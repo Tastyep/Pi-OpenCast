@@ -475,17 +475,18 @@ const PlaylistPage = observer(() => {
   const videos = store.playlistVideos(id);
 
   const shufflePlayNext = (playlist) => {
+    const shuffledIds = shuffleIds(playlist.ids);
     const playlistIds = queueNext(
       store.playerPlaylist,
       store.player.videoId,
-      shuffleIds(playlist.ids)
+      shuffledIds
     );
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
-        if (store.player.isStopped) {
-          playerAPI.playMedia(playlistIds[0]).catch(snackBarHandler(store));
-        }
+        if (store.player.videoId !== shuffledIds[0]) {
+        playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
+          }
       })
       .catch(snackBarHandler(store));
   };

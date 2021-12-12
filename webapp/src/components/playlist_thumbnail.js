@@ -69,7 +69,7 @@ const PlaylistMenuThumbnail = (props) => {
     evt.preventDefault();
   };
 
-  const playArtist = (evt) => {
+  const playList = (evt) => {
     playNext(true);
     evt.preventDefault();
   };
@@ -108,7 +108,7 @@ const PlaylistMenuThumbnail = (props) => {
           >
             <MoreVertIcon sx={{ marginLeft: "auto", color: "#FFFFFF" }} />
           </IconButton>
-          <ThumbnailPlayButton onClick={playArtist}>
+          <ThumbnailPlayButton onClick={playList}>
             <PlayArrowIcon sx={{ color: "#F5F5F5", marginTop: "auto" }} />
           </ThumbnailPlayButton>
         </Stack>

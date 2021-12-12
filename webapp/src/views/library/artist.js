@@ -132,7 +132,7 @@ const ArtistPage = observer(() => {
     playlistAPI
       .update(store.playerPlaylist.id, { ids: playlistIds })
       .then((_) => {
-        if (store.player.isStopped) {
+        if (store.player.videoId !== shuffledIds[0]) {
           playerAPI.playMedia(shuffledIds[0]).catch(snackBarHandler(store));
         }
       })
