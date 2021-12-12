@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -26,6 +26,9 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import { styled } from "@mui/material/styles";
 
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Virtuoso } from "react-virtuoso";
+
 import { useParams, useNavigate } from "react-router-dom";
 
 import { observer } from "mobx-react-lite";
@@ -42,7 +45,6 @@ import { humanReadableDuration } from "services/duration";
 import { useAppStore } from "components/app_context";
 import { PlaylistThumbnail } from "components/playlist_thumbnail";
 import { MediaItem } from "components/media_item";
-import { VirtualizedMediaList } from "components/media_list";
 
 const pluralize = require("pluralize");
 
@@ -320,6 +322,147 @@ const Suggestions = ({ playlist }) => {
   );
 };
 
+const DraggableMediaItem = observer((props) => {
+  const { video, index } = props;
+
+  return (
+    <Draggable draggableId={video.id} index={index}>
+      {(provided, _) => (
+        <MediaItem
+          {...props}
+          itemProps={{
+            ref: provided.innerRef,
+            ...provided.draggableProps,
+            ...provided.dragHandleProps,
+          }}
+          provided={provided}
+          isDragging={false}
+          draggingOver={null}
+        />
+      )}
+    </Draggable>
+  );
+});
+
+const Playlist = observer(({ playlist, videos, provided, isSmallDevice }) => {
+  const store = useAppStore();
+  const activeVideoId = store.player.videoId;
+
+  const itemContent = (index, video) => (
+    <DraggableMediaItem
+      isSmallDevice={isSmallDevice}
+      video={video}
+      index={index}
+      key={video.id}
+      isActive={video.id === activeVideoId}
+      playlist={playlist}
+    />
+  );
+
+  const Components = React.useMemo(() => {
+    return {
+      HeightPreservingItem: ({ children, ...props }) => {
+        return (
+          // the height is necessary to prevent the item container from collapsing, which confuses Virtuoso measurements
+          <div
+            {...props}
+            style={{ height: props["data-known-size"] || undefined }}
+          >
+            {children}
+          </div>
+        );
+      },
+    };
+  }, []);
+
+  return (
+    <Virtuoso
+      data={videos}
+      scrollerRef={provided.innerRef}
+      itemContent={itemContent}
+      components={{ Item: Components.HeightPreservingItem }}
+    />
+  );
+});
+
+const DroppablePlaylist = observer(({ playlist, videos }) => {
+  const store = useAppStore();
+
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
+
+  const onDragEnd = useCallback(
+    (result, videos) => {
+      const { destination, source, draggableId } = result;
+
+      if (!destination) {
+        const playlist = store.playlists[source.droppableId];
+        store.removePlaylistVideo(playlist.id, draggableId);
+        playlistAPI
+          .update(playlist.id, { ids: playlist.ids })
+          .catch(snackBarHandler(store));
+        return;
+      }
+
+      if (
+        destination.droppableId === source.droppableId &&
+        destination.index === source.index
+      ) {
+        return;
+      }
+
+      const playlist = store.playlists[destination.droppableId];
+      const nextVideo = videos[destination.index];
+      const realIndex = playlist.ids.indexOf(nextVideo.id);
+
+      store.removePlaylistVideo(source.droppableId, draggableId);
+      store.insertPlaylistVideo(playlist.id, draggableId, realIndex);
+
+      const destPlaylist = store.playlists[destination.droppableId];
+      playlistAPI
+        .update(destination.droppableId, { ids: destPlaylist.ids })
+        .catch(snackBarHandler(store));
+    },
+    [store]
+  );
+
+  return (
+    <DragDropContext onDragEnd={(result) => onDragEnd(result, videos)}>
+      <Droppable
+        droppableId={playlist.id}
+        mode="virtual"
+        renderClone={(provided, _, rubric) => {
+          const video = videos[rubric.source.index];
+          return (
+            <MediaItem
+              isSmallDevice={isSmallDevice}
+              video={video}
+              itemProps={{
+                ref: provided.innerRef,
+                ...provided.draggableProps,
+                ...provided.dragHandleProps,
+              }}
+              isActive={video.id === store.player.videoId}
+              playlist={playlist}
+            />
+          );
+        }}
+        style={{ width: "100%" }}
+      >
+        {(provided) => (
+          <Playlist
+            playlist={playlist}
+            videos={videos}
+            provided={provided}
+            isSmallDevice={isSmallDevice}
+          />
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+});
+
 const PlaylistPage = observer(() => {
   const store = useAppStore();
   const { id } = useParams();
@@ -351,7 +494,10 @@ const PlaylistPage = observer(() => {
     let total = 0;
 
     for (const id of playlist.ids) {
-      total += store.videos[id].duration;
+      const video = store.videos[id];
+      if (video) {
+        total += store.videos[id].duration;
+      }
     }
 
     return humanReadableDuration(total);
@@ -429,23 +575,22 @@ const PlaylistPage = observer(() => {
           />
         </Stack>
       </Box>
-      <Stack sx={{ flex: 1, minHeight: "0px" }}>
-        <Box
-          sx={{
-            flex: "1.5 1 0",
-            overflow: "auto",
-            borderStyle: "solid hidden",
-            borderWidth: "1px",
-            borderColor: "#E0E0E0",
-          }}
-        >
-          <VirtualizedMediaList
-            videos={videos}
-            mediaProps={{ playlist: playlist }}
-          />
-        </Box>
-        <Suggestions playlist={playlist} />
-      </Stack>
+      {videos.length > 0 && (
+        <Stack sx={{ flex: 1, minHeight: "0px" }}>
+          <Box
+            sx={{
+              flex: "1.5 1 0",
+              overflow: "auto",
+              borderStyle: "solid hidden",
+              borderWidth: "1px",
+              borderColor: "#E0E0E0",
+            }}
+          >
+            <DroppablePlaylist playlist={playlist} videos={videos} />
+          </Box>
+          <Suggestions playlist={playlist} />
+        </Stack>
+      )}
     </Stack>
   );
 });

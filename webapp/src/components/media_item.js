@@ -437,6 +437,7 @@ const MediaItem = observer((props) => {
     isSmallDevice,
     video,
     isActive,
+    itemProps = {},
     playlist = null,
     showOptions = true,
   } = props;
@@ -474,6 +475,7 @@ const MediaItem = observer((props) => {
   if (!isSmallDevice) {
     return (
       <ListItem
+        {...itemProps}
         sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}
         onMouseEnter={() => {
           setHover(true);
@@ -603,7 +605,10 @@ const MediaItem = observer((props) => {
   }
 
   return (
-    <ListItem sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}>
+    <ListItem
+      {...itemProps}
+      sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}
+    >
       <Stack
         direction="row"
         alignItems="center"

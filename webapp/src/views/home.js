@@ -24,6 +24,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Virtuoso } from "react-virtuoso";
 
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
@@ -40,7 +41,6 @@ import { queueNext, shuffleIds } from "services/playlist";
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
 import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
-import { Virtuoso } from "react-virtuoso";
 
 const PageContainer = styled("div")({
   display: "flex",

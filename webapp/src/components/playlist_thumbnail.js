@@ -32,7 +32,7 @@ const listPopularVideos = (videos) => {
 };
 
 const PlaylistThumbnail = ({ videos }) => {
-  const popVideos = listPopularVideos(videos);
+  const popVideos = listPopularVideos(Array.from(videos));
 
   if (popVideos.length === 0) {
     return (
