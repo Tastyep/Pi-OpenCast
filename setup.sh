@@ -64,7 +64,7 @@ install_nvm() {
 install_project_deps() {
   log_info "Installing project dependencies..."
 
-  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3 -
   "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
