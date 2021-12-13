@@ -6,7 +6,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import ClosedCaptionIcon from "@mui/icons-material/ClosedCaption";
-import ClosedCaptionDisabledIcon from '@mui/icons-material/ClosedCaptionDisabled';
+import ClosedCaptionDisabledIcon from "@mui/icons-material/ClosedCaptionDisabled";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import FastRewindIcon from "@mui/icons-material/FastRewind";
@@ -218,34 +218,35 @@ const ActiveMediaData = observer(({ variant }) => {
 });
 
 const SubtitleControl = observer(() => {
-  const store = useAppStore()
+  const store = useAppStore();
 
-  return <>
-    <IconButton
-      size="small"
-      onClick={() =>
-        updatePlayer(store, playerAPI.seekSubtitle, false)
-      }
-    >
-      <RemoveCircleOutlineIcon />
-    </IconButton>
-    <IconButton
-      size="small"
-      onClick={() => updatePlayer(store, playerAPI.toggleSubtitle)}
-    >
-      {store.player.subState ?
-        <ClosedCaptionIcon /> : <ClosedCaptionDisabledIcon />}
-    </IconButton>
-    <IconButton
-      size="small"
-      onClick={() =>
-        updatePlayer(store, playerAPI.seekSubtitle, true)
-      }
-    >
-      <AddCircleOutlineIcon />
-    </IconButton>
-  </>
-})
+  return (
+    <>
+      <IconButton
+        size="small"
+        onClick={() => updatePlayer(store, playerAPI.seekSubtitle, false)}
+      >
+        <RemoveCircleOutlineIcon />
+      </IconButton>
+      <IconButton
+        size="small"
+        onClick={() => updatePlayer(store, playerAPI.toggleSubtitle)}
+      >
+        {store.player.subState ? (
+          <ClosedCaptionIcon />
+        ) : (
+          <ClosedCaptionDisabledIcon />
+        )}
+      </IconButton>
+      <IconButton
+        size="small"
+        onClick={() => updatePlayer(store, playerAPI.seekSubtitle, true)}
+      >
+        <AddCircleOutlineIcon />
+      </IconButton>
+    </>
+  );
+});
 
 const ControlBar = observer(() => {
   const store = useAppStore();
