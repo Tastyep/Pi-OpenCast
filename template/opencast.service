@@ -4,7 +4,6 @@ After=network.target
 
 [Service]
 Type=simple
-User={ USER }
 KillMode=control-group
 RemainAfterExit=true
 TimeoutStartSec=infinity
@@ -13,4 +12,4 @@ ExecStart={ START_COMMAND }
 ExecStop={ STOP_COMMAND }
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
