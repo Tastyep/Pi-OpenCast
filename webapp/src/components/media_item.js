@@ -167,7 +167,13 @@ const PlaylistMenu = (props) => {
         }}
       >
         <Paper elevation={3} sx={{ height: "100%" }}>
-          <ClickAwayListener onClickAway={closeMenu}>
+          <ClickAwayListener
+            onClickAway={() => {
+              if (!modalOpen) {
+                closeMenu();
+              }
+            }}
+          >
             <Stack sx={{ height: "100%" }}>
               <ListItem>
                 <Typography variant="h5">Playlists</Typography>
@@ -212,7 +218,6 @@ const PlaylistMenu = (props) => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => {
-                  closeMenu();
                   setModalOpen(true);
                 }}
                 sx={{
