@@ -28,7 +28,7 @@
     "start": "react-scripts start",
     "serve": "serve -s build -l $WEBAPP_PORT --no-clipboard",
     "stop": "lsof -t -a -i :$(grep 'PORT' .env | cut -f 2 -d'=') -c node | xargs kill >/dev/null 2>&1 || echo 'Not started'",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
