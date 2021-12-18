@@ -1,6 +1,6 @@
 [Unit]
 Description="OpenCast systemd service"
-After=network.target
+After=default.target rc-local.service
 
 [Service]
 Type=simple
