@@ -31,7 +31,7 @@ log() {
 }
 
 start() {
-  mkdir -p "$LOG_DIR"
+  mkdir -p "$ROOT/$LOG_DIR"
   penv python -m "$PROJECT_NAME" &
 }
 
