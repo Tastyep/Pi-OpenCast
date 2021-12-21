@@ -31,6 +31,7 @@ class PlayerWrapper:
         self._player.set_media(media)
         media.release()
         self._player.play()
+        self._player.set_fullscreen(True)
 
     def stop(self):
         self._player.stop()
