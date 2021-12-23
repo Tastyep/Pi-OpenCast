@@ -36,7 +36,7 @@ import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
-import { queueNext, shuffleIds } from "services/playlist";
+import { filterVideos, queueNext, shuffleIds } from "services/playlist";
 
 import { useAppStore } from "components/app_context";
 import StreamInput from "components/stream_input";
@@ -317,17 +317,12 @@ const DroppablePlaylist = observer(({ playlistId }) => {
     }
   };
 
-  const filter = (videos) => {
-    if (input === "") {
-      return videos;
-    }
-    const lowerInput = input.toLowerCase();
-    return videos.filter((video) =>
-      video.title.toLowerCase().includes(lowerInput)
-    );
-  };
-
-  const videos = filter(store.playlistVideos(playlistId));
+  const videos = filterVideos(
+    store.artists,
+    store.albums,
+    store.playlistVideos(playlistId),
+    input
+  );
   if (!playlistId) {
     return null;
   }

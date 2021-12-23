@@ -14,6 +14,7 @@ import { observer } from "mobx-react-lite";
 import { useMediaQuery } from "react-responsive";
 import { SIZES } from "constants.js";
 
+import { filterVideos } from "services/playlist";
 import { useAppStore } from "components/app_context";
 import { VirtualizedMediaList } from "components/media_list";
 
@@ -30,22 +31,6 @@ const MediasPage = observer(() => {
   if (!isSmallDevice) {
     contentStyle["width"] = "92%";
   }
-
-  const filter = (videos) => {
-    if (input === "") {
-      return videos;
-    }
-    const lowerInput = input.toLowerCase();
-    return videos.filter((video) => {
-      const artist = store.artists[video.artist_id];
-      const album = store.albums[video.album_id];
-      return (
-        video.title.toLowerCase().includes(lowerInput) ||
-        (artist && artist.name.toLowerCase().includes(lowerInput)) ||
-        (album && album.name.toLowerCase().includes(lowerInput))
-      );
-    });
-  };
 
   const updateInputContent = (e) => {
     setInput(e.target.value);
@@ -96,7 +81,7 @@ const MediasPage = observer(() => {
         />
       </Box>
       <VirtualizedMediaList
-        videos={filter(videos)}
+        videos={filterVideos(store.artists, store.albums, videos, input)}
         style={{ width: "100%", height: "100%", minHeight: "0px" }}
       />
     </Stack>

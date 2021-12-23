@@ -60,4 +60,21 @@ function shuffleIds(ids) {
   return shuffledIds;
 }
 
-export { queueNext, queueLast, shuffleIds };
+function filterVideos(artists, albums, videos, input) {
+  if (input === "") {
+    return videos;
+  }
+
+  const lowerInput = input.toLowerCase();
+  return videos.filter((video) => {
+    const artist = artists[video.artist_id];
+    const album = albums[video.album_id];
+    return (
+      video.title.toLowerCase().includes(lowerInput) ||
+      (artist && artist.name.toLowerCase().includes(lowerInput)) ||
+      (album && album.name.toLowerCase().includes(lowerInput))
+    );
+  });
+}
+
+export { queueNext, queueLast, shuffleIds, filterVideos };
