@@ -178,29 +178,6 @@ const Playlist = observer(({ videos, provided }) => {
   const virtuoso = useRef(null);
   const activeVideoId = store.player.videoId;
 
-  useEffect(() => {
-    if (virtuoso === null) {
-      return;
-    }
-
-    let index = 0;
-    for (; index < videos.length; index++) {
-      if (videos[index].id === activeVideoId) {
-        break;
-      }
-    }
-
-    if (index === videos.length) {
-      return;
-    }
-
-    virtuoso.current.scrollToIndex({
-      index: index,
-      align: "start",
-      behavior: "smooth",
-    });
-  }, [virtuoso, activeVideoId, videos]);
-
   const itemContent = (index, video) => (
     <DraggableMediaItem
       video={video}

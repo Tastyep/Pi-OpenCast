@@ -42,7 +42,7 @@ async function toggleSubtitle() {
 
 async function seekSubtitle(duration) {
   return await API.post("/player/subtitle/seek", null, {
-    params: { duration: duration},
+    params: { duration: duration },
   });
 }
 
