@@ -82,24 +82,29 @@ export class AppStore {
   }
 
   load() {
-    this.loadPlayer();
-    this.loadVideos();
-    this.loadPlaylists();
-    this.loadAlbums();
-    this.loadArtists();
+    let promises = [
+      this.loadPlayer(),
+      this.loadVideos(),
+      this.loadPlaylists(),
+      this.loadAlbums(),
+      this.loadArtists(),
+    ];
+
+    Promise.all(promises).then(() => {
+      this.webSocket.send("play_time");
+    });
   }
 
   loadPlayer() {
-    playerAPI
+    return playerAPI
       .get()
       .then((response) => {
         this.setPlayer(response.data);
-        this.webSocket.send("play_time");
       })
       .catch(snackBarHandler(this));
   }
   loadVideos() {
-    videoAPI
+    return videoAPI
       .list()
       .then((response) => {
         this.setVideos(response.data.videos);
@@ -107,7 +112,7 @@ export class AppStore {
       .catch(snackBarHandler(this));
   }
   loadPlaylists() {
-    playlistAPI
+    return playlistAPI
       .list()
       .then((response) => {
         this.setPlaylists(response.data.playlists);
@@ -115,7 +120,7 @@ export class AppStore {
       .catch(snackBarHandler(this));
   }
   loadAlbums() {
-    albumAPI
+    return albumAPI
       .list()
       .then((response) => {
         this.setAlbums(response.data.albums);
@@ -123,7 +128,7 @@ export class AppStore {
       .catch(snackBarHandler(this));
   }
   loadArtists() {
-    artistAPI
+    return artistAPI
       .list()
       .then((response) => {
         this.setArtists(response.data.artists);
