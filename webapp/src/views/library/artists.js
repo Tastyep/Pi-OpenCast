@@ -189,6 +189,9 @@ const ArtistsPage = observer(() => {
   if (artists.length === 0) {
     return null;
   }
+  artists.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  });
 
   return (
     <List
