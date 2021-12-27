@@ -93,16 +93,9 @@ class PlayerService(Service):
         self._player.toggle_subtitle()
         self._update(cmd.id, impl)
 
-    def _adjust_subtitle_delay(self, cmd):
+    def _update_subtitle_delay(self, cmd):
         def impl(model):
-            model.subtitle_delay = model.subtitle_delay + cmd.amount
-            self._player.set_subtitle_delay(model.subtitle_delay)
-
-        self._update(cmd.id, impl)
-
-    def _decrease_subtitle_delay(self, cmd):
-        def impl(model):
-            model.subtitle_delay = model.subtitle_delay - cmd.amount
+            model.subtitle_delay = cmd.delay
             self._player.set_subtitle_delay(model.subtitle_delay)
 
         self._update(cmd.id, impl)

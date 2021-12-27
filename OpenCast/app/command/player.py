@@ -39,10 +39,5 @@ class ToggleSubtitle(Command):
 
 
 @command
-class AdjustSubtitleDelay(Command):
-    amount: int
-
-
-@command
-class DecreaseSubtitleDelay(Command):
-    amount: int
+class UpdateSubtitleDelay(Command):
+    delay: int

@@ -369,8 +369,8 @@ class PlayerMonitController(MonitorController):
             {
                 "in": "query",
                 "name": "forward",
-                "description": "True to advance the media subtitle, False otherwise",
-                "type": "boolean",
+                "description": "The time in ms to seek the subtitles",
+                "type": "int",
                 "required": True,
             }
         ],
@@ -380,10 +380,9 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def subtitle_seek(self, req):
-        forward = str_to_bool(req.query["forward"])
-        step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
+        duration = int(req.query["duration"])
         handlers, channel = self._make_default_handlers(PlayerEvt.SubtitleDelayUpdated)
-        self._observe_dispatch(handlers, Cmd.AdjustSubtitleDelay, step)
+        self._observe_dispatch(handlers, Cmd.UpdateSubtitleDelay, duration)
 
         return await channel.receive()
 

@@ -144,16 +144,9 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.ToggleSubtitle, self.player_id
         )
 
-    def test_increase_subtitle_delay(self):
+    def test_update_subtitle_delay(self):
         self.data_producer.player().populate(self.data_facade)
 
-        self.evt_expecter.expect(
-            Evt.SubtitleDelayUpdated, self.player_id, Player.SUBTITLE_DELAY_STEP
-        ).from_(Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP)
-
-    def test_decrease_subtitle_delay(self):
-        self.data_producer.player().populate(self.data_facade)
-
-        self.evt_expecter.expect(
-            Evt.SubtitleDelayUpdated, self.player_id, -Player.SUBTITLE_DELAY_STEP
-        ).from_(Cmd.DecreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP)
+        self.evt_expecter.expect(Evt.SubtitleDelayUpdated, self.player_id, 100).from_(
+            Cmd.UpdateSubtitleDelay, self.player_id, 100
+        )

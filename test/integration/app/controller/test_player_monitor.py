@@ -430,51 +430,25 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         )
 
     @unittest_run_loop
-    async def test_subtitle_seek_forward(self):
+    async def test_subtitle_seek(self):
         self.expect_and_raise(
             make_cmd(
-                PlayerCmd.AdjustSubtitleDelay,
+                PlayerCmd.UpdateSubtitleDelay,
                 self.player_id,
-                Player.SUBTITLE_DELAY_STEP,
+                100,
             ),
             [
                 {
                     "type": PlayerEvt.SubtitleDelayUpdated,
                     "args": {
-                        "delay": Player.SUBTITLE_DELAY_STEP,
+                        "delay": 100,
                     },
                 }
             ],
         )
 
         resp = await self.client.post(
-            "/api/player/subtitle/seek", params={"forward": "true"}
-        )
-        body = await resp.json()
-        player = self.data_facade.player_repo.get_player()
-        self.assertEqual(200, resp.status)
-        self.assertEqual(player.to_dict(), body)
-
-    @unittest_run_loop
-    async def test_subtitle_seek_backward(self):
-        self.expect_and_raise(
-            make_cmd(
-                PlayerCmd.AdjustSubtitleDelay,
-                self.player_id,
-                -Player.SUBTITLE_DELAY_STEP,
-            ),
-            [
-                {
-                    "type": PlayerEvt.SubtitleDelayUpdated,
-                    "args": {
-                        "delay": -Player.SUBTITLE_DELAY_STEP,
-                    },
-                }
-            ],
-        )
-
-        resp = await self.client.post(
-            "/api/player/subtitle/seek", params={"forward": "false"}
+            "/api/player/subtitle/seek", params={"duration": 100}
         )
         body = await resp.json()
         player = self.data_facade.player_repo.get_player()
@@ -485,15 +459,15 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
     async def test_subtitle_seek_error(self):
         self.expect_and_error(
             make_cmd(
-                PlayerCmd.AdjustSubtitleDelay,
+                PlayerCmd.UpdateSubtitleDelay,
                 self.player_id,
-                Player.SUBTITLE_DELAY_STEP,
+                100,
             ),
             error="Error message",
         )
 
         resp = await self.client.post(
-            "/api/player/subtitle/seek", params={"forward": "true"}
+            "/api/player/subtitle/seek", params={"duration": 100}
         )
         body = await resp.json()
         self.assertEqual(500, resp.status)

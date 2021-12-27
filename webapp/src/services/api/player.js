@@ -40,9 +40,9 @@ async function toggleSubtitle() {
   return await API.post("/player/subtitle/toggle");
 }
 
-async function seekSubtitle(forward) {
+async function seekSubtitle(duration) {
   return await API.post("/player/subtitle/seek", null, {
-    params: { forward: forward },
+    params: { duration: duration},
   });
 }
 

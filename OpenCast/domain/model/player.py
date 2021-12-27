@@ -34,11 +34,6 @@ class PlayerSchema(Schema):
 class Player(Entity):
     Schema = PlayerSchema
 
-    VOLUME_STEP = 10
-    SUBTITLE_DELAY_STEP = 100
-    SHORT_TIME_STEP = 1000
-    LONG_TIME_STEP = 30000
-
     @dataclass
     class Data:
         id: Id
