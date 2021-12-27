@@ -224,7 +224,13 @@ const SubtitleControl = observer(() => {
     <>
       <IconButton
         size="small"
-        onClick={() => updatePlayer(store, playerAPI.seekSubtitle, store.player.subDelay - 100)}
+        onClick={() =>
+          updatePlayer(
+            store,
+            playerAPI.seekSubtitle,
+            store.player.subDelay - 100
+          )
+        }
       >
         <RemoveCircleOutlineIcon />
       </IconButton>
@@ -240,7 +246,13 @@ const SubtitleControl = observer(() => {
       </IconButton>
       <IconButton
         size="small"
-        onClick={() => updatePlayer(store, playerAPI.seekSubtitle, store.player.subDelay + 100)}
+        onClick={() =>
+          updatePlayer(
+            store,
+            playerAPI.seekSubtitle,
+            store.player.subDelay + 100
+          )
+        }
       >
         <AddCircleOutlineIcon />
       </IconButton>

@@ -6,7 +6,6 @@ from OpenCast.app.service.error import OperationError
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as Evt
 from OpenCast.domain.event import video as VideoEvt
-from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.service.identity import IdentityService

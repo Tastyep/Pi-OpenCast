@@ -21,9 +21,8 @@ from OpenCast.app.workflow.player import (
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model import Id
-from OpenCast.domain.model.player import Player, PlayerSchema
+from OpenCast.domain.model.player import PlayerSchema
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.util.conversion import str_to_bool
 
 from .monitor import MonitorController
 from .monitoring_schema import ErrorSchema
