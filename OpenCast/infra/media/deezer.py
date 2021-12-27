@@ -23,7 +23,6 @@ class Deezer:
                 async with session.get(
                     f"{self.ROOT_URL}/search", params=params
                 ) as response:
-                    print(f"RESP: {response.url}")
                     json = await response.json()
                     return json["data"]
 
