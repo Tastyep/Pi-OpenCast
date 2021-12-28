@@ -105,6 +105,29 @@ class VideoTest(ModelTestCase):
         self.video.stop()
         self.expect_events(self.video, Evt.VideoStateUpdated, Evt.VideoStateUpdated)
 
+    def test_pause(self):
+        self.video.state = VideoState.READY
+        self.video.start()
+        self.video.release_events()
+
+        self.video.pause()
+        self.expect_events(self.video, Evt.VideoStateUpdated)
+
+    def test_unpause(self):
+        self.video.state = VideoState.PAUSED
+        self.video.release_events()
+
+        self.video.pause()
+        self.expect_events(self.video, Evt.VideoStateUpdated)
+
+    def test_pause_stopped(self):
+        self.video.state = VideoState.READY
+        self.video.release_events()
+
+        with self.assertRaises(DomainError) as ctx:
+            self.video.pause()
+        self.assertEqual("the video is not started", str(ctx.exception))
+
     def test_stop_not_started(self):
         with self.assertRaises(DomainError) as ctx:
             self.video.stop()

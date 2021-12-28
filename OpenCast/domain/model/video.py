@@ -22,7 +22,8 @@ class State(Enum):
     CREATED = 1
     COLLECTING = 2
     READY = 3
-    PLAYING = 4
+    PAUSED = 4
+    PLAYING = 5
 
 
 @dataclass
@@ -228,12 +229,23 @@ class Video(Entity):
     def start(self):
         if self.state is State.PLAYING:
             raise DomainError("the video is already started", title=self.title)
-        if self.state is not State.READY:
+        if self.state not in [State.READY, State.PAUSED]:
             raise DomainError(
                 "the video is not ready", title=self.title, state=self.state
             )
         self._data.last_play = datetime.now()
         self.state = State.PLAYING
+
+    def pause(self):
+        if self.state not in [State.PLAYING, State.PAUSED]:
+            raise DomainError(
+                "the video is not started", title=self.title, state=self.state
+            )
+        if self.state is State.PAUSED:
+            self.start()
+        else:
+            self._data.total_playing_duration += datetime.now() - self._data.last_play
+            self.state = State.PAUSED
 
     def stop(self):
         if self.state is not State.PLAYING:

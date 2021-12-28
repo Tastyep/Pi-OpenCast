@@ -95,18 +95,37 @@ class PlayerServiceTest(ServiceTestCase):
             self.data_facade
         )
 
+        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
             Evt.PlayerStateUpdated,
             self.player_id,
             PlayerState.PLAYING,
             PlayerState.PAUSED,
-        ).from_(Cmd.TogglePlayerState, self.player_id)
+        ).expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.PLAYING,
+            VideoState.PAUSED,
+            timedelta(),
+            now,
+        ).from_(
+            Cmd.TogglePlayerState, self.player_id
+        )
         self.evt_expecter.expect(
             Evt.PlayerStateUpdated,
             self.player_id,
             PlayerState.PAUSED,
             PlayerState.PLAYING,
-        ).from_(Cmd.TogglePlayerState, self.player_id)
+        ).expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.PAUSED,
+            VideoState.PLAYING,
+            timedelta(),
+            now,
+        ).from_(
+            Cmd.TogglePlayerState, self.player_id
+        )
 
     def test_seek_video(self):
         self.data_producer.player().video("source").play("source").populate(

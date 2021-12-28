@@ -66,7 +66,10 @@ export default class Video {
           this.setState(e.new_state);
           this.setTotalPlayingDuration(e.total_playing_duration);
           this.setLastPlay(e.last_play);
-          if (e.new_state === VideoState.PLAYING) {
+          if (
+            e.old_state === VideoState.READY &&
+            e.new_state === VideoState.PLAYING
+          ) {
             this.setPlayTime(0);
           }
         },

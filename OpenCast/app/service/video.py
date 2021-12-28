@@ -8,6 +8,7 @@ from OpenCast.app.command import video as video_cmds
 from OpenCast.app.notification import Level as NotifLevel
 from OpenCast.app.notification import Notification
 from OpenCast.domain.event import player as PlayerEvt
+from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Video, timedelta
 from OpenCast.domain.service.identity import IdentityService
@@ -21,9 +22,11 @@ class VideoService(Service):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, video_cmds)
 
+        self._observe_event(PlayerEvt.PlayerStateUpdated)
         self._observe_event(PlayerEvt.PlayerVideoUpdated)
 
         self._video_repo = data_facade.video_repo
+        self._player_repo = data_facade.player_repo
         self._downloader = media_factory.make_downloader(app_facade.evt_dispatcher)
         self._source_service = service_factory.make_source_service(
             self._downloader, media_factory.make_video_parser()
@@ -171,6 +174,28 @@ class VideoService(Service):
             return
         video.stop()
         ctx.update(video)
+
+    def _player_state_updated(self, evt):
+        if evt.old_state is PlayerState.PAUSED and evt.new_state is PlayerState.PLAYING:
+            player = self._player_repo.get_player()
+            self._start_transaction(
+                self._video_repo,
+                evt.id,
+                lambda ctx: self.start_video(ctx, player.video_id),
+            )
+        elif evt.new_state is PlayerState.PAUSED:
+
+            def pause_video(ctx, video_id):
+                video = self._video_repo.get(video_id)
+                video.pause()
+                ctx.update(video)
+
+            player = self._player_repo.get_player()
+            self._start_transaction(
+                self._video_repo,
+                evt.id,
+                lambda ctx: pause_video(ctx, player.video_id),
+            )
 
     def _player_video_updated(self, evt):
         if evt.old_video_id is None:
