@@ -54,6 +54,9 @@ export class AppStore {
     });
 
     this.webSocket = webSocket;
+    this.webSocket.addEventListener("open", (_) => {
+      this.load();
+    });
     this.modelFactory = modelFactory;
     this.eventDispatcher = eventDispatcher;
 
