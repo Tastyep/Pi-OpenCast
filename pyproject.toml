@@ -50,3 +50,7 @@ my-script = 'OpenCast:main'
 [tool.isort]
 profile = "black"
 src_paths = ["OpenCast", "test"]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "NOTSET"
