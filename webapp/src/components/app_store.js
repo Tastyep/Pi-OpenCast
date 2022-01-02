@@ -87,10 +87,10 @@ export class AppStore {
   load() {
     let promises = [
       this.loadPlayer(),
-      this.loadVideos(),
       this.loadPlaylists(),
       this.loadAlbums(),
       this.loadArtists(),
+      this.loadVideos(),
     ];
 
     Promise.all(promises).then(() => {
