@@ -55,7 +55,10 @@ export class AppStore {
 
     this.webSocket = webSocket;
     this.webSocket.addEventListener("open", (_) => {
-      this.load();
+      this.loadPlayer();
+      this.loadPlaylists();
+      this.loadAlbums();
+      this.loadArtists();
     });
     this.modelFactory = modelFactory;
     this.eventDispatcher = eventDispatcher;
@@ -119,6 +122,14 @@ export class AppStore {
       .list()
       .then((response) => {
         this.setPlaylists(response.data.playlists);
+      })
+      .catch(snackBarHandler(this));
+  }
+  loadPlaylistVideos(playlistId) {
+    return playlistAPI
+      .videos(playlistId)
+      .then((response) => {
+        this.setVideos(response.data.videos);
       })
       .catch(snackBarHandler(this));
   }

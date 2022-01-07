@@ -20,8 +20,8 @@ async function delete_(id) {
   return await API.delete("/playlists/" + id);
 }
 
-async function videos(playlist_id) {
-  return await API.get("/playlists/" + playlist_id + "/videos");
+async function videos(playlistId) {
+  return await API.get("/playlists/" + playlistId + "/videos");
 }
 
 const playlistAPI = {

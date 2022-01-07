@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import Grid from "@mui/material/Grid";
 import Tabs from "@mui/material/Tabs";
@@ -120,12 +120,6 @@ const Layout = () => {
 };
 
 const App = () => {
-  const store = useAppStore();
-
-  useEffect(() => {
-    store.load();
-  }, [store]);
-
   return (
     <Router>
       <Routes>

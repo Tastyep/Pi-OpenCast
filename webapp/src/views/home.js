@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { styled } from "@mui/material/styles";
 
@@ -440,6 +440,12 @@ const PlayingMediaThumbnail = observer(() => {
 const HomePage = observer(() => {
   const store = useAppStore();
   const playlistId = store.player.queue;
+
+  useEffect(() => {
+    if (playlistId) {
+      store.loadPlaylistVideos(playlistId);
+    }
+  }, [store, playlistId]);
 
   if (!playlistId) {
     return null;

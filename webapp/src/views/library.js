@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Box, Divider, Stack, Tabs, Tab, Typography } from "@mui/material";
 
@@ -55,6 +55,7 @@ const LibraryPage = observer(() => {
 
 const LibraryLayout = () => {
   const location = useLocation();
+  const store = useAppStore();
 
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
@@ -65,6 +66,10 @@ const LibraryLayout = () => {
   const pathname = location.pathname;
   for (let i = 0; i < pathname.length; count += pathname[i++] === "/");
   const displayTabs = count < 3;
+
+  useEffect(() => {
+    store.loadVideos();
+  }, [store]);
 
   return (
     <Stack direction="column" alignItems="center" sx={{ height: "100%" }}>
