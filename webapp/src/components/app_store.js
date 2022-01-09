@@ -87,20 +87,6 @@ export class AppStore {
     tasks.push(new UpdateMediaTime(this, eventDispatcher));
   }
 
-  load() {
-    let promises = [
-      this.loadPlayer(),
-      this.loadPlaylists(),
-      this.loadAlbums(),
-      this.loadArtists(),
-      this.loadVideos(),
-    ];
-
-    Promise.all(promises).then(() => {
-      this.webSocket.send("play_time");
-    });
-  }
-
   loadPlayer() {
     return playerAPI
       .get()
@@ -243,6 +229,7 @@ export class AppStore {
     for (const video of videos) {
       this.addVideo(video);
     }
+    this.webSocket.send("play_time");
   }
 
   addVideo(video) {
@@ -276,7 +263,7 @@ export class AppStore {
     delete this.artists[id];
   }
 
-  enqueueSnackbar(note, details) {
+  enqueueSnackbar(note, details = undefined) {
     note.message = note.message.charAt(0).toUpperCase() + note.message.slice(1);
     if (!note.options.content) {
       note.options.content = (key) => {
