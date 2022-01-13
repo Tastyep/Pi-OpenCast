@@ -14,7 +14,7 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 WEBAPP_DIR="$ROOT/webapp"
-WEBAPP_PORT="8081"
+WEBAPP_PORT="$(grep "REACT_APP_PORT" <"$ROOT/webapp/.env" | cut -d'=' -f2)"
 SERVICE_NAME="front"
 
 # shellcheck source=script/cli_builder.sh
@@ -29,7 +29,7 @@ source "$ROOT/script/env.sh"
 start() {
   local npm_cmd
   npm_cmd="WEBAPP_PORT=$WEBAPP_PORT npm run serve &"
-  [[ -n "${ARGS["--dev"]}" ]] && npm_cmd="npm start"
+  [[ -n "${ARGS["--dev"]}" ]] && npm_cmd="PORT=$WEBAPP_PORT npm start"
 
   (cd "$WEBAPP_DIR" && eval "$npm_cmd")
 }
