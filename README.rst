@@ -25,7 +25,7 @@ OpenCast
    :target: https://tastyep.github.io/Pi-OpenCast/
    :alt: OpenCast generated documentation
 
-OpenCast is a streaming application whose goal is to transform a computer as small as a Raspberry Pi into
+OpenCast is a home theater application whose goal is to transform a computer as small as a Raspberry Pi into
 an awesome streaming device.
 
 Key Features
@@ -38,31 +38,6 @@ Key Features
  - Local library.
  - VLC under the hood.
 
-Background
-===========
-
-Opencast started off as a fork of `RaspberryCast <https://github.com/vincelwt/RaspberryCast>`_ to implement features specific to my home setup.
-After some years this work has evolved into a testable and maintainable project named OpenCast.
-
-General goals of the project are:
-
- - Using and supporting newer features of the python language standards.
- - Conforming to `PEP-8 guidelines <https://www.python.org/dev/peps/pep-0008/>`_.
- - Openness to contributions including pull requests with new features.
- - Providing a continuous integration and unit tests to avoid regressions.
- - Accommodating both the user and the developer with utilities to easily install/use/test the project.
-
-
-System Dependencies
-===================
-
- - Python 3.7+
- - nodejs
- - npm
- - curl
- - lsof
- - pip3
-
 How To
 ======
 Install
@@ -73,11 +48,59 @@ Install
    $ git clone https://github.com/Tastyep/Pi-OpenCast.git
    $ cd Pi-OpenCast && ./setup.sh
 
-Use
----
+⚠️ Because the web application has grown in size over time, it is possible that building on a raspberry-pi with <= 1giga of RAM will fail as it will run out of memory. In that case, you will have to build it manually on your computer by running the following command:
 
-- Note the address of the device running OpenCast by executing `sudo ifconfig`.
-- Open your browser and go on `<address>:8081`
+.. code-block:: bash
+
+   $ ./OpenCast.sh build webapp
+
+Then transfer the generated ``./webapp/build`` directory into the ``webapp`` directory on your raspberry-pi (filezilla is your friend).
+
+
+Use
+-------
+
+After successfully installing OpenCast, you should note the IP address of your raspberry-pi:
+
+
+.. code-block:: bash
+
+   $ hostname -I
+
+You can then access the webpage from any device on the same local network at ``<ip-addr>:8081``
+
+Monitor
+-------
+
+OpenCast is managed as a systemd service and loaded automatically at startup time.
+To interact with the service, two options are available:
+
+- Using systemctl (**recommended**)
+
+.. code-block:: bash
+
+   $ systemctl --user [start|stop|restart|status] opencast
+
+- Using the shell entry-point (**advanced**):
+
+.. code-block:: bash
+
+   $ ./OpenCast.sh service [start|stop|restart|status]
+
+Logs can be accessed running:
+
+.. code-block:: bash
+
+   $ journalctl --user -u opencast
+   $ ./OpenCast.sh service back log
+
+Configure
+-------
+
+The backend and the web application can be configured through their configuration file:
+
+- Backend: ``config.yml``
+- Webapp: ``webapp/.env``
 
 Source Code
 ===========
@@ -85,7 +108,7 @@ Source Code
 The project is hosted on `Github <https://github.com/Tastyep/Pi-OpenCast>`_.
 
 Please feel free to file an issue on the `bug tracker <https://github.com/Tastyep/Pi-OpenCast/issues>`_
-if you have found a bug or have some suggestion in order to improve OpenCast.
+if you have found a bug or have suggestions to improve OpenCast.
 
 License
 -------
