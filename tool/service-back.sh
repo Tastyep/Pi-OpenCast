@@ -12,7 +12,7 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 PROJECT_NAME="OpenCast"
-API_PORT="2020"
+API_PORT="$(grep "port:" <"$ROOT/config.yml" | cut -d':' -f2 | xargs)"
 LOG_DIR="log"
 LOG_FILE="$PROJECT_NAME.log"
 SERVICE_NAME="back"
