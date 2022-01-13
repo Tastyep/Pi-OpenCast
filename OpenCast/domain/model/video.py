@@ -120,7 +120,7 @@ class Video(Entity):
         streams: List[Stream] = field(default_factory=list)
         subtitle: Optional[str] = None
         state: State = State.CREATED
-    
+
         def __post_init__(self):
             for i, stream in enumerate(self.streams):
                 if isinstance(stream, dict):
