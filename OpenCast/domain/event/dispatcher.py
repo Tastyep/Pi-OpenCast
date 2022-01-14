@@ -13,6 +13,8 @@ class EventDispatcher:
 
     class _Handler:
         def __init__(self, evtcls_handler, count):
+            self.links = []
+
             self._evtcls_handler = evtcls_handler
             self._count = count
 
@@ -32,6 +34,7 @@ class EventDispatcher:
         self._logger = structlog.get_logger(__name__)
         self._handler_map = {}
         self._evt_to_handler_ids = {}
+        self._handler_id_to_evts = {}
         self._lock = Lock()
 
     def once(self, evt_cls, handler):
@@ -41,17 +44,29 @@ class EventDispatcher:
         self.observe_result(self.ANY_ID, evtcls_handler, times)
 
     def observe_result(self, evt_id: Id, evtcls_handler: dict, times=-1):
-        self._observe(
-            evt_id, evtcls_handler.keys(), self._Handler(evtcls_handler, times)
-        )
+        self._observe(evt_id, self._Handler(evtcls_handler, times))
+
+    def observe_group(self, evt_ids_to_evtcls_to_handler: dict, times=-1):
+        handlers = []
+        for evt_id, evtcls_handler in evt_ids_to_evtcls_to_handler.items():
+            handlers.append(self._Handler(evtcls_handler, times))
+
+        for evt_id, handler in zip(evt_ids_to_evtcls_to_handler, handlers):
+            handler.links = [
+                id(other_handler)
+                for other_handler in handlers
+                if other_handler is not handler
+            ]
+            self._observe(evt_id, handler)
 
     def dispatch(self, evt):
-        def remove_handler_links(evt_id, handler):
-            handler_id = id(handler)
-            for evt_cls in handler.handled_evts():
-                evt_hash = hash((evt_id, evt_cls))
-                self._evt_to_handler_ids[evt_hash].remove(handler_id)
-            self._handler_map.pop(handler_id)
+        def remove_handler_links(handler):
+            for handler_id in [id(handler), *handler.links]:
+                evt_hashes = self._handler_id_to_evts[handler_id]
+                for evt_hash in evt_hashes:
+                    self._evt_to_handler_ids[evt_hash].remove(handler_id)
+                self._handler_id_to_evts.pop(handler_id)
+                self._handler_map.pop(handler_id)
 
         self._logger.info(type(evt).__name__, evt=evt)
 
@@ -67,18 +82,23 @@ class EventDispatcher:
                     handler = self._handler_map[handler_id]
                     handlers.append(handler)
                     if handler.update_expires():
-                        remove_handler_links(evt_id, handler)
+                        remove_handler_links(handler)
 
         for handler in handlers:
             handler(evt)
 
-    def _observe(self, evt_id: Id, evt_clss: list, handler):
+    def _observe(self, evt_id: Id, handler):
         with self._lock:
             handler_id = id(handler)
             self._handler_map[handler_id] = handler
 
-            for evt_cls in evt_clss:
+            for evt_cls in handler.handled_evts():
                 evt_hash = hash((evt_id, evt_cls))
+
                 handler_ids = self._evt_to_handler_ids.get(evt_hash, [])
                 handler_ids.append(handler_id)
                 self._evt_to_handler_ids[evt_hash] = handler_ids
+
+                evt_hashes = self._handler_id_to_evts.get(handler_id, [])
+                evt_hashes.append(evt_hash)
+                self._handler_id_to_evts[handler_id] = evt_hashes

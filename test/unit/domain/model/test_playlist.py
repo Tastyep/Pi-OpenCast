@@ -16,6 +16,7 @@ class PlaylistTest(ModelTestCase):
         playlist = Playlist(None, "name", content)
         self.assertEqual("name", playlist.name)
         self.assertEqual(content, playlist.ids)
+        self.assertEqual(False, playlist.generated)
         self.expect_events(playlist, Evt.PlaylistCreated)
 
     def test_rename(self):
@@ -40,10 +41,16 @@ class PlaylistTest(ModelTestCase):
         with self.assertRaises(DomainError) as ctx:
             self.playlist.remove(video_id)
         self.assertEqual(
-            f"video '{video_id}' not in playlist '{self.playlist.id}'",
+            "video not in playlist",
             str(ctx.exception),
         )
 
     def test_delete(self):
         self.playlist.delete()
         self.expect_events(self.playlist, Evt.PlaylistDeleted)
+
+    def test_delete_generated(self):
+        playlist = Playlist(None, "name", [], True)
+        with self.assertRaises(DomainError) as ctx:
+            playlist.delete()
+        self.assertEqual("cannot delete generated playlists", str(ctx.exception))

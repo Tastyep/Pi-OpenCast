@@ -76,14 +76,18 @@ class SourceServiceTest(TestCase):
         self.downloader.download_metadata.return_value = {
             "source_protocol": "http",
             "title": "test",
-            "collection_name": "collection",
+            "duration": 300,
+            "artist": "artist",
+            "album": "album",
             "thumbnail": "url",
         }
         metadata = self.service.pick_stream_metadata("source")
         expected = {
             "source_protocol": "http",
             "title": "test",
-            "collection_name": "collection",
+            "duration": 300,
+            "artist": "artist",
+            "album": "album",
             "thumbnail": "url",
         }
         self.assertEqual(expected, metadata)
@@ -96,7 +100,24 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": None,
             "title": "test",
-            "collection_name": None,
+            "duration": None,
+            "artist": None,
+            "album": None,
+            "thumbnail": None,
+        }
+        self.assertEqual(expected, metadata)
+
+    def test_pick_stream_metadata_post_processed(self):
+        self.downloader.download_metadata.return_value = {
+            "artist": "toto, band members",
+        }
+        metadata = self.service.pick_stream_metadata("source")
+        expected = {
+            "source_protocol": None,
+            "title": None,
+            "duration": None,
+            "artist": "toto",
+            "album": None,
             "thumbnail": None,
         }
         self.assertEqual(expected, metadata)
@@ -105,6 +126,8 @@ class SourceServiceTest(TestCase):
         self.downloader.download_metadata.return_value = {
             "protocol": "http",
             "title": "test",
+            "duration": 300,
+            "artist": "artist",
             "album": "album_name",
             "thumbnail": "url",
         }
@@ -112,7 +135,9 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": "http",
             "title": "test",
-            "collection_name": "album_name",
+            "duration": 300,
+            "artist": "artist",
+            "album": "album_name",
             "thumbnail": "url",
         }
         self.assertEqual(expected, metadata)
@@ -127,7 +152,9 @@ class SourceServiceTest(TestCase):
         expected = {
             "source_protocol": None,
             "title": "video",
-            "collection_name": None,
+            "duration": None,
+            "artist": None,
+            "album": None,
             "thumbnail": None,
         }
         self.assertEqual(expected, metadata)

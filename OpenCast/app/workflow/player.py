@@ -8,8 +8,10 @@ import structlog
 
 from OpenCast.app.command import player as PlayerCmd
 from OpenCast.app.command import playlist as PlaylistCmd
+from OpenCast.app.command import video as VideoCmd
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id as ModelId
 from OpenCast.domain.service.identity import IdentityService
 
@@ -33,10 +35,14 @@ class QueueVideoWorkflow(Workflow):
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
         ["start",                     States.INITIAL,    States.COLLECTING],
+
+        ["_video_created",            States.COLLECTING, States.QUEUEING],
         ["_video_workflow_completed", States.COLLECTING, States.REMOVING, "is_queued"],
         ["_video_workflow_completed", States.COLLECTING, States.QUEUEING],
-        ["_playlist_content_updated", States.REMOVING,   States.QUEUEING],
         ["_video_workflow_aborted",   States.COLLECTING, States.ABORTED],
+
+        ["_playlist_content_updated", States.REMOVING,   States.QUEUEING],
+
         ["_playlist_content_updated", States.QUEUEING,   States.COMPLETED],
         ["_operation_error",          States.QUEUEING,   States.ABORTED],
     ]
@@ -69,7 +75,15 @@ class QueueVideoWorkflow(Workflow):
         workflow = self._factory.make_video_workflow(
             workflow_id, self._app_facade, self._data_facade, self.video
         )
-        self._observe_start(workflow)
+
+        create_cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, self.video.id)
+        self._observe_group(
+            {
+                workflow_id: [workflow.Completed, workflow.Aborted],
+                create_cmd_id: [VideoEvt.VideoCreated],
+            },
+        )
+        self._start_workflow(workflow)
 
     def on_enter_REMOVING(self, _):
         playlist = self._data_facade.playlist_repo.get(self.playlist_id)
@@ -81,7 +95,7 @@ class QueueVideoWorkflow(Workflow):
             playlist.ids,
         )
 
-    def on_enter_QUEUEING(self, evt):
+    def on_enter_QUEUEING(self, _):
         self._observe_dispatch(
             PlaylistEvt.PlaylistContentUpdated,
             PlaylistCmd.QueueVideo,
@@ -115,6 +129,7 @@ class QueuePlaylistWorkflow(Workflow):
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
         ["_queue_videos",                      States.INITIAL,    States.QUEUEING],
+
         ["_queue_video_workflow_completed",    States.QUEUEING,   States.COMPLETED, "_is_last_video"],  # noqa: E501
         ["_queue_video_workflow_completed",    States.QUEUEING,   "="],
         ["_queue_video_workflow_aborted",      States.QUEUEING,   States.COMPLETED, "_is_last_video"],  # noqa: E501
@@ -162,7 +177,7 @@ class QueuePlaylistWorkflow(Workflow):
         self._complete()
 
     # Conditions
-    def _is_last_video(self, evt):
+    def _is_last_video(self, _):
         return len(self.videos) == 0
 
 
@@ -174,17 +189,25 @@ class StreamVideoWorkflow(Workflow):
     class States(Enum):
         INITIAL = auto()
         QUEUEING = auto()
+        SYNCHRONIZING = auto()
         STARTING = auto()
         COMPLETED = auto()
         ABORTED = auto()
 
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
-        ["start",                           States.INITIAL,    States.QUEUEING],
-        ["_queue_video_workflow_completed", States.QUEUEING,   States.STARTING],
-        ["_queue_video_workflow_aborted",   States.QUEUEING,   States.ABORTED],
-        ["_player_started",                 States.STARTING,   States.COMPLETED],
-        ["_operation_error",                States.STARTING,   States.ABORTED],
+        ["start",                           States.INITIAL,         States.QUEUEING],
+
+        ["_video_workflow_completed",       States.QUEUEING,        States.SYNCHRONIZING],   # noqa: E501
+        ["_queue_video_workflow_completed", States.QUEUEING,        States.SYNCHRONIZING],   # noqa: E501
+        ["_queue_video_workflow_aborted",   States.QUEUEING,        States.ABORTED],
+
+        ["_video_workflow_completed",       States.SYNCHRONIZING,   States.STARTING],
+        ["_queue_video_workflow_completed", States.SYNCHRONIZING,   States.STARTING],
+        ["_queue_video_workflow_aborted",   States.SYNCHRONIZING,   States.ABORTED],
+
+        ["_player_state_updated",           States.STARTING,        States.COMPLETED],
+        ["_operation_error",                States.STARTING,        States.ABORTED],
     ]
     # fmt: on
 
@@ -203,24 +226,34 @@ class StreamVideoWorkflow(Workflow):
 
     # States
     def on_enter_QUEUEING(self):
-        workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, self.video.id)
-        workflow = self._factory.make_queue_video_workflow(
-            workflow_id,
+        queue_workflow_id = IdentityService.id_workflow(
+            QueueVideoWorkflow, self.video.id
+        )
+        queue_workflow = self._factory.make_queue_video_workflow(
+            queue_workflow_id,
             self._app_facade,
             self._data_facade,
             self.video,
             self.playlist_id,
             queue_front=True,
         )
-        self._observe_start(workflow)
 
-    def on_enter_STARTING(self, evt):
+        video_workflow_id = IdentityService.id_workflow(VideoWorkflow, self.video.id)
+        self._observe(
+            video_workflow_id,
+            [VideoWorkflow.Completed],
+        )
+        self._observe_start(queue_workflow)
+
+    def on_enter_SYNCHRONIZING(self, _):
+        pass
+
+    def on_enter_STARTING(self, _):
         self._observe_dispatch(
-            PlayerEvt.PlayerStarted,
+            PlayerEvt.PlayerStateUpdated,
             PlayerCmd.PlayVideo,
             IdentityService.id_player(),
             self.video.id,
-            self.playlist_id,
         )
 
     def on_enter_COMPLETED(self, _):
@@ -244,6 +277,7 @@ class StreamPlaylistWorkflow(Workflow):
     # Trigger - Source - Dest - Conditions - Unless - Before - After - Prepare
     transitions = [
         ["_play_video",                      States.INITIAL,  States.STARTING],
+
         ["_stream_video_workflow_completed", States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
         ["_stream_video_workflow_completed", States.STARTING, States.QUEUEING],
         ["_stream_video_workflow_aborted",   States.STARTING, States.COMPLETED, "_is_last_video"],   # noqa: E501
@@ -290,7 +324,7 @@ class StreamPlaylistWorkflow(Workflow):
             workflow,
         )
 
-    def on_enter_QUEUEING(self, evt):
+    def on_enter_QUEUEING(self, _):
         video = self.videos.pop()
         workflow_id = IdentityService.id_workflow(QueueVideoWorkflow, video.id)
         workflow = self._factory.make_queue_video_workflow(

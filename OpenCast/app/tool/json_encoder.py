@@ -1,12 +1,15 @@
 """ Custom JSON encoder definitions """
 
+from datetime import datetime, timedelta
 from enum import Enum
 from json import JSONEncoder
 from pathlib import PosixPath
 
-from OpenCast.domain.event.event import Event
+from OpenCast.app.notification import NotificationBase
+from OpenCast.domain.event.event import Event as DomainEvent
 from OpenCast.domain.model.entity import Entity
 from OpenCast.infra import Id
+from OpenCast.infra.event.event import Event as InfraEvent
 
 
 class EnhancedJSONEncoder(JSONEncoder):
@@ -15,6 +18,10 @@ class EnhancedJSONEncoder(JSONEncoder):
             return str(obj)
         if isinstance(obj, Enum):
             return obj.name
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, timedelta):
+            return obj.total_seconds()
         return super().default(obj)
 
 
@@ -27,6 +34,10 @@ class ModelEncoder(EnhancedJSONEncoder):
 
 class EventEncoder(EnhancedJSONEncoder):
     def default(self, obj):
-        if isinstance(obj, Event):
+        if (
+            isinstance(obj, DomainEvent)
+            or isinstance(obj, InfraEvent)
+            or isinstance(obj, NotificationBase)
+        ):
             return obj.to_dict()
         return super().default(obj)

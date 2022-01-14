@@ -6,7 +6,6 @@ from marshmallow import fields
 
 from OpenCast.app.command import playlist as Cmd
 from OpenCast.app.service.error import OperationError
-from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.playlist import PlaylistSchema
@@ -29,7 +28,6 @@ class PlaylistMonitController(MonitorController):
         self._route("GET", "/{id:" + self.UUID + "}/videos", handle=self.list_videos)
         self._route("PATCH", "/{id:" + self.UUID + "}", handle=self.update)
         self._route("DELETE", "/{id:" + self.UUID + "}", handle=self.delete)
-        self._route("GET", "/events", handle=self.stream_events)
 
     @docs(
         tags=["playlist"],
@@ -59,7 +57,7 @@ class PlaylistMonitController(MonitorController):
             channel.send(self._ok(playlist))
 
         def on_error(evt):
-            channel.send(self._internal_error(evt.error))
+            channel.send(self._internal_error(evt.error, evt.details))
 
         self._observe_dispatch(
             {PlaylistEvt.PlaylistCreated: on_success, OperationError: on_error},
@@ -190,7 +188,7 @@ class PlaylistMonitController(MonitorController):
                 channel.send(self._ok(playlist))
 
         def on_error(evt):
-            channel.send(self._internal_error(evt.error))
+            channel.send(self._internal_error(evt.error, evt.details))
 
         def update_field(field, cmd_cls, evt_cls):
             self._observe_dispatch(
@@ -229,6 +227,7 @@ class PlaylistMonitController(MonitorController):
         ],
         responses={
             204: {"description": "Successful operation"},
+            403: {"description": "Forbidden operation"},
             404: {"description": "Playlist not found"},
         },
     )
@@ -237,25 +236,18 @@ class PlaylistMonitController(MonitorController):
         if not self._playlist_repo.exists(id):
             return self._not_found()
 
-        if id == HOME_PLAYLIST.id:
-            return self._forbidden(f"{HOME_PLAYLIST.name} playlist can't be deleted")
-
         channel = self._io_factory.make_janus_channel()
 
-        def on_success(evt):
+        def on_success(_):
             channel.send(self._no_content())
 
+        def on_error(evt):
+            channel.send(self._forbidden(evt.error, evt.details))
+
         self._observe_dispatch(
-            {PlaylistEvt.PlaylistDeleted: on_success}, Cmd.DeletePlaylist, id
+            {PlaylistEvt.PlaylistDeleted: on_success, OperationError: on_error},
+            Cmd.DeletePlaylist,
+            id,
         )
 
         return await channel.receive()
-
-    @docs(
-        tags=["playlist"],
-        summary="Stream playlist events",
-        description="Stream playlist events over WebSocket",
-        operationId="streamPlaylistEvents",
-    )
-    async def stream_events(self, request):
-        return await self._stream_ws_events(request, PlaylistEvt)

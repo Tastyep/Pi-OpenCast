@@ -1,8 +1,13 @@
+from datetime import datetime, timedelta
+from unittest.mock import patch
+
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.service.error import OperationError
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as Evt
-from OpenCast.domain.model.player import Player
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import State as PlayerState
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ServiceTestCase
@@ -15,7 +20,7 @@ class PlayerServiceTest(ServiceTestCase):
         self.video_repo = self.data_facade.video_repo
 
         self.player_id = IdentityService.id_player()
-        self.player_playlist_id = IdentityService.id_playlist()
+        self.player_playlist_id = HOME_PLAYLIST.id
 
     def test_create(self):
         self.evt_expecter.expect(
@@ -29,47 +34,105 @@ class PlayerServiceTest(ServiceTestCase):
         ).from_(Cmd.CreatePlayer, self.player_id, self.player_playlist_id)
         self.media_player.set_volume.assert_called_once_with(70)
 
-    def test_play_video(self):
-        self.data_producer.player().video("source").video("source2").populate(
+    @patch("OpenCast.domain.model.video.datetime")
+    def test_play_video(self, datetime_mock):
+        now = datetime.now()
+        datetime_mock.now.return_value = now
+
+        self.data_producer.player().video("source", state=VideoState.READY).populate(
             self.data_facade
         )
 
-        video_id = IdentityService.id_video("source2")
+        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
-            Evt.PlayerQueueUpdated, self.player_id, self.player_playlist_id
-        ).expect(
-            Evt.PlayerStarted, self.player_id, PlayerState.PLAYING, video_id
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.STOPPED,
+            PlayerState.PLAYING,
+        ).expect(Evt.PlayerVideoUpdated, self.player_id, None, video_id,).expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.READY,
+            VideoState.PLAYING,
+            timedelta(),
+            now,
         ).from_(
-            Cmd.PlayVideo, self.player_id, video_id, self.player_playlist_id
+            Cmd.PlayVideo, self.player_id, video_id
         )
 
-    def test_stop_player(self):
+    @patch("OpenCast.domain.model.video.datetime")
+    def test_stop_player(self, datetime_mock):
+        now = datetime.now()
+        datetime_mock.now.return_value = now
+
         self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
+        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
-            Evt.PlayerStopped, self.player_id, PlayerState.STOPPED, video_id=None
-        ).from_(Cmd.StopPlayer, self.player_id)
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.PLAYING,
+            PlayerState.STOPPED,
+        ).expect(Evt.PlayerVideoUpdated, self.player_id, video_id, None,).expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.PLAYING,
+            VideoState.READY,
+            timedelta(),
+            now,
+        ).from_(
+            Cmd.StopPlayer, self.player_id
+        )
 
-    def test_toggle_player_state(self):
+    @patch("OpenCast.domain.model.video.datetime")
+    def test_toggle_player_state(self, datetime_mock):
+        now = datetime.now()
+        datetime_mock.now.return_value = now
+
         self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
+        video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(
-            Evt.PlayerStateToggled, self.player_id, PlayerState.PAUSED
-        ).from_(Cmd.TogglePlayerState, self.player_id)
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.PLAYING,
+            PlayerState.PAUSED,
+        ).expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.PLAYING,
+            VideoState.PAUSED,
+            timedelta(),
+            now,
+        ).from_(
+            Cmd.TogglePlayerState, self.player_id
+        )
         self.evt_expecter.expect(
-            Evt.PlayerStateToggled, self.player_id, PlayerState.PLAYING
-        ).from_(Cmd.TogglePlayerState, self.player_id)
+            Evt.PlayerStateUpdated,
+            self.player_id,
+            PlayerState.PAUSED,
+            PlayerState.PLAYING,
+        ).expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.PAUSED,
+            VideoState.PLAYING,
+            timedelta(),
+            now,
+        ).from_(
+            Cmd.TogglePlayerState, self.player_id
+        )
 
     def test_seek_video(self):
         self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
-        self.evt_expecter.expect(Evt.VideoSeeked, self.player_id).from_(
+        self.evt_expecter.expect(Evt.VideoSeeked, self.player_id, 1).from_(
             Cmd.SeekVideo, self.player_id, 1
         )
 
@@ -81,7 +144,7 @@ class PlayerServiceTest(ServiceTestCase):
         )
 
     def test_change_video_volume(self):
-        self.data_producer.player().video("source").play("source", None).populate(
+        self.data_producer.player().video("source").play("source").populate(
             self.data_facade
         )
 
@@ -99,16 +162,9 @@ class PlayerServiceTest(ServiceTestCase):
             Cmd.ToggleSubtitle, self.player_id
         )
 
-    def test_increase_subtitle_delay(self):
+    def test_update_subtitle_delay(self):
         self.data_producer.player().populate(self.data_facade)
 
-        self.evt_expecter.expect(
-            Evt.SubtitleDelayUpdated, self.player_id, Player.SUBTITLE_DELAY_STEP
-        ).from_(Cmd.AdjustSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP)
-
-    def test_decrease_subtitle_delay(self):
-        self.data_producer.player().populate(self.data_facade)
-
-        self.evt_expecter.expect(
-            Evt.SubtitleDelayUpdated, self.player_id, -Player.SUBTITLE_DELAY_STEP
-        ).from_(Cmd.DecreaseSubtitleDelay, self.player_id, Player.SUBTITLE_DELAY_STEP)
+        self.evt_expecter.expect(Evt.SubtitleDelayUpdated, self.player_id, 100).from_(
+            Cmd.UpdateSubtitleDelay, self.player_id, 100
+        )

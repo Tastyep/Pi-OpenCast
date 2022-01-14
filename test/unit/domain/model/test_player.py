@@ -25,32 +25,44 @@ class PlayerTest(ModelTestCase):
 
     def test_play(self):
         video_id = IdentityService.id_video("source")
-        playlist_id = IdentityService.id_playlist()
-        self.player.play(video_id, playlist_id)
+        self.player.play(video_id)
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.assertEqual(video_id, self.player.video_id)
-        self.assertEqual(playlist_id, self.player.queue)
-        self.expect_events(self.player, Evt.PlayerQueueUpdated, Evt.PlayerStarted)
+        self.expect_events(
+            self.player,
+            Evt.PlayerVideoUpdated,
+            Evt.PlayerStateUpdated,
+        )
+
+    def test_play_already_playing(self):
+        video_id = IdentityService.id_video("source")
+        self.player.play(video_id)
+        with self.assertRaises(DomainError) as ctx:
+            self.player.play(video_id)
+        self.assertEqual("the player is already started", str(ctx.exception))
 
     def test_stop(self):
-        video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.state = PlayerState.PLAYING
+        self.player.release_events()
+
         self.player.stop()
         self.assertEqual(PlayerState.STOPPED, self.player.state)
         self.assertEqual(None, self.player.video_id)
-        self.expect_events(self.player, Evt.PlayerStarted, Evt.PlayerStopped)
+        self.expect_events(self.player, Evt.PlayerStateUpdated, Evt.PlayerVideoUpdated)
 
     def test_stop_not_started(self):
         with self.assertRaises(DomainError) as ctx:
             self.player.stop()
-        self.assertEqual("the player is already stopped", str(ctx.exception))
+        self.assertEqual("the player is not started", str(ctx.exception))
 
     def test_toggle_pause(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.play(video_id)
+        self.player.release_events()
+
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PAUSED, self.player.state)
-        self.expect_events(self.player, Evt.PlayerStarted, Evt.PlayerStateToggled)
+        self.expect_events(self.player, Evt.PlayerStateUpdated)
 
     def test_toggle_pause_not_started(self):
         with self.assertRaises(DomainError) as ctx:
@@ -59,15 +71,16 @@ class PlayerTest(ModelTestCase):
 
     def test_toggle_pause_twice(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
+        self.player.play(video_id)
+        self.player.release_events()
+
         self.player.toggle_pause()
         self.player.toggle_pause()
         self.assertEqual(PlayerState.PLAYING, self.player.state)
         self.expect_events(
             self.player,
-            Evt.PlayerStarted,
-            Evt.PlayerStateToggled,
-            Evt.PlayerStateToggled,
+            Evt.PlayerStateUpdated,
+            Evt.PlayerStateUpdated,
         )
 
     def test_volume(self):
@@ -85,11 +98,13 @@ class PlayerTest(ModelTestCase):
 
     def test_seek_video(self):
         video_id = IdentityService.id_video("source")
-        self.player.play(video_id, self.player.queue)
-        self.player.seek_video()
-        self.expect_events(self.player, Evt.PlayerStarted, Evt.VideoSeeked)
+        self.player.play(video_id)
+        self.player.release_events()
+
+        self.player.seek_video(100)
+        self.expect_events(self.player, Evt.VideoSeeked)
 
     def test_seek_video_not_started(self):
         with self.assertRaises(DomainError) as ctx:
-            self.player.seek_video()
+            self.player.seek_video(100)
         self.assertEqual("the player is not started", str(ctx.exception))

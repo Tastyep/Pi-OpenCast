@@ -3,21 +3,37 @@ import { action, makeObservable, observable, computed } from "mobx";
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import videoAPI from "services/api/video";
+import albumAPI from "services/api/album";
+import artistAPI from "services/api/artist";
+import snackBarHandler from "services/api/error";
+import { UpdateMediaTime } from "tasks/player";
+
+import SnackMessage from "components/snack_message";
+
+let tasks = [];
 
 export class AppStore {
   player = {};
   playlists = {};
   videos = {};
+  albums = {};
+  artists = {};
+  notifications = [];
 
-  constructor(eventDispatcher, modelFactory) {
+  constructor(webSocket, eventDispatcher, modelFactory) {
     makeObservable(this, {
       player: observable,
       playlists: observable,
       videos: observable,
+      albums: observable,
+      artists: observable,
+      notifications: observable,
 
       setPlayer: action,
       setPlaylists: action,
       setVideos: action,
+      setAlbums: action,
+      setArtists: action,
       insertPlaylistVideo: action,
       removePlaylistVideo: action,
 
@@ -26,47 +42,98 @@ export class AppStore {
 
       addPlaylist: action,
       removePlaylist: action,
+
+      addAlbum: action,
+      removeAlbum: action,
+
+      addArtist: action,
+      removeArtist: action,
+
+      enqueueSnackbar: action,
+      removeSnackbar: action,
     });
 
+    this.webSocket = webSocket;
+    this.webSocket.addEventListener("open", (_) => {
+      this.loadPlayer();
+      this.loadPlaylists();
+      this.loadAlbums();
+      this.loadArtists();
+    });
     this.modelFactory = modelFactory;
+    this.eventDispatcher = eventDispatcher;
 
     eventDispatcher.observe({
       VideoCreated: (e) => this.onVideoCreated(e),
       VideoDeleted: (e) => this.removeVideo(e.model_id),
       PlaylistCreated: (e) => this.onPlaylistCreated(e),
       PlaylistDeleted: (e) => this.removePlaylist(e.model_id),
+      AlbumCreated: (e) => this.onAlbumCreated(e),
+      AlbumDeleted: (e) => this.removeAlbum(e.model_id),
+      ArtistCreated: (e) => this.onArtistCreated(e),
+      ArtistDeleted: (e) => this.removeArtist(e.model_id),
+      Notification: (e) =>
+        this.enqueueSnackbar(
+          {
+            message: e.message,
+            options: {
+              variant: e.level.toLowerCase(),
+            },
+          },
+          e.details
+        ),
     });
-  }
 
-  load() {
-    this.loadPlayer();
-    this.loadVideos();
-    this.loadPlaylists();
+    tasks.push(new UpdateMediaTime(this, eventDispatcher));
   }
 
   loadPlayer() {
-    playerAPI
+    return playerAPI
       .get()
       .then((response) => {
         this.setPlayer(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
   loadVideos() {
-    videoAPI
+    return videoAPI
       .list()
       .then((response) => {
         this.setVideos(response.data.videos);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
   loadPlaylists() {
-    playlistAPI
+    return playlistAPI
       .list()
       .then((response) => {
         this.setPlaylists(response.data.playlists);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
+  }
+  loadPlaylistVideos(playlistId) {
+    return playlistAPI
+      .videos(playlistId)
+      .then((response) => {
+        this.setVideos(response.data.videos);
+      })
+      .catch(snackBarHandler(this));
+  }
+  loadAlbums() {
+    return albumAPI
+      .list()
+      .then((response) => {
+        this.setAlbums(response.data.albums);
+      })
+      .catch(snackBarHandler(this));
+  }
+  loadArtists() {
+    return artistAPI
+      .list()
+      .then((response) => {
+        this.setArtists(response.data.artists);
+      })
+      .catch(snackBarHandler(this));
   }
 
   onVideoCreated(evt) {
@@ -75,7 +142,7 @@ export class AppStore {
       .then((response) => {
         this.addVideo(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
   }
 
   onPlaylistCreated(evt) {
@@ -84,7 +151,25 @@ export class AppStore {
       .then((response) => {
         this.addPlaylist(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch(snackBarHandler(this));
+  }
+
+  onAlbumCreated(evt) {
+    albumAPI
+      .get(evt.model_id)
+      .then((response) => {
+        this.addAlbum(response.data);
+      })
+      .catch(snackBarHandler(this));
+  }
+
+  onArtistCreated(evt) {
+    artistAPI
+      .get(evt.model_id)
+      .then((response) => {
+        this.addArtist(response.data);
+      })
+      .catch(snackBarHandler(this));
   }
 
   setPlayer(player) {
@@ -115,17 +200,28 @@ export class AppStore {
     playlist.ids = playlist.ids.filter((id) => id !== videoId);
   }
 
+  get playerPlaylist() {
+    return this.playlists[this.player.queue];
+  }
+
+  filterVideos(ids) {
+    let videos = [];
+    for (const id of ids) {
+      const video = this.videos[id];
+      if (video) {
+        videos.push(this.videos[id]);
+      }
+    }
+    return videos;
+  }
+
   playlistVideos(id) {
     return computed(() => {
       if (!Object.keys(this.playlists).includes(id)) {
         return [];
       }
       const playlist = this.playlists[id];
-      let videos = [];
-      for (const id of playlist.ids) {
-        videos.push(this.videos[id]);
-      }
-      return videos;
+      return this.filterVideos(playlist.ids);
     }).get();
   }
 
@@ -133,6 +229,7 @@ export class AppStore {
     for (const video of videos) {
       this.addVideo(video);
     }
+    this.webSocket.send("play_time");
   }
 
   addVideo(video) {
@@ -140,5 +237,55 @@ export class AppStore {
   }
   removeVideo(id) {
     delete this.videos[id];
+  }
+
+  setAlbums(albums) {
+    for (const album of albums) {
+      this.addAlbum(album);
+    }
+  }
+  addAlbum(album) {
+    this.albums[album.id] = this.modelFactory.makeAlbum(album);
+  }
+  removeAlbum(id) {
+    delete this.albums[id];
+  }
+
+  setArtists(artists) {
+    for (const artist of artists) {
+      this.addArtist(artist);
+    }
+  }
+  addArtist(artist) {
+    this.artists[artist.id] = this.modelFactory.makeArtist(artist);
+  }
+  removeArtist(id) {
+    delete this.artists[id];
+  }
+
+  enqueueSnackbar(note, details = undefined) {
+    note.message = note.message.charAt(0).toUpperCase() + note.message.slice(1);
+    if (!note.options.content) {
+      note.options.content = (key) => {
+        return (
+          <SnackMessage
+            key={key}
+            message={note.message}
+            options={note.options}
+            details={details}
+          />
+        );
+      };
+    }
+    this.notifications.push({
+      key: new Date().getTime() + Math.random(),
+      ...note,
+    });
+  }
+
+  removeSnackbar(key) {
+    this.notifications = this.notifications.filter(
+      (notification) => notification.key !== key
+    );
   }
 }

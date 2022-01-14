@@ -1,6 +1,6 @@
 """ Set of exceptions related to operation errors """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from OpenCast.infra import Id
 
@@ -9,3 +9,4 @@ from OpenCast.infra import Id
 class OperationError:
     id: Id
     error: str
+    details: dict = field(default_factory=dict)

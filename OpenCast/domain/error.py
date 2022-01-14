@@ -2,6 +2,8 @@
 
 
 class DomainError(Exception):
-    """ Generic exception thrown by the domain on business logic errors """
+    """Generic exception thrown by the domain on business logic errors"""
 
-    pass
+    def __init__(self, message, **details):
+        self.message = message
+        self.details = details

@@ -30,9 +30,18 @@ class PlayerControllerTest(ControllerTestCase):
         next_video_id = IdentityService.id_video("source")
         self.queueing_service.next_video.return_value = next_video_id
         self.raise_event(self.controller, Evt.MediaEndReached, None)
-        self.expect_dispatch(
-            Cmd.PlayVideo,
-            self.player.id,
-            next_video_id,
-            self.player.queue,
-        )
+        self.expect_dispatch_l(
+            [
+                {
+                    "type": Cmd.StopPlayer,
+                    "args": {"model_id": IdentityService.id_player()},
+                },
+                {
+                    "type": Cmd.PlayVideo,
+                    "args": {
+                        "model_id": self.player.id,
+                        "video_id": next_video_id,
+                    },
+                },
+            ]
+        ),

@@ -2,13 +2,11 @@
 
 from copy import deepcopy
 
-import dacite
-
 
 class Entity:
     def __init__(self, data_cls, *args, **kwargs):
-        if not args:  # Initialized from a dict
-            self._data = dacite.from_dict(data_cls, kwargs)
+        if args and type(args[0]) is data_cls:  # Initialized from a dict
+            self._data = args[0]
         else:
             self._data = data_cls(*args, **kwargs)
         self._events = []
@@ -21,7 +19,8 @@ class Entity:
 
     @classmethod
     def from_dict(cls, data: dict):
-        entity = cls(**cls.Schema().load(data))
+        clsdata = cls.Schema().load(data)
+        entity = cls(cls.Data(**clsdata))
         entity._events.clear()
         return entity
 

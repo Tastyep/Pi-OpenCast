@@ -2,6 +2,7 @@
 
 import traceback
 from concurrent.futures import ThreadPoolExecutor
+from datetime import timedelta
 from queue import SimpleQueue
 
 import structlog
@@ -14,6 +15,7 @@ from .app.tool.json_encoder import ModelEncoder
 from .config import settings
 from .domain.service.factory import ServiceFactory
 from .domain.service.identity import IdentityService
+from .infra.data.cache import TimeBasedCache
 from .infra.data.manager import DataManager, StorageType
 from .infra.data.repo.factory import RepoFactory
 from .infra.facade import InfraFacade
@@ -26,7 +28,9 @@ from .infra.service.factory import ServiceFactory as InfraServiceFactory
 def run_server(logger, infra_facade):
     try:
         infra_facade.server.start(
-            settings["server.host"], settings["server.port"], settings["log.api_trafic"]
+            settings["server.host"],
+            settings["server.port"],
+            settings["log.api_trafic"],
         )
     except Exception as e:
         logger.error(
@@ -81,10 +85,11 @@ def main(argv=None):
     )
 
     io_factory = IoFactory()
-    media_factory = MediaFactory(
-        VlcInstance(), ThreadPoolExecutor(settings["downloader.max_concurrency"])
-    )
-    infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory)
+    downloader_executor = ThreadPoolExecutor(settings["downloader.max_concurrency"])
+    media_cache = TimeBasedCache(max_duration=timedelta(minutes=2))
+    media_factory = MediaFactory(VlcInstance(), downloader_executor, media_cache)
+    player = media_factory.make_player(app_facade.evt_dispatcher)
+    infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory, player)
 
     ControllerModule(app_facade, infra_facade, data_facade, service_factory)
     ServiceModule(app_facade, infra_facade, data_facade, service_factory)

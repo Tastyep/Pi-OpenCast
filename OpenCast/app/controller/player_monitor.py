@@ -1,9 +1,15 @@
 """ Player capabilities monitoring routes """
 
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
 import structlog
 from aiohttp_apispec import docs
 
 from OpenCast.app.command import player as Cmd
+from OpenCast.app.notification import Level as NotifLevel
+from OpenCast.app.notification import Notification
 from OpenCast.app.service.error import OperationError
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
@@ -12,18 +18,18 @@ from OpenCast.app.workflow.player import (
     StreamVideoWorkflow,
     Video,
 )
+from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model import Id
-from OpenCast.domain.model.player import Player, PlayerSchema
+from OpenCast.domain.model.player import PlayerSchema
 from OpenCast.domain.service.identity import IdentityService
-from OpenCast.util.conversion import str_to_bool
 
 from .monitor import MonitorController
 from .monitoring_schema import ErrorSchema
 
 
 class PlayerMonitController(MonitorController):
-    """ The controller in charge of player related requests """
+    """The controller in charge of player related requests"""
 
     def __init__(self, app_facade, infra_facade, data_facade, service_factory):
         logger = structlog.get_logger(__name__)
@@ -49,7 +55,6 @@ class PlayerMonitController(MonitorController):
         self._route("POST", "/volume", self.volume)
         self._route("POST", "/subtitle/toggle", self.subtitle_toggle)
         self._route("POST", "/subtitle/seek", self.subtitle_seek)
-        self._route("GET", "/events", self.stream_events)
 
     @docs(
         tags=["player"],
@@ -89,25 +94,48 @@ class PlayerMonitController(MonitorController):
         playlist_id = self._player_repo.get_player().queue
 
         if self._source_service.is_playlist(source):
-            sources = self._source_service.unfold(source)
-            if not sources:
-                return self._internal_error("Could not unfold the playlist URL")
-
             collection_id = IdentityService.random()
-            videos = [
-                Video(IdentityService.id_video(source), source, collection_id)
-                for source in sources
-            ]
-
-            workflow_id = IdentityService.id_workflow(StreamPlaylistWorkflow, video_id)
-            self._start_workflow(
-                StreamPlaylistWorkflow,
-                workflow_id,
-                self._data_facade,
-                videos,
-                playlist_id,
+            self._evt_dispatcher.dispatch(
+                Notification(
+                    collection_id,
+                    NotifLevel.INFO,
+                    "unfolding playlist",
+                    {"source": source},
+                )
             )
-            return self._no_content()
+
+            loop = asyncio.get_running_loop()
+            with ThreadPoolExecutor() as pool:
+                sources = await loop.run_in_executor(
+                    pool, partial(self._source_service.unfold, source)
+                )
+                if not sources:
+                    return self._internal_error("Could not unfold the playlist URL")
+
+                self._evt_dispatcher.dispatch(
+                    Notification(
+                        collection_id,
+                        NotifLevel.INFO,
+                        "downloading playlist",
+                        {"source": source, "count": f"{len(sources)} media"},
+                    )
+                )
+                videos = [
+                    Video(IdentityService.id_video(source), source, collection_id)
+                    for source in sources
+                ]
+
+                workflow_id = IdentityService.id_workflow(
+                    StreamPlaylistWorkflow, video_id
+                )
+                self._start_workflow(
+                    StreamPlaylistWorkflow,
+                    workflow_id,
+                    self._data_facade,
+                    videos,
+                    playlist_id,
+                )
+                return self._no_content()
 
         video = Video(video_id, source, collection_id=None)
         self._start_workflow(
@@ -141,25 +169,48 @@ class PlayerMonitController(MonitorController):
         playlist_id = self._player_repo.get_player().queue
 
         if self._source_service.is_playlist(source):
-            sources = self._source_service.unfold(source)
-            if not sources:
-                return self._internal_error("Could not unfold the playlist URL")
-
             collection_id = IdentityService.random()
-            videos = [
-                Video(IdentityService.id_video(source), source, collection_id)
-                for source in sources
-            ]
-
-            workflow_id = IdentityService.id_workflow(QueuePlaylistWorkflow, video_id)
-            self._start_workflow(
-                QueuePlaylistWorkflow,
-                workflow_id,
-                self._data_facade,
-                videos,
-                playlist_id,
+            self._evt_dispatcher.dispatch(
+                Notification(
+                    collection_id,
+                    NotifLevel.INFO,
+                    "unfolding playlist",
+                    {"source": source},
+                )
             )
-            return self._no_content()
+
+            loop = asyncio.get_running_loop()
+            with ThreadPoolExecutor() as pool:
+                sources = await loop.run_in_executor(
+                    pool, partial(self._source_service.unfold, source)
+                )
+                if not sources:
+                    return self._internal_error("Could not unfold the playlist URL")
+
+                self._evt_dispatcher.dispatch(
+                    Notification(
+                        collection_id,
+                        NotifLevel.INFO,
+                        "downloading playlist",
+                        {"source": source, "count": f"{len(sources)} media"},
+                    )
+                )
+                videos = [
+                    Video(IdentityService.id_video(source), source, collection_id)
+                    for source in sources
+                ]
+
+                workflow_id = IdentityService.id_workflow(
+                    QueuePlaylistWorkflow, video_id
+                )
+                self._start_workflow(
+                    QueuePlaylistWorkflow,
+                    workflow_id,
+                    self._data_facade,
+                    videos,
+                    playlist_id,
+                )
+                return self._no_content()
 
         video = Video(video_id, source, collection_id=None)
         self._start_workflow(
@@ -181,13 +232,6 @@ class PlayerMonitController(MonitorController):
         parameters=[
             {
                 "in": "query",
-                "name": "playlist_id",
-                "description": "ID of the playlist",
-                "type": "string",
-                "required": True,
-            },
-            {
-                "in": "query",
                 "name": "id",
                 "description": "ID of the media",
                 "type": "string",
@@ -201,15 +245,16 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def play(self, req):
-        playlist_id = Id(req.query["playlist_id"])
         video_id = Id(req.query["id"])
-        if not self._playlist_repo.exists(playlist_id) or not self._video_repo.exists(
-            video_id
-        ):
+        if not self._video_repo.exists(video_id):
             return self._not_found()
 
-        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStarted)
-        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id, playlist_id)
+        playlist = self._playlist_repo.get(HOME_PLAYLIST.id)
+        if video_id not in playlist.ids:
+            return self._forbidden("the video is not queued")
+
+        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
+        self._observe_dispatch(handlers, Cmd.PlayVideo, video_id)
 
         return await channel.receive()
 
@@ -224,7 +269,7 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def stop(self, _):
-        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStopped)
+        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
         self._observe_dispatch(handlers, Cmd.StopPlayer)
 
         return await channel.receive()
@@ -240,7 +285,7 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def pause(self, _):
-        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateToggled)
+        handlers, channel = self._make_default_handlers(PlayerEvt.PlayerStateUpdated)
         self._observe_dispatch(handlers, Cmd.TogglePlayerState)
 
         return await channel.receive()
@@ -253,16 +298,9 @@ class PlayerMonitController(MonitorController):
         parameters=[
             {
                 "in": "query",
-                "name": "forward",
-                "description": "True to advance in the media, False otherwise",
-                "type": "boolean",
-                "required": True,
-            },
-            {
-                "in": "query",
-                "name": "long",
-                "description": "True to use the highest seeking step, False otherwise",
-                "type": "boolean",
+                "name": "duration",
+                "description": "The time in ms to seek the media to",
+                "type": "integer",
                 "required": True,
             },
         ],
@@ -272,12 +310,9 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def seek(self, req):
-        forward = str_to_bool(req.query["forward"])
-        long = str_to_bool(req.query["long"])
-        side = 1 if forward is True else -1
-        step = Player.LONG_TIME_STEP if long is True else Player.SHORT_TIME_STEP
+        duration = int(req.query["duration"])
         handlers, channel = self._make_default_handlers(PlayerEvt.VideoSeeked)
-        self._observe_dispatch(handlers, Cmd.SeekVideo, side * step)
+        self._observe_dispatch(handlers, Cmd.SeekVideo, duration)
 
         return await channel.receive()
 
@@ -333,8 +368,8 @@ class PlayerMonitController(MonitorController):
             {
                 "in": "query",
                 "name": "forward",
-                "description": "True to advance the media subtitle, False otherwise",
-                "type": "boolean",
+                "description": "The time in ms to seek the subtitles",
+                "type": "int",
                 "required": True,
             }
         ],
@@ -344,21 +379,11 @@ class PlayerMonitController(MonitorController):
         },
     )
     async def subtitle_seek(self, req):
-        forward = str_to_bool(req.query["forward"])
-        step = Player.SUBTITLE_DELAY_STEP if forward else -Player.SUBTITLE_DELAY_STEP
+        duration = int(req.query["duration"])
         handlers, channel = self._make_default_handlers(PlayerEvt.SubtitleDelayUpdated)
-        self._observe_dispatch(handlers, Cmd.AdjustSubtitleDelay, step)
+        self._observe_dispatch(handlers, Cmd.UpdateSubtitleDelay, duration)
 
         return await channel.receive()
-
-    @docs(
-        tags=["player"],
-        summary="Stream player events",
-        description="Stream player events over WebSocket",
-        operationId="streamPlayerEvents",
-    )
-    async def stream_events(self, request):
-        return await self._stream_ws_events(request, PlayerEvt)
 
     def _make_default_handlers(self, evt_cls):
         channel = self._io_factory.make_janus_channel()
@@ -368,7 +393,7 @@ class PlayerMonitController(MonitorController):
             channel.send(self._ok(player))
 
         def on_error(evt):
-            channel.send(self._internal_error(evt.error))
+            channel.send(self._internal_error(evt.error, evt.details))
 
         evtcls_handler = {evt_cls: on_success, OperationError: on_error}
         return evtcls_handler, channel

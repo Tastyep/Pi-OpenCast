@@ -1,12 +1,13 @@
 """ Player external operations """
 
-from typing import List, Union
+from typing import List, Optional, Union
 
 import structlog
 
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.player import State as PlayerState
 from OpenCast.domain.model.playlist import Playlist
+from OpenCast.domain.model.video import State as VideoState
 
 
 class QueueingService:
@@ -54,20 +55,22 @@ class QueueingService:
 
     def next_video(
         self, playlist_id: Id, video_id: Id, loop_last: Union[bool, str]
-    ) -> Id:
+    ) -> Optional[Id]:
         playlist = self._playlist_repo.get(playlist_id)
         if video_id not in playlist.ids:
             self._logger.warning("unknown video", video=video_id, playlist=playlist)
             return None
 
+        videos = self._video_repo.list(playlist.ids)
+        playlist_size = len(playlist.ids)
         video_idx = playlist.ids.index(video_id)
-        if video_idx + 1 < len(playlist.ids):
-            return playlist.ids[video_idx + 1]
+        for i in range(video_idx + 1, playlist_size, 1):
+            if videos[i].state == VideoState.READY:
+                return videos[i].id
 
         if loop_last == "track":
             return playlist.ids[video_idx]
         if loop_last == "album":
-            videos = self._video_repo.list(playlist.ids)
             while (
                 video_idx > 0
                 and videos[video_idx].collection_id is not None

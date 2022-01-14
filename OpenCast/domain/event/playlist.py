@@ -11,6 +11,7 @@ from .event import Event, ModelId
 class PlaylistCreated(Event):
     name: str
     ids: List[ModelId]
+    generated: bool
 
 
 @dataclass

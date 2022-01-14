@@ -1,11 +1,16 @@
+from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
 
 from OpenCast.app.command import video as Cmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.config import settings
+from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
+from OpenCast.domain.model.player import State as PlayerState
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Stream
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
@@ -29,18 +34,25 @@ class VideoServiceTest(ServiceTestCase):
 
         metadata = {
             "title": "title",
+            "duration": 300,
             "source_protocol": "http",
-            "collection_name": "album",
+            "artist": "artist",
+            "album": "album",
             "thumbnail": "thumbnail_url",
         }
         self.downloader.download_metadata.return_value = metadata
+        self.deezer.search.return_value = []
 
+        attrs = deepcopy(metadata)
+        attrs["artist_id"] = IdentityService.id_artist(attrs.pop("artist"))
+        attrs["album_id"] = IdentityService.id_album(attrs.pop("album"))
         self.evt_expecter.expect(
             VideoEvt.VideoCreated,
             video_id,
             source,
             collection_id,
-            **metadata,
+            **attrs,
+            state=VideoState.CREATED,
         ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     @patch("OpenCast.app.service.video.Path")
@@ -52,19 +64,27 @@ class VideoServiceTest(ServiceTestCase):
 
         path_inst.is_file.return_value = True
         metadata = {
-            "collection_name": None,
+            "artist": None,
+            "album": None,
             "title": "test_title",
+            "duration": None,
             "source_protocol": None,
             "thumbnail": None,
         }
         path_inst.stem = metadata["title"]
+        attrs = deepcopy(metadata)
+        attrs["artist_id"] = None
+        attrs["album_id"] = None
+        del attrs["artist"]
+        del attrs["album"]
 
         self.evt_expecter.expect(
             VideoEvt.VideoCreated,
             video_id,
             source,
             collection_id,
-            **metadata,
+            **attrs,
+            state=VideoState.CREATED,
         ).from_(Cmd.CreateVideo, video_id, source, collection_id)
 
     def test_create_video_missing_metadata(self):
@@ -74,22 +94,29 @@ class VideoServiceTest(ServiceTestCase):
         metadata = None
         self.downloader.download_metadata.return_value = metadata
 
-        self.evt_expecter.expect(OperationError, "Unavailable metadata").from_(
-            Cmd.CreateVideo, video_id, source, collection_id=None
-        )
+        self.evt_expecter.expect(
+            OperationError, "no media found", {"source": source}
+        ).from_(Cmd.CreateVideo, video_id, source, collection_id=None)
 
     def test_delete_video(self):
-        self.data_producer.player().video("source").video("source2").populate(
-            self.data_facade
-        )
+        self.data_producer.player().video("source").video("source2").play(
+            "source"
+        ).populate(self.data_facade)
 
         player = self.player_repo.get_player()
         video_id = IdentityService.id_video("source")
         self.evt_expecter.expect(VideoEvt.VideoDeleted, video_id).expect(
+            PlayerEvt.PlayerStateUpdated,
+            player.id,
+            PlayerState.PLAYING,
+            PlayerState.STOPPED,
+        ).expect(PlayerEvt.PlayerVideoUpdated, player.id, video_id, None,).expect(
             PlaylistEvt.PlaylistContentUpdated,
             player.queue,
             [IdentityService.id_video("source2")],
-        ).from_(Cmd.DeleteVideo, video_id)
+        ).from_(
+            Cmd.DeleteVideo, video_id
+        )
 
         other_video_id = IdentityService.id_video("source2")
         self.assertListEqual(
@@ -125,17 +152,18 @@ class VideoServiceTest(ServiceTestCase):
 
     def test_retrieve_video_from_stream_error(self):
         video_id = IdentityService.id_video("http://url")
-        self.data_producer.video("http://url", source_protocol="m3u8").populate(
-            self.data_facade
-        )
+        title = "title"
+        self.data_producer.video(
+            "http://url", title=title, source_protocol="m3u8"
+        ).populate(self.data_facade)
 
         metadata = {}
         self.downloader.download_metadata.return_value = metadata
 
         output_dir = settings["downloader.output_directory"]
-        self.evt_expecter.expect(OperationError, "Unavailable stream URL").from_(
-            Cmd.RetrieveVideo, video_id, output_dir
-        )
+        self.evt_expecter.expect(
+            OperationError, "Unavailable stream URL", {"title": title}
+        ).from_(Cmd.RetrieveVideo, video_id, output_dir)
 
     def test_retrieve_video_download_success(self):
         video_id = IdentityService.id_video("source")
@@ -203,3 +231,16 @@ class VideoServiceTest(ServiceTestCase):
         self.evt_expecter.expect(
             VideoEvt.VideoSubtitleFetched, video_id, Path(source_subtitle)
         ).from_(Cmd.FetchVideoSubtitle, video_id, subtitle_language)
+
+    def test_set_video_ready(self):
+        self.data_producer.video("source").populate(self.data_facade)
+
+        video_id = IdentityService.id_video("source")
+        self.evt_expecter.expect(
+            VideoEvt.VideoStateUpdated,
+            video_id,
+            VideoState.CREATED,
+            VideoState.READY,
+            timedelta(),
+            None,
+        ).from_(Cmd.SetVideoReady, video_id)

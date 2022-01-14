@@ -1,8 +1,29 @@
+from test.util import TestCase
+
 import OpenCast.domain.event.video as Evt
-from OpenCast.domain.model.video import Video
+from OpenCast.domain.error import DomainError
+from OpenCast.domain.model.video import State as VideoState
+from OpenCast.domain.model.video import (
+    Video,
+    artist_processor,
+    timedelta,
+    title_processor,
+)
 from OpenCast.domain.service.identity import IdentityService
 
 from .util import ModelTestCase
+
+
+class MetadataProcessors(TestCase):
+    def test_title_processor(self):
+        artist = "toto"
+        title = f"{artist} - title"
+        metadata = {"artist": artist, "title": title}
+        self.assertEqual("title", title_processor()(title, metadata))
+
+    def test_artist_processor(self):
+        artist = "tata, other"
+        self.assertEqual("tata", artist_processor()(artist, {}))
 
 
 class VideoTest(ModelTestCase):
@@ -12,12 +33,18 @@ class VideoTest(ModelTestCase):
 
     def test_construction(self):
         collection_id = IdentityService.random()
+        artist_id = (IdentityService.id_artist("artist"),)
+        album_id = (IdentityService.id_album("album_name"),)
         video = Video(
             IdentityService.random(),
             "source",
             collection_id,
-            "album_name",
+            artist_id,
+            album_id,
             "title",
+            timedelta(seconds=300),
+            timedelta(),
+            None,
             "protocol",
             "thumbnail_url",
             "/tmp/file",
@@ -26,8 +53,10 @@ class VideoTest(ModelTestCase):
         )
         self.assertEqual("source", video.source)
         self.assertEqual(collection_id, video.collection_id)
-        self.assertEqual("album_name", video.collection_name)
+        self.assertEqual(artist_id, video.artist_id)
+        self.assertEqual(album_id, video.album_id)
         self.assertEqual("title", video.title)
+        self.assertEqual(300, video.duration)
         self.assertEqual("/tmp/file", video.location)
         self.assertEqual([], video.streams)
         self.assertEqual("subtitle", video.subtitle)
@@ -49,6 +78,60 @@ class VideoTest(ModelTestCase):
         self.assertFalse(self.video.streamable())
         video = Video(IdentityService.random(), "source", source_protocol="m3u8")
         self.assertTrue(video.streamable())
+
+    def test_start(self):
+        self.video.state = VideoState.READY
+        self.video.release_events()
+
+        self.video.start()
+        self.expect_events(self.video, Evt.VideoStateUpdated)
+
+    def test_start_already_started(self):
+        self.video.state = VideoState.PLAYING
+        with self.assertRaises(DomainError) as ctx:
+            self.video.start()
+        self.assertEqual("the video is already started", str(ctx.exception))
+
+    def test_start_not_ready(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.video.start()
+        self.assertEqual("the video is not ready", str(ctx.exception))
+
+    def test_start_stop(self):
+        self.video.state = VideoState.READY
+        self.video.release_events()
+
+        self.video.start()
+        self.video.stop()
+        self.expect_events(self.video, Evt.VideoStateUpdated, Evt.VideoStateUpdated)
+
+    def test_pause(self):
+        self.video.state = VideoState.READY
+        self.video.start()
+        self.video.release_events()
+
+        self.video.pause()
+        self.expect_events(self.video, Evt.VideoStateUpdated)
+
+    def test_unpause(self):
+        self.video.state = VideoState.PAUSED
+        self.video.release_events()
+
+        self.video.pause()
+        self.expect_events(self.video, Evt.VideoStateUpdated)
+
+    def test_pause_stopped(self):
+        self.video.state = VideoState.READY
+        self.video.release_events()
+
+        with self.assertRaises(DomainError) as ctx:
+            self.video.pause()
+        self.assertEqual("the video is not started", str(ctx.exception))
+
+    def test_stop_not_started(self):
+        with self.assertRaises(DomainError) as ctx:
+            self.video.stop()
+        self.assertEqual("the video is not started", str(ctx.exception))
 
     def test_delete(self):
         self.video.delete()

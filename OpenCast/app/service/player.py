@@ -1,11 +1,11 @@
 """ Handlers for player commands """
 
-
 import structlog
 
 from OpenCast.app.command import player as player_cmds
 from OpenCast.config import settings
 from OpenCast.domain.event import player as PlayerEvt
+from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.player import Player
 from OpenCast.domain.model.player import State as PlayerState
 
@@ -13,15 +13,16 @@ from .service import Service
 
 
 class PlayerService(Service):
-    def __init__(self, app_facade, data_facade, media_factory):
+    def __init__(self, app_facade, data_facade, player):
         logger = structlog.get_logger(__name__)
         super().__init__(app_facade, logger, player_cmds)
 
         self._observe_event(PlayerEvt.PlayerCreated)
+        self._observe_event(VideoEvt.VideoDeleted)
 
         self._player_repo = data_facade.player_repo
         self._video_repo = data_facade.video_repo
-        self._player = media_factory.make_player(app_facade.evt_dispatcher)
+        self._player = player
 
         player = self._player_repo.get_player()
         if player is not None:
@@ -39,7 +40,11 @@ class PlayerService(Service):
     def _play_video(self, cmd):
         def impl(player):
             video = self._video_repo.get(cmd.video_id)
-            player.play(video.id, cmd.playlist_id)
+            # Stop the player so that it triggers observers of PlayerStateUpdated
+            if player.state != PlayerState.STOPPED:
+                player.stop()
+            player.play(video.id)
+            video.start()
 
             self._player.play(video.location, video.streamable())
 
@@ -69,7 +74,7 @@ class PlayerService(Service):
 
     def _seek_video(self, cmd):
         def impl(model):
-            model.seek_video()
+            model.seek_video(cmd.duration)
             self._player.seek(cmd.duration)
 
         self._update(cmd.id, impl)
@@ -88,16 +93,9 @@ class PlayerService(Service):
         self._player.toggle_subtitle()
         self._update(cmd.id, impl)
 
-    def _adjust_subtitle_delay(self, cmd):
+    def _update_subtitle_delay(self, cmd):
         def impl(model):
-            model.subtitle_delay = model.subtitle_delay + cmd.amount
-            self._player.set_subtitle_delay(model.subtitle_delay)
-
-        self._update(cmd.id, impl)
-
-    def _decrease_subtitle_delay(self, cmd):
-        def impl(model):
-            model.subtitle_delay = model.subtitle_delay - cmd.amount
+            model.subtitle_delay = cmd.delay
             self._player.set_subtitle_delay(model.subtitle_delay)
 
         self._update(cmd.id, impl)
@@ -107,17 +105,18 @@ class PlayerService(Service):
     def _player_created(self, evt):
         self._init_player(evt.volume)
 
-    # Private
-    def _player_model(self):
-        return self._player_repo.get_player()
+    def _video_deleted(self, evt):
+        player = self._player_repo.get_player()
+        if evt.model_id == player.video_id:
+            self._stop_player(evt)
 
     def _init_player(self, volume):
         self._player.set_volume(volume)
 
     def _update(self, cmd_id, mutator, *args):
         def impl(ctx):
-            model = self._player_model()
-            mutator(model, *args)
-            ctx.update(model)
+            player = self._player_repo.get_player()
+            mutator(player, *args)
+            ctx.update(player)
 
         self._start_transaction(self._player_repo, cmd_id, impl)

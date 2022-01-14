@@ -11,7 +11,6 @@ class CreatePlayer(Command):
 @command
 class PlayVideo(Command):
     video_id: ModelId
-    playlist_id: ModelId
 
 
 @command
@@ -40,10 +39,5 @@ class ToggleSubtitle(Command):
 
 
 @command
-class AdjustSubtitleDelay(Command):
-    amount: int
-
-
-@command
-class DecreaseSubtitleDelay(Command):
-    amount: int
+class UpdateSubtitleDelay(Command):
+    delay: int

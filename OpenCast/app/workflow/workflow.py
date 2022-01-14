@@ -48,7 +48,7 @@ class Workflow(Machine):
         return f"{type(self).__name__}(id={self.id})"
 
     def _cancel(self, *args):
-        """ Cancel the workflow and dispatch the related event"""
+        """Cancel the workflow and dispatch the related event"""
         self._evt_dispatcher.dispatch(self.Aborted(self.id, *args))
 
     def _complete(self, *args):
@@ -62,8 +62,6 @@ class Workflow(Machine):
         self._app_facade.workflow_manager.start(workflow, *args, **kwargs)
 
     def _observe_dispatch(self, evt_cls, cmd_cls, model_id: Id, *args, **kwargs):
-        # TODO consider using the workflow id for commands from a same workflow
-        # cmd = cmd_cls(self.id, model_id, *args, **kwargs)
         cmd = make_cmd(cmd_cls, model_id, *args, **kwargs)
         self._observe(cmd.id, [evt_cls, OperationError])
         self._cmd_dispatcher.dispatch(cmd)
@@ -73,6 +71,13 @@ class Workflow(Machine):
             evt_cls: self._event_handler(evt_cls) for evt_cls in evt_clss
         }
         self._evt_dispatcher.observe_result(cmd_id, evtcls_to_handler, times=1)
+
+    def _observe_group(self, cmd_ids_to_evt_clss: dict):
+        cmd_ids_to_evt_cls_to_handler = {
+            cmd_id: {evt_cls: self._event_handler(evt_cls) for evt_cls in evt_clss}
+            for cmd_id, evt_clss in cmd_ids_to_evt_clss.items()
+        }
+        self._evt_dispatcher.observe_group(cmd_ids_to_evt_cls_to_handler, times=1)
 
     def _event_handler(self, evt_cls):
         handler_name = name_handler_method(evt_cls)

@@ -1,10 +1,10 @@
 [Unit]
 Description="OpenCast systemd service"
-After=network.target
+After=default.target rc-local.service
 
 [Service]
 Type=simple
-User={ USER }
+KillMode=control-group
 RemainAfterExit=true
 TimeoutStartSec=infinity
 TimeoutStopSec=infinity
@@ -12,4 +12,4 @@ ExecStart={ START_COMMAND }
 ExecStop={ STOP_COMMAND }
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

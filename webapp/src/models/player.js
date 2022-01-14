@@ -1,6 +1,6 @@
 import { action, makeObservable, observable, computed } from "mobx";
 
-const PlayerState = {
+export const PlayerState = {
   PLAYING: "PLAYING",
   PAUSED: "PAUSED",
   STOPPED: "STOPPED",
@@ -19,9 +19,9 @@ export default class Player {
     makeObservable(this, {
       queue: observable,
       state: observable,
+      videoId: observable,
       subState: observable,
       subDelay: observable,
-      videoId: observable,
       volume: observable,
 
       setQueue: action,
@@ -32,30 +32,19 @@ export default class Player {
       setVolume: action,
 
       isPlaying: computed,
+      isStopped: computed,
     });
 
     eventDispatcher.observe(
       {
-        PlayerQueueUpdated: (e) => this.setQueue(e.queue),
-        PlayerStarted: (e) => this.onPlayerStarted(e),
-        PlayerStopped: (e) => this.onPlayerStopped(e),
-        PlayerStateToggled: (e) => this.setState(e.state),
+        PlayerStateUpdated: (e) => this.setState(e.new_state),
+        PlayerVideoUpdated: (e) => this.setVideoId(e.new_video_id),
         VolumeUpdated: (e) => this.setVolume(e.volume),
         SubtitleStateUpdated: (e) => this.setSubState(e.state),
         SubtitleDelayUpdated: (e) => this.setSubDelay(e.delay),
       },
       this.id
     );
-  }
-
-  onPlayerStarted(e) {
-    this.setState(e.state);
-    this.setVideoId(e.video_id);
-  }
-
-  onPlayerStopped(e) {
-    this.setState(e.state);
-    this.setVideoId(e.video_id);
   }
 
   setQueue(playlist_id) {
@@ -79,5 +68,8 @@ export default class Player {
 
   get isPlaying() {
     return this.state === PlayerState.PLAYING;
+  }
+  get isStopped() {
+    return this.state === PlayerState.STOPPED;
   }
 }

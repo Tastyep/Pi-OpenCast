@@ -9,7 +9,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 USER="$(whoami)"
 PROJECT="$(basename "$ROOT")"
 INTERNAL_NAME="$(echo "$PROJECT" | cut -f2 -d'-')"
-SYSTEMD_CONFIG_DIR="/etc/systemd/system"
+SYSTEMD_CONFIG_DIR=".config/systemd/user"
 TEMPLATE_DIR="$ROOT/template"
 DOWNLOAD_DIRECTORY="$ROOT/library"
 
@@ -64,7 +64,7 @@ install_nvm() {
 install_project_deps() {
   log_info "Installing project dependencies..."
 
-  curl -sSL "https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py" | python3
+  curl -sSL https://install.python-poetry.org | python3 -
   "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
@@ -86,18 +86,18 @@ config_service() {
 
 # Format and install the systemd config file.
 start_at_boot() {
-  log_info "Setting up startup at boot"
+  log_info "Setting up $INTERNAL_NAME service"
 
   local service_name config
   # lowercase
   service_name="${INTERNAL_NAME,,}"
   config="$TEMPLATE_DIR/$service_name.service"
-  sed "s#{ USER }#$USER#g
-       s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g
+  mkdir -p "$HOME/$SYSTEMD_CONFIG_DIR"
+  sed "s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g
        s#{ STOP_COMMAND }#$ROOT/$INTERNAL_NAME.sh service stop#g" -- "$config" |
-    sudo tee "$SYSTEMD_CONFIG_DIR/$service_name.service" >/dev/null
-  sudo systemctl daemon-reload
-  sudo systemctl enable "$service_name"
+    tee "$HOME/$SYSTEMD_CONFIG_DIR/$service_name.service" >/dev/null
+  systemctl --user daemon-reload
+  systemctl --user enable "$service_name"
 }
 
 # Prevent user from installing poetry as root

@@ -1,6 +1,7 @@
 from test.shared.infra.data.producer import DataProducer
 from test.util import TestCase
 
+from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.service.identity import IdentityService
 from OpenCast.domain.service.player import QueueingService
 from OpenCast.infra.data.manager import DataManager, StorageType
@@ -119,9 +120,9 @@ class QueueingServiceTest(TestCase):
         self.assertListEqual(expected, queue.ids)
 
     def test_next(self):
-        self.data_producer.player().video("source1").video("source2").populate(
-            self.data_facade
-        )
+        self.data_producer.player().video("source1", state=VideoState.READY).video(
+            "source2", state=VideoState.READY
+        ).populate(self.data_facade)
 
         videos = self.video_repo.list()
         self.assertEqual(
@@ -132,8 +133,21 @@ class QueueingServiceTest(TestCase):
             None, self.service.next_video(self.queue_id, videos[1].id, loop_last=False)
         )
 
+    def test_next_skip_not_ready(self):
+        self.data_producer.player().video("source1", state=VideoState.READY).video(
+            "source2", state=VideoState.CREATED
+        ).video("source3", state=VideoState.READY).populate(self.data_facade)
+
+        videos = self.video_repo.list()
+        self.assertEqual(
+            videos[2].id,
+            self.service.next_video(self.queue_id, videos[0].id, loop_last=False),
+        )
+
     def test_next_no_loop(self):
-        self.data_producer.player().video("source1").populate(self.data_facade)
+        self.data_producer.player().video("source1", state=VideoState.READY).populate(
+            self.data_facade
+        )
 
         video_id = IdentityService.id_video("source1")
         self.assertEqual(
@@ -141,9 +155,9 @@ class QueueingServiceTest(TestCase):
         )
 
     def test_next_loop_last_track(self):
-        self.data_producer.player().video("source1").video("source2").populate(
-            self.data_facade
-        )
+        self.data_producer.player().video("source1", state=VideoState.READY).video(
+            "source2", state=VideoState.READY
+        ).populate(self.data_facade)
 
         videos = self.video_repo.list()
         self.assertEqual(
@@ -157,9 +171,13 @@ class QueueingServiceTest(TestCase):
 
     def test_next_loop_last_album(self):
         collection_id = IdentityService.random()
-        self.data_producer.player().video("source1").video(
-            "source2", collection_id=collection_id
-        ).video("source3", collection_id=collection_id).populate(self.data_facade)
+        self.data_producer.player().video("source1", state=VideoState.READY).video(
+            "source2", collection_id=collection_id, state=VideoState.READY
+        ).video(
+            "source3", collection_id=collection_id, state=VideoState.READY
+        ).populate(
+            self.data_facade
+        )
 
         videos = self.video_repo.list()
         expected = videos[1].id
@@ -170,9 +188,13 @@ class QueueingServiceTest(TestCase):
 
     def test_next_loop_last_album_no_album(self):
         collection_id = IdentityService.random()
-        self.data_producer.player().video("source1", collection_id=collection_id).video(
-            "source2"
-        ).video("source3").populate(self.data_facade)
+        self.data_producer.player().video(
+            "source1", collection_id=collection_id, state=VideoState.READY
+        ).video("source2", state=VideoState.READY).video(
+            "source3", state=VideoState.READY
+        ).populate(
+            self.data_facade
+        )
 
         videos = self.video_repo.list()
         expected = videos[2].id
@@ -182,9 +204,9 @@ class QueueingServiceTest(TestCase):
         )
 
     def test_next_loop_last_playlist(self):
-        self.data_producer.player().video("source1").video("source2").video(
-            "source3"
-        ).populate(self.data_facade)
+        self.data_producer.player().video("source1", state=VideoState.READY).video(
+            "source2", state=VideoState.READY
+        ).video("source3", state=VideoState.READY).populate(self.data_facade)
 
         videos = self.video_repo.list()
         expected = videos[0].id
@@ -194,9 +216,9 @@ class QueueingServiceTest(TestCase):
         )
 
     def test_next_invalid_video(self):
-        self.data_producer.player().video("source1").video("source2").populate(
-            self.data_facade
-        )
+        self.data_producer.player().video("source1", state=VideoState.READY).video(
+            "source2", state=VideoState.READY
+        ).populate(self.data_facade)
 
         video_id = IdentityService.id_video("source3")
         self.assertEqual(

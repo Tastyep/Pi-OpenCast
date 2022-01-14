@@ -1,16 +1,15 @@
 """ Parse, download and extract a media with its metadata """
 
-
 from pathlib import Path
-from typing import List
+from typing import Callable, List, Optional
 
 import structlog
 from hurry.filesize import alternative, size
-from youtube_dl import YoutubeDL
-from youtube_dl.utils import ISO639Utils
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import ISO639Utils
 
 from OpenCast.infra import Id
-from OpenCast.infra.event.downloader import DownloadError, DownloadSuccess
+from OpenCast.infra.event.downloader import DownloadError, DownloadInfo, DownloadSuccess
 
 
 class Logger:
@@ -62,15 +61,33 @@ class Logger:
 
 
 class Downloader:
-    def __init__(self, executor, evt_dispatcher):
+    def __init__(self, executor, cache, evt_dispatcher):
         self._executor = executor
+        self._cache = cache
         self._evt_dispatcher = evt_dispatcher
         self._logger = structlog.get_logger(__name__)
         self._dl_logger = Logger(self._logger)
 
-    def download_video(self, op_id: Id, source: str, dest: str):
+    def download_video(
+        self,
+        op_id: Id,
+        video_id: Id,
+        source: str,
+        dest: str,
+        on_dl_starting: Optional[Callable[[Logger], None]] = None,
+    ):
+        def dispatch_dl_events(data):
+            status = data.get("status")
+            total = data.get("total_bytes")
+            downloaded = data.get("downloaded_bytes")
+            if status == "downloading" and downloaded is not None and total is not None:
+                self._evt_dispatcher.dispatch(
+                    DownloadInfo(op_id, video_id, total, downloaded)
+                )
+
         def impl():
-            self._logger.info("Downloading", video=dest)
+            if on_dl_starting:
+                on_dl_starting(self._logger)
             options = {
                 "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
                 "bestvideo+bestaudio/best",
@@ -78,7 +95,10 @@ class Downloader:
                 "merge_output_format": "mp4",
                 "outtmpl": dest,
                 "quiet": True,
-                "progress_hooks": [self._dl_logger.log_download_progress],
+                "progress_hooks": [
+                    self._dl_logger.log_download_progress,
+                    dispatch_dl_events,
+                ],
             }
             ydl = YoutubeDL(options)
             with ydl:  # Download the video
@@ -104,7 +124,7 @@ class Downloader:
 
             self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
 
-        self._logger.debug("Queing", video=dest)
+        self._logger.debug("Queuing", video=dest)
         self._executor.submit(impl)
 
     def download_subtitle(self, url: str, dest: str, lang: str, exts: List[str]):
@@ -133,7 +153,16 @@ class Downloader:
         return None
 
     def download_metadata(self, url: str, process_ie_data: bool):
-        self._logger.debug("Downloading metadata", url=url)
+        self._cache.clean()
+        cache_key = f"{url}{process_ie_data}"
+        cached_data = self._cache.get(cache_key)
+
+        self._logger.debug(
+            "Downloading metadata", url=url, cached=cached_data is not None
+        )
+        if cached_data:
+            return cached_data
+
         options = {
             # Allow getting the _type value set to URL when passing a playlist entry
             "noplaylist": True,
@@ -141,12 +170,16 @@ class Downloader:
             # Causes ydl to return None on error
             "ignoreerrors": True,
             "quiet": True,
-            "progress_hooks": [self._dl_logger.log_download_progress],
+            "progress_hooks": [],
         }
         ydl = YoutubeDL(options)
         with ydl:
             try:
-                return ydl.extract_info(url, download=False, process=process_ie_data)
+                metadata = ydl.extract_info(
+                    url, download=False, process=process_ie_data
+                )
+                self._cache.register(cache_key, metadata)
+                return metadata
             except Exception as e:
                 self._logger.error("Downloading metadata error", url=url, error=e)
         return None

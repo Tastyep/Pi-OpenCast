@@ -1,0 +1,18 @@
+""" Artist repository """
+
+from OpenCast.domain.model.artist import Artist
+from OpenCast.infra import Id
+
+from .repository import Repository
+
+
+class ArtistRepo(Repository):
+    def __init__(self, database, db_lock):
+        super().__init__(database, db_lock, Artist)
+
+    def list_containing(self, video_id: Id):
+        with self._lock:
+            results = self._collection.search(
+                lambda entity: str(video_id) in entity["ids"]
+            )
+        return [self._entity.from_dict(result) for result in results]

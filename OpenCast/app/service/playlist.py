@@ -27,7 +27,7 @@ class PlaylistService(Service):
     # Command handler implementation
     def _create_playlist(self, cmd):
         def impl(ctx):
-            playlist = Playlist(cmd.model_id, cmd.name, cmd.ids)
+            playlist = Playlist(cmd.model_id, cmd.name, cmd.ids, cmd.generated)
             ctx.add(playlist)
 
         self._start_transaction(self._playlist_repo, cmd.id, impl)

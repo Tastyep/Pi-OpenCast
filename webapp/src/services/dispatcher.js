@@ -1,20 +1,18 @@
 class SocketEventDispatcher {
-  constructor(websockets) {
+  constructor(websocket) {
     this.eventsToHandlers = {};
 
-    for (const i in websockets) {
-      websockets[i].addEventListener("message", (evt) => this.onEvent(evt));
-    }
+    websocket.addEventListener("message", (evt) => this.onEvent(evt));
   }
 
   onEvent(event) {
     const data = JSON.parse(event.data);
-    console.log(
-      "Received Event",
-      data.name,
-      this.eventsToHandlers.hasOwnProperty(data.name),
-      event.data
-    );
+    // console.log(
+    //   "Received Event",
+    //   data.name,
+    //   this.eventsToHandlers.hasOwnProperty(data.name),
+    //   event.data
+    // );
     if (this.eventsToHandlers.hasOwnProperty(data.name)) {
       const handlers = this.eventsToHandlers[data.name];
       for (const handler of handlers) {

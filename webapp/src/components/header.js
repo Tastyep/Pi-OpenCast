@@ -1,6 +1,6 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, IconButton } from "@material-ui/core";
-import CastConnectedIcon from "@material-ui/icons/CastConnected";
+import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import CastConnectedIcon from "@mui/icons-material/CastConnected";
 
 const Header = () => {
   return (

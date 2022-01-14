@@ -2,14 +2,12 @@ from aiohttp.test_utils import unittest_run_loop
 
 from OpenCast.app.command import make_cmd
 from OpenCast.app.command import playlist as PlaylistCmd
-from OpenCast.app.command import video as VideoCmd
 from OpenCast.app.service.error import OperationError
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
-from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.service.identity import IdentityService
 
-from .util import MonitorControllerTestCase, asyncio
+from .util import MonitorControllerTestCase
 
 
 class PlaylistMonitorControllerTest(MonitorControllerTestCase):
@@ -40,7 +38,9 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
                 id=playlist_id, name=cmd.name, ids=cmd.ids
             ).populate(self.data_facade)
             self.app_facade.evt_dispatcher.dispatch(
-                PlaylistEvt.PlaylistCreated(cmd.id, playlist_id, cmd.name, cmd.ids)
+                PlaylistEvt.PlaylistCreated(
+                    cmd.id, playlist_id, cmd.name, cmd.ids, cmd.generated
+                )
             )
 
         self.hook_cmd(PlaylistCmd.CreatePlaylist, make_and_respond)
@@ -220,55 +220,18 @@ class PlaylistMonitorControllerTest(MonitorControllerTestCase):
 
     @unittest_run_loop
     async def test_delete_forbidden(self):
+        self.expect_and_error(
+            make_cmd(PlaylistCmd.DeletePlaylist, HOME_PLAYLIST.id),
+            error="cannot delete generated playlists",
+        )
         resp = await self.client.delete(f"/api/playlists/{HOME_PLAYLIST.id}")
         body = await resp.json()
 
         self.assertEqual(403, resp.status)
         self.assertEqual(
             {
-                "message": f"{HOME_PLAYLIST.name} playlist can't be deleted",
+                "message": "cannot delete generated playlists",
                 "details": {},
             },
             body,
         )
-
-    @unittest_run_loop
-    async def test_event_listening(self):
-        async with self.client.ws_connect("/api/playlists/events") as ws:
-            playlist = self.playlist_repo.get(self.playlist_id)
-            cmd_id = IdentityService.id_command(PlaylistCmd.CreatePlaylist, playlist.id)
-            created_evt = PlaylistEvt.PlaylistCreated(
-                cmd_id,
-                playlist.id,
-                "name",
-                [],
-            )
-            self.evt_dispatcher.dispatch(created_evt)
-            await self.expect_ws_events(ws, [created_evt])
-
-            cmd_id = IdentityService.id_command(
-                PlaylistCmd.UpdatePlaylistContent, playlist.id
-            )
-            second_evt = PlaylistEvt.PlaylistContentUpdated(cmd_id, playlist.id, [])
-            self.evt_dispatcher.dispatch(created_evt)
-            self.evt_dispatcher.dispatch(second_evt)
-            await self.expect_ws_events(ws, [created_evt, second_evt])
-
-    @unittest_run_loop
-    async def test_invalid_event_listening(self):
-        async with self.client.ws_connect("/api/player/events") as ws:
-            video_id = IdentityService.id_video("source")
-            cmd_id = IdentityService.id_command(VideoCmd.CreateVideo, video_id)
-            video_evt = VideoEvt.VideoCreated(
-                cmd_id,
-                video_id,
-                "source",
-                IdentityService.random(),
-                "album",
-                "title",
-                "http",
-                "thumbnail",
-            )
-            self.evt_dispatcher.dispatch(video_evt)
-            with self.assertRaises(asyncio.TimeoutError):
-                await self.expect_ws_events(ws, [video_evt])

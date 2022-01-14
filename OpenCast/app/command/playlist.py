@@ -10,6 +10,7 @@ from .command import Command, ModelId, command
 class CreatePlaylist(Command):
     name: str
     ids: List[ModelId] = field(default_factory=list)
+    generated: bool = False
 
 
 @command

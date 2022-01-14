@@ -21,7 +21,13 @@ doc() {
 }
 
 webapp() {
-  (cd "$ROOT/webapp" && npm run build)
+  local options
+  local node_version
+
+  node_version="$(node --version | cut -f 1 -d'.' | tr -d 'v')"
+  [[ "$node_version" -ge "17" ]] && options="NODE_OPTIONS=--openssl-legacy-provider"
+
+  (cd "$ROOT/webapp" && eval "$options npm run build")
 }
 
 parse_args "$@"

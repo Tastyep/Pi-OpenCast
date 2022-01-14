@@ -13,7 +13,7 @@ class Videos(Schema):
 
 class ErrorSchema(Schema):
     message = fields.String()
-    details = fields.Dict(keys=fields.String(), values=fields.List(fields.String()))
+    details = fields.Dict(keys=fields.String(), values=fields.Raw())
 
 
 def schema(**kwargs):

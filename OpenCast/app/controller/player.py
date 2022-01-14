@@ -29,10 +29,9 @@ class PlayerController(Controller):
         video_id = self._queueing_service.next_video(
             player.queue, player.video_id, settings["player.loop_last"]
         )
-        if video_id is None:
-            self._dispatch(Cmd.StopPlayer)
-        else:
-            self._dispatch(Cmd.PlayVideo, video_id, player.queue)
+        self._dispatch(Cmd.StopPlayer)
+        if video_id is not None:
+            self._dispatch(Cmd.PlayVideo, video_id)
 
     def _dispatch(self, cmd_cls, *args, **kwargs):
         player_id = IdentityService.id_player()

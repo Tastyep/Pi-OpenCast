@@ -17,30 +17,20 @@ class PlayerCreated(Event):
 
 
 @dataclass
-class PlayerQueueUpdated(Event):
-    queue: ModelId
+class PlayerStateUpdated(Event):
+    old_state: State
+    new_state: State
 
 
 @dataclass
-class PlayerStarted(Event):
-    state: State
-    video_id: ModelId
-
-
-@dataclass
-class PlayerStopped(Event):
-    state: State
-    video_id: ModelId
-
-
-@dataclass
-class PlayerStateToggled(Event):
-    state: State
+class PlayerVideoUpdated(Event):
+    old_video_id: State
+    new_video_id: State
 
 
 @dataclass
 class VideoSeeked(Event):
-    pass
+    duration: int
 
 
 @dataclass
