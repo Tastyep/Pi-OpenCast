@@ -31,7 +31,7 @@ yt-dlp = "^2021.10.10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
-pytest-cov = "^2.11"
+pytest-cov = "^3.0"
 sphinx_rtd_theme = "^0.5.1"
 sphinx = "^3.4.3"
 mypy = "^0.800"
