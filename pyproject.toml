@@ -40,7 +40,7 @@ sphinxcontrib-openapi = "^0.7.0"
 mistune = "<2.0.0"
 flake8 = "^3.8.4"
 isort = "^5.7.0"
-coverage = "^5.4"
+coverage = "^6.2"
 sphinxemoji = "^0.1.8"
 black = "^21.12b0"
 
