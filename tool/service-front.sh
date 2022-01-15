@@ -29,7 +29,7 @@ source "$ROOT/script/env.sh"
 
 start() {
   local npm_cmd
-  npm_cmd="WEBAPP_PORT=$WEBAPP_PORT npm run serve &"
+  npm_cmd="PORT=$WEBAPP_PORT npm run serve &"
   [[ -n "${ARGS["--dev"]}" ]] && npm_cmd="REACT_APP_API_PORT=$API_PORT PORT=$WEBAPP_PORT npm start"
 
   (cd "$WEBAPP_DIR" && eval "$npm_cmd")

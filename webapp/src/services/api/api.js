@@ -1,7 +1,6 @@
 import axios from "axios";
 import RobustWebSocket from "robust-websocket";
 
-// process.env.PORT is undefined for unknown reasons.
 const WEBAPP_PORT = process.env.REACT_APP_PORT;
 const API_PORT = process.env.REACT_APP_API_PORT;
 const API_URL =
@@ -11,7 +10,8 @@ const API = axios.create({
 });
 
 const makeWebSocket = (endpoint) => {
-  return new RobustWebSocket(API_URL.replace("http", "ws") + endpoint);
+  const url = API_URL.replace("http", "ws") + endpoint;
+  return new RobustWebSocket(url);
 };
 
 const listen = () => {

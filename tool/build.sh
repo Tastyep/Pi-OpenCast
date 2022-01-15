@@ -8,6 +8,7 @@
 
 HERE="$(cd "$(dirname "${BASH_SOURCE:-0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
+API_PORT="$(grep "port:" <"$ROOT/config.yml" | cut -d':' -f2 | xargs)"
 
 # shellcheck source=script/cli_builder.sh
 source "$ROOT/script/cli_builder.sh"
@@ -27,7 +28,7 @@ webapp() {
   node_version="$(node --version | cut -f 1 -d'.' | tr -d 'v')"
   [[ "$node_version" -ge "17" ]] && options="NODE_OPTIONS=--openssl-legacy-provider"
 
-  (cd "$ROOT/webapp" && eval "$options npm run build")
+  (cd "$ROOT/webapp" && eval "$options REACT_APP_API_PORT=$API_PORT npm run build")
 }
 
 parse_args "$@"
