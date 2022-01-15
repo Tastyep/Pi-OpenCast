@@ -41,7 +41,7 @@ mistune = "<2.0.0"
 flake8 = "^3.8.4"
 isort = "^5.7.0"
 coverage = "^5.4"
-sphinxemoji = "^0.1.8"
+sphinxemoji = "^0.2.0"
 black = "^21.12b0"
 
 [tool.poetry.scripts]
