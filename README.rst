@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/Tastyep/Pi-OpenCast/master/assets/images/banner.gif
+.. image:: https://raw.githubusercontent.com/Tastyep/Pi-OpenCast/master/assets/images/banner.webp
    :scale: 80 %
    :align: center
    :alt: Banner
