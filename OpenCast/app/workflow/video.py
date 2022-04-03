@@ -14,6 +14,7 @@ from OpenCast.app.service.error import OperationError
 from OpenCast.config import settings
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model import Id
+from OpenCast.infra.media.downloader import Options as DownloadOptions
 
 from .workflow import Workflow
 
@@ -23,10 +24,10 @@ class Video:
     id: Id
     source: str
     collection_id: Optional[Id]
+    dl_opts: DownloadOptions
 
     def to_tuple(self):
-        return astuple(self)
-
+        return (self.id, self.source, self.collection_id)
 
 class VideoWorkflow(Workflow):
     Completed = namedtuple("VideoWorkflowCompleted", ("id", "model_id"))
@@ -79,7 +80,11 @@ class VideoWorkflow(Workflow):
     # States
     def on_enter_CREATING(self):
         self._observe_dispatch(
-            VideoEvt.VideoCreated, Cmd.CreateVideo, *self._video.to_tuple()
+            VideoEvt.VideoCreated,
+            Cmd.CreateVideo,
+            self._video.id,
+            self._video.source,
+            self._video.collection_id,
         )
 
     def on_enter_RETRIEVING(self, _):
@@ -88,6 +93,7 @@ class VideoWorkflow(Workflow):
             Cmd.RetrieveVideo,
             self._video.id,
             settings["downloader.output_directory"],
+            self._video.dl_opts,
         )
 
     def on_enter_PARSING(self, _):

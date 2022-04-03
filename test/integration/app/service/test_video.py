@@ -168,15 +168,15 @@ class VideoServiceTest(ServiceTestCase):
     def test_retrieve_video_download_success(self):
         video_id = IdentityService.id_video("source")
         video_title = "video_title"
+        output_dir = settings["downloader.output_directory"]
+        video_path = str(Path(output_dir) / f"{video_title}.mp4")
         self.data_producer.video("source", title=video_title).populate(self.data_facade)
 
         def dispatch_downloaded(op_id, *args):
-            self.app_facade.evt_dispatcher.dispatch(DownloadSuccess(op_id))
+            self.app_facade.evt_dispatcher.dispatch(DownloadSuccess(op_id, video_path))
 
         self.downloader.download_video.side_effect = dispatch_downloaded
-        output_dir = settings["downloader.output_directory"]
-        location = str(Path(output_dir) / f"{video_title}.mp4")
-        self.evt_expecter.expect(VideoEvt.VideoRetrieved, video_id, location).from_(
+        self.evt_expecter.expect(VideoEvt.VideoRetrieved, video_id, video_path).from_(
             Cmd.RetrieveVideo, video_id, output_dir
         )
 
@@ -185,7 +185,7 @@ class VideoServiceTest(ServiceTestCase):
         video_title = "video_title"
         self.data_producer.video("source", title=video_title).populate(self.data_facade)
 
-        def dispatch_error(op_id, *args):
+        def dispatch_error(op_id, *_):
             self.app_facade.evt_dispatcher.dispatch(
                 DownloadError(op_id, "Download error")
             )

@@ -6,6 +6,7 @@ import OpenCast.app.command.video as VideoCmd
 import OpenCast.domain.event.player as PlayerEvt
 import OpenCast.domain.event.playlist as PlaylistEvt
 import OpenCast.domain.event.video as VideoEvt
+from OpenCast.app.workflow.video import DownloadOptions
 from OpenCast.app.workflow.player import (
     QueuePlaylistWorkflow,
     QueueVideoWorkflow,
@@ -44,6 +45,7 @@ class QueueVideoWorkflowTest(WorkflowTestCase):
             IdentityService.id_video("source"),
             "source",
             collection_id=None,
+            dl_opts=DownloadOptions()
         )
         self.workflow = self.make_workflow(
             QueueVideoWorkflow,
@@ -169,7 +171,7 @@ class QueuePlaylistWorkflowTest(WorkflowTestCase):
         collection_id = IdentityService.random()
         sources = [f"src{i}" for i in range(video_count)]
         videos = [
-            Video(IdentityService.id_video(source), source, collection_id)
+            Video(IdentityService.id_video(source), source, collection_id, dl_opts=DownloadOptions())
             for source in sources
         ]
         return self.make_workflow(
@@ -231,6 +233,7 @@ class StreamVideoWorkflowTest(WorkflowTestCase):
             IdentityService.id_video("source"),
             "source",
             collection_id=None,
+            dl_opts=DownloadOptions()
         )
         self.workflow = self.make_workflow(
             StreamVideoWorkflow,
@@ -304,7 +307,7 @@ class StreamPlaylistWorkflowTest(WorkflowTestCase):
         collection_id = IdentityService.random()
         sources = [f"src{i}" for i in range(video_count)]
         videos = [
-            Video(IdentityService.id_video(source), source, collection_id)
+            Video(IdentityService.id_video(source), source, collection_id, dl_opts=DownloadOptions())
             for source in sources
         ]
         return self.make_workflow(

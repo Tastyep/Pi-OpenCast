@@ -1,5 +1,6 @@
 """ Parse, download and extract a media with its metadata """
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, List, Optional
 
@@ -10,6 +11,12 @@ from yt_dlp.utils import ISO639Utils
 
 from OpenCast.infra import Id
 from OpenCast.infra.event.downloader import DownloadError, DownloadInfo, DownloadSuccess
+
+
+@dataclass
+class Options:
+    download_video: bool = True
+    download_subtitles: bool = False
 
 
 class Logger:
@@ -74,6 +81,7 @@ class Downloader:
         video_id: Id,
         source: str,
         dest: str,
+        opts: Options,
         on_dl_starting: Optional[Callable[[Logger], None]] = None,
     ):
         def dispatch_dl_events(data):
@@ -85,21 +93,38 @@ class Downloader:
                     DownloadInfo(op_id, video_id, total, downloaded)
                 )
 
+        def set_final_filename(data):
+            status = data.get("status")
+            if not status == "finished":
+                return
+
+            nonlocal dest
+            dest = data.get("filename", "unknown")
+
         def impl():
             if on_dl_starting:
                 on_dl_starting(self._logger)
             options = {
-                "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
-                "bestvideo+bestaudio/best",
                 "noplaylist": True,
-                "merge_output_format": "mp4",
                 "outtmpl": dest,
                 "quiet": True,
                 "progress_hooks": [
                     self._dl_logger.log_download_progress,
                     dispatch_dl_events,
+                    set_final_filename,
                 ],
             }
+            if opts.download_video:
+                options |= {
+                    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/"
+                    "bestvideo+bestaudio/best",
+                    "merge_output_format": "mp4",
+                }
+            else:
+                options |= {
+                    "format": "bestaudio/best",
+                }
+
             ydl = YoutubeDL(options)
             with ydl:  # Download the video
                 try:
@@ -122,7 +147,7 @@ class Downloader:
                 self._evt_dispatcher.dispatch(DownloadError(op_id, error))
                 return
 
-            self._evt_dispatcher.dispatch(DownloadSuccess(op_id))
+            self._evt_dispatcher.dispatch(DownloadSuccess(op_id, dest))
 
         self._logger.debug("Queuing", video=dest)
         self._executor.submit(impl)

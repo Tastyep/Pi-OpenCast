@@ -8,7 +8,7 @@ from OpenCast.infra.event.event import Event
 
 @dataclass
 class DownloadSuccess(Event):
-    pass
+    filepath: str
 
 
 @dataclass

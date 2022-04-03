@@ -1,7 +1,7 @@
 """ Video commands """
 
 from .command import Command, Id, command
-
+from OpenCast.infra.media.downloader import Options as DownloadOptions
 
 @command
 class CreateVideo(Command):
@@ -17,6 +17,7 @@ class DeleteVideo(Command):
 @command
 class RetrieveVideo(Command):
     output_directory: str
+    dl_opts: DownloadOptions = DownloadOptions()
 
 
 @command

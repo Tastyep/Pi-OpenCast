@@ -7,7 +7,6 @@ from vlc import EventType, MediaParsedStatus, MediaParseFlag, TrackType
 
 from .error import VideoParsingError
 
-
 class VideoParser:
     def __init__(self, vlc_instance):
         self._logger = structlog.get_logger(__name__)

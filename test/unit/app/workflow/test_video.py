@@ -4,7 +4,7 @@ from pathlib import Path
 import OpenCast.app.command.video as Cmd
 import OpenCast.domain.event.video as Evt
 from OpenCast.app.service.error import OperationError
-from OpenCast.app.workflow.video import Video, VideoWorkflow
+from OpenCast.app.workflow.video import Video, VideoWorkflow, DownloadOptions
 from OpenCast.config import settings
 from OpenCast.domain.model.video import State as VideoState
 from OpenCast.domain.model.video import Video as VideoModel
@@ -17,7 +17,7 @@ class VideoWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(VideoWorkflowTest, self).setUp()
         self.video_repo = self.data_facade.video_repo
-        self.video = Video(IdentityService.id_video("source"), "source", None)
+        self.video = Video(IdentityService.id_video("source"), "source", None, DownloadOptions())
         self.workflow = self.make_workflow(VideoWorkflow, self.video)
 
     def tearDown(self):

@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 import structlog
-from aiohttp_apispec import docs
+from aiohttp_apispec import docs, json_schema
 
 from OpenCast.app.command import player as Cmd
 from OpenCast.app.notification import Level as NotifLevel
@@ -18,6 +18,7 @@ from OpenCast.app.workflow.player import (
     StreamVideoWorkflow,
     Video,
 )
+from OpenCast.app.workflow.video import DownloadOptions
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import player as PlayerEvt
 from OpenCast.domain.model import Id
@@ -26,6 +27,7 @@ from OpenCast.domain.service.identity import IdentityService
 
 from .monitor import MonitorController
 from .monitoring_schema import ErrorSchema
+from .monitoring_schema import VideoOptions as VideoOptionsSchema
 
 
 class PlayerMonitController(MonitorController):
@@ -88,11 +90,14 @@ class PlayerMonitController(MonitorController):
             500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
+    @json_schema(VideoOptionsSchema)
     async def stream(self, req):
         source = req.query["url"]
+        json_data = await req.json()
         video_id = IdentityService.id_video(source)
         playlist_id = self._player_repo.get_player().queue
 
+        dl_opts = DownloadOptions(**json_data.get("dl_opts", {}))
         if self._source_service.is_playlist(source):
             collection_id = IdentityService.random()
             self._evt_dispatcher.dispatch(
@@ -120,8 +125,11 @@ class PlayerMonitController(MonitorController):
                         {"source": source, "count": f"{len(sources)} media"},
                     )
                 )
+
                 videos = [
-                    Video(IdentityService.id_video(source), source, collection_id)
+                    Video(
+                        IdentityService.id_video(source), source, collection_id, dl_opts
+                    )
                     for source in sources
                 ]
 
@@ -137,7 +145,7 @@ class PlayerMonitController(MonitorController):
                 )
                 return self._no_content()
 
-        video = Video(video_id, source, collection_id=None)
+        video = Video(video_id, source, collection_id=None, dl_opts=dl_opts)
         self._start_workflow(
             StreamVideoWorkflow, video_id, self._data_facade, video, playlist_id
         )
@@ -165,9 +173,11 @@ class PlayerMonitController(MonitorController):
     )
     async def queue(self, req):
         source = req.query["url"]
+        json_data = await req.json()
         video_id = IdentityService.id_video(source)
         playlist_id = self._player_repo.get_player().queue
 
+        dl_opts = DownloadOptions(**json_data.get("dl_opts", {}))
         if self._source_service.is_playlist(source):
             collection_id = IdentityService.random()
             self._evt_dispatcher.dispatch(
@@ -196,7 +206,7 @@ class PlayerMonitController(MonitorController):
                     )
                 )
                 videos = [
-                    Video(IdentityService.id_video(source), source, collection_id)
+                    Video(IdentityService.id_video(source), source, collection_id, dl_opts)
                     for source in sources
                 ]
 
@@ -212,7 +222,7 @@ class PlayerMonitController(MonitorController):
                 )
                 return self._no_content()
 
-        video = Video(video_id, source, collection_id=None)
+        video = Video(video_id, source, collection_id=None, dl_opts=dl_opts)
         self._start_workflow(
             QueueVideoWorkflow,
             video_id,
@@ -388,7 +398,7 @@ class PlayerMonitController(MonitorController):
     def _make_default_handlers(self, evt_cls):
         channel = self._io_factory.make_janus_channel()
 
-        def on_success(evt):
+        def on_success(_):
             player = self._player_repo.get_player()
             channel.send(self._ok(player))
 

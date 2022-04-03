@@ -52,7 +52,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_workflow
         )
 
-        resp = await self.client.post("/api/player/stream", params={"url": url})
+        resp = await self.client.post("/api/player/stream", params={"url": url}, json={})
         self.assertEqual(204, resp.status)
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
@@ -72,7 +72,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_workflow
         )
 
-        resp = await self.client.post("/api/player/stream", params={"url": url})
+        resp = await self.client.post("/api/player/stream", params={"url": url}, json={})
         self.assertEqual(204, resp.status)
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
@@ -82,7 +82,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.source_service.is_playlist.return_value = True
         self.source_service.unfold.return_value = []
 
-        resp = await self.client.post("/api/player/stream", params={"url": url})
+        resp = await self.client.post("/api/player/stream", params={"url": url}, json={})
         body = await resp.json()
         self.assertEqual(500, resp.status)
         self.assertEqual(
@@ -109,7 +109,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_workflow
         )
 
-        resp = await self.client.post("/api/player/queue", params={"url": url})
+        resp = await self.client.post("/api/player/queue", params={"url": url}, json={})
         self.assertEqual(204, resp.status)
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
@@ -129,7 +129,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
             make_workflow
         )
 
-        resp = await self.client.post("/api/player/queue", params={"url": url})
+        resp = await self.client.post("/api/player/queue", params={"url": url}, json={})
         self.assertEqual(204, resp.status)
         self.app_facade.workflow_manager.start.assert_called_with(workflow)
 
@@ -139,7 +139,7 @@ class PlayerMonitorControllerTest(MonitorControllerTestCase):
         self.source_service.is_playlist.return_value = True
         self.source_service.unfold.return_value = []
 
-        resp = await self.client.post("/api/player/queue", params={"url": url})
+        resp = await self.client.post("/api/player/queue", params={"url": url}, json={})
         body = await resp.json()
         self.assertEqual(500, resp.status)
         self.assertEqual(

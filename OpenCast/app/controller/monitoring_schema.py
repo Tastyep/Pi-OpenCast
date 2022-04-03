@@ -16,6 +16,14 @@ class ErrorSchema(Schema):
     details = fields.Dict(keys=fields.String(), values=fields.Raw())
 
 
+class VideoDownloadOptions(Schema):
+    download_video = fields.Boolean(allow_none=True)
+
+
+class VideoOptions(Schema):
+    dl_opts = fields.Nested(VideoDownloadOptions, allow_none=True)
+
+
 def schema(**kwargs):
     items = list(kwargs.items())
     if len(items) != 1 or not isinstance(items[0][1], dict):

@@ -96,12 +96,12 @@ class VideoService(Service):
                 return
 
             ctx.update(video)
-            video_location = str(Path(cmd.output_directory) / f"{video.title}.mp4")
+            video_location = str(Path(cmd.output_directory) / f"{video.title}.%(ext)s")
 
             # Video source points downloadable media
-            def video_downloaded(_):
+            def video_downloaded(evt):
                 def impl(ctx):
-                    video.location = video_location
+                    video.location = evt.filepath
                     ctx.update(video)
 
                 self._start_transaction(self._video_repo, cmd.id, impl)
@@ -130,7 +130,7 @@ class VideoService(Service):
 
             # TODO: Move this part out of the repo transaction
             self._downloader.download_video(
-                cmd.id, video.id, video.source, video_location, on_dl_starting
+                cmd.id, video.id, video.source, video_location, cmd.dl_opts, on_dl_starting
             )
 
         video = self._video_repo.get(cmd.model_id)
