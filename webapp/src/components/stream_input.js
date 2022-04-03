@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
-import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -15,17 +14,21 @@ import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import SendIcon from "@mui/icons-material/Send";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MusicVideoIcon from "@mui/icons-material/MusicVideo";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
 
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "components/app_context";
+import { List, ListItem } from "@mui/material";
 
 const StreamInput = () => {
   const store = useAppStore();
 
   const [url, setUrl] = useState("");
-  const [action, setAction] = useState(() => playerAPI.streamMedia);
+  const [streamOpt, setStreamOpt] = useState(true);
+  const [videoOpt, setVideoOpt] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
   const handleSubmit = (event) => {
@@ -35,19 +38,30 @@ const StreamInput = () => {
     if (url === "") {
       return;
     }
-    action(url).catch(snackBarHandler(store));
+    if (streamOpt) {
+      playerAPI
+        .streamMedia(url, { dl_opts: { download_video: videoOpt } })
+        .catch(snackBarHandler(store));
+    } else {
+      playerAPI
+        .queueMedia(url, { dl_opts: { download_video: videoOpt } })
+        .catch(snackBarHandler(store));
+    }
     setUrl("");
   };
 
-  const updateAction = (_, newAction) => {
-    if (!newAction) {
+  const updateAction = (_, value) => {
+    if (!value) {
       return;
     }
-    setAction(
-      newAction === "stream"
-        ? () => playerAPI.streamMedia
-        : () => playerAPI.queueMedia
-    );
+    setStreamOpt(value === "stream");
+  };
+
+  const updateDownloadedChannels = (_, value) => {
+    if (!value) {
+      return;
+    }
+    setVideoOpt(value === "video");
   };
 
   const updateBlur = (evt) => {
@@ -107,10 +121,13 @@ const StreamInput = () => {
             <Typography variant="h6" sx={{ marginBottom: "16px" }}>
               Options
             </Typography>
-            <Grid container alignItems="center" flexWrap="nowrap">
-              <Grid item xs={8} sx={{ marginRight: "16px" }}>
+            <List>
+              <ListItem
+                alignItems="center"
+                sx={{ paddingLeft: "0px", paddingRight: "0px" }}
+              >
                 <ToggleButtonGroup
-                  value={action === playerAPI.streamMedia ? "stream" : "queue"}
+                  value={streamOpt ? "stream" : "queue"}
                   exclusive
                   onChange={updateAction}
                   aria-label="text alignment"
@@ -122,15 +139,32 @@ const StreamInput = () => {
                     <PlaylistAddIcon />
                   </ToggleButton>
                 </ToggleButtonGroup>
-              </Grid>
-              <Grid item xs>
-                <Typography noWrap sx={{ minWidth: "80px" }}>
-                  {action === playerAPI.streamMedia
-                    ? "Play next"
-                    : "Queue last"}
+                <Typography noWrap sx={{ marginLeft: "16px" }}>
+                  {streamOpt ? "Play next" : "Queue last"}
                 </Typography>
-              </Grid>
-            </Grid>
+              </ListItem>
+              <ListItem
+                alignItems="center"
+                sx={{ paddingLeft: "0px", paddingRight: "0px" }}
+              >
+                <ToggleButtonGroup
+                  value={videoOpt ? "video" : "audio"}
+                  exclusive
+                  onChange={updateDownloadedChannels}
+                  aria-label="text alignment"
+                >
+                  <ToggleButton value="video" aria-label="video">
+                    <MusicVideoIcon />
+                  </ToggleButton>
+                  <ToggleButton value="audio" aria-label="audio">
+                    <MusicNoteIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                <Typography noWrap sx={{ marginLeft: "16px" }}>
+                  {videoOpt ? "Video" : "Audio only"}
+                </Typography>
+              </ListItem>
+            </List>
           </Paper>
         </Collapse>
       </Box>

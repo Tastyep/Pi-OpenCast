@@ -4,12 +4,12 @@ async function get() {
   return await API.get("/player/");
 }
 
-async function streamMedia(url) {
-  return await API.post("/player/stream", null, { params: { url: url } });
+async function streamMedia(url, opts = null) {
+  return await API.post("/player/stream", opts, { params: { url: url } });
 }
 
-async function queueMedia(url) {
-  return await API.post("/player/queue", null, { params: { url: url } });
+async function queueMedia(url, opts = null) {
+  return await API.post("/player/queue", opts, { params: { url: url } });
 }
 
 async function playMedia(id) {
