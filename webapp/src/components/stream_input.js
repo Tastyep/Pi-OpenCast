@@ -48,6 +48,7 @@ const StreamInput = () => {
         .catch(snackBarHandler(store));
     }
     setUrl("");
+    setExpanded(false);
   };
 
   const updateAction = (_, value) => {
