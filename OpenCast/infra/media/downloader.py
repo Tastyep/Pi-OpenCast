@@ -84,6 +84,8 @@ class Downloader:
         opts: Options,
         on_dl_starting: Optional[Callable[[Logger], None]] = None,
     ):
+        file_path = dest
+
         def dispatch_dl_events(data):
             status = data.get("status")
             total = data.get("total_bytes")
@@ -98,8 +100,9 @@ class Downloader:
             if not status == "finished":
                 return
 
-            nonlocal dest
-            dest = data.get("filename", "unknown")
+            nonlocal file_path 
+            if file_path == dest:
+                file_path = data.get("info_dict", {}).get("_filename", dest)
 
         def impl():
             if on_dl_starting:
@@ -131,23 +134,23 @@ class Downloader:
                     ydl.download([source])
                 except Exception as e:
                     self._logger.error(
-                        "Download error", video=dest, source=source, error=e
+                        "Download error", video=file_path, source=source, error=e
                     )
                     self._evt_dispatcher.dispatch(DownloadError(op_id, str(e)))
                     return
 
-            if not Path(dest).exists():
+            if not Path(file_path).exists():
                 error = "video path points to non existent file"
                 self._logger.error(
                     "Download error",
-                    video=dest,
+                    video=file_path,
                     source=source,
                     error=error,
                 )
                 self._evt_dispatcher.dispatch(DownloadError(op_id, error))
                 return
 
-            self._evt_dispatcher.dispatch(DownloadSuccess(op_id, dest))
+            self._evt_dispatcher.dispatch(DownloadSuccess(op_id, file_path))
 
         self._logger.debug("Queuing", video=dest)
         self._executor.submit(impl)
