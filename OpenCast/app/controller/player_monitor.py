@@ -206,7 +206,9 @@ class PlayerMonitController(MonitorController):
                     )
                 )
                 videos = [
-                    Video(IdentityService.id_video(source), source, collection_id, dl_opts)
+                    Video(
+                        IdentityService.id_video(source), source, collection_id, dl_opts
+                    )
                     for source in sources
                 ]
 

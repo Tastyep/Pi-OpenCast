@@ -1,7 +1,7 @@
 """ Workflows running video related operations """
 
 from collections import namedtuple
-from dataclasses import astuple, dataclass
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
 
@@ -28,6 +28,7 @@ class Video:
 
     def to_tuple(self):
         return (self.id, self.source, self.collection_id)
+
 
 class VideoWorkflow(Workflow):
     Completed = namedtuple("VideoWorkflowCompleted", ("id", "model_id"))

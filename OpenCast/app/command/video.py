@@ -1,7 +1,9 @@
 """ Video commands """
 
-from .command import Command, Id, command
 from OpenCast.infra.media.downloader import Options as DownloadOptions
+
+from .command import Command, Id, command
+
 
 @command
 class CreateVideo(Command):

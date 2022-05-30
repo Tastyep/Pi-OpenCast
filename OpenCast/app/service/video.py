@@ -130,7 +130,12 @@ class VideoService(Service):
 
             # TODO: Move this part out of the repo transaction
             self._downloader.download_video(
-                cmd.id, video.id, video.source, video_location, cmd.dl_opts, on_dl_starting
+                cmd.id,
+                video.id,
+                video.source,
+                video_location,
+                cmd.dl_opts,
+                on_dl_starting,
             )
 
         video = self._video_repo.get(cmd.model_id)

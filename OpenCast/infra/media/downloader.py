@@ -100,7 +100,7 @@ class Downloader:
             if not status == "finished":
                 return
 
-            nonlocal file_path 
+            nonlocal file_path
             if file_path == dest:
                 file_path = data.get("info_dict", {}).get("_filename", dest)
 

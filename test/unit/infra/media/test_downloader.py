@@ -113,7 +113,6 @@ class DownloaderTest(TestCase):
         path_mock = path_cls.return_value
         path_mock.exists.return_value = True
 
-
         op_id = IdentityService.random()
         video_id = IdentityService.id_video("url")
         video_path = "/tmp/media.mp4"
@@ -126,7 +125,9 @@ class DownloaderTest(TestCase):
 
         op_id = IdentityService.random()
         video_id = IdentityService.id_video("url")
-        self.downloader.download_video(op_id, video_id, "url", "/tmp/media.mp4", Options())
+        self.downloader.download_video(
+            op_id, video_id, "url", "/tmp/media.mp4", Options()
+        )
 
         self.dispatcher.dispatch.assert_called_with(DownloadError(op_id, "error"))
 
@@ -137,7 +138,9 @@ class DownloaderTest(TestCase):
 
         op_id = IdentityService.random()
         video_id = IdentityService.id_video("url")
-        self.downloader.download_video(op_id, video_id, "url", "/tmp/media.mp4", Options())
+        self.downloader.download_video(
+            op_id, video_id, "url", "/tmp/media.mp4", Options()
+        )
 
         self.dispatcher.dispatch.assert_called_with(
             DownloadError(op_id, "video path points to non existent file")
