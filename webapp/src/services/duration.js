@@ -1,22 +1,41 @@
 const pluralize = require("pluralize");
 
-function durationToHMS(duration) {
-  const date = new Date(duration * 1000);
-  const parts = [date.getUTCHours(), date.getUTCMinutes(), date.getSeconds()];
+function durationToHMS(msDuration, maxParts = null) {
+  const date = new Date(msDuration);
+  const parts = [date.getSeconds(), date.getUTCMinutes(), date.getUTCHours()];
   let hms_duration = "";
 
-  parts.forEach((part) => {
+  if (maxParts === null) {
+    maxParts = countHMSParts(msDuration);
+  }
+  const partCount = maxParts === 0 ? parts.length : Math.min(parts.length, maxParts);
+  for (let i = 0; i < partCount; i++) {
+    const part = parts[i];
+
     if (hms_duration === "") {
-      if (part === 0) {
-        return;
-      }
-      hms_duration = part.toString();
+      hms_duration = part.toString().padStart(2, "0");
     } else {
-      hms_duration = hms_duration + ":" + part.toString().padStart(2, "0");
+      hms_duration = part.toString().padStart(2, "0") + ":" + hms_duration;
+    }
+  };
+
+  return hms_duration;
+}
+
+function countHMSParts(msDuration) {
+  const date = new Date(msDuration);
+  const parts = [date.getSeconds(), date.getUTCMinutes(), date.getUTCHours()];
+
+  let count = 0;
+  parts.forEach(part => {
+    if (part !== 0) {
+      count++;
+    } else {
+      return count;
     }
   });
 
-  return hms_duration;
+  return count;
 }
 
 function humanReadableDuration(duration) {
@@ -43,4 +62,4 @@ function humanReadableDuration(duration) {
   return format_duration;
 }
 
-export { durationToHMS, humanReadableDuration };
+export { durationToHMS, humanReadableDuration, countHMSParts };

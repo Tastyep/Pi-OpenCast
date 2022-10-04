@@ -134,7 +134,7 @@ const MediaItem = observer((props) => {
               sx={{ maxHeight: "100%", overflow: "hidden" }}
             />
             <ListItemText
-              primary={durationToHMS(video.duration)}
+              primary={durationToHMS(video.duration * 1000)}
               sx={{
                 textAlign: "right",
                 minWidth: "max-content",

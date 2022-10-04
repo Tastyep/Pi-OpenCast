@@ -101,7 +101,7 @@ const MediaSecondaryData = ({ artist, album, duration }) => {
     <div style={{ whiteSpace: "nowrap" }}>• Album</div>
   );
 
-  const HMSDuration = durationToHMS(duration);
+  const HMSDuration = durationToHMS(duration * 1000);
   return (
     <Stack
       direction="row"
@@ -425,6 +425,7 @@ const MediaAvatar = memo(({ video, isHover, onClick }) => {
             position: "absolute",
             backgroundColor: "rgba(0,0,0,0.33)",
             borderRadius: "100%",
+            borderColor: "white"
           }}
         >
           <PlayArrowIcon sx={{ color: "#F5F5F5" }} />
@@ -577,7 +578,7 @@ const MediaItem = observer((props) => {
           </Box>
           <Box sx={{ display: "flex" }}>
             <ListItemText
-              primary={durationToHMS(video.duration)}
+              primary={durationToHMS(video.duration * 1000)}
               sx={{
                 width: "54px",
                 color: "#505050",

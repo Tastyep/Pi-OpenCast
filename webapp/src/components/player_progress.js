@@ -6,7 +6,7 @@ import { useAppStore } from "./app_context";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
-const PlayerProgress = observer(() => {
+const PlayerProgress = observer(({ height = 4 }) => {
   const store = useAppStore();
   const media = store.videos[store.player.videoId];
 
@@ -32,8 +32,9 @@ const PlayerProgress = observer(() => {
       onChangeCommitted={seekMedia}
       sx={{
         display: "block",
+        borderRadius: "0px",
         color: "rgba(89,123,157,0.87)",
-        height: 4,
+        height: { height },
         padding: "0px",
         "@media (pointer: coarse)": {
           padding: "0px",

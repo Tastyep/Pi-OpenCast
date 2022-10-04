@@ -60,7 +60,7 @@ const renderMediaSecondaryData = (artist, album, duration) => {
     "Album"
   );
 
-  const HMSDuration = durationToHMS(duration);
+  const HMSDuration = durationToHMS(duration * 1000);
 
   return (
     <Grid
@@ -260,9 +260,10 @@ const SubtitleControl = observer(() => {
   );
 });
 
-const ControlBar = observer(() => {
+const ControlBar = observer((props) => {
   const store = useAppStore();
 
+  const { openTrackInfo } = props;
   const [expanded, setExpanded] = useState(false);
   const activeVideo = store.videos[store.player.videoId];
 
@@ -513,11 +514,8 @@ const ControlBar = observer(() => {
                 <IconButton size="small" onClick={playNext}>
                   <SkipNextIcon />
                 </IconButton>
-                <IconButton
-                  size="medium"
-                  onClick={() => setExpanded(!expanded)}
-                >
-                  {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                <IconButton size="medium" onClick={() => openTrackInfo()}>
+                 <ExpandMoreIcon />
                 </IconButton>
               </Stack>
             </BarContainer>

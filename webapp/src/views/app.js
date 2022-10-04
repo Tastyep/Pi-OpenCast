@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 
+import Drawer from '@mui/material/Drawer';
 import Grid from "@mui/material/Grid";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -22,6 +23,7 @@ import ControlBar from "components/control_bar";
 import PlayerProgress from "components/player_progress";
 import Notifier from "components/notifier";
 import HomePage from "views/home";
+import ControlPage from "views/control";
 
 import {
   LibraryLayout,
@@ -79,8 +81,9 @@ const HeaderTabs = () => {
   );
 };
 
-const CollapsableControlBar = observer(() => {
+const CollapsableControlBar = observer((props) => {
   const store = useAppStore();
+  const { openTrackInfo } = props;
 
   if (store.player.isStopped === undefined) {
     return null;
@@ -90,13 +93,15 @@ const CollapsableControlBar = observer(() => {
     <Box>
       <Collapse in={!store.player.isStopped} timeout="auto">
         <PlayerProgress />
-        <ControlBar />
+        <ControlBar openTrackInfo={openTrackInfo} />
       </Collapse>
     </Box>
   );
 });
 
 const Layout = () => {
+  const [controlPageOpen, closeControlPage] = useState(false);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Notifier />
@@ -110,11 +115,22 @@ const Layout = () => {
       >
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
         <Grid item xs={12} sm={10} sx={{ height: "100%" }}>
+          <Drawer
+            anchor='top'
+            open={controlPageOpen}
+            onClose={() => closeControlPage(false)}
+          >
+            <ControlPage closePage={() => closeControlPage(false)} />
+          </Drawer>
           <Outlet />
         </Grid>
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
       </Grid>
-      <CollapsableControlBar />
+      {!controlPageOpen &&
+        <CollapsableControlBar
+          openTrackInfo={() => closeControlPage(true)}
+        />
+      }
     </div>
   );
 };
