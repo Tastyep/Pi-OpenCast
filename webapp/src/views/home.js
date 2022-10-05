@@ -45,22 +45,21 @@ import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
 const PageContainer = styled("div")({
   display: "flex",
   flexWrap: "wrap",
-  height: `calc(100% - 16px)`,
+  height: `calc(100% - 12px)`,
   justifyContent: "center",
-  paddingTop: "16px",
+  paddingTop: "12px",
   width: "100%",
 });
 
 const LargeThumbnail = styled("img")({
   width: "100%",
   height: "auto",
-  maxHeight: "100%",
+  maxHeight: "96%",
   objectFit: "contain",
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  paddingBottom: "16px",
 });
 
 const MediaItem = observer((props) => {
@@ -321,6 +320,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
 
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
+      <Divider sx={{ height: "2px" }} />
       <Stack
         direction="row"
         alignItems="center"
@@ -363,6 +363,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
           </IconButton>
         </Stack>
       </Stack>
+      <Divider sx={{ height: "2px" }} />
       <Box sx={{ flex: 1 }}>
         {videos.length === 0 ? null : (
           <DragDropContext onDragEnd={(result) => onDragEnd(result, videos)}>
@@ -460,14 +461,7 @@ const HomePage = observer(() => {
               <Grid item xs={8} sx={{ height: "100%" }}>
                 <Container sx={{ height: "100%" }}>
                   <Stack direction="column" sx={{ height: "100%" }}>
-                    <div
-                      style={{
-                        width: "100%",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      <StreamInput />
-                    </div>
+                    <StreamInput />
                     <div style={{ position: "relative", height: "100%" }}>
                       <PlayingMediaThumbnail />
                     </div>
@@ -493,7 +487,7 @@ const HomePage = observer(() => {
                   width: "100%",
                   paddingLeft: "16px",
                   paddingRight: "16px",
-                  marginBottom: "16px",
+                  marginBottom: "10px",
                   boxSizing: "border-box",
                 }}
               >
