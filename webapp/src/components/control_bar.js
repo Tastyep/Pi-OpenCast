@@ -15,7 +15,6 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
@@ -91,19 +90,21 @@ const updatePlayer = (store, update, ...args) => {
   update(...args).catch(snackBarHandler(store));
 };
 
-const PausePlayIcon = observer(() => {
+const PausePlayIcon = observer((props) => {
   const store = useAppStore();
   const isPlayerPlaying = store.player.isPlaying;
+  const { sx } = props;
 
   return (
     <IconButton
       size="small"
+      sx={sx}
       onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
     >
       {isPlayerPlaying ? (
-        <PauseIcon fontSize="large" />
+        <PauseIcon sx={{ fontSize: 30 }} />
       ) : (
-        <PlayArrowIcon fontSize="large" />
+        <PlayArrowIcon sx={{ fontSize: 30 }} />
       )}
     </IconButton>
   );
@@ -420,84 +421,6 @@ const ControlBar = observer((props) => {
           </BarContainer>
         ) : (
           <div style={{ minHeight: "auto" }}>
-            <Collapse
-              in={expanded}
-              timeout="auto"
-              unmountOnExit
-              sx={{
-                minHeight: "auto",
-              }}
-            >
-              <Grid
-                container
-                sx={{ paddingBottom: "8px", backgroundColor: "#F2F2F2" }}
-              >
-                <Grid item xs={12} sx={{ paddingLeft: "8px" }}>
-                  <VolumeControl />
-                </Grid>
-                <Grid item xs={6}>
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      updatePlayer(
-                        store,
-                        playerAPI.seekMedia,
-                        Math.round(activeVideo.playTime - seekStep.big)
-                      )
-                    }
-                  >
-                    <FastRewindIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      updatePlayer(
-                        store,
-                        playerAPI.seekMedia,
-                        Math.round(activeVideo.playTime - seekStep.small)
-                      )
-                    }
-                  >
-                    <ArrowLeftIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    disableFocusRipple
-                    disableRipple
-                    onClick={() => updatePlayer(store, playerAPI.stopMedia)}
-                  >
-                    <StopIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      updatePlayer(
-                        store,
-                        playerAPI.seekMedia,
-                        Math.round(activeVideo.playTime + seekStep.small)
-                      )
-                    }
-                  >
-                    <ArrowRightIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      updatePlayer(
-                        store,
-                        playerAPI.seekMedia,
-                        Math.round(activeVideo.playTime + seekStep.big)
-                      )
-                    }
-                  >
-                    <FastForwardIcon />
-                  </IconButton>
-                </Grid>
-                <Grid item container xs={6} justifyContent="flex-end">
-                  <SubtitleControl />
-                </Grid>
-              </Grid>
-            </Collapse>
             <BarContainer direction="row">
               <Stack
                 direction="row"
@@ -506,18 +429,10 @@ const ControlBar = observer((props) => {
               >
                 <ActiveMediaData variant="small" />
               </Stack>
-              <Stack direction="row">
-                <IconButton size="small" onClick={playPrev}>
-                  <SkipPreviousIcon />
-                </IconButton>
-                <PausePlayIcon />
-                <IconButton size="small" onClick={playNext}>
-                  <SkipNextIcon />
-                </IconButton>
-                <IconButton size="medium" onClick={() => openTrackInfo()}>
-                  <ExpandMoreIcon />
-                </IconButton>
-              </Stack>
+              <PausePlayIcon sx={{ marginLeft: "auto" }} />
+              <IconButton size="medium" onClick={() => openTrackInfo()}>
+                <ExpandMoreIcon sx={{ fontSize: 30 }} />
+              </IconButton>
             </BarContainer>
           </div>
         )
