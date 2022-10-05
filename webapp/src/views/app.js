@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import Drawer from '@mui/material/Drawer';
+import Drawer from "@mui/material/Drawer";
 import Grid from "@mui/material/Grid";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -116,7 +116,7 @@ const Layout = () => {
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
         <Grid item xs={12} sm={10} sx={{ height: "100%" }}>
           <Drawer
-            anchor='top'
+            anchor="top"
             open={controlPageOpen}
             onClose={() => closeControlPage(false)}
           >
@@ -126,11 +126,9 @@ const Layout = () => {
         </Grid>
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
       </Grid>
-      {!controlPageOpen &&
-        <CollapsableControlBar
-          openTrackInfo={() => closeControlPage(true)}
-        />
-      }
+      {!controlPageOpen && (
+        <CollapsableControlBar openTrackInfo={() => closeControlPage(true)} />
+      )}
     </div>
   );
 };

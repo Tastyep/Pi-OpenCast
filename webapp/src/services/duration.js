@@ -8,7 +8,8 @@ function durationToHMS(msDuration, maxParts = null) {
   if (maxParts === null) {
     maxParts = countHMSParts(msDuration);
   }
-  const partCount = maxParts === 0 ? parts.length : Math.min(parts.length, maxParts);
+  const partCount =
+    maxParts === 0 ? parts.length : Math.min(parts.length, maxParts);
   for (let i = 0; i < partCount; i++) {
     const part = parts[i];
 
@@ -17,7 +18,7 @@ function durationToHMS(msDuration, maxParts = null) {
     } else {
       hms_duration = part.toString().padStart(2, "0") + ":" + hms_duration;
     }
-  };
+  }
 
   return hms_duration;
 }
@@ -27,7 +28,7 @@ function countHMSParts(msDuration) {
   const parts = [date.getSeconds(), date.getUTCMinutes(), date.getUTCHours()];
 
   let count = 0;
-  parts.forEach(part => {
+  parts.forEach((part) => {
     if (part !== 0) {
       count++;
     } else {

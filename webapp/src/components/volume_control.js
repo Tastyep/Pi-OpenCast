@@ -4,7 +4,7 @@ import { Stack, Slider, Button, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
-import VolumeDownIcon from '@mui/icons-material/VolumeDown';
+import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 
 import playerAPI from "services/api/player";
 import { useAppStore } from "./app_context";
@@ -64,7 +64,8 @@ const VolumeControl = observer(() => {
           aria-labelledby="continuous-slider"
           sx={{
             width: "86%",
-            color: theme.palette.mode === "dark" ? "#fff" : "rgba(89,123,157,0.87)",
+            color:
+              theme.palette.mode === "dark" ? "#fff" : "rgba(89,123,157,0.87)",
             "& .MuiSlider-track": {
               border: "none",
             },

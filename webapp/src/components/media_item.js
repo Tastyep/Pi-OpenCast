@@ -425,7 +425,7 @@ const MediaAvatar = memo(({ video, isHover, onClick }) => {
             position: "absolute",
             backgroundColor: "rgba(0,0,0,0.33)",
             borderRadius: "100%",
-            borderColor: "white"
+            borderColor: "white",
           }}
         >
           <PlayArrowIcon sx={{ color: "#F5F5F5" }} />

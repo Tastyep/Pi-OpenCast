@@ -515,7 +515,7 @@ const ControlBar = observer((props) => {
                   <SkipNextIcon />
                 </IconButton>
                 <IconButton size="medium" onClick={() => openTrackInfo()}>
-                 <ExpandMoreIcon />
+                  <ExpandMoreIcon />
                 </IconButton>
               </Stack>
             </BarContainer>

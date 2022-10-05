@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -21,7 +16,7 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import VolumeControl from "components/volume_control";
 import PlayerProgress from "components/player_progress";
@@ -107,13 +102,10 @@ const OptionMenu = (props) => {
   const { open, anchorEl, closeMenu, closeParent } = props;
 
   const stop = () => {
-    playerAPI
-      .stopMedia()
-      .catch(snackBarHandler(store));
+    playerAPI.stopMedia().catch(snackBarHandler(store));
     closeMenu();
     closeParent();
   };
-
 
   return (
     <Menu
@@ -144,7 +136,13 @@ const PlayingMediaImage = (props) => {
     <Box
       justifyContent="center"
       alignItems="center"
-      sx={{ display: "flex", backgroundColor: "black", width: "100%", height: "50vh", position: "relative" }}
+      sx={{
+        display: "flex",
+        backgroundColor: "black",
+        width: "100%",
+        height: "50vh",
+        position: "relative",
+      }}
     >
       <img
         src={src}
@@ -188,7 +186,6 @@ const ControlPage = observer((props) => {
   }
 
   const activeArtist = store.artists[activeVideo.artist_id];
-  const activeAlbum = store.albums[activeVideo.album_id];
 
   const playNext = () => {
     if (!activeVideo) {
@@ -248,11 +245,13 @@ const ControlPage = observer((props) => {
 
   // Highlight subtitle button when on
   return (
-    <Stack
-      alignItems="center"
-      sx={{ position: "relative", height: "100vh" }}
-    >
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ backgroundColor: "#F2F2F2", width: "100%" }}>
+    <Stack alignItems="center" sx={{ position: "relative", height: "100vh" }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ backgroundColor: "#F2F2F2", width: "100%" }}
+      >
         <IconButton size="large" onClick={() => closePage()}>
           <ExpandLessIcon fontSize="medium" />
         </IconButton>
@@ -285,7 +284,10 @@ const ControlPage = observer((props) => {
             style={{ marginTop: "16px", marginBottom: "8px" }}
           >
             <Typography>
-              {durationToHMS(activeVideo.playTime, countHMSParts(activeVideo.duration * 1000))}
+              {durationToHMS(
+                activeVideo.playTime,
+                countHMSParts(activeVideo.duration * 1000)
+              )}
             </Typography>
             <Typography>
               {durationToHMS(activeVideo.duration * 1000)}
