@@ -35,10 +35,10 @@ const PlayerProgress = observer(({ height = 4 }) => {
       value={media.playTime / 1000}
       onChange={updateMediaTime}
       onChangeCommitted={seekMedia}
+      color="secondary"
       sx={{
         display: "block",
         borderRadius: "0px",
-        color: "rgba(89,123,157,0.87)",
         height: { height },
         padding: "0px",
         "@media (pointer: coarse)": {

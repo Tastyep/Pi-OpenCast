@@ -36,5 +36,4 @@ const SnackBarProvider = (props) => {
   );
 };
 
-export default SnackBarProvider
-
+export default SnackBarProvider;

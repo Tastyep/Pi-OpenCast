@@ -9,7 +9,6 @@ import { listen as listenAppEvents } from "services/api/api";
 
 import ModelFactory from "models/factory";
 
-
 const AppContext = React.createContext(null);
 const webSocket = listenAppEvents();
 const eventDispatcher = new SocketEventDispatcher(webSocket);

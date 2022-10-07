@@ -98,6 +98,7 @@ const PausePlayIcon = observer((props) => {
   return (
     <IconButton
       size="small"
+      color="secondary"
       sx={sx}
       onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
     >
@@ -213,13 +214,11 @@ const ActiveMediaData = observer(({ variant }) => {
         <Typography noWrap variant="body1">
           {activeVideo.title}
         </Typography>
-        {activeArtist &&
-          (
-            <Typography noWrap variant="body2">
-              {activeArtist.name}
-            </Typography>
-
-          )}
+        {activeArtist && (
+          <Typography noWrap variant="body2">
+            {activeArtist.name}
+          </Typography>
+        )}
       </Stack>
     </>
   );
@@ -232,6 +231,7 @@ const SubtitleControl = observer(() => {
     <>
       <IconButton
         size="small"
+        color="secondary"
         onClick={() =>
           updatePlayer(
             store,
@@ -244,6 +244,7 @@ const SubtitleControl = observer(() => {
       </IconButton>
       <IconButton
         size="small"
+        color="secondary"
         onClick={() => updatePlayer(store, playerAPI.toggleSubtitle)}
       >
         {store.player.subState ? (
@@ -254,6 +255,7 @@ const SubtitleControl = observer(() => {
       </IconButton>
       <IconButton
         size="small"
+        color="secondary"
         onClick={() =>
           updatePlayer(
             store,
@@ -341,24 +343,26 @@ const ControlBar = observer((props) => {
         matches ? (
           <BarContainer direction="row">
             <Stack direction="row">
-              <IconButton size="small" onClick={playPrev}>
+              <IconButton size="small" color="secondary" onClick={playPrev}>
                 <SkipPreviousIcon />
               </IconButton>
               <PausePlayIcon />
               <IconButton
                 size="small"
+                color="secondary"
                 disableFocusRipple
                 disableRipple
                 onClick={() => updatePlayer(store, playerAPI.stopMedia)}
               >
                 <StopIcon />
               </IconButton>
-              <IconButton size="small" onClick={playNext}>
+              <IconButton size="small" color="secondary" onClick={playNext}>
                 <SkipNextIcon />
               </IconButton>
 
               <IconButton
                 size="small"
+                color="secondary"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -372,6 +376,7 @@ const ControlBar = observer((props) => {
               </IconButton>
               <IconButton
                 size="small"
+                color="secondary"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -384,6 +389,7 @@ const ControlBar = observer((props) => {
               </IconButton>
               <IconButton
                 size="small"
+                color="secondary"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -396,6 +402,7 @@ const ControlBar = observer((props) => {
               </IconButton>
               <IconButton
                 size="small"
+                color="secondary"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -437,7 +444,11 @@ const ControlBar = observer((props) => {
                 <ActiveMediaData variant="small" />
               </Stack>
               <PausePlayIcon sx={{ marginLeft: "auto" }} />
-              <IconButton size="medium" onClick={() => openTrackInfo()}>
+              <IconButton
+                size="medium"
+                color="secondary"
+                onClick={() => openTrackInfo()}
+              >
                 <ExpandMoreIcon sx={{ fontSize: 30 }} />
               </IconButton>
             </BarContainer>

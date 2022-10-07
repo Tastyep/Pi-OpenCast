@@ -45,6 +45,7 @@ const VolumeControl = observer((props) => {
     <Stack direction="row" justifyContent="end" alignItems="center" sx={sx}>
       <IconButton
         size="small"
+        color="secondary"
         sx={{
           marginLeft: "8px",
         }}
@@ -55,14 +56,13 @@ const VolumeControl = observer((props) => {
       <Box justifyContent="center" sx={{ display: "flex", flex: 1 }}>
         <Slider
           size="small"
+          color="secondary"
           value={store.player.volume}
           valueLabelDisplay="auto"
           aria-labelledby="continuous-slider"
           sx={{
             width: "96%",
             marginLeft: "4px",
-            color:
-              theme.palette.mode === "dark" ? "#fff" : "rgba(89,123,157,0.87)",
             "& .MuiSlider-track": {
               border: "none",
             },
@@ -86,6 +86,7 @@ const VolumeControl = observer((props) => {
       </Box>
       <IconButton
         size="small"
+        color="secondary"
         sx={{
           marginLeft: "8px",
         }}
@@ -95,6 +96,5 @@ const VolumeControl = observer((props) => {
     </Stack>
   );
 });
-
 
 export { VolumeControl };

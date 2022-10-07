@@ -306,13 +306,13 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   const endAdornment =
     input.length > 0 ? (
       <InputAdornment position="end">
-        <IconButton onClick={() => setInput("")}>
+        <IconButton color="secondary" onClick={() => setInput("")}>
           <ClearIcon />
         </IconButton>
       </InputAdornment>
     ) : (
       <InputAdornment position="end">
-        <IconButton>
+        <IconButton color="secondary">
           <SearchIcon />
         </IconButton>
       </InputAdornment>
@@ -355,10 +355,18 @@ const DroppablePlaylist = observer(({ playlistId }) => {
               margin: "0px 8px",
             }}
           />
-          <IconButton sx={{ flex: 0 }} onClick={shufflePlaylist}>
+          <IconButton
+            color="secondary"
+            sx={{ flex: 0 }}
+            onClick={shufflePlaylist}
+          >
             <ShuffleIcon />
           </IconButton>
-          <IconButton sx={{ flex: 0 }} onClick={emptyPlaylist}>
+          <IconButton
+            color="secondary"
+            sx={{ flex: 0 }}
+            onClick={emptyPlaylist}
+          >
             <ClearIcon />
           </IconButton>
         </Stack>

@@ -140,7 +140,8 @@ const PlayingMediaImage = (props) => {
         display: "flex",
         backgroundColor: "black",
         width: "100%",
-        height: "50vh",
+        maxHeight: "50vh",
+        aspectRatio: "1/1",
         position: "relative",
       }}
     >
@@ -282,8 +283,7 @@ const ControlPage = observer((props) => {
           justifyContent="space-between"
           style={{ width: "98%", marginTop: "8px", marginBottom: "8px" }}
         >
-          <Typography
-            variant="body2">
+          <Typography variant="body2">
             {durationToHMS(
               activeVideo.playTime,
               countHMSParts(activeVideo.duration * 1000)
@@ -299,7 +299,6 @@ const ControlPage = observer((props) => {
         alignItems="center"
         style={{ width: "88%", flex: 1, marginTop: "24px" }}
       >
-
         <Stack
           direction="column"
           justifyContent="center"
@@ -315,7 +314,11 @@ const ControlPage = observer((props) => {
           )}
         </Stack>
 
-        <Stack alignItems="center" justifyContent="end" sx={{ flex: 1, width: "100%" }}>
+        <Stack
+          alignItems="center"
+          justifyContent="end"
+          sx={{ flex: 1, width: "100%" }}
+        >
           <Stack
             direction="row"
             justifyContent="space-around"
@@ -333,9 +336,7 @@ const ControlPage = observer((props) => {
 
           <VolumeControl sx={{ width: "100%" }} />
         </Stack>
-
       </Stack>
-
     </Stack>
   );
 });
