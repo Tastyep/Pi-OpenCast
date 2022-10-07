@@ -2,7 +2,7 @@ import Slider from "@mui/material/Slider";
 
 import { observer } from "mobx-react-lite";
 
-import { useAppStore } from "./app_context";
+import { useAppStore } from "providers/app_context";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 

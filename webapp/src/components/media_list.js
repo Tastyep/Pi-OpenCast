@@ -9,7 +9,7 @@ import { SIZES } from "constants.js";
 
 import { Virtuoso } from "react-virtuoso";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { MediaItem } from "components/media_item";
 
 const VirtualizedMediaList = observer((props) => {

@@ -15,7 +15,7 @@ import { useMediaQuery } from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { filterVideos } from "services/playlist";
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { VirtualizedMediaList } from "components/media_list";
 
 const MediasPage = observer(() => {

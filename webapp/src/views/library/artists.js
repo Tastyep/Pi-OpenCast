@@ -25,7 +25,7 @@ import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { ArtistMenuThumbnail } from "components/artist_thumbnail";
 
 const ArtistItemContainer = styled(ListItem)({

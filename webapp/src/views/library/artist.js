@@ -26,7 +26,7 @@ import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 import { humanReadableDuration } from "services/duration";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { ArtistThumbnail } from "components/artist_thumbnail";
 import { VirtualizedMediaList } from "components/media_list";
 

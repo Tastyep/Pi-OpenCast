@@ -5,7 +5,7 @@ import { autorun } from "mobx";
 
 import { withSnackbar } from "notistack";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 
 const Notifier = observer((props) => {
   const store = useAppStore();

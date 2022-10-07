@@ -14,7 +14,7 @@ import ArtistsPage from "views/library/artists";
 import MediasPage from "views/library/medias";
 import PlaylistsPage from "views/library/playlists";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import VideoList from "components/video_list";
 
 const listLastPlayedVideos = (videos) => {

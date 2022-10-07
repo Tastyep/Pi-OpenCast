@@ -25,7 +25,7 @@ import { durationToHMS, countHMSParts } from "services/duration";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
 
 const updatePlayer = (store, update, ...args) => {

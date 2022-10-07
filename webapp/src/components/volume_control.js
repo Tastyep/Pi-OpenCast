@@ -9,7 +9,7 @@ import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 
 import playerAPI from "services/api/player";
-import { useAppStore } from "./app_context";
+import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
 
 const VolumeControl = observer((props) => {

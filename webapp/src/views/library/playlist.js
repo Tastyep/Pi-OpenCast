@@ -42,7 +42,7 @@ import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 import { humanReadableDuration } from "services/duration";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { PlaylistThumbnail } from "components/playlist_thumbnail";
 import { MediaItem } from "components/media_item";
 

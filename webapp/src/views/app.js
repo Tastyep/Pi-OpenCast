@@ -37,7 +37,7 @@ import PlaylistPage from "views/library/playlist";
 import ArtistPage from "views/library/artist";
 import AlbumPage from "views/library/album";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 
 const StyledTab = styled((props) => <Tab {...props} />)(() => ({
   color: "#B0B0B0",

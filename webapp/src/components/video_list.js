@@ -12,7 +12,7 @@ import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { queueNext } from "services/playlist";
 
-import { useAppStore } from "./app_context";
+import { useAppStore } from "providers/app_context";
 
 const VideoList = observer(({ videos, count }) => {
   const store = useAppStore();

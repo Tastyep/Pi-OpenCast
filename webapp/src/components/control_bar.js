@@ -30,7 +30,7 @@ import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
 import "./player_control.css";
-import { useAppStore } from "./app_context";
+import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
 
 const StyledLink = styled(Link)({
@@ -210,9 +210,16 @@ const ActiveMediaData = observer(({ variant }) => {
           overflow: "hidden",
         }}
       >
-        <Typography noWrap variant="body2">
+        <Typography noWrap variant="body1">
           {activeVideo.title}
         </Typography>
+        {activeArtist &&
+          (
+            <Typography noWrap variant="body2">
+              {activeArtist.name}
+            </Typography>
+
+          )}
       </Stack>
     </>
   );

@@ -23,7 +23,7 @@ import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 
 const StreamInput = () => {
   const store = useAppStore();

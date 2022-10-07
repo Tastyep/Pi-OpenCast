@@ -31,7 +31,7 @@ import playlistAPI from "services/api/playlist";
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import { PlaylistMenuThumbnail } from "components/playlist_thumbnail";
 import PlaylistModal from "components/playlist_modal";
 

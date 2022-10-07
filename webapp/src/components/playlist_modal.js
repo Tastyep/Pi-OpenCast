@@ -7,7 +7,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 

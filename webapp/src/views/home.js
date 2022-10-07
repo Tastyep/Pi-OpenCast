@@ -38,7 +38,7 @@ import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
 import { filterVideos, queueNext, shuffleIds } from "services/playlist";
 
-import { useAppStore } from "components/app_context";
+import { useAppStore } from "providers/app_context";
 import StreamInput from "components/stream_input";
 import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
 
