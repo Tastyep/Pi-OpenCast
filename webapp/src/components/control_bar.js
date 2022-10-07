@@ -23,7 +23,7 @@ import { Link } from "react-router-dom";
 import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
-import VolumeControl from "components/volume_control";
+import { VolumeControl } from "components/volume_control";
 
 import { durationToHMS } from "services/duration";
 import playerAPI from "services/api/player";
@@ -415,7 +415,7 @@ const ControlBar = observer((props) => {
             </Stack>
 
             <Stack direction="row">
-              <VolumeControl />
+              <VolumeControl sx={{ minWidth: "320px" }} />
               <SubtitleControl />
             </Stack>
           </BarContainer>

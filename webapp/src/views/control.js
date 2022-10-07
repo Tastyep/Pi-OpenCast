@@ -18,7 +18,7 @@ import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import VolumeControl from "components/volume_control";
+import { VolumeControl } from "components/volume_control";
 import PlayerProgress from "components/player_progress";
 
 import { durationToHMS, countHMSParts } from "services/duration";
@@ -275,25 +275,31 @@ const ControlPage = observer((props) => {
 
       <PlayingMediaImage src={activeVideo.thumbnail} alt={activeVideo.title} />
 
-      <Stack alignItems="center" style={{ width: "88%", flex: 1 }}>
-        <Box sx={{ marginTop: "24px", width: "100%" }}>
-          <PlayerProgress height={6} />
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            style={{ marginTop: "16px", marginBottom: "8px" }}
-          >
-            <Typography>
-              {durationToHMS(
-                activeVideo.playTime,
-                countHMSParts(activeVideo.duration * 1000)
-              )}
-            </Typography>
-            <Typography>
-              {durationToHMS(activeVideo.duration * 1000)}
-            </Typography>
-          </Stack>
-        </Box>
+      <Stack direction="column" alignItems="center" sx={{ width: "100%" }}>
+        <PlayerProgress height={6} />
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          style={{ width: "98%", marginTop: "8px", marginBottom: "8px" }}
+        >
+          <Typography
+            variant="body2">
+            {durationToHMS(
+              activeVideo.playTime,
+              countHMSParts(activeVideo.duration * 1000)
+            )}
+          </Typography>
+          <Typography variant="body2">
+            {durationToHMS(activeVideo.duration * 1000)}
+          </Typography>
+        </Stack>
+      </Stack>
+
+      <Stack
+        alignItems="center"
+        style={{ width: "88%", flex: 1, marginTop: "24px" }}
+      >
+
         <Stack
           direction="column"
           justifyContent="center"
@@ -308,25 +314,28 @@ const ControlPage = observer((props) => {
             </Typography>
           )}
         </Stack>
-        <Stack
-          direction="row"
-          justifyContent="space-around"
-          alignItems="center"
-          sx={{ width: "70%", flex: 1 }}
-        >
-          <IconButton disableRipple={true} size="medium" onClick={playPrev}>
-            <SkipPreviousIcon fontSize="inherit" style={iconStyle} />
-          </IconButton>
-          <PausePlayIcon />
-          <IconButton disableRipple={true} size="medium" onClick={playNext}>
-            <SkipNextIcon fontSize="inherit" style={iconStyle} />
-          </IconButton>
+
+        <Stack alignItems="center" justifyContent="end" sx={{ flex: 1, width: "100%" }}>
+          <Stack
+            direction="row"
+            justifyContent="space-around"
+            alignItems="center"
+            sx={{ width: "70%", flexGrow: 0 }}
+          >
+            <IconButton disableRipple={true} size="medium" onClick={playPrev}>
+              <SkipPreviousIcon fontSize="inherit" style={iconStyle} />
+            </IconButton>
+            <PausePlayIcon />
+            <IconButton disableRipple={true} size="medium" onClick={playNext}>
+              <SkipNextIcon fontSize="inherit" style={iconStyle} />
+            </IconButton>
+          </Stack>
+
+          <VolumeControl sx={{ width: "100%" }} />
         </Stack>
 
-        <Box style={{ width: "100%" }}>
-          <VolumeControl />
-        </Box>
       </Stack>
+
     </Stack>
   );
 });

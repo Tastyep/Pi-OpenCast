@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 
-import { Stack, Slider, Button, Box } from "@mui/material";
+import { Stack, Slider, IconButton, Box } from "@mui/material";
+
 import { useTheme } from "@mui/material/styles";
+
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
@@ -10,9 +12,10 @@ import playerAPI from "services/api/player";
 import { useAppStore } from "./app_context";
 import { observer } from "mobx-react-lite";
 
-const VolumeControl = observer(() => {
+const VolumeControl = observer((props) => {
   const store = useAppStore();
   const theme = useTheme();
+  const { sx } = props;
   const [oldVolume, setOldVolume] = useState(store.player.volume);
 
   const handleCommit = (_, value) => {
@@ -39,23 +42,16 @@ const VolumeControl = observer(() => {
   }
 
   return (
-    <Stack
-      direction="row"
-      justifyContent="end"
-      alignItems="center"
-      sx={{ minWidth: "160px" }}
-    >
-      <Button
+    <Stack direction="row" justifyContent="end" alignItems="center" sx={sx}>
+      <IconButton
         size="small"
         sx={{
-          color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
-          minWidth: "0px",
           marginLeft: "8px",
         }}
         onClick={toggleMute}
       >
         {(store.player.volume === 0 && <VolumeOffIcon />) || <VolumeDownIcon />}
-      </Button>
+      </IconButton>
       <Box justifyContent="center" sx={{ display: "flex", flex: 1 }}>
         <Slider
           size="small"
@@ -63,7 +59,8 @@ const VolumeControl = observer(() => {
           valueLabelDisplay="auto"
           aria-labelledby="continuous-slider"
           sx={{
-            width: "86%",
+            width: "96%",
+            marginLeft: "4px",
             color:
               theme.palette.mode === "dark" ? "#fff" : "rgba(89,123,157,0.87)",
             "& .MuiSlider-track": {
@@ -87,18 +84,17 @@ const VolumeControl = observer(() => {
           onChangeCommitted={handleCommit}
         />
       </Box>
-      <Button
+      <IconButton
         size="small"
         sx={{
-          color: theme.palette.mode === "dark" ? "#fff" : "rgba(0,0,0,0.87)",
-          minWidth: "0px",
           marginLeft: "8px",
         }}
       >
         <VolumeUpIcon />
-      </Button>
+      </IconButton>
     </Stack>
   );
 });
 
-export default VolumeControl;
+
+export { VolumeControl };
