@@ -17,8 +17,10 @@ class VideoWorkflowTest(WorkflowTestCase):
     def setUp(self):
         super(VideoWorkflowTest, self).setUp()
         self.video_repo = self.data_facade.video_repo
+
+        self.dl_opts = DownloadOptions(True, True)
         self.video = Video(
-            IdentityService.id_video("source"), "source", None, DownloadOptions()
+            IdentityService.id_video("source"), "source", None, self.dl_opts
         )
         self.workflow = self.make_workflow(VideoWorkflow, self.video)
 
@@ -78,7 +80,10 @@ class VideoWorkflowTest(WorkflowTestCase):
         )
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(
-            Cmd.RetrieveVideo, self.video.id, settings["downloader.output_directory"]
+            Cmd.RetrieveVideo,
+            self.video.id,
+            settings["downloader.output_directory"],
+            self.dl_opts,
         )
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
@@ -98,7 +103,10 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.workflow.to_RETRIEVING(event)
 
         cmd = self.expect_dispatch(
-            Cmd.RetrieveVideo, self.video.id, settings["downloader.output_directory"]
+            Cmd.RetrieveVideo,
+            self.video.id,
+            settings["downloader.output_directory"],
+            self.dl_opts,
         )
 
         def return_video(id):
@@ -129,7 +137,10 @@ class VideoWorkflowTest(WorkflowTestCase):
         )
         self.workflow.to_RETRIEVING(event)
         cmd = self.expect_dispatch(
-            Cmd.RetrieveVideo, self.video.id, settings["downloader.output_directory"]
+            Cmd.RetrieveVideo,
+            self.video.id,
+            settings["downloader.output_directory"],
+            self.dl_opts,
         )
         self.raise_event(
             Evt.VideoRetrieved,
@@ -150,8 +161,26 @@ class VideoWorkflowTest(WorkflowTestCase):
         self.raise_error(cmd)
         self.assertTrue(self.workflow.is_DELETING())
 
-    def test_parsing_to_finalizing(self):
+    def test_parsing_to_finalizing_disabled_subtitles_from_config(self):
         settings["subtitle.enabled"] = False
+        event = Evt.VideoRetrieved(
+            IdentityService.random(),
+            self.video.id,
+            f"{settings['downloader.output_directory']}/video.mp4",
+        )
+        self.workflow.to_PARSING(event)
+        cmd = self.expect_dispatch(Cmd.ParseVideo, self.video.id)
+        self.raise_event(
+            Evt.VideoParsed,
+            cmd.id,
+            self.video.id,
+            {},
+        )
+        self.assertTrue(self.workflow.is_FINALIZING())
+
+    def test_parsing_to_finalizing_disabled_subtitles_from_opts(self):
+        self.dl_opts.download_subtitles = False
+
         event = Evt.VideoRetrieved(
             IdentityService.random(),
             self.video.id,

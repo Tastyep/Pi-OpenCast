@@ -171,6 +171,7 @@ class PlayerMonitController(MonitorController):
             500: {"description": "Internal error", "schema": ErrorSchema},
         },
     )
+    @json_schema(VideoOptionsSchema)
     async def queue(self, req):
         source = req.query["url"]
         json_data = await req.json()

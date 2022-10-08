@@ -18,6 +18,7 @@ class ErrorSchema(Schema):
 
 class VideoDownloadOptions(Schema):
     download_video = fields.Boolean(allow_none=True)
+    download_subtitles = fields.Boolean(allow_none=True)
 
 
 class VideoOptions(Schema):

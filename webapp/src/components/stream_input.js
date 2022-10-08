@@ -30,7 +30,8 @@ const StreamInput = () => {
 
   const [url, setUrl] = useState("");
   const [streamOpt, setStreamOpt] = useState(true);
-  const [videoOpt, setVideoOpt] = useState(true);
+  const [audioOnlyOpt, setAudioOnlyOpt] = useState(false);
+  const [subtitleDlOpt, setSubtitleDlOpt] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   const handleSubmit = (event) => {
@@ -42,11 +43,11 @@ const StreamInput = () => {
     }
     if (streamOpt) {
       playerAPI
-        .streamMedia(url, { dl_opts: { download_video: videoOpt } })
+        .streamMedia(url, { dl_opts: { download_video: audioOnlyOpt } })
         .catch(snackBarHandler(store));
     } else {
       playerAPI
-        .queueMedia(url, { dl_opts: { download_video: videoOpt } })
+        .queueMedia(url, { dl_opts: { download_video: audioOnlyOpt } })
         .catch(snackBarHandler(store));
     }
     setUrl("");
@@ -64,7 +65,8 @@ const StreamInput = () => {
     if (!value) {
       return;
     }
-    setVideoOpt(value === "video");
+    setAudioOnlyOpt(value === "audio");
+    setSubtitleDlOpt(value !== "audio");
   };
 
   const updateBlur = (evt) => {
@@ -144,7 +146,7 @@ const StreamInput = () => {
               sx={{ paddingLeft: "0px", paddingRight: "0px" }}
             >
               <ToggleButtonGroup
-                value={videoOpt ? "video" : "audio"}
+                value={audioOnlyOpt ? "video" : "audio"}
                 exclusive
                 onChange={updateDownloadedChannels}
                 aria-label="text alignment"
@@ -157,7 +159,7 @@ const StreamInput = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
               <Typography noWrap sx={{ marginLeft: "16px" }}>
-                {videoOpt ? "Video" : "Audio only"}
+                {audioOnlyOpt ? "Audio only" : "Video"}
               </Typography>
             </ListItem>
           </List>

@@ -53,8 +53,8 @@ class VideoWorkflow(Workflow):
         ["_video_created",          States.CREATING,       States.RETRIEVING],
         ["_video_retrieved",        States.RETRIEVING,     States.FINALIZING,  "is_stream"],  # noqa: E501
         ["_video_retrieved",        States.RETRIEVING,     States.PARSING],
-        ["_video_parsed",           States.PARSING,        States.FINALIZING,  "subtitle_disabled"],  # noqa: E501
-        ["_video_parsed",           States.PARSING,        States.SUB_RETRIEVING],
+        ["_video_parsed",           States.PARSING,        States.SUB_RETRIEVING, "are_subtitles_enabled"], # noqa: E501 
+        ["_video_parsed",           States.PARSING,        States.FINALIZING],  
         ["_video_subtitle_fetched", States.SUB_RETRIEVING, States.FINALIZING],
         ["_video_state_updated",    States.FINALIZING,     States.COMPLETED],
 
@@ -142,5 +142,8 @@ class VideoWorkflow(Workflow):
     def is_stream(self, _):
         return self._video_repo.get(self._video.id).streamable()
 
-    def subtitle_disabled(self, _):
-        return not settings["subtitle.enabled"]
+    def are_subtitles_enabled(self, _):
+        return (
+            settings["subtitle.enabled"]
+            and self._video.dl_opts.download_subtitles is True
+        )
