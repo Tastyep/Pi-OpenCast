@@ -89,13 +89,13 @@ const ArtistMenu = (props) => {
     >
       <MenuItem onClick={playNext}>
         <ListItemIcon>
-          <PlaylistPlayIcon />
+          <PlaylistPlayIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Play next</ListItemText>
       </MenuItem>
       <MenuItem onClick={queue}>
         <ListItemIcon>
-          <QueueMusicIcon />
+          <QueueMusicIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Add to queue</ListItemText>
       </MenuItem>
@@ -204,7 +204,7 @@ const ArtistPage = observer(() => {
             aria-expanded={isMenuOpen ? "true" : undefined}
             onClick={(e) => setAnchor(e.currentTarget)}
           >
-            <MoreVertIcon />
+            <MoreVertIcon color="secondary" />
           </IconButton>
           <ArtistMenu
             open={isMenuOpen}

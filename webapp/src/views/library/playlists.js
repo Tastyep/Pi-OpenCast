@@ -174,25 +174,25 @@ const PlaylistItem = ({ playlist, isSmallDevice }) => {
       >
         <MenuItem onClick={() => shufflePlayNext(playlist)}>
           <ListItemIcon>
-            <ShuffleIcon />
+            <ShuffleIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Shuffle play</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => playNext()}>
           <ListItemIcon>
-            <PlaylistPlayIcon />
+            <PlaylistPlayIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Play next</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => queue()}>
           <ListItemIcon>
-            <QueueMusicIcon />
+            <QueueMusicIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Add to queue</ListItemText>
         </MenuItem>
         <MenuItem onClick={removePlaylist}>
           <ListItemIcon>
-            <DeleteIcon />
+            <DeleteIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Delete playlist</ListItemText>
         </MenuItem>
@@ -234,7 +234,7 @@ const PlaylistsPage = observer(() => {
             }}
             onClick={() => setOpen(true)}
           >
-            <AddIcon sx={{ height: "25%", width: "25%" }} />
+            <AddIcon color="primary" sx={{ height: "25%", width: "25%" }} />
           </IconButton>
           <PlaylistItemBar>
             <Typography sx={{ color: "#FFFFFF" }}>New playlist</Typography>

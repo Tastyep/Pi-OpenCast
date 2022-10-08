@@ -252,19 +252,19 @@ const AlbumItem = ({ album, isSmallDevice }) => {
       >
         <MenuItem onClick={() => shufflePlayNext()}>
           <ListItemIcon>
-            <ShuffleIcon />
+            <ShuffleIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Shuffle play</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => playNext()}>
           <ListItemIcon>
-            <PlaylistPlayIcon />
+            <PlaylistPlayIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Play next</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => queue()}>
           <ListItemIcon>
-            <QueueMusicIcon />
+            <QueueMusicIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Add to queue</ListItemText>
         </MenuItem>

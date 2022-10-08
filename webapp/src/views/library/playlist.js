@@ -177,19 +177,19 @@ const PlaylistMenu = (props) => {
     >
       <MenuItem onClick={() => playNext(playlist)}>
         <ListItemIcon>
-          <PlaylistPlayIcon />
+          <PlaylistPlayIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Play next</ListItemText>
       </MenuItem>
       <MenuItem onClick={() => queue(playlist)}>
         <ListItemIcon>
-          <QueueMusicIcon />
+          <QueueMusicIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Add to queue</ListItemText>
       </MenuItem>
       <MenuItem onClick={() => removePlaylist(playlist)}>
         <ListItemIcon>
-          <DeleteIcon />
+          <DeleteIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Delete playlist</ListItemText>
       </MenuItem>
@@ -298,8 +298,12 @@ const Suggestions = ({ playlist }) => {
         >
           Refresh
         </Button>
-        <Box sx={{ marginLeft: "auto", color: "#606060" }}>
-          {expanded ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+        <Box sx={{ marginLeft: "auto" }}>
+          {expanded ? (
+            <ExpandMoreIcon color="secondary" />
+          ) : (
+            <ExpandLessIcon color="secondary" />
+          )}
         </Box>
       </Stack>
       <Collapse
@@ -561,6 +565,7 @@ const PlaylistPage = observer(() => {
             </Button>
           </Box>
           <IconButton
+            color="secondary"
             aria-controls="playlist-menu"
             aria-haspopup="true"
             aria-expanded={isMenuOpen ? "true" : undefined}

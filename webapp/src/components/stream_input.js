@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { useTheme } from "@mui/material/styles";
+
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
@@ -79,9 +81,7 @@ const StreamInput = () => {
     <InputAdornment position="end">
       <IconButton
         size="small"
-        sx={{
-          color: "#333333",
-        }}
+        color="secondary"
         onClick={() => setExpanded(!expanded)}
       >
         <MoreVertIcon />
@@ -89,6 +89,7 @@ const StreamInput = () => {
     </InputAdornment>
   );
 
+  const theme = useTheme();
   return (
     <Box>
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
@@ -96,9 +97,17 @@ const StreamInput = () => {
           <TextField
             fullWidth
             label="Media's URL"
+            color="primary"
             value={url}
             InputProps={{
               endAdornment: menuOptions,
+            }}
+            variant="outlined"
+            sx={{
+              // "& .MuiInputLabel-root": { color: theme.palette.secondary.main },//styles the label
+              "& .MuiOutlinedInput-root": {
+                "& > fieldset": { borderColor: theme.palette.primary.light },
+              },
             }}
             onChange={(e) => setUrl(e.target.value)}
             onKeyPress={updateBlur}
@@ -107,8 +116,6 @@ const StreamInput = () => {
             size="small"
             variant="outlined"
             sx={{
-              color: "#333333",
-              borderColor: "#8F8F8F",
               marginLeft: "16px",
             }}
             onClick={handleSubmit}
@@ -130,10 +137,18 @@ const StreamInput = () => {
                 onChange={updateAction}
                 aria-label="text alignment"
               >
-                <ToggleButton value="stream" aria-label="stream">
+                <ToggleButton
+                  value="stream"
+                  color="secondary"
+                  aria-label="stream"
+                >
                   <PlaylistPlayIcon />
                 </ToggleButton>
-                <ToggleButton value="queue" aria-label="queue">
+                <ToggleButton
+                  value="queue"
+                  color="secondary"
+                  aria-label="queue"
+                >
                   <PlaylistAddIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -151,10 +166,18 @@ const StreamInput = () => {
                 onChange={updateDownloadedChannels}
                 aria-label="text alignment"
               >
-                <ToggleButton value="video" aria-label="video">
+                <ToggleButton
+                  value="video"
+                  color="secondary"
+                  aria-label="video"
+                >
                   <MusicVideoIcon />
                 </ToggleButton>
-                <ToggleButton value="audio" aria-label="audio">
+                <ToggleButton
+                  value="audio"
+                  color="secondary"
+                  aria-label="audio"
+                >
                   <MusicNoteIcon />
                 </ToggleButton>
               </ToggleButtonGroup>

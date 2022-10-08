@@ -58,6 +58,12 @@ const ClickableBox = styled(Box)({
   cursor: "pointer",
 });
 
+const styles = (theme) => ({
+  icon: {
+    color: theme.palette.primary.main,
+  },
+});
+
 const playVideo = (video, store) => {
   const playerPlaylist = store.playerPlaylist;
 
@@ -176,7 +182,9 @@ const PlaylistMenu = (props) => {
           >
             <Stack sx={{ height: "100%" }}>
               <ListItem>
-                <Typography variant="h5">Playlists</Typography>
+                <Typography variant="h5" sx={{ margin: "8px 0px" }}>
+                  Playlists
+                </Typography>
               </ListItem>
               <Divider />
               <MenuList
@@ -292,6 +300,7 @@ const MediaItemMenu = (props) => {
     closeMenu();
     videoAPI.delete_(video.id);
   };
+
   return (
     <Menu
       id="media-menu"
@@ -306,33 +315,33 @@ const MediaItemMenu = (props) => {
     >
       <MenuItem onClick={() => playNext(video)}>
         <ListItemIcon>
-          <PlaylistPlayIcon />
+          <PlaylistPlayIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Play next</ListItemText>
       </MenuItem>
       <MenuItem onClick={() => queue(video)}>
         <ListItemIcon>
-          <QueueMusicIcon />
+          <QueueMusicIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Add to queue</ListItemText>
       </MenuItem>
       <MenuItem onClick={selectPlaylist}>
         <ListItemIcon>
-          <PlaylistAddIcon />
+          <PlaylistAddIcon color="primary" />
         </ListItemIcon>
         <ListItemText>Add to playlist</ListItemText>
       </MenuItem>
       {playlist ? (
         <MenuItem onClick={() => removePlaylistVideo(playlist, video)}>
           <ListItemIcon>
-            <DeleteOutlineIcon />
+            <DeleteOutlineIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Remove from playlist</ListItemText>
         </MenuItem>
       ) : (
         <MenuItem onClick={() => removeVideo(video)}>
           <ListItemIcon>
-            <DeleteOutlineIcon />
+            <DeleteOutlineIcon color="primary" />
           </ListItemIcon>
           <ListItemText>Delete video</ListItemText>
         </MenuItem>
@@ -558,6 +567,7 @@ const MediaItem = observer((props) => {
           <Box sx={{ display: "inline-flex", flex: "0 1 auto" }}>
             {showOptions && (isHover || isMenuOpen || isPlMenuOpen) ? (
               <IconButton
+                color="secondary"
                 aria-controls="media-menu"
                 aria-haspopup="true"
                 aria-expanded={isMenuOpen ? "true" : undefined}
@@ -647,6 +657,7 @@ const MediaItem = observer((props) => {
           {children}
           {showOptions && (
             <IconButton
+              color="secondary"
               aria-controls="media-menu"
               aria-haspopup="true"
               aria-expanded={isMenuOpen ? "true" : undefined}
