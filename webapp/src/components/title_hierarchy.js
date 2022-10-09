@@ -19,13 +19,13 @@ const TitleHierarchy = (props) => {
   } = props;
 
   const artistBlock = artist ? (
-    <StyledLink to={`/library/artists/${artist.id}`}>{artist.name}</StyledLink>
+    <StyledLink to={`/artists/${artist.id}`}>{artist.name}</StyledLink>
   ) : displayPlaceholders ? (
     "Artist"
   ) : null;
 
   const albumBlock = album ? (
-    <StyledLink to={`/library/albums/${album.id}`}>{album.name}</StyledLink>
+    <StyledLink to={`/albums/${album.id}`}>{album.name}</StyledLink>
   ) : displayPlaceholders ? (
     "Album"
   ) : null;

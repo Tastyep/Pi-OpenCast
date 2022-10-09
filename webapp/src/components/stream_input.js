@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
+import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -21,13 +22,17 @@ import SendIcon from "@mui/icons-material/Send";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import MenuIcon from '@mui/icons-material/Menu';
 
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
+import { hexToRgba } from "services/color"
 
 import { useAppStore } from "providers/app_context";
 
-const StreamInput = () => {
+const StreamInput = (props) => {
+  const { sx } = props;
+
   const store = useAppStore();
 
   const [url, setUrl] = useState("");
@@ -90,38 +95,29 @@ const StreamInput = () => {
   );
 
   const theme = useTheme();
+  const inputBackground = "#a32036";
+
   return (
-    <Box>
+    <Box sx={sx}>
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
         <Stack direction="row">
-          <TextField
+          <IconButton color="inherit">
+            <MenuIcon />
+          </IconButton>
+          <InputBase
             fullWidth
-            label="Media's URL"
-            color="primary"
+            placeholder="Media's URL"
             value={url}
-            InputProps={{
-              endAdornment: menuOptions,
-            }}
-            variant="outlined"
-            sx={{
-              // "& .MuiInputLabel-root": { color: theme.palette.secondary.main },//styles the label
-              "& .MuiOutlinedInput-root": {
-                "& > fieldset": { borderColor: theme.palette.primary.light },
-              },
-            }}
+            sx={{ color: theme.palette.neutral.contrastText, backgroundColor: inputBackground, borderRadius: "16px", margin: "0px 8px", padding: "0px 16px" }}
             onChange={(e) => setUrl(e.target.value)}
             onKeyPress={updateBlur}
           />
-          <Button
-            size="small"
-            variant="outlined"
-            sx={{
-              marginLeft: "16px",
-            }}
+          <IconButton
+            color="inherit"
             onClick={handleSubmit}
           >
             <SendIcon sx={{ fontSize: "20px" }} />
-          </Button>
+          </IconButton>
         </Stack>
       </form>
       <Box sx={{ display: "flex" }}>

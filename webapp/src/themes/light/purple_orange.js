@@ -34,6 +34,9 @@ const purpleOrangeTheme = {
     //   dark: "#ba5f66",
     // },
 
+    neutral: {
+      contrastText: "#FFFFFF",
+    },
     action: {
       hover: "rgba(144, 26, 52, 0.04)",
     },

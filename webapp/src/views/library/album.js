@@ -125,7 +125,7 @@ const AlbumPage = observer(() => {
   }
 
   if (album.ids.length === 0) {
-    navigate("/library");
+    navigate("/profil");
   }
 
   const albumVideos = store.filterVideos(album.ids);

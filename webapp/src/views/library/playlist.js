@@ -158,7 +158,7 @@ const PlaylistMenu = (props) => {
     playlistAPI
       .delete_(playlist.id)
       .then((_) => {
-        navigate("/library/playlists");
+        navigate("/playlists");
       })
       .catch(snackBarHandler(store));
   };

@@ -88,7 +88,7 @@ const playVideo = (video, store) => {
 const MediaSecondaryData = ({ artist, album, duration }) => {
   const artistBloc = artist ? (
     <StyledLink
-      to={`/library/artists/${artist.id}`}
+      to={`/artists/${artist.id}`}
       style={{ whiteSpace: "nowrap" }}
     >
       {artist.name}
@@ -99,7 +99,7 @@ const MediaSecondaryData = ({ artist, album, duration }) => {
 
   const albumBloc = album ? (
     <StyledLink
-      to={`/library/albums/${album.id}`}
+      to={`/albums/${album.id}`}
       style={{ whiteSpace: "nowrap" }}
     >
       • {album.name}
@@ -537,7 +537,7 @@ const MediaItem = observer((props) => {
               <Box sx={{ flex: "1 1 0%" }}>
                 {artist ? (
                   <StyledLink
-                    to={`/library/artists/${artist.id}`}
+                    to={`/artists/${artist.id}`}
                     color="inherit"
                     underline="none"
                   >
@@ -552,7 +552,7 @@ const MediaItem = observer((props) => {
               <Box sx={{ flex: "1 1 0%" }}>
                 {album ? (
                   <StyledLink
-                    to={`/library/albums/${album.id}`}
+                    to={`/albums/${album.id}`}
                     color="inherit"
                     underline="none"
                   >

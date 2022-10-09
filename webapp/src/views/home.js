@@ -6,7 +6,6 @@ import {
   Container,
   Grid,
   Divider,
-  ListItem,
   ListItemText,
   ListItemAvatar,
   LinearProgress,
@@ -39,10 +38,8 @@ import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
 import { filterVideos, queueNext, shuffleIds } from "services/playlist";
-import { hexToRgba } from "services/color";
 
 import { useAppStore } from "providers/app_context";
-import StreamInput from "components/stream_input";
 import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
 
 const PageContainer = styled("div")({
@@ -284,7 +281,6 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   };
 
   const updateInputContent = (e) => {
-    console.log(e);
     setInput(e.target.value);
   };
 
@@ -321,11 +317,10 @@ const DroppablePlaylist = observer(({ playlistId }) => {
 
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
-      <Divider sx={{ height: "2px" }} />
       <Stack
         direction="row"
         alignItems="center"
-        sx={{ margin: "8px 4px 4px 16px" }}
+        sx={{ margin: "0px 4px 4px 16px" }}
       >
         <Typography
           sx={{
@@ -469,12 +464,9 @@ const HomePage = observer(() => {
             <Grid container justifyContent="center" sx={{ height: "100%" }}>
               <Grid item xs={8} sx={{ height: "100%" }}>
                 <Container sx={{ height: "100%" }}>
-                  <Stack direction="column" sx={{ height: "100%" }}>
-                    <StreamInput />
-                    <div style={{ position: "relative", height: "100%" }}>
-                      <PlayingMediaThumbnail />
-                    </div>
-                  </Stack>
+                  <div style={{ position: "relative", height: "100%" }}>
+                    <PlayingMediaThumbnail />
+                  </div>
                 </Container>
               </Grid>
               <Grid item xs={4} sx={{ height: "100%" }}>
@@ -491,17 +483,6 @@ const HomePage = observer(() => {
             </Grid>
           ) : (
             <Stack sx={{ height: "100%", width: "100%" }}>
-              <div
-                style={{
-                  width: "100%",
-                  paddingLeft: "16px",
-                  paddingRight: "16px",
-                  marginBottom: "10px",
-                  boxSizing: "border-box",
-                }}
-              >
-                <StreamInput />
-              </div>
               <DroppablePlaylist playlistId={playlistId} />
             </Stack>
           )

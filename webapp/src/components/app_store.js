@@ -59,6 +59,7 @@ export class AppStore {
       this.loadPlaylists();
       this.loadAlbums();
       this.loadArtists();
+      this.loadVideos();
     });
     this.modelFactory = modelFactory;
     this.eventDispatcher = eventDispatcher;

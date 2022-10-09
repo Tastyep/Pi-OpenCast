@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 
+import AppBar from "@mui/material/AppBar";
 import Drawer from "@mui/material/Drawer";
 import Grid from "@mui/material/Grid";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import Collapse from "@mui/material/Collapse";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 
 import {
   BrowserRouter as Router,
@@ -25,59 +27,92 @@ import Notifier from "components/notifier";
 import HomePage from "views/home";
 import ControlPage from "views/control";
 
-import {
-  LibraryLayout,
-  LibraryPage,
-  PlaylistsPage,
-  ArtistsPage,
-  AlbumsPage,
-  MediasPage,
-} from "views/library";
-import PlaylistPage from "views/library/playlist";
-import ArtistPage from "views/library/artist";
+import ProfilPage from "views/profil";
+import AlbumsPage from "views/library/albums";
 import AlbumPage from "views/library/album";
+import ArtistsPage from "views/library/artists";
+import ArtistPage from "views/library/artist";
+import MediasPage from "views/library/medias";
+import PlaylistsPage from "views/library/playlists";
+import PlaylistPage from "views/library/playlist";
+
+import StreamInput from "components/stream_input";
 
 import { useAppStore } from "providers/app_context";
 
-const StyledTab = styled((props) => <Tab {...props} />)(() => ({
-  color: "#B0B0B0",
-  border: "black",
-  borderStyle: "hidden solid hidden solid",
-  borderWidth: "1px",
-  "&.Mui-selected": {
-    color: "#FFFFFF",
-    backgroundColor: "#111111",
-  },
-}));
 
-const HeaderTabs = () => {
+const Header = () => {
+  const theme = useTheme();
+
+  return (
+    <AppBar position="sticky">
+      <Box sx={{ backgroundColor: theme.palette.primary.main }}>
+        <StreamInput sx={{ margin: "8px 0px 4px 0px" }} />
+      </Box>
+      <HeaderTabs sx={{ backgroundColor: theme.palette.primary.main }} />
+    </AppBar>
+  )
+};
+
+const HeaderTabs = (props) => {
+  const { sx } = props;
+
   const location = useLocation();
+
   let rootURL = location.pathname;
   const secondSlashPos = rootURL.indexOf("/", 1);
-
   if (secondSlashPos !== -1) {
     rootURL = rootURL.substring(0, secondSlashPos);
   }
 
   return (
-    <Tabs
-      value={rootURL}
-      TabIndicatorProps={{
-        style: {
-          display: "none",
-        },
-      }}
-      centered
-      sx={{ backgroundColor: "#333333" }}
-    >
-      <StyledTab label="Home" value="/" to="/" component={Link} />
-      <StyledTab
-        label="Library"
-        value="/library"
-        to="/library"
-        component={Link}
-      />
-    </Tabs>
+    <Box display="flex" justifyContent="center" sx={{ width: "100%" }}>
+      <Tabs
+        allowScrollButtonsMobile
+        scrollButtons="auto"
+        variant="scrollable"
+        value={rootURL}
+        textColor="inherit"
+        TabIndicatorProps={{
+          style: {
+            display: "none",
+          },
+        }}
+        sx={sx}
+      >
+        <Tab label="Player" value="/" to="/" component={Link} />
+        <Tab
+          label="Profil"
+          value="/profil"
+          to="/profil"
+          component={Link}
+        />
+        <Tab
+          label="Playlists"
+          value={"/playlists"}
+          to={"playlists"}
+          component={Link}
+        />
+        <Tab
+          label="Artists"
+          value={"/artists"}
+          to={"artists"}
+          component={Link}
+        />
+        <Tab
+          label="Albums"
+          value={"/albums"}
+          to={"albums"}
+          component={Link}
+        />
+        <Tab
+          label="Titles"
+          value={"/medias"}
+          to={"medias"}
+          component={Link}
+        />
+      </Tabs>
+    </Box>
   );
 };
 
@@ -103,9 +138,9 @@ const Layout = () => {
   const [controlPageOpen, closeControlPage] = useState(false);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <Stack sx={{ height: "100%" }}>
       <Notifier />
-      <HeaderTabs />
+      <Header />
       <Grid
         container
         sx={{
@@ -114,7 +149,7 @@ const Layout = () => {
         }}
       >
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
-        <Grid item xs={12} sm={10} sx={{ height: "100%" }}>
+        <Grid item container xs={12} sm={10} sx={{ height: "100%", overflow: "auto" }}>
           <Drawer
             anchor="top"
             open={controlPageOpen}
@@ -129,7 +164,7 @@ const Layout = () => {
       {!controlPageOpen && (
         <CollapsableControlBar openTrackInfo={() => closeControlPage(true)} />
       )}
-    </div>
+    </Stack>
   );
 };
 
@@ -139,16 +174,14 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="library" element={<LibraryLayout />}>
-            <Route index element={<LibraryPage />} />
-            <Route path={"playlists"} element={<PlaylistsPage />} />
-            <Route path={"artists"} element={<ArtistsPage />} />
-            <Route path={"albums"} element={<AlbumsPage />} />
-            <Route path={"medias"} element={<MediasPage />} />
-            <Route path={"playlists/:id"} element={<PlaylistPage />} />
-            <Route path={"artists/:id"} element={<ArtistPage />} />
-            <Route path={"albums/:id"} element={<AlbumPage />} />
-          </Route>
+          <Route path={"profil"} element={<ProfilPage />} />
+          <Route path={"playlists"} element={<PlaylistsPage />} />
+          <Route path={"artists"} element={<ArtistsPage />} />
+          <Route path={"albums"} element={<AlbumsPage />} />
+          <Route path={"medias"} element={<MediasPage />} />
+          <Route path={"playlists/:id"} element={<PlaylistPage />} />
+          <Route path={"artists/:id"} element={<ArtistPage />} />
+          <Route path={"albums/:id"} element={<AlbumPage />} />
         </Route>
       </Routes>
     </Router>

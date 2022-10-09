@@ -48,13 +48,13 @@ const BarContainer = styled(Stack)({
 
 const renderMediaSecondaryData = (artist, album, duration) => {
   const artistBloc = artist ? (
-    <StyledLink to={`/library/artists/${artist.id}`}>{artist.name}</StyledLink>
+    <StyledLink to={`/artists/${artist.id}`}>{artist.name}</StyledLink>
   ) : (
     "Artist"
   );
 
   const albumBloc = album ? (
-    <StyledLink to={`/library/albums/${album.id}`}>{album.name}</StyledLink>
+    <StyledLink to={`/albums/${album.id}`}>{album.name}</StyledLink>
   ) : (
     "Album"
   );

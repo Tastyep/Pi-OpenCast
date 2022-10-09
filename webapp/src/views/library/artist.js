@@ -117,7 +117,7 @@ const ArtistPage = observer(() => {
   }
 
   if (artist.ids.length === 0) {
-    navigate("/library");
+    navigate("/profil");
   }
 
   const artistVideos = store.filterVideos(artist.ids);
