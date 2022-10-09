@@ -7,6 +7,7 @@ import {
   Divider,
   IconButton,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -489,8 +490,9 @@ const MediaItem = observer((props) => {
 
   if (!isSmallDevice) {
     return (
-      <ListItem
+      <ListItemButton
         {...itemProps}
+        selected={isActive}
         sx={{ width: "100%", paddingLeft: "0px", paddingRight: "8px" }}
         onMouseEnter={() => {
           setHover(true);
@@ -616,7 +618,7 @@ const MediaItem = observer((props) => {
             />
           )}
         </div>
-      </ListItem>
+      </ListItemButton>
     );
   }
 

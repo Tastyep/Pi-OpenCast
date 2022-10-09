@@ -39,7 +39,7 @@ import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
 import { filterVideos, queueNext, shuffleIds } from "services/playlist";
-import { hexToRgba } from "services/color"
+import { hexToRgba } from "services/color";
 
 import { useAppStore } from "providers/app_context";
 import StreamInput from "components/stream_input";
@@ -81,10 +81,13 @@ const MediaItem = observer((props) => {
 
   const downloadRatio = video.downloadRatio;
 
-  let styles = { };
+  let styles = {};
   const theme = useTheme();
   if (isDragging) {
-    styles["backgroundColor"] = draggingOver === null ? theme.palette.error.main : theme.palette.action.hover;
+    styles["backgroundColor"] =
+      draggingOver === null
+        ? theme.palette.error.main
+        : theme.palette.action.hover;
   }
 
   return (
@@ -96,18 +99,6 @@ const MediaItem = observer((props) => {
         disableRipple
         selected={isActive}
         sx={styles}
-        className={{
-          root: {
-            "&:hover": {
-              backgroundColor: "blue",
-              color: "white",
-              "& .MuiListItemIcon-root": {
-                color: "white"
-              }
-            }
-          }
-          ,
-        }}
         onClick={onMediaClicked}
         onMouseEnter={() => {
           setHover(true);
@@ -201,7 +192,10 @@ const Playlist = observer(({ videos, provided }) => {
           // the height is necessary to prevent the item container from collapsing, which confuses Virtuoso measurements
           <List
             {...props}
-            sx={{ height: props["data-known-size"] || undefined, padding: "0px" }}
+            sx={{
+              height: props["data-known-size"] || undefined,
+              padding: "0px",
+            }}
           >
             {children}
           </List>

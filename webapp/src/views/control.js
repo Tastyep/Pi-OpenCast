@@ -45,9 +45,17 @@ const PausePlayIcon = observer(() => {
       onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
     >
       {isPlayerPlaying ? (
-        <PauseCircleFilledIcon fontSize="large" color="primary" style={iconStyle} />
+        <PauseCircleFilledIcon
+          fontSize="large"
+          color="primary"
+          style={iconStyle}
+        />
       ) : (
-        <PlayCircleFilledIcon fontSize="large" color="secondary" style={iconStyle} />
+        <PlayCircleFilledIcon
+          fontSize="large"
+          color="secondary"
+          style={iconStyle}
+        />
       )}
     </IconButton>
   );
