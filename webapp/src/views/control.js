@@ -43,12 +43,11 @@ const PausePlayIcon = observer(() => {
       size="large"
       disableRipple={true}
       onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
-      sx={{ color: "rgba(89,123,157,0.87)" }}
     >
       {isPlayerPlaying ? (
-        <PauseCircleFilledIcon fontSize="large" style={iconStyle} />
+        <PauseCircleFilledIcon fontSize="large" color="primary" style={iconStyle} />
       ) : (
-        <PlayCircleFilledIcon fontSize="large" style={iconStyle} />
+        <PlayCircleFilledIcon fontSize="large" color="secondary" style={iconStyle} />
       )}
     </IconButton>
   );

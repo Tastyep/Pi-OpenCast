@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 
 import {
   Container,
@@ -16,6 +16,8 @@ import Box from "@mui/material/Box";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -37,6 +39,7 @@ import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
 import { durationToHMS } from "services/duration";
 import { filterVideos, queueNext, shuffleIds } from "services/playlist";
+import { hexToRgba } from "services/color"
 
 import { useAppStore } from "providers/app_context";
 import StreamInput from "components/stream_input";
@@ -64,7 +67,7 @@ const LargeThumbnail = styled("img")({
 
 const MediaItem = observer((props) => {
   const store = useAppStore();
-  const { video, isActive, isLast, provided, isDragging, draggingOver } = props;
+  const { video, isActive, provided, isDragging, draggingOver } = props;
 
   const [isHover, setHover] = useState(false);
 
@@ -77,28 +80,34 @@ const MediaItem = observer((props) => {
   };
 
   const downloadRatio = video.downloadRatio;
-  let styles = { margin: "0px" };
-  if (isActive === true) {
-    styles["backgroundColor"] = "rgba(246,250,254,1)";
-  }
 
+  let styles = { };
+  const theme = useTheme();
   if (isDragging) {
-    let bgcolor = "rgba(200, 200, 200, 0.5)";
-    if (draggingOver === null) {
-      bgcolor = "rgba(211, 87, 87, 0.7)";
-    }
-    styles["backgroundColor"] = bgcolor;
+    styles["backgroundColor"] = draggingOver === null ? theme.palette.error.main : theme.palette.action.hover;
   }
 
   return (
     <>
-      <ListItem
+      <ListItemButton
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        button
         disableRipple
+        selected={isActive}
         sx={styles}
+        className={{
+          root: {
+            "&:hover": {
+              backgroundColor: "blue",
+              color: "white",
+              "& .MuiListItemIcon-root": {
+                color: "white"
+              }
+            }
+          }
+          ,
+        }}
         onClick={onMediaClicked}
         onMouseEnter={() => {
           setHover(true);
@@ -149,8 +158,7 @@ const MediaItem = observer((props) => {
             />
           )}
         </Stack>
-      </ListItem>
-      {!isLast && <Divider />}
+      </ListItemButton>
     </>
   );
 });
@@ -183,7 +191,6 @@ const Playlist = observer(({ videos, provided }) => {
       index={index}
       key={video.id}
       isActive={video.id === activeVideoId}
-      isLast={index + 1 === videos.length}
     />
   );
 
@@ -192,12 +199,12 @@ const Playlist = observer(({ videos, provided }) => {
       HeightPreservingItem: ({ children, ...props }) => {
         return (
           // the height is necessary to prevent the item container from collapsing, which confuses Virtuoso measurements
-          <div
+          <List
             {...props}
-            style={{ height: props["data-known-size"] || undefined }}
+            sx={{ height: props["data-known-size"] || undefined, padding: "0px" }}
           >
             {children}
-          </div>
+          </List>
         );
       },
     };
