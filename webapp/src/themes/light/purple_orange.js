@@ -23,19 +23,25 @@ const purpleOrangeTheme = {
     //   light: "#edca51",
     //   dark: "#836c00",
     // },
-    secondary: {
-      main: "#00827c",
-      light: "#4cb2ab",
-      dark: "#005550",
-    },
+    // secondary: {
+    //   main: "#00827c",
+    //   light: "#4cb2ab",
+    //   dark: "#005550",
+    // },
     // secondary: {
     //   main: "#ef8e94",
     //   light: "#ffbfc4",
     //   dark: "#ba5f66",
     // },
 
+    secondary: {
+      main: "#903b1a",
+      light: "#c56843",
+      dark: "#5d0d00",
+    },
+
     neutral: {
-      contrastText: "#FFFFFF",
+      light: "#FFFFFF",
     },
     action: {
       hover: "rgba(144, 26, 52, 0.04)",

@@ -43,17 +43,26 @@ import StreamInput from "components/stream_input";
 
 import { useAppStore } from "providers/app_context";
 
-
 const Header = () => {
   const theme = useTheme();
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: theme.palette.primary.main, padding: "8px 16px 0px 16px" }}>
+    <AppBar
+      position="sticky"
+      sx={{
+        backgroundColor: theme.palette.primary.main,
+      }}
+    >
       <MediaQuery minWidth={SIZES.xlarge.min}>
         {(matches) =>
           matches ? (
-            <Grid container>
-              <Grid item xs={3}>
+            <Grid
+              container
+              sx={{
+                padding: "8px 16px 4px 16px",
+              }}
+            >
+              <Grid item xs={3} sx={{ marginTop: "2px" }}>
                 <StreamInput />
               </Grid>
               <Grid item xs>
@@ -62,14 +71,15 @@ const Header = () => {
               <Grid item xs={3} />
             </Grid>
           ) : (
-            <>
+            <Box sx={{ paddingTop: "12px" }}>
               <StreamInput />
               <HeaderTabs />
-            </>
-          )}
+            </Box>
+          )
+        }
       </MediaQuery>
     </AppBar>
-  )
+  );
 };
 
 const HeaderTabs = (props) => {
@@ -99,12 +109,7 @@ const HeaderTabs = (props) => {
         sx={sx}
       >
         <Tab label="Player" value="/" to="/" component={Link} />
-        <Tab
-          label="Profil"
-          value="/profil"
-          to="/profil"
-          component={Link}
-        />
+        <Tab label="Profil" value="/profil" to="/profil" component={Link} />
         <Tab
           label="Playlists"
           value={"/playlists"}
@@ -117,18 +122,8 @@ const HeaderTabs = (props) => {
           to={"artists"}
           component={Link}
         />
-        <Tab
-          label="Albums"
-          value={"/albums"}
-          to={"albums"}
-          component={Link}
-        />
-        <Tab
-          label="Titles"
-          value={"/medias"}
-          to={"medias"}
-          component={Link}
-        />
+        <Tab label="Albums" value={"/albums"} to={"albums"} component={Link} />
+        <Tab label="Titles" value={"/medias"} to={"medias"} component={Link} />
       </Tabs>
     </Box>
   );
@@ -167,7 +162,13 @@ const Layout = () => {
         }}
       >
         <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
-        <Grid item container xs={12} sm={10} sx={{ height: "100%", overflow: "auto" }}>
+        <Grid
+          item
+          container
+          xs={12}
+          sm={10}
+          sx={{ height: "100%", overflow: "auto" }}
+        >
           <Drawer
             anchor="top"
             open={controlPageOpen}

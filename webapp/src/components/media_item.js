@@ -87,10 +87,7 @@ const playVideo = (video, store) => {
 
 const MediaSecondaryData = ({ artist, album, duration }) => {
   const artistBloc = artist ? (
-    <StyledLink
-      to={`/artists/${artist.id}`}
-      style={{ whiteSpace: "nowrap" }}
-    >
+    <StyledLink to={`/artists/${artist.id}`} style={{ whiteSpace: "nowrap" }}>
       {artist.name}
     </StyledLink>
   ) : (
@@ -98,10 +95,7 @@ const MediaSecondaryData = ({ artist, album, duration }) => {
   );
 
   const albumBloc = album ? (
-    <StyledLink
-      to={`/albums/${album.id}`}
-      style={{ whiteSpace: "nowrap" }}
-    >
+    <StyledLink to={`/albums/${album.id}`} style={{ whiteSpace: "nowrap" }}>
       • {album.name}
     </StyledLink>
   ) : (

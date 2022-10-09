@@ -22,11 +22,11 @@ import SendIcon from "@mui/icons-material/Send";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
-import MenuIcon from '@mui/icons-material/Menu';
+import MenuIcon from "@mui/icons-material/Menu";
 
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
-import { hexToRgba } from "services/color"
+import { hexToRgba } from "services/color";
 
 import { useAppStore } from "providers/app_context";
 
@@ -101,27 +101,35 @@ const StreamInput = (props) => {
     <Box sx={sx}>
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
         <Stack direction="row">
-          <IconButton color="inherit">
+          <IconButton color="inherit" onClick={() => setExpanded(!expanded)}>
             <MenuIcon />
           </IconButton>
           <InputBase
             fullWidth
             placeholder="Media's URL"
             value={url}
-            sx={{ color: theme.palette.neutral.contrastText, backgroundColor: inputBackground, borderRadius: "16px", margin: "0px 8px", padding: "0px 16px" }}
+            sx={{
+              color: theme.palette.neutral.light,
+              backgroundColor: inputBackground,
+              borderRadius: "16px",
+              margin: "0px 8px",
+              padding: "0px 16px",
+            }}
             onChange={(e) => setUrl(e.target.value)}
             onKeyPress={updateBlur}
           />
-          <IconButton
-            color="inherit"
-            onClick={handleSubmit}
-          >
+          <IconButton color="inherit" onClick={handleSubmit}>
             <SendIcon sx={{ fontSize: "20px" }} />
           </IconButton>
         </Stack>
       </form>
       <Box sx={{ display: "flex" }}>
-        <Collapse in={expanded} timeout="auto" unmountOnExit sx={{}}>
+        <Collapse
+          in={expanded}
+          timeout="auto"
+          unmountOnExit
+          sx={{ backgroundColor: theme.palette.neutral.light }}
+        >
           <List>
             <ListItem
               alignItems="center"

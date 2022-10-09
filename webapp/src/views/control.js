@@ -27,6 +27,7 @@ import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
+import { useTheme } from "@emotion/react";
 
 const updatePlayer = (store, update, ...args) => {
   update(...args).catch(snackBarHandler(store));
@@ -182,6 +183,7 @@ const PlayingMediaImage = (props) => {
 
 const ControlPage = observer((props) => {
   const store = useAppStore();
+  const theme = useTheme();
 
   const { closePage } = props;
   const activeVideo = store.videos[store.player.videoId];
@@ -258,17 +260,31 @@ const ControlPage = observer((props) => {
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        sx={{ backgroundColor: "#F2F2F2", width: "100%" }}
+        sx={{
+          backgroundColor: theme.palette.primary.main,
+          width: "100%",
+          padding: "8px 0px 8px 0px",
+        }}
       >
-        <IconButton size="large" onClick={() => closePage()}>
+        <IconButton
+          size="large"
+          sx={{ color: theme.palette.neutral.light }}
+          onClick={() => closePage()}
+        >
           <ExpandLessIcon fontSize="medium" />
         </IconButton>
-        <Typography noWrap align="center" noWrap sx={{ height: "auto" }}>
+        <Typography
+          noWrap
+          align="center"
+          noWrap
+          sx={{ height: "auto", color: theme.palette.neutral.light }}
+        >
           {activeVideo.title}
         </Typography>
         <IconButton
           size="large"
           aria-expanded={isMenuOpen ? "true" : undefined}
+          sx={{ color: theme.palette.neutral.light }}
           onClick={(e) => setAnchor(e.currentTarget)}
         >
           <MoreVertIcon fontSize="medium" />
