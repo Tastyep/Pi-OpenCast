@@ -21,6 +21,9 @@ import {
 
 import { observer } from "mobx-react-lite";
 
+import MediaQuery from "react-responsive";
+import { SIZES } from "constants.js";
+
 import ControlBar from "components/control_bar";
 import PlayerProgress from "components/player_progress";
 import Notifier from "components/notifier";
@@ -45,11 +48,26 @@ const Header = () => {
   const theme = useTheme();
 
   return (
-    <AppBar position="sticky">
-      <Box sx={{ backgroundColor: theme.palette.primary.main }}>
-        <StreamInput sx={{ margin: "8px 0px 4px 0px" }} />
-      </Box>
-      <HeaderTabs sx={{ backgroundColor: theme.palette.primary.main }} />
+    <AppBar position="sticky" sx={{ backgroundColor: theme.palette.primary.main, padding: "8px 16px 0px 16px" }}>
+      <MediaQuery minWidth={SIZES.xlarge.min}>
+        {(matches) =>
+          matches ? (
+            <Grid container>
+              <Grid item xs={3}>
+                <StreamInput />
+              </Grid>
+              <Grid item xs>
+                <HeaderTabs />
+              </Grid>
+              <Grid item xs={3} />
+            </Grid>
+          ) : (
+            <>
+              <StreamInput />
+              <HeaderTabs />
+            </>
+          )}
+      </MediaQuery>
     </AppBar>
   )
 };

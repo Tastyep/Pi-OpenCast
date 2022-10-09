@@ -44,6 +44,7 @@ const BarContainer = styled(Stack)({
   flexDirection: "row",
   justifyContent: "space-between",
   height: "56px",
+  padding: "0px 16px",
 });
 
 const renderMediaSecondaryData = (artist, album, duration) => {
