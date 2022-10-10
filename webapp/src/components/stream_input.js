@@ -26,7 +26,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 import playerAPI from "services/api/player";
 import snackBarHandler from "services/api/error";
-import { hexToRgba } from "services/color";
+import { mixColor } from "services/color";
 
 import { useAppStore } from "providers/app_context";
 
@@ -72,6 +72,7 @@ const StreamInput = (props) => {
     if (!value) {
       return;
     }
+    console.log("value: ", value);
     setAudioOnlyOpt(value === "audio");
     setSubtitleDlOpt(value !== "audio");
   };
@@ -95,7 +96,7 @@ const StreamInput = (props) => {
   );
 
   const theme = useTheme();
-  const inputBackground = "#a32036";
+  const inputBackground = mixColor(theme.palette.primary.main, "#FFFFFF", 0.18);
 
   return (
     <Box sx={sx}>
@@ -165,7 +166,7 @@ const StreamInput = (props) => {
               sx={{ paddingLeft: "0px", paddingRight: "0px" }}
             >
               <ToggleButtonGroup
-                value={audioOnlyOpt ? "video" : "audio"}
+                value={audioOnlyOpt ? "audio" : "video"}
                 exclusive
                 onChange={updateDownloadedChannels}
                 aria-label="text alignment"

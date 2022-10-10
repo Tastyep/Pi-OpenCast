@@ -1,13 +1,21 @@
 import { grey } from "@mui/material/colors";
+import { mixColor } from "services/color";
+
+const primary = {
+  main: "#7d9365",
+  light: "#adc393",
+  dark: "#50653a",
+};
 
 const purpleOrangeTheme = {
   palette: {
     mode: "light",
-    primary: {
-      main: "#901a34",
-      light: "#c54e5d",
-      dark: "#5c000e",
-    },
+    primary: primary,
+    // primary: {
+    //   main: "#901a34",
+    //   light: "#c54e5d",
+    //   dark: "#5c000e",
+    // },
     // primary: {
     //   main: "#e5975f",
     //   light: "#ffc88d",
@@ -34,20 +42,26 @@ const purpleOrangeTheme = {
     //   dark: "#ba5f66",
     // },
 
+    // secondary: {
+    //   main: "#903b1a",
+    //   light: "#c56843",
+    //   dark: "#5d0d00",
+    // },
+
     secondary: {
-      main: "#903b1a",
-      light: "#c56843",
-      dark: "#5d0d00",
+      main: "#7a6593",
+      light: "#aa93c4",
+      dark: "#4d3a65",
     },
 
     neutral: {
       light: "#FFFFFF",
     },
     action: {
-      hover: "rgba(144, 26, 52, 0.04)",
+      hover: mixColor(primary.light, "#11FFFFFF", 0.9),
     },
 
-    divider: "#901a34",
+    divider: primary.main,
 
     text: {
       primary: grey[900],
