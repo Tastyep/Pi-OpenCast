@@ -23,7 +23,7 @@ const listPopularVideos = (videos) => {
     .slice(0, 10);
 };
 
-const ProfilPage = observer(() => {
+const ProfilePage = observer(() => {
   const store = useAppStore();
 
   return (
@@ -43,4 +43,4 @@ const ProfilPage = observer(() => {
   );
 });
 
-export default ProfilPage;
+export default ProfilePage;
