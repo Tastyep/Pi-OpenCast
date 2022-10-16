@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Collapse, Grid, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Collapse, Grid, IconButton, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 import PauseIcon from "@mui/icons-material/Pause";
@@ -32,64 +32,82 @@ import snackBarHandler from "services/api/error";
 import "./player_control.css";
 import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
+import { useTheme } from "@emotion/react";
 
 const StyledLink = styled(Link)({
   color: "inherit",
   textDecoration: "none",
 });
 
-const BarContainer = styled(Stack)({
-  backgroundColor: "#F2F2F2",
+const BarContainer = styled(Stack)(({ theme, smallLayout = false }) => ({
+  backgroundColor: theme.palette.primary.main,
   alignItems: "center",
   flexDirection: "row",
   justifyContent: "space-between",
   height: "56px",
-  padding: "0px 16px",
-});
-
-const renderMediaSecondaryData = (artist, album, duration) => {
-  const artistBloc = artist ? (
-    <StyledLink to={`/artists/${artist.id}`}>{artist.name}</StyledLink>
-  ) : (
-    "Artist"
-  );
-
-  const albumBloc = album ? (
-    <StyledLink to={`/albums/${album.id}`}>{album.name}</StyledLink>
-  ) : (
-    "Album"
-  );
-
-  const HMSDuration = durationToHMS(duration * 1000);
-
-  return (
-    <Grid
-      container
-      direction="row"
-      sx={{ flexWrap: "nowrap", color: "#505050", minWidth: "0px" }}
-    >
-      <Grid item zeroMinWidth>
-        <Typography noWrap>{artistBloc}</Typography>
-      </Grid>
-      <Grid item zeroMinWidth>
-        <Stack direction="row">
-          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
-          <Typography noWrap>{albumBloc}</Typography>
-        </Stack>
-      </Grid>
-      <Grid item>
-        <Stack direction="row">
-          <Typography sx={{ padding: "0px 4px" }}>•</Typography>
-          <Typography noWrap>{HMSDuration}</Typography>
-        </Stack>
-      </Grid>
-    </Grid>
-  );
-};
+  padding: smallLayout ? "0px" : "0px 16px",
+}));
 
 const updatePlayer = (store, update, ...args) => {
   update(...args).catch(snackBarHandler(store));
 };
+
+const MediaData = observer((props) => {
+  const { video, sx, smallLayout = false } = props;
+
+  const store = useAppStore();
+  const artist = store.artists[video.artist_id];
+  const album = store.albums[video.album_id];
+
+  if (!smallLayout) {
+    const artistBloc = artist ? (
+      <StyledLink to={`/artists/${artist.id}`}>{artist.name}</StyledLink>
+    ) : (
+      "Artist"
+    );
+
+    const albumBloc = album ? (
+      <StyledLink to={`/albums/${album.id}`}>{album.name}</StyledLink>
+    ) : (
+      "Album"
+    );
+
+    const HMSDuration = durationToHMS(video.duration * 1000);
+
+    return (
+      <Stack sx={sx}>
+        <Typography color="primary.contrastText" noWrap> {video.title}</Typography>
+        <Grid
+          container
+          direction="row"
+          sx={{ flexWrap: "nowrap", minWidth: "0px" }}
+        >
+          <Grid item zeroMinWidth>
+            <Typography color="primary.contrastText" noWrap>{artistBloc}</Typography>
+          </Grid>
+          <Grid item zeroMinWidth>
+            <Stack direction="row">
+              <Typography color="primary.contrastText" sx={{ padding: "0px 4px" }}>•</Typography>
+              <Typography color="primary.contrastText" noWrap>{albumBloc}</Typography>
+            </Stack>
+          </Grid>
+          <Grid item>
+            <Stack direction="row">
+              <Typography color="primary.contrastText" sx={{ padding: "0px 4px" }}>•</Typography>
+              <Typography color="primary.contrastText" noWrap>{HMSDuration}</Typography>
+            </Stack>
+          </Grid>
+        </Grid>
+      </Stack>
+    );
+  }
+
+  return (
+    <Box sx={sx}>
+      <Typography color="primary.contrastText">{video.title}</Typography>
+    </Box>
+  )
+});
 
 const PausePlayIcon = observer((props) => {
   const store = useAppStore();
@@ -119,9 +137,6 @@ const ActiveMediaData = observer(({ variant }) => {
   if (!activeVideo) {
     return null;
   }
-
-  const activeArtist = store.artists[activeVideo.artist_id];
-  const activeAlbum = store.albums[activeVideo.album_id];
 
   if (variant === "big") {
     return (
@@ -154,20 +169,7 @@ const ActiveMediaData = observer(({ variant }) => {
             </Stack>
           </div>
         )}
-        <Stack
-          sx={{
-            marginLeft: "8px",
-            minWidth: "0px",
-            overflow: "hidden",
-          }}
-        >
-          <Typography noWrap> {activeVideo.title}</Typography>
-          {renderMediaSecondaryData(
-            activeArtist,
-            activeAlbum,
-            activeVideo.duration
-          )}
-        </Stack>
+        <MediaData video={activeVideo} sx={{ marginLeft: "8px", minWidth: "0px", overflow: "hidden" }} />
       </>
     );
   }
@@ -205,22 +207,7 @@ const ActiveMediaData = observer(({ variant }) => {
           </Stack>
         </div>
       )}
-      <Stack
-        sx={{
-          marginLeft: "8px",
-          minWidth: "0px",
-          overflow: "hidden",
-        }}
-      >
-        <Typography noWrap variant="body1">
-          {activeVideo.title}
-        </Typography>
-        {activeArtist && (
-          <Typography noWrap variant="body2">
-            {activeArtist.name}
-          </Typography>
-        )}
-      </Stack>
+      <MediaData smallLayout video={activeVideo} sx={{ marginLeft: "8px", minWidth: "0px", overflow: "hidden" }} />
     </>
   );
 });
@@ -435,25 +422,23 @@ const ControlBar = observer((props) => {
             </Stack>
           </BarContainer>
         ) : (
-          <div style={{ minHeight: "auto" }}>
-            <BarContainer direction="row">
-              <Stack
-                direction="row"
-                alignItems="center"
-                style={{ height: "100%", minWidth: "0px" }}
-              >
-                <ActiveMediaData variant="small" />
-              </Stack>
-              <PausePlayIcon sx={{ marginLeft: "auto" }} />
-              <IconButton
-                size="medium"
-                color="secondary"
-                onClick={() => openTrackInfo()}
-              >
-                <ExpandMoreIcon sx={{ fontSize: 30 }} />
-              </IconButton>
-            </BarContainer>
-          </div>
+          <BarContainer direction="row" smallLayout>
+            <Stack
+              direction="row"
+              alignItems="center"
+              style={{ height: "100%", minWidth: "0px" }}
+            >
+              <ActiveMediaData variant="small" />
+            </Stack>
+            <PausePlayIcon sx={{ marginLeft: "auto" }} />
+            <IconButton
+              size="medium"
+              color="secondary"
+              onClick={() => openTrackInfo()}
+            >
+              <ExpandMoreIcon sx={{ fontSize: 30 }} />
+            </IconButton>
+          </BarContainer>
         )
       }
     </MediaQuery>
