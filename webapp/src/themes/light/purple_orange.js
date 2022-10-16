@@ -2,10 +2,16 @@ import { grey } from "@mui/material/colors";
 import { mixColor } from "services/color";
 
 const primary = {
-  main: "#7d9365",
-  light: "#adc393",
-  dark: "#50653a",
+  main: "#232F34",
+  light: "#47606A",
+  dark: "#1B2529",
 };
+
+// const primary = {
+//   main: "#7d9365",
+//   light: "#adc393",
+//   dark: "#50653a",
+// };
 
 const purpleOrangeTheme = {
   palette: {
@@ -48,10 +54,41 @@ const purpleOrangeTheme = {
     //   dark: "#5d0d00",
     // },
 
+    // secondary: {
+    //   main: "#7a6593",
+    //   light: "#aa93c4",
+    //   dark: "#4d3a65",
+    // },
+
     secondary: {
-      main: "#7a6593",
-      light: "#aa93c4",
-      dark: "#4d3a65",
+      main: "#F9AA33",
+      light: "#F9B043",
+      dark: "#D08006",
+    },
+
+
+    error: {
+      main: "#BB3E4B",
+      light: "#CC6670",
+      dark: "#6B242B"
+    },
+
+    warning: {
+      main: "#BBAF3E",
+      light: "#CCC266",
+      dark: "#504B1B",
+    },
+
+    info: {
+      main: "#7e91a0",
+      light: "#9AA9B4",
+      dark: "#4E5E6A",
+    },
+
+    success: {
+      main: primary.light,
+      light: "#BED565",
+      dark: "#647520",
     },
 
     neutral: {

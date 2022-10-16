@@ -110,7 +110,7 @@ const StreamInput = (props) => {
             placeholder="Media's URL"
             value={url}
             sx={{
-              color: theme.palette.neutral.light,
+              color: theme.palette.primary.contrastText,
               backgroundColor: inputBackground,
               borderRadius: "16px",
               margin: "0px 8px",
@@ -129,7 +129,7 @@ const StreamInput = (props) => {
           in={expanded}
           timeout="auto"
           unmountOnExit
-          sx={{ backgroundColor: theme.palette.neutral.light }}
+          sx={{ backgroundColor: theme.palette.primary.main }}
         >
           <List>
             <ListItem
@@ -137,6 +137,7 @@ const StreamInput = (props) => {
               sx={{ paddingLeft: "0px", paddingRight: "0px" }}
             >
               <ToggleButtonGroup
+                color="secondary"
                 value={streamOpt ? "stream" : "queue"}
                 exclusive
                 onChange={updateAction}
@@ -144,20 +145,18 @@ const StreamInput = (props) => {
               >
                 <ToggleButton
                   value="stream"
-                  color="secondary"
                   aria-label="stream"
                 >
                   <PlaylistPlayIcon />
                 </ToggleButton>
                 <ToggleButton
                   value="queue"
-                  color="secondary"
                   aria-label="queue"
                 >
                   <PlaylistAddIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
-              <Typography noWrap sx={{ marginLeft: "16px" }}>
+              <Typography noWrap color="primary.contrastText" sx={{ marginLeft: "16px" }}>
                 {streamOpt ? "Play next" : "Queue last"}
               </Typography>
             </ListItem>
@@ -166,6 +165,7 @@ const StreamInput = (props) => {
               sx={{ paddingLeft: "0px", paddingRight: "0px" }}
             >
               <ToggleButtonGroup
+                color="secondary"
                 value={audioOnlyOpt ? "audio" : "video"}
                 exclusive
                 onChange={updateDownloadedChannels}
@@ -173,20 +173,18 @@ const StreamInput = (props) => {
               >
                 <ToggleButton
                   value="video"
-                  color="secondary"
                   aria-label="video"
                 >
                   <MusicVideoIcon />
                 </ToggleButton>
                 <ToggleButton
                   value="audio"
-                  color="secondary"
                   aria-label="audio"
                 >
                   <MusicNoteIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
-              <Typography noWrap sx={{ marginLeft: "16px" }}>
+              <Typography noWrap color="primary.contrastText" sx={{ marginLeft: "16px" }}>
                 {audioOnlyOpt ? "Audio only" : "Video"}
               </Typography>
             </ListItem>

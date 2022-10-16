@@ -228,8 +228,8 @@ const AlbumItem = ({ album, isSmallDevice }) => {
       />
       <AlbumItemBar>
         <Typography
+          color="primary.contrastText"
           sx={{
-            color: "#FFFFFF",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",

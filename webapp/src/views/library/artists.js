@@ -134,8 +134,8 @@ const ArtistItem = ({ artist, isSmallDevice }) => {
       />
       <ArtistItemBar>
         <Typography
+          color="neutral.light"
           sx={{
-            color: "#FFFFFF",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",

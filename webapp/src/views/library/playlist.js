@@ -55,7 +55,6 @@ const ModalContent = styled(Box)({
   transform: "translate(-50%, -50%)",
   width: 400,
   maxWidth: "75%",
-  backgroundColor: "#FFFFFF",
   border: "2px solid #000",
   boxShadow: 24,
 

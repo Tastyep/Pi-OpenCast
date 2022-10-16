@@ -48,7 +48,7 @@ const PausePlayIcon = observer(() => {
       {isPlayerPlaying ? (
         <PauseCircleFilledIcon
           fontSize="large"
-          color="primary"
+          color="secondary"
           style={iconStyle}
         />
       ) : (
@@ -268,7 +268,7 @@ const ControlPage = observer((props) => {
       >
         <IconButton
           size="large"
-          sx={{ color: theme.palette.neutral.light }}
+          color="secondary"
           onClick={() => closePage()}
         >
           <ExpandLessIcon fontSize="medium" />
@@ -277,14 +277,14 @@ const ControlPage = observer((props) => {
           noWrap
           align="center"
           noWrap
-          sx={{ height: "auto", color: theme.palette.neutral.light }}
+          color="primary.contrastText"
         >
           {activeVideo.title}
         </Typography>
         <IconButton
           size="large"
+          color="secondary"
           aria-expanded={isMenuOpen ? "true" : undefined}
-          sx={{ color: theme.palette.neutral.light }}
           onClick={(e) => setAnchor(e.currentTarget)}
         >
           <MoreVertIcon fontSize="medium" />

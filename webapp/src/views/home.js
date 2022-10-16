@@ -12,7 +12,6 @@ import {
   Stack,
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import List from "@mui/material/List";
@@ -23,6 +22,8 @@ import Typography from "@mui/material/Typography";
 
 import SearchIcon from "@mui/icons-material/Search";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
+import DeleteIcon from '@mui/icons-material/Delete';
+import ClearIcon from "@mui/icons-material/Clear";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Virtuoso } from "react-virtuoso";
@@ -323,9 +324,9 @@ const DroppablePlaylist = observer(({ playlistId }) => {
         sx={{ margin: "0px 4px 4px 16px" }}
       >
         <Typography
+          color="primary.main"
           sx={{
             flex: "1",
-            color: "#666666",
             whiteSpace: "nowrap",
             margin: "0px 8px",
           }}
@@ -363,7 +364,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
             sx={{ flex: 0 }}
             onClick={emptyPlaylist}
           >
-            <ClearIcon />
+            <DeleteIcon />
           </IconButton>
         </Stack>
       </Stack>

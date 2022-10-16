@@ -30,7 +30,7 @@ import Notifier from "components/notifier";
 import HomePage from "views/home";
 import ControlPage from "views/control";
 
-import ProfilPage from "views/profil";
+import ProfilePage from "views/profile";
 import AlbumsPage from "views/library/albums";
 import AlbumPage from "views/library/album";
 import ArtistsPage from "views/library/artists";
@@ -42,6 +42,53 @@ import PlaylistPage from "views/library/playlist";
 import StreamInput from "components/stream_input";
 
 import { useAppStore } from "providers/app_context";
+
+const HeaderTabs = (props) => {
+  const { sx } = props;
+
+  const location = useLocation();
+
+  let rootURL = location.pathname;
+  const secondSlashPos = rootURL.indexOf("/", 1);
+  if (secondSlashPos !== -1) {
+    rootURL = rootURL.substring(0, secondSlashPos);
+  }
+
+  return (
+    <Box display="flex" justifyContent="center" sx={{ width: "100%" }}>
+      <Tabs
+        allowScrollButtonsMobile
+        scrollButtons="auto"
+        variant="scrollable"
+        value={rootURL}
+        textColor="inherit"
+        TabIndicatorProps={{
+          style: {
+            display: "none",
+          },
+        }}
+        sx={sx}
+      >
+        <Tab label="Player" value="/" to="/" component={Link} />
+        <Tab label="Profile" value="/profile" to="/profile" component={Link} />
+        <Tab
+          label="Playlists"
+          value={"/playlists"}
+          to={"playlists"}
+          component={Link}
+        />
+        <Tab
+          label="Artists"
+          value={"/artists"}
+          to={"artists"}
+          component={Link}
+        />
+        <Tab label="Albums" value={"/albums"} to={"albums"} component={Link} />
+        <Tab label="Titles" value={"/medias"} to={"medias"} component={Link} />
+      </Tabs>
+    </Box>
+  );
+};
 
 const Header = () => {
   const theme = useTheme();
@@ -79,53 +126,6 @@ const Header = () => {
         }
       </MediaQuery>
     </AppBar>
-  );
-};
-
-const HeaderTabs = (props) => {
-  const { sx } = props;
-
-  const location = useLocation();
-
-  let rootURL = location.pathname;
-  const secondSlashPos = rootURL.indexOf("/", 1);
-  if (secondSlashPos !== -1) {
-    rootURL = rootURL.substring(0, secondSlashPos);
-  }
-
-  return (
-    <Box display="flex" justifyContent="center" sx={{ width: "100%" }}>
-      <Tabs
-        allowScrollButtonsMobile
-        scrollButtons="auto"
-        variant="scrollable"
-        value={rootURL}
-        textColor="inherit"
-        TabIndicatorProps={{
-          style: {
-            display: "none",
-          },
-        }}
-        sx={sx}
-      >
-        <Tab label="Player" value="/" to="/" component={Link} />
-        <Tab label="Profil" value="/profil" to="/profil" component={Link} />
-        <Tab
-          label="Playlists"
-          value={"/playlists"}
-          to={"playlists"}
-          component={Link}
-        />
-        <Tab
-          label="Artists"
-          value={"/artists"}
-          to={"artists"}
-          component={Link}
-        />
-        <Tab label="Albums" value={"/albums"} to={"albums"} component={Link} />
-        <Tab label="Titles" value={"/medias"} to={"medias"} component={Link} />
-      </Tabs>
-    </Box>
   );
 };
 
@@ -193,7 +193,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path={"profil"} element={<ProfilPage />} />
+          <Route path={"profile"} element={<ProfilePage />} />
           <Route path={"playlists"} element={<PlaylistsPage />} />
           <Route path={"artists"} element={<ArtistsPage />} />
           <Route path={"albums"} element={<AlbumsPage />} />
