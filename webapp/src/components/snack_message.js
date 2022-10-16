@@ -26,9 +26,15 @@ const NotifCard = (props) => {
   const { colorScheme, children } = props;
   const theme = useTheme();
 
-  return (<Card sx={{
-    background: colorScheme.main
-  }} >{children} </Card>);
+  return (
+    <Card
+      sx={{
+        background: colorScheme.main,
+      }}
+    >
+      {children}{" "}
+    </Card>
+  );
 };
 
 const NotifIcon = (props) => {
@@ -43,14 +49,13 @@ const NotifIcon = (props) => {
   };
   const icon = icons[variant];
 
-  return <Box sx={sx}>{icon}</Box>
+  return <Box sx={sx}>{icon}</Box>;
 };
 
 const NotifCardActions = styled(CardActions)({
   padding: "8px 8px 8px 16px",
   justifyContent: "space-between",
 });
-
 
 const SnackMessage = forwardRef((props, ref) => {
   const { id, message, options, details } = props;
@@ -77,10 +82,18 @@ const SnackMessage = forwardRef((props, ref) => {
       >
         <NotifCardActions>
           <Stack direction="row">
-            <NotifIcon variant={options.variant} colorScheme={colorScheme} sx={{ marginRight: "8px" }} />
+            <NotifIcon
+              variant={options.variant}
+              colorScheme={colorScheme}
+              sx={{ marginRight: "8px" }}
+            />
             <Typography
               variant="subtitle2"
-              sx={{ alignSelf: "center", fontWeight: "bold", color: colorScheme.contrastText }}
+              sx={{
+                alignSelf: "center",
+                fontWeight: "bold",
+                color: colorScheme.contrastText,
+              }}
             >
               {message}
             </Typography>
@@ -89,7 +102,10 @@ const SnackMessage = forwardRef((props, ref) => {
             {details && (
               <IconButton
                 aria-label="Show more"
-                sx={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)", color: colorScheme.dark }}
+                sx={{
+                  transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+                  color: colorScheme.dark,
+                }}
                 onClick={handleExpandClick}
               >
                 <ExpandMoreIcon />
@@ -134,7 +150,7 @@ const SnackMessage = forwardRef((props, ref) => {
           </Collapse>
         )}
       </NotifCard>
-    </SnackbarContent >
+    </SnackbarContent>
   );
 });
 

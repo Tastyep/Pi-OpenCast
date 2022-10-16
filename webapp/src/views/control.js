@@ -266,19 +266,10 @@ const ControlPage = observer((props) => {
           padding: "8px 0px 8px 0px",
         }}
       >
-        <IconButton
-          size="large"
-          color="secondary"
-          onClick={() => closePage()}
-        >
+        <IconButton size="large" color="secondary" onClick={() => closePage()}>
           <ExpandLessIcon fontSize="medium" />
         </IconButton>
-        <Typography
-          noWrap
-          align="center"
-          noWrap
-          color="primary.contrastText"
-        >
+        <Typography noWrap align="center" noWrap color="primary.contrastText">
           {activeVideo.title}
         </Typography>
         <IconButton

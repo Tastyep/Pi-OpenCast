@@ -22,7 +22,7 @@ import Typography from "@mui/material/Typography";
 
 import SearchIcon from "@mui/icons-material/Search";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";

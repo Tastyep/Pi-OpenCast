@@ -143,20 +143,18 @@ const StreamInput = (props) => {
                 onChange={updateAction}
                 aria-label="text alignment"
               >
-                <ToggleButton
-                  value="stream"
-                  aria-label="stream"
-                >
+                <ToggleButton value="stream" aria-label="stream">
                   <PlaylistPlayIcon />
                 </ToggleButton>
-                <ToggleButton
-                  value="queue"
-                  aria-label="queue"
-                >
+                <ToggleButton value="queue" aria-label="queue">
                   <PlaylistAddIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
-              <Typography noWrap color="primary.contrastText" sx={{ marginLeft: "16px" }}>
+              <Typography
+                noWrap
+                color="primary.contrastText"
+                sx={{ marginLeft: "16px" }}
+              >
                 {streamOpt ? "Play next" : "Queue last"}
               </Typography>
             </ListItem>
@@ -171,20 +169,18 @@ const StreamInput = (props) => {
                 onChange={updateDownloadedChannels}
                 aria-label="text alignment"
               >
-                <ToggleButton
-                  value="video"
-                  aria-label="video"
-                >
+                <ToggleButton value="video" aria-label="video">
                   <MusicVideoIcon />
                 </ToggleButton>
-                <ToggleButton
-                  value="audio"
-                  aria-label="audio"
-                >
+                <ToggleButton value="audio" aria-label="audio">
                   <MusicNoteIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
-              <Typography noWrap color="primary.contrastText" sx={{ marginLeft: "16px" }}>
+              <Typography
+                noWrap
+                color="primary.contrastText"
+                sx={{ marginLeft: "16px" }}
+              >
                 {audioOnlyOpt ? "Audio only" : "Video"}
               </Typography>
             </ListItem>

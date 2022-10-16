@@ -66,11 +66,10 @@ const purpleOrangeTheme = {
       dark: "#D08006",
     },
 
-
     error: {
       main: "#BB3E4B",
       light: "#CC6670",
-      dark: "#6B242B"
+      dark: "#6B242B",
     },
 
     warning: {

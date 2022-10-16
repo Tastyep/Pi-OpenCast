@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, Collapse, Grid, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Collapse,
+  Grid,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 import PauseIcon from "@mui/icons-material/Pause";
@@ -76,25 +83,44 @@ const MediaData = observer((props) => {
 
     return (
       <Stack sx={sx}>
-        <Typography color="primary.contrastText" noWrap> {video.title}</Typography>
+        <Typography color="primary.contrastText" noWrap>
+          {" "}
+          {video.title}
+        </Typography>
         <Grid
           container
           direction="row"
           sx={{ flexWrap: "nowrap", minWidth: "0px" }}
         >
           <Grid item zeroMinWidth>
-            <Typography color="primary.contrastText" noWrap>{artistBloc}</Typography>
+            <Typography color="primary.contrastText" noWrap>
+              {artistBloc}
+            </Typography>
           </Grid>
           <Grid item zeroMinWidth>
             <Stack direction="row">
-              <Typography color="primary.contrastText" sx={{ padding: "0px 4px" }}>•</Typography>
-              <Typography color="primary.contrastText" noWrap>{albumBloc}</Typography>
+              <Typography
+                color="primary.contrastText"
+                sx={{ padding: "0px 4px" }}
+              >
+                •
+              </Typography>
+              <Typography color="primary.contrastText" noWrap>
+                {albumBloc}
+              </Typography>
             </Stack>
           </Grid>
           <Grid item>
             <Stack direction="row">
-              <Typography color="primary.contrastText" sx={{ padding: "0px 4px" }}>•</Typography>
-              <Typography color="primary.contrastText" noWrap>{HMSDuration}</Typography>
+              <Typography
+                color="primary.contrastText"
+                sx={{ padding: "0px 4px" }}
+              >
+                •
+              </Typography>
+              <Typography color="primary.contrastText" noWrap>
+                {HMSDuration}
+              </Typography>
             </Stack>
           </Grid>
         </Grid>
@@ -106,7 +132,7 @@ const MediaData = observer((props) => {
     <Box sx={sx}>
       <Typography color="primary.contrastText">{video.title}</Typography>
     </Box>
-  )
+  );
 });
 
 const PausePlayIcon = observer((props) => {
@@ -169,7 +195,10 @@ const ActiveMediaData = observer(({ variant }) => {
             </Stack>
           </div>
         )}
-        <MediaData video={activeVideo} sx={{ marginLeft: "8px", minWidth: "0px", overflow: "hidden" }} />
+        <MediaData
+          video={activeVideo}
+          sx={{ marginLeft: "8px", minWidth: "0px", overflow: "hidden" }}
+        />
       </>
     );
   }
@@ -207,7 +236,11 @@ const ActiveMediaData = observer(({ variant }) => {
           </Stack>
         </div>
       )}
-      <MediaData smallLayout video={activeVideo} sx={{ marginLeft: "8px", minWidth: "0px", overflow: "hidden" }} />
+      <MediaData
+        smallLayout
+        video={activeVideo}
+        sx={{ marginLeft: "8px", minWidth: "0px", overflow: "hidden" }}
+      />
     </>
   );
 });
