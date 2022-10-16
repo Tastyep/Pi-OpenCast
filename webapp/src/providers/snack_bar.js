@@ -6,6 +6,13 @@ import { SIZES } from "constants.js";
 const SnackBarProvider = (props) => {
   const { children } = props;
 
+  const styles = {
+    error: {
+      bacgroundColor: "blue",
+      color: "orange",
+    },
+  };
+
   return (
     <MediaQuery maxWidth={SIZES.small.max}>
       {(matches) =>

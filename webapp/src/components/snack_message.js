@@ -1,7 +1,7 @@
 import React, { useState, forwardRef, useCallback } from "react";
 import { useSnackbar, SnackbarContent } from "notistack";
 
-import { makeStyles } from "@mui/styles";
+import { styled } from "@mui/styles";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
 import Paper from "@mui/material/Paper";
@@ -20,54 +20,46 @@ import ErrorIcon from "@mui/icons-material/Error";
 import WarningIcon from "@mui/icons-material/Warning";
 import InfoIcon from "@mui/icons-material/Info";
 
-import clsx from "clsx";
+import { useTheme } from "@emotion/react";
 
-const useStyles = makeStyles({
-  default: {
-    background: "#313131",
-  },
-  error: {
-    background: "#D32F2F",
-  },
-  warning: {
-    background: "#FF9800",
-  },
-  info: {
-    background: "#2196F3",
-  },
-  success: {
-    background: "#43A047",
-  },
-  actionRoot: {
-    padding: "8px 8px 8px 16px",
-    justifyContent: "space-between",
-  },
-  expand: {
-    transform: "rotate(0deg)",
-  },
-  button: {
-    padding: "8px 8px",
-    color: "rgba(0,0,0,0.6)",
-  },
-  expandOpen: {
-    transform: "rotate(180deg)",
-  },
-});
+const NotifCard = (props) => {
+  const { colorScheme, children } = props;
+  const theme = useTheme();
 
-const icons = {
-  error: <ErrorIcon />,
-  warning: <WarningIcon />,
-  info: <InfoIcon />,
-  success: <CheckCircleIcon />,
+  return (<Card sx={{
+    background: colorScheme.main
+  }} >{children} </Card>);
 };
 
+const NotifIcon = (props) => {
+  const { variant, colorScheme, sx } = props;
+  const theme = useTheme();
+
+  const icons = {
+    error: <ErrorIcon sx={{ color: colorScheme.dark }} />,
+    warning: <WarningIcon sx={{ color: colorScheme.dark }} />,
+    info: <InfoIcon sx={{ color: colorScheme.dark }} />,
+    success: <CheckCircleIcon sx={{ color: colorScheme.dark }} />,
+  };
+  const icon = icons[variant];
+
+  return <Box sx={sx}>{icon}</Box>
+};
+
+const NotifCardActions = styled(CardActions)({
+  padding: "8px 8px 8px 16px",
+  justifyContent: "space-between",
+});
+
+
 const SnackMessage = forwardRef((props, ref) => {
+  const { id, message, options, details } = props;
+
   const { closeSnackbar } = useSnackbar();
   const [expanded, setExpanded] = useState(false);
-  const classes = useStyles();
 
-  const { id, message, options, details } = props;
-  const icon = icons[options.variant];
+  const theme = useTheme();
+  const colorScheme = theme.palette[options.variant];
 
   const handleExpandClick = useCallback(() => {
     setExpanded((oldExpanded) => !oldExpanded);
@@ -79,16 +71,16 @@ const SnackMessage = forwardRef((props, ref) => {
 
   return (
     <SnackbarContent ref={ref}>
-      <Card
-        className={classes[options.variant]}
+      <NotifCard
+        colorScheme={colorScheme}
         sx={{ width: "100%", maxWidth: "500px" }}
       >
-        <CardActions className={classes.actionRoot}>
-          <Stack direction="row" sx={{ color: "#FFFFFF" }}>
-            <Box sx={{ marginRight: "8px" }}>{icon && icon}</Box>
+        <NotifCardActions>
+          <Stack direction="row">
+            <NotifIcon variant={options.variant} colorScheme={colorScheme} sx={{ marginRight: "8px" }} />
             <Typography
               variant="subtitle2"
-              sx={{ alignSelf: "center", fontWeight: "bold" }}
+              sx={{ alignSelf: "center", fontWeight: "bold", color: colorScheme.contrastText }}
             >
               {message}
             </Typography>
@@ -97,22 +89,20 @@ const SnackMessage = forwardRef((props, ref) => {
             {details && (
               <IconButton
                 aria-label="Show more"
-                className={`${clsx(classes.expand, {
-                  [classes.expandOpen]: expanded,
-                })} ${classes.button}`}
+                sx={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)", color: colorScheme.dark }}
                 onClick={handleExpandClick}
               >
                 <ExpandMoreIcon />
               </IconButton>
             )}
             <IconButton
-              className={` ${classes.expand} ${classes.button}`}
+              sx={{ color: colorScheme.dark }}
               onClick={handleDismiss}
             >
               <CloseIcon />
             </IconButton>
           </div>
-        </CardActions>
+        </NotifCardActions>
         {details && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Paper sx={{ borderRadius: "0px" }}>
@@ -143,8 +133,8 @@ const SnackMessage = forwardRef((props, ref) => {
             </Paper>
           </Collapse>
         )}
-      </Card>
-    </SnackbarContent>
+      </NotifCard>
+    </SnackbarContent >
   );
 });
 
