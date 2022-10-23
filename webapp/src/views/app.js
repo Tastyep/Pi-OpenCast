@@ -97,7 +97,7 @@ const Header = () => {
     <AppBar
       position="sticky"
       sx={{
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: theme.palette.primary.dark,
       }}
     >
       <MediaQuery minWidth={SIZES.xlarge.min}>

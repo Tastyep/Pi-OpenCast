@@ -449,7 +449,11 @@ const ControlBar = observer((props) => {
             </Stack>
 
             <Stack direction="row">
-              <VolumeControl sx={{ minWidth: "320px" }} />
+              <VolumeControl
+                iconColor="secondary"
+                sliderColor="secondary"
+                sx={{ minWidth: "320px" }}
+              />
               <SubtitleControl />
             </Stack>
           </BarContainer>

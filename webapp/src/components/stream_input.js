@@ -96,7 +96,7 @@ const StreamInput = (props) => {
   );
 
   const theme = useTheme();
-  const inputBackground = mixColor(theme.palette.primary.main, "#FFFFFF", 0.18);
+  const inputBackground = mixColor(theme.palette.primary.dark, "#FFFFFF", 0.18);
 
   return (
     <Box sx={sx}>

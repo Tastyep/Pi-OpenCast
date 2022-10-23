@@ -15,7 +15,7 @@ import { observer } from "mobx-react-lite";
 const VolumeControl = observer((props) => {
   const store = useAppStore();
   const theme = useTheme();
-  const { sx } = props;
+  const { iconColor = "primary", sliderColor = "secondary", sx } = props;
   const [oldVolume, setOldVolume] = useState(store.player.volume);
 
   const handleCommit = (_, value) => {
@@ -45,7 +45,7 @@ const VolumeControl = observer((props) => {
     <Stack direction="row" justifyContent="end" alignItems="center" sx={sx}>
       <IconButton
         size="small"
-        color="secondary"
+        color={iconColor}
         sx={{
           marginLeft: "8px",
         }}
@@ -56,7 +56,7 @@ const VolumeControl = observer((props) => {
       <Box justifyContent="center" sx={{ display: "flex", flex: 1 }}>
         <Slider
           size="small"
-          color="secondary"
+          color={sliderColor}
           value={store.player.volume}
           valueLabelDisplay="auto"
           aria-labelledby="continuous-slider"
@@ -86,7 +86,7 @@ const VolumeControl = observer((props) => {
       </Box>
       <IconButton
         size="small"
-        color="secondary"
+        color={iconColor}
         sx={{
           marginLeft: "8px",
         }}

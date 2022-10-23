@@ -48,13 +48,13 @@ const PausePlayIcon = observer(() => {
       {isPlayerPlaying ? (
         <PauseCircleFilledIcon
           fontSize="large"
-          color="secondary"
+          color="primary"
           style={iconStyle}
         />
       ) : (
         <PlayCircleFilledIcon
           fontSize="large"
-          color="secondary"
+          color="primary"
           style={iconStyle}
         />
       )}
@@ -261,21 +261,31 @@ const ControlPage = observer((props) => {
         justifyContent="space-between"
         alignItems="center"
         sx={{
-          backgroundColor: theme.palette.primary.main,
+          backgroundColor: theme.palette.primary.dark,
           width: "100%",
           padding: "8px 0px 8px 0px",
         }}
       >
-        <IconButton size="large" color="secondary" onClick={() => closePage()}>
+        <IconButton
+          size="large"
+          sx={{ color: theme.palette.primary.contrastText }}
+          onClick={() => closePage()}
+        >
           <ExpandLessIcon fontSize="medium" />
         </IconButton>
-        <Typography noWrap align="center" noWrap color="primary.contrastText">
-          {activeVideo.title}
+        <Typography
+          noWrap
+          variant="h5"
+          align="center"
+          color="primary.contrastText"
+          sx={{ paddingTop: "6px" }}
+        >
+          Control
         </Typography>
         <IconButton
           size="large"
-          color="secondary"
           aria-expanded={isMenuOpen ? "true" : undefined}
+          sx={{ color: theme.palette.primary.contrastText }}
           onClick={(e) => setAnchor(e.currentTarget)}
         >
           <MoreVertIcon fontSize="medium" />
@@ -339,11 +349,21 @@ const ControlPage = observer((props) => {
             alignItems="center"
             sx={{ width: "70%", flexGrow: 0 }}
           >
-            <IconButton disableRipple={true} size="medium" onClick={playPrev}>
+            <IconButton
+              disableRipple={true}
+              size="medium"
+              color="primary"
+              onClick={playPrev}
+            >
               <SkipPreviousIcon fontSize="inherit" style={iconStyle} />
             </IconButton>
             <PausePlayIcon />
-            <IconButton disableRipple={true} size="medium" onClick={playNext}>
+            <IconButton
+              disableRipple={true}
+              size="medium"
+              color="primary"
+              onClick={playNext}
+            >
               <SkipNextIcon fontSize="inherit" style={iconStyle} />
             </IconButton>
           </Stack>

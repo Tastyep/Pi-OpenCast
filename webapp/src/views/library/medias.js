@@ -45,13 +45,13 @@ const MediasPage = observer(() => {
   const endAdornment =
     input.length > 0 ? (
       <InputAdornment position="end">
-        <IconButton color="secondary" onClick={() => setInput("")}>
+        <IconButton color="primary" onClick={() => setInput("")}>
           <ClearIcon />
         </IconButton>
       </InputAdornment>
     ) : (
       <InputAdornment position="end">
-        <IconButton color="secondary">
+        <IconButton color="primary">
           <SearchIcon />
         </IconButton>
       </InputAdornment>

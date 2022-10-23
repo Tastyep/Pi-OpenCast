@@ -2,9 +2,9 @@ import { grey } from "@mui/material/colors";
 import { mixColor } from "services/color";
 
 const primary = {
-  main: "#232F34",
+  main: "#3A4E57",
   light: "#47606A",
-  dark: "#1B2529",
+  dark: "#212C31",
 };
 
 // const primary = {
