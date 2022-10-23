@@ -278,7 +278,7 @@ const ControlPage = observer((props) => {
           variant="h5"
           align="center"
           color="primary.contrastText"
-          sx={{ paddingTop: "6px" }}
+          sx={{ paddingTop: "2px" }}
         >
           Control
         </Typography>
