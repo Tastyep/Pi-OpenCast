@@ -10,6 +10,7 @@ import {
   ListItemAvatar,
   LinearProgress,
   Stack,
+  Button,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -169,9 +170,8 @@ const DraggableMediaItem = observer((props) => {
   );
 });
 
-const Playlist = observer(({ videos, provided }) => {
+const Playlist = observer(({ virtuoso, videos, provided }) => {
   const store = useAppStore();
-  const virtuoso = useRef(null);
   const activeVideoId = store.player.videoId;
 
   const itemContent = (index, video) => (
@@ -229,6 +229,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   const store = useAppStore();
 
   const [input, setInput] = useState("");
+  const virtuoso = useRef(null);
 
   const onDragEnd = useCallback(
     (result, videos) => {
@@ -297,6 +298,22 @@ const DroppablePlaylist = observer(({ playlistId }) => {
     store.playlistVideos(playlistId),
     input
   );
+
+  const scrollToActiveVideo = () => {
+    let videoIdx = videos.findIndex(
+      (video) => video.id == store.player.videoId
+    );
+    if (videoIdx === -1) {
+      videoIdx = 0;
+    }
+
+    virtuoso.current.scrollToIndex({
+      index: videoIdx,
+      align: "start",
+      behavior: "auto",
+    });
+  };
+
   if (!playlistId) {
     return null;
   }
@@ -304,35 +321,40 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   const endAdornment =
     input.length > 0 ? (
       <InputAdornment position="end">
-        <IconButton color="secondary" onClick={() => setInput("")}>
+        <IconButton color="primary" onClick={() => setInput("")}>
           <ClearIcon />
         </IconButton>
       </InputAdornment>
     ) : (
       <InputAdornment position="end">
-        <IconButton color="secondary">
+        <IconButton color="primary">
           <SearchIcon />
         </IconButton>
       </InputAdornment>
     );
 
+  const theme = useTheme();
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
       <Stack
         direction="row"
         alignItems="center"
-        sx={{ margin: "0px 4px 4px 16px" }}
+        sx={{ margin: "0px 0px 4px 0px" }}
       >
-        <Typography
-          color="primary.main"
+        <Button
+          variant="outlined"
+          color="primary"
           sx={{
-            flex: "1",
             whiteSpace: "nowrap",
             margin: "0px 8px",
+            justifyContent: "center",
+            alignItems: "center",
+            // color: theme.palette.secondary.dark,
           }}
+          onClick={scrollToActiveVideo}
         >
           UP NEXT
-        </Typography>
+        </Button>
         <Stack direction="row" justifyContent="end" sx={{ flex: "3" }}>
           <TextField
             fullWidth
@@ -390,7 +412,13 @@ const DroppablePlaylist = observer(({ playlistId }) => {
               }}
               style={{ width: "100%" }}
             >
-              {(provided) => <Playlist videos={videos} provided={provided} />}
+              {(provided) => (
+                <Playlist
+                  virtuoso={virtuoso}
+                  videos={videos}
+                  provided={provided}
+                />
+              )}
             </Droppable>
           </DragDropContext>
         )}
