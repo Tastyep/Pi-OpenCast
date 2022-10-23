@@ -46,13 +46,12 @@ const StyledLink = styled(Link)({
   textDecoration: "none",
 });
 
-const BarContainer = styled(Stack)(({ theme, smallLayout = false }) => ({
+const BarContainer = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   alignItems: "center",
   flexDirection: "row",
   justifyContent: "space-between",
   height: "56px",
-  padding: smallLayout ? "0px" : "0px 16px",
 }));
 
 const updatePlayer = (store, update, ...args) => {
@@ -362,7 +361,7 @@ const ControlBar = observer((props) => {
     <MediaQuery minWidth={SIZES.large.min}>
       {(matches) =>
         matches ? (
-          <BarContainer direction="row">
+          <BarContainer sx={{ padding: "0px 16px" }}>
             <Stack direction="row">
               <IconButton size="small" color="secondary" onClick={playPrev}>
                 <SkipPreviousIcon />
@@ -455,7 +454,7 @@ const ControlBar = observer((props) => {
             </Stack>
           </BarContainer>
         ) : (
-          <BarContainer direction="row" smallLayout>
+          <BarContainer>
             <Stack
               direction="row"
               alignItems="center"

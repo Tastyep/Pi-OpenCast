@@ -165,6 +165,7 @@ const Layout = () => {
         <Grid
           item
           container
+          justifyContent="center"
           xs={12}
           sm={10}
           sx={{ height: "100%", overflow: "auto" }}
