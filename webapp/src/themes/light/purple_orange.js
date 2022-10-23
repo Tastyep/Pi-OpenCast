@@ -60,6 +60,10 @@ const purpleOrangeTheme = {
     //   dark: "#4d3a65",
     // },
 
+    primaryContrast: {
+      main: mixColor("#FFFFFF", primary.main, 0.1),
+    },
+
     secondary: {
       main: "#F9AA33",
       light: "#F9B043",

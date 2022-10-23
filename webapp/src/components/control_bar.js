@@ -142,7 +142,7 @@ const PausePlayIcon = observer((props) => {
   return (
     <IconButton
       size="small"
-      color="secondary"
+      color="primaryContrast"
       sx={sx}
       onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
     >
@@ -251,7 +251,7 @@ const SubtitleControl = observer(() => {
     <>
       <IconButton
         size="small"
-        color="secondary"
+        color="primaryContrast"
         onClick={() =>
           updatePlayer(
             store,
@@ -264,7 +264,7 @@ const SubtitleControl = observer(() => {
       </IconButton>
       <IconButton
         size="small"
-        color="secondary"
+        color="primaryContrast"
         onClick={() => updatePlayer(store, playerAPI.toggleSubtitle)}
       >
         {store.player.subState ? (
@@ -275,7 +275,7 @@ const SubtitleControl = observer(() => {
       </IconButton>
       <IconButton
         size="small"
-        color="secondary"
+        color="primaryContrast"
         onClick={() =>
           updatePlayer(
             store,
@@ -363,26 +363,34 @@ const ControlBar = observer((props) => {
         matches ? (
           <BarContainer sx={{ padding: "0px 16px" }}>
             <Stack direction="row">
-              <IconButton size="small" color="secondary" onClick={playPrev}>
+              <IconButton
+                size="small"
+                color="primaryContrast"
+                onClick={playPrev}
+              >
                 <SkipPreviousIcon />
               </IconButton>
               <PausePlayIcon />
               <IconButton
                 size="small"
-                color="secondary"
+                color="primaryContrast"
                 disableFocusRipple
                 disableRipple
                 onClick={() => updatePlayer(store, playerAPI.stopMedia)}
               >
                 <StopIcon />
               </IconButton>
-              <IconButton size="small" color="secondary" onClick={playNext}>
+              <IconButton
+                size="small"
+                color="primaryContrast"
+                onClick={playNext}
+              >
                 <SkipNextIcon />
               </IconButton>
 
               <IconButton
                 size="small"
-                color="secondary"
+                color="primaryContrast"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -396,7 +404,7 @@ const ControlBar = observer((props) => {
               </IconButton>
               <IconButton
                 size="small"
-                color="secondary"
+                color="primaryContrast"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -409,7 +417,7 @@ const ControlBar = observer((props) => {
               </IconButton>
               <IconButton
                 size="small"
-                color="secondary"
+                color="primaryContrast"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -422,7 +430,7 @@ const ControlBar = observer((props) => {
               </IconButton>
               <IconButton
                 size="small"
-                color="secondary"
+                color="primaryContrast"
                 onClick={() =>
                   updatePlayer(
                     store,
@@ -450,7 +458,7 @@ const ControlBar = observer((props) => {
 
             <Stack direction="row">
               <VolumeControl
-                iconColor="secondary"
+                iconColor="primaryContrast"
                 sliderColor="secondary"
                 sx={{ minWidth: "320px" }}
               />
@@ -469,7 +477,7 @@ const ControlBar = observer((props) => {
             <PausePlayIcon sx={{ marginLeft: "auto" }} />
             <IconButton
               size="medium"
-              color="secondary"
+              color="primaryContrast"
               onClick={() => openTrackInfo()}
             >
               <ExpandMoreIcon sx={{ fontSize: 30 }} />

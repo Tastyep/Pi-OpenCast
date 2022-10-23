@@ -2,8 +2,6 @@ import React, { useState } from "react";
 
 import { Stack, Slider, IconButton, Box } from "@mui/material";
 
-import { useTheme } from "@mui/material/styles";
-
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
@@ -14,7 +12,6 @@ import { observer } from "mobx-react-lite";
 
 const VolumeControl = observer((props) => {
   const store = useAppStore();
-  const theme = useTheme();
   const { iconColor = "primary", sliderColor = "secondary", sx } = props;
   const [oldVolume, setOldVolume] = useState(store.player.volume);
 
