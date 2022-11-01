@@ -294,7 +294,6 @@ const AlbumsPage = observer(() => {
         flexDirection: "row",
         flexWrap: "wrap",
         gap: "8px 16px",
-        width: "92%",
       }}
     >
       {albums.map((album, _) => (

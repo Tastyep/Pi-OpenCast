@@ -8,7 +8,17 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Collapse from "@mui/material/Collapse";
-import { styled, useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+
+import { useTheme } from "@mui/material/styles";
+
+import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import GroupsIcon from "@mui/icons-material/Groups";
+import AlbumIcon from "@mui/icons-material/Album";
+import SearchIcon from "@mui/icons-material/Search";
 
 import {
   BrowserRouter as Router,
@@ -21,15 +31,11 @@ import {
 
 import { observer } from "mobx-react-lite";
 
-import MediaQuery from "react-responsive";
+import { useMediaQuery } from "react-responsive";
 import { SIZES } from "constants.js";
 
-import ControlBar from "components/control_bar";
-import PlayerProgress from "components/player_progress";
-import Notifier from "components/notifier";
 import HomePage from "views/home";
 import ControlPage from "views/control";
-
 import ProfilePage from "views/profile";
 import AlbumsPage from "views/library/albums";
 import AlbumPage from "views/library/album";
@@ -39,12 +45,17 @@ import MediasPage from "views/library/medias";
 import PlaylistsPage from "views/library/playlists";
 import PlaylistPage from "views/library/playlist";
 
+import ControlBar from "components/control_bar";
+import PlayerProgress from "components/player_progress";
+import Notifier from "components/notifier";
 import StreamInput from "components/stream_input";
+
+import { hexToRgba } from "services/color";
 
 import { useAppStore } from "providers/app_context";
 
 const HeaderTabs = (props) => {
-  const { sx } = props;
+  const { smallLayout, sx } = props;
 
   const location = useLocation();
 
@@ -54,43 +65,136 @@ const HeaderTabs = (props) => {
     rootURL = rootURL.substring(0, secondSlashPos);
   }
 
+  const tabSx = {
+    justifyContent: "flex-start",
+    minHeight: "56px",
+
+    "& .MuiTab-iconWrapper": {
+      width: "24px",
+      height: "24px",
+      marginRight: "12px",
+    },
+  };
+
   return (
-    <Box display="flex" justifyContent="center" sx={{ width: "100%" }}>
-      <Tabs
-        allowScrollButtonsMobile
-        scrollButtons="auto"
-        variant="scrollable"
-        value={rootURL}
-        textColor="inherit"
-        TabIndicatorProps={{
-          style: {
-            display: "none",
-          },
-        }}
-        sx={sx}
-      >
-        <Tab label="Player" value="/" to="/" component={Link} />
-        <Tab label="Profile" value="/profile" to="/profile" component={Link} />
-        <Tab
-          label="Playlists"
-          value={"/playlists"}
-          to={"playlists"}
-          component={Link}
-        />
-        <Tab
-          label="Artists"
-          value={"/artists"}
-          to={"artists"}
-          component={Link}
-        />
-        <Tab label="Albums" value={"/albums"} to={"albums"} component={Link} />
-        <Tab label="Titles" value={"/medias"} to={"medias"} component={Link} />
-      </Tabs>
-    </Box>
+    <>
+      {smallLayout ? (
+        <Tabs
+          allowScrollButtonsMobile
+          scrollButtons="auto"
+          variant="scrollable"
+          value={rootURL}
+          textColor="inherit"
+          indicatorColor="secondary"
+          sx={sx}
+        >
+          <Tab value="/" to="/" icon={<OndemandVideoIcon />} component={Link} />
+          <Tab
+            value="/profile"
+            to="/profile"
+            icon={<FavoriteIcon />}
+            component={Link}
+          />
+          <Tab
+            value={"/playlists"}
+            to={"playlists"}
+            icon={<PlaylistPlayIcon />}
+            component={Link}
+          />
+          <Tab
+            value={"/artists"}
+            to={"artists"}
+            icon={<GroupsIcon />}
+            component={Link}
+          />
+          <Tab
+            value={"/albums"}
+            to={"albums"}
+            icon={<AlbumIcon />}
+            component={Link}
+          />
+          <Tab
+            value={"/medias"}
+            to={"medias"}
+            icon={<SearchIcon />}
+            component={Link}
+          />
+        </Tabs>
+      ) : (
+        <Tabs
+          variant="standard"
+          value={rootURL}
+          textColor="inherit"
+          orientation="vertical"
+          sx={sx}
+        >
+          <Tab
+            label="Player"
+            value="/"
+            to="/"
+            disableRipple={true}
+            iconPosition="start"
+            icon={<OndemandVideoIcon />}
+            component={Link}
+            sx={tabSx}
+          />
+          <Tab
+            label="Profile"
+            value="/profile"
+            to="/profile"
+            disableRipple={true}
+            iconPosition="start"
+            icon={<FavoriteIcon />}
+            component={Link}
+            sx={tabSx}
+          />
+          <Tab
+            label="Playlists"
+            value={"/playlists"}
+            to={"playlists"}
+            disableRipple={true}
+            iconPosition="start"
+            icon={<PlaylistPlayIcon />}
+            component={Link}
+            sx={tabSx}
+          />
+          <Tab
+            label="Artists"
+            value={"/artists"}
+            to={"artists"}
+            disableRipple={true}
+            iconPosition="start"
+            icon={<GroupsIcon />}
+            component={Link}
+            sx={tabSx}
+          />
+          <Tab
+            label="Albums"
+            value={"/albums"}
+            to={"albums"}
+            disableRipple={true}
+            iconPosition="start"
+            icon={<AlbumIcon />}
+            component={Link}
+            sx={tabSx}
+          />
+          <Tab
+            label="Medias"
+            value={"/medias"}
+            to={"medias"}
+            disableRipple={true}
+            iconPosition="start"
+            icon={<SearchIcon />}
+            component={Link}
+            sx={tabSx}
+          />
+        </Tabs>
+      )}
+    </>
   );
 };
 
-const Header = () => {
+const Header = ({ smallLayout }) => {
   const theme = useTheme();
 
   return (
@@ -98,33 +202,28 @@ const Header = () => {
       position="sticky"
       sx={{
         backgroundColor: theme.palette.primary.dark,
+        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
-      <MediaQuery minWidth={SIZES.xlarge.min}>
-        {(matches) =>
-          matches ? (
-            <Grid
-              container
-              sx={{
-                padding: "8px 16px 4px 16px",
-              }}
-            >
-              <Grid item xs={3} sx={{ marginTop: "2px" }}>
-                <StreamInput />
-              </Grid>
-              <Grid item xs>
-                <HeaderTabs />
-              </Grid>
-              <Grid item xs={3} />
-            </Grid>
-          ) : (
-            <Box sx={{ paddingTop: "12px" }}>
-              <StreamInput />
-              <HeaderTabs />
-            </Box>
-          )
-        }
-      </MediaQuery>
+      {smallLayout ? (
+        <Box sx={{ paddingTop: "12px" }}>
+          <StreamInput />
+          <HeaderTabs smallLayout={smallLayout} />
+        </Box>
+      ) : (
+        <Grid
+          container
+          sx={{
+            padding: "8px 16px 6px 16px",
+          }}
+        >
+          <Grid item xs={3} />
+          <Grid item xs>
+            <StreamInput />
+          </Grid>
+          <Grid item xs={3} />
+        </Grid>
+      )}
     </AppBar>
   );
 };
@@ -147,40 +246,23 @@ const CollapsableControlBar = observer((props) => {
   );
 });
 
-const Layout = () => {
+const SmallLayout = () => {
   const [controlPageOpen, closeControlPage] = useState(false);
 
   return (
     <Stack sx={{ height: "100%" }}>
       <Notifier />
-      <Header />
-      <Grid
-        container
-        sx={{
-          minHeight: "0px", // Set minHeight of flex item to 0 otherwise it defaults to the content's height
-          flex: 1,
-        }}
+      <Header smallLayout={true} />
+      <Drawer
+        anchor="top"
+        open={controlPageOpen}
+        onClose={() => closeControlPage(false)}
       >
-        <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
-        <Grid
-          item
-          container
-          justifyContent="center"
-          xs={12}
-          sm={10}
-          sx={{ height: "100%", overflow: "auto" }}
-        >
-          <Drawer
-            anchor="top"
-            open={controlPageOpen}
-            onClose={() => closeControlPage(false)}
-          >
-            <ControlPage closePage={() => closeControlPage(false)} />
-          </Drawer>
-          <Outlet />
-        </Grid>
-        <Grid item xs={false} sm={1} sx={{ backgroundColor: "#F2F2F2" }} />
-      </Grid>
+        <ControlPage closePage={() => closeControlPage(false)} />
+      </Drawer>
+      <Box sx={{ display: "flex", flex: 1, minHeight: "0px", margin: "0px 8px 0px 8px" }}>
+        <Outlet />
+      </Box>
       {!controlPageOpen && (
         <CollapsableControlBar openTrackInfo={() => closeControlPage(true)} />
       )}
@@ -188,11 +270,85 @@ const Layout = () => {
   );
 };
 
+const LargeLayout = () => {
+  const [controlPageOpen, closeControlPage] = useState(false);
+  const navWidth = "360px";
+
+  const theme = useTheme();
+  const navIndicatorColor = hexToRgba(theme.palette.primary.main, 0.5);
+
+  return (
+    <Stack sx={{ height: "100%" }}>
+      <Notifier />
+      <Header smallLayout={false} />
+      <Stack direction="row" sx={{ flex: 1 }}>
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: navWidth,
+            flexShrink: 0,
+          }}
+          PaperProps={{
+            sx: {
+              width: navWidth,
+              boxSizing: "border-box",
+            },
+          }}
+        >
+          <Toolbar />
+          <Typography
+            variant="subtitle1"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              minHeight: "56px",
+              marginLeft: "24px",
+            }}
+          >
+            OpenCast
+          </Typography>
+          <HeaderTabs
+            smallLayout={false}
+            sx={{
+              marginLeft: "12px",
+              marginRight: "12px",
+              "& .MuiTabs-indicator": {
+                width: "100%",
+                borderRadius: "32px",
+                backgroundColor: navIndicatorColor,
+              },
+            }}
+          />
+        </Drawer>
+        <Box sx={{ display: "flex", flex: 1, margin: "0px 32px 0px 32px" }}>
+          <Outlet />
+        </Box>
+      </Stack>
+      {!controlPageOpen && (
+        <Box
+          sx={{
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+          }}
+        >
+          <CollapsableControlBar openTrackInfo={() => closeControlPage(true)} />
+        </Box>
+      )}
+    </Stack>
+  );
+};
+
 const App = () => {
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route
+          path="/"
+          element={isSmallDevice ? <SmallLayout /> : <LargeLayout />}
+        >
           <Route index element={<HomePage />} />
           <Route path={"profile"} element={<ProfilePage />} />
           <Route path={"playlists"} element={<PlaylistsPage />} />

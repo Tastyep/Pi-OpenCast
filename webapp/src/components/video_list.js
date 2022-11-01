@@ -37,7 +37,10 @@ const VideoList = observer(({ videos, count }) => {
     <ImageList
       cols={count}
       gap={8}
-      sx={{ flexWrap: "nowrap", transform: "translateZ(0)" }}
+      sx={{
+        flexWrap: "nowrap",
+        transform: "translateZ(0)",
+      }}
     >
       {[...Array(count).keys()].map((index) => {
         if (index >= videos.length) {

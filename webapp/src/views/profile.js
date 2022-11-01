@@ -27,19 +27,23 @@ const ProfilePage = observer(() => {
   const store = useAppStore();
 
   return (
-    <Box sx={{ width: "92%" }}>
+    <Stack direction="column" sx={{ overflowX: "hidden", overflowY: "auto" }}>
       <Typography variant="h6" sx={{ paddingTop: "32px" }}>
         Recent activity
       </Typography>
-      <VideoList videos={listLastPlayedVideos(store.videos)} count={10} />
+      <Box sx={{ display: "flex" }}>
+        <VideoList videos={listLastPlayedVideos(store.videos)} count={10} />
+      </Box>
       <Divider
         sx={{
           margin: "32px 0px",
         }}
       />
       <Typography variant="h6">Most played</Typography>
-      <VideoList videos={listPopularVideos(store.videos)} count={10} />
-    </Box>
+      <Box sx={{ display: "flex" }}>
+        <VideoList videos={listPopularVideos(store.videos)} count={10} />
+      </Box>
+    </Stack>
   );
 });
 

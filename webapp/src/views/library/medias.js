@@ -27,10 +27,6 @@ const MediasPage = observer(() => {
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
-  let contentStyle = { flex: 1, width: "100%" };
-  if (!isSmallDevice) {
-    contentStyle["width"] = "92%";
-  }
 
   const updateInputContent = (e) => {
     setInput(e.target.value);
@@ -58,7 +54,7 @@ const MediasPage = observer(() => {
     );
 
   return (
-    <Stack style={contentStyle}>
+    <Stack direction="column" sx={{ flex: 1 }}>
       <Box
         sx={{
           alignSelf: "end",

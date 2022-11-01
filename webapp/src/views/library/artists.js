@@ -200,7 +200,6 @@ const ArtistsPage = observer(() => {
         flexDirection: "row",
         flexWrap: "wrap",
         gap: "8px 16px",
-        width: "92%",
       }}
     >
       {artists.map((artist, _) => (
