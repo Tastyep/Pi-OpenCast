@@ -11,6 +11,7 @@ class UpdateMediaTime {
     eventDispatcher.observe({
       WSResponse: (e) => this.onWSResponse(e),
       PlayerStateUpdated: (e) => this.onPlayerStateUpdated(e),
+      PlayerVideoUpdated: (e) => this.onPlayerVideoUpdated(e),
       VideoSeeked: (e) => this.onVideoSeeked(e),
     });
   }
@@ -46,6 +47,15 @@ class UpdateMediaTime {
 
     clearInterval(this.task);
     this.task = null;
+  }
+
+  onPlayerVideoUpdated(e) {
+    let video = this.store.videos[e.old_video_id];
+    if (!video) {
+      return;
+    }
+
+    video.setPlayTime(0);
   }
 
   onVideoSeeked(e) {
