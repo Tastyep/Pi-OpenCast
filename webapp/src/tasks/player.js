@@ -4,6 +4,7 @@ class UpdateMediaTime {
   RPS = 3;
   video_id = null;
   task = null;
+  last_time_update = null;
 
   constructor(store, eventDispatcher) {
     this.store = store;
@@ -47,6 +48,7 @@ class UpdateMediaTime {
 
     clearInterval(this.task);
     this.task = null;
+    this.last_update = null;
   }
 
   onPlayerVideoUpdated(e) {
@@ -87,7 +89,14 @@ class UpdateMediaTime {
         return;
       }
 
-      video.setPlayTime(video.playTime + 1000 / this.RPS);
+      let timeDiff = 0;
+      if (this.last_update) {
+        const now = Date.now();
+        timeDiff = Math.abs(now - this.last_update);
+      }
+      this.last_update = Date.now();
+
+      video.setPlayTime(video.playTime + timeDiff);
     }, 1000 / this.RPS);
   }
 }
