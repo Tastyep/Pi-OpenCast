@@ -53,8 +53,8 @@ class VideoWorkflow(Workflow):
         ["_video_created",          States.CREATING,       States.RETRIEVING],
         ["_video_retrieved",        States.RETRIEVING,     States.FINALIZING,  "is_stream"],  # noqa: E501
         ["_video_retrieved",        States.RETRIEVING,     States.PARSING],
-        ["_video_parsed",           States.PARSING,        States.SUB_RETRIEVING, "are_subtitles_enabled"], # noqa: E501 
-        ["_video_parsed",           States.PARSING,        States.FINALIZING],  
+        ["_video_parsed",           States.PARSING,        States.SUB_RETRIEVING, "are_subtitles_enabled"],  # noqa: E501
+        ["_video_parsed",           States.PARSING,        States.FINALIZING],
         ["_video_subtitle_fetched", States.SUB_RETRIEVING, States.FINALIZING],
         ["_video_state_updated",    States.FINALIZING,     States.COMPLETED],
 
