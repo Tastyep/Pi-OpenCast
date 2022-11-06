@@ -11,8 +11,13 @@ import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
 
 const VolumeControl = observer((props) => {
+  const {
+    iconColor = "primary",
+    sliderColor = "secondary",
+    height = 2,
+    sx,
+  } = props;
   const store = useAppStore();
-  const { iconColor = "primary", sliderColor = "secondary", sx } = props;
   const [oldVolume, setOldVolume] = useState(store.player.volume);
 
   const handleCommit = (_, value) => {
@@ -40,24 +45,17 @@ const VolumeControl = observer((props) => {
 
   return (
     <Stack direction="row" justifyContent="end" alignItems="center" sx={sx}>
-      <IconButton
-        size="small"
-        color={iconColor}
-        sx={{
-          marginLeft: "8px",
-        }}
-        onClick={toggleMute}
-      >
+      <IconButton size="small" color={iconColor} onClick={toggleMute}>
         {(store.player.volume === 0 && <VolumeOffIcon />) || <VolumeDownIcon />}
       </IconButton>
       <Box justifyContent="center" sx={{ display: "flex", flex: 1 }}>
         <Slider
-          size="small"
           color={sliderColor}
           value={store.player.volume}
           valueLabelDisplay="auto"
           aria-labelledby="continuous-slider"
           sx={{
+            height: { height },
             width: "96%",
             marginLeft: "4px",
             "& .MuiSlider-track": {
