@@ -293,7 +293,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
 
   const scrollToActiveVideo = () => {
     let videoIdx = videos.findIndex(
-      (video) => video.id == store.player.videoId
+      (video) => video.id === store.player.videoId
     );
     if (videoIdx === -1) {
       videoIdx = 0;

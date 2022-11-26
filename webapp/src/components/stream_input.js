@@ -50,11 +50,21 @@ const StreamInput = (props) => {
     }
     if (streamOpt) {
       playerAPI
-        .streamMedia(url, { dl_opts: { download_video: audioOnlyOpt } })
+        .streamMedia(url, {
+          dl_opts: {
+            download_video: !audioOnlyOpt,
+            download_subtitles: subtitleDlOpt,
+          },
+        })
         .catch(snackBarHandler(store));
     } else {
       playerAPI
-        .queueMedia(url, { dl_opts: { download_video: audioOnlyOpt } })
+        .queueMedia(url, {
+          dl_opts: {
+            download_video: !audioOnlyOpt,
+            download_subtitles: subtitleDlOpt,
+          },
+        })
         .catch(snackBarHandler(store));
     }
     setUrl("");
@@ -72,9 +82,12 @@ const StreamInput = (props) => {
     if (!value) {
       return;
     }
-    console.log("value: ", value);
+
     setAudioOnlyOpt(value === "audio");
-    setSubtitleDlOpt(value !== "audio");
+    // TODO: add real support for downloading subtitles.
+    // Add a button for enabling subtitle downloading.
+    // Add another one for downloading subtitles after downloading a video
+    // setSubtitleDlOpt(value !== "audio");
   };
 
   const updateBlur = (evt) => {

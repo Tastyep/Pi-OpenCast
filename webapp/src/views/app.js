@@ -65,17 +65,6 @@ const MobileHeaderTabs = (props) => {
     rootURL = rootURL.substring(0, secondSlashPos);
   }
 
-  const tabSx = {
-    justifyContent: "flex-start",
-    minHeight: "56px",
-
-    "& .MuiTab-iconWrapper": {
-      width: "24px",
-      height: "24px",
-      marginRight: "12px",
-    },
-  };
-
   return (
     <Tabs
       allowScrollButtonsMobile
@@ -216,7 +205,6 @@ const DesktopHeaderTabs = (props) => {
 };
 
 const MobileHeader = (props) => {
-  const {} = props;
   const theme = useTheme();
 
   return (
