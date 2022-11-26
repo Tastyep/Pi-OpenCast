@@ -260,7 +260,14 @@ const SmallLayout = () => {
       >
         <ControlPage closePage={() => closeControlPage(false)} />
       </Drawer>
-      <Box sx={{ display: "flex", flex: 1, minHeight: "0px", margin: "0px 8px 0px 8px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flex: 1,
+          minHeight: "0px",
+          margin: "0px 8px 0px 8px",
+        }}
+      >
         <Outlet />
       </Box>
       {!controlPageOpen && (
@@ -271,7 +278,6 @@ const SmallLayout = () => {
 };
 
 const LargeLayout = () => {
-  const [controlPageOpen, closeControlPage] = useState(false);
   const navWidth = "360px";
 
   const theme = useTheme();
@@ -320,19 +326,16 @@ const LargeLayout = () => {
             }}
           />
         </Drawer>
-        <Box sx={{ display: "flex", flex: 1, margin: "0px 32px 0px 32px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flex: 1,
+            padding: "0px 32px 0px 32px",
+          }}
+        >
           <Outlet />
         </Box>
       </Stack>
-      {!controlPageOpen && (
-        <Box
-          sx={{
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-          }}
-        >
-          <CollapsableControlBar openTrackInfo={() => closeControlPage(true)} />
-        </Box>
-      )}
     </Stack>
   );
 };

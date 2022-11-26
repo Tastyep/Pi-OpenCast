@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 
 import {
-  Container,
   Grid,
   Divider,
   ListItemText,
@@ -19,22 +18,24 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 
 import SearchIcon from "@mui/icons-material/Search";
-import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Virtuoso } from "react-virtuoso";
 
-import MediaQuery from "react-responsive";
+import { useMediaQuery } from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { observer } from "mobx-react-lite";
 
-import noPreview from "images/no-preview.png";
+import MediaControl from "views/media_control";
+
+import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
+
 import playerAPI from "services/api/player";
 import playlistAPI from "services/api/playlist";
 import snackBarHandler from "services/api/error";
@@ -42,27 +43,18 @@ import { durationToHMS } from "services/duration";
 import { filterVideos, queueNext, shuffleIds } from "services/playlist";
 
 import { useAppStore } from "providers/app_context";
-import { MediaAvatar, PlayingMediaAvatar } from "components/media_item";
 
-const PageContainer = styled("div")({
+const PageContainer = styled("div", {
+  shouldForwardProp: (props) => props !== "smallSize",
+})(({ smallSize }) => ({
   display: "flex",
+  flex: 1,
   flexWrap: "wrap",
-  height: `calc(100% - 12px)`,
   justifyContent: "center",
-  paddingTop: "12px",
+  paddingTop: smallSize ? "12px" : "24px",
+  paddingBottom: smallSize ? "0px" : "24px",
   width: "100%",
-});
-
-const LargeThumbnail = styled("img")({
-  width: "100%",
-  height: "auto",
-  maxHeight: "96%",
-  objectFit: "contain",
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-});
+}));
 
 const MediaItem = observer((props) => {
   const store = useAppStore();
@@ -333,13 +325,12 @@ const DroppablePlaylist = observer(({ playlistId }) => {
       </InputAdornment>
     );
 
-  const theme = useTheme();
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
       <Stack
         direction="row"
         alignItems="center"
-        sx={{ margin: "0px 0px 4px 0px" }}
+        sx={{ margin: "0px 0px 8px 0px" }}
       >
         <Button
           variant="outlined"
@@ -427,50 +418,6 @@ const DroppablePlaylist = observer(({ playlistId }) => {
   );
 });
 
-const PlayingMediaThumbnail = observer(() => {
-  const store = useAppStore();
-  const video = store.videos[store.player.videoId];
-
-  if (!video || !video.thumbnail) {
-    return (
-      <Stack
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          width: "100%",
-          aspectRatio: "16/9",
-          maxHeight: "100%",
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          paddingBottom: "16px",
-          background:
-            "linear-gradient(to bottom right, #333536 0%, #515355 50%, #333536 100%)",
-          borderRadius: "16px",
-          overflow: "hidden",
-          caretColor: "transparent",
-        }}
-      >
-        <MusicVideoIcon
-          sx={{
-            height: "50%",
-            width: "50%",
-            color: "#000000",
-          }}
-        />
-      </Stack>
-    );
-  }
-
-  return (
-    <LargeThumbnail
-      src={video.thumbnail === null ? noPreview : video.thumbnail}
-      alt={video.title}
-    />
-  );
-});
-
 const HomePage = observer(() => {
   const store = useAppStore();
   const playlistId = store.player.queue;
@@ -481,42 +428,53 @@ const HomePage = observer(() => {
     }
   }, [store, playlistId]);
 
+  const isSmallDevice = useMediaQuery({
+    maxWidth: SIZES.small.max,
+  });
+
+  console.log("isSmallDevice: ", isSmallDevice);
   if (!playlistId) {
     return null;
   }
 
   return (
-    <PageContainer>
-      <MediaQuery minWidth={SIZES.large.min}>
-        {(matches) =>
-          matches ? (
-            <Grid container justifyContent="center" sx={{ height: "100%" }}>
-              <Grid item xs={8} sx={{ height: "100%" }}>
-                <Container sx={{ height: "100%" }}>
-                  <div style={{ position: "relative", height: "100%" }}>
-                    <PlayingMediaThumbnail />
-                  </div>
-                </Container>
-              </Grid>
-              <Grid item xs={4} sx={{ height: "100%" }}>
-                <Stack direction="row" sx={{ height: "100%" }}>
-                  <Divider
-                    orientation="vertical"
-                    sx={{
-                      backgroundColor: "#F0F0F0",
-                    }}
-                  />
-                  <DroppablePlaylist playlistId={playlistId} />
-                </Stack>
-              </Grid>
-            </Grid>
-          ) : (
-            <Stack sx={{ height: "100%", width: "100%" }}>
+    <PageContainer smallSize={isSmallDevice}>
+      {isSmallDevice ? (
+        <Stack sx={{ height: "100%", width: "100%" }}>
+          <DroppablePlaylist playlistId={playlistId} />
+        </Stack>
+      ) : (
+        <Grid container justifyContent="center" sx={{ height: "100%" }}>
+          <Grid
+            container
+            item
+            alignItems="center"
+            justifyContent="center"
+            xs={8}
+            sx={{ paddingRight: "24px" }}
+          >
+            <MediaControl iconColor="primary" />
+          </Grid>
+          <Grid
+            item
+            container
+            xs={4}
+            justifyContent="flex-end"
+            sx={{ height: "100%" }}
+          >
+            <Paper
+              elevation={2}
+              sx={{
+                display: "flex",
+                flex: 1,
+                padding: "12px 12px 12px 12px",
+              }}
+            >
               <DroppablePlaylist playlistId={playlistId} />
-            </Stack>
-          )
-        }
-      </MediaQuery>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
     </PageContainer>
   );
 });

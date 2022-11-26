@@ -9,8 +9,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import PauseIcon from "@mui/icons-material/Pause";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import ClosedCaptionIcon from "@mui/icons-material/ClosedCaption";
 import ClosedCaptionDisabledIcon from "@mui/icons-material/ClosedCaptionDisabled";
@@ -31,6 +29,7 @@ import MediaQuery from "react-responsive";
 import { SIZES } from "constants.js";
 
 import { VolumeControl } from "components/volume_control";
+import { PausePlayButton } from "components/player_buttons";
 
 import { durationToHMS } from "services/duration";
 import playerAPI from "services/api/player";
@@ -39,7 +38,6 @@ import snackBarHandler from "services/api/error";
 import "./player_control.css";
 import { useAppStore } from "providers/app_context";
 import { observer } from "mobx-react-lite";
-import { useTheme } from "@emotion/react";
 
 const StyledLink = styled(Link)({
   color: "inherit",
@@ -131,27 +129,6 @@ const MediaData = observer((props) => {
     <Box sx={sx}>
       <Typography color="primary.contrastText">{video.title}</Typography>
     </Box>
-  );
-});
-
-const PausePlayIcon = observer((props) => {
-  const store = useAppStore();
-  const isPlayerPlaying = store.player.isPlaying;
-  const { sx } = props;
-
-  return (
-    <IconButton
-      size="small"
-      color="primaryContrast"
-      sx={sx}
-      onClick={() => updatePlayer(store, playerAPI.pauseMedia)}
-    >
-      {isPlayerPlaying ? (
-        <PauseIcon sx={{ fontSize: 30 }} />
-      ) : (
-        <PlayArrowIcon sx={{ fontSize: 30 }} />
-      )}
-    </IconButton>
   );
 });
 
@@ -370,7 +347,7 @@ const ControlBar = observer((props) => {
               >
                 <SkipPreviousIcon />
               </IconButton>
-              <PausePlayIcon />
+              <PausePlayButton />
               <IconButton
                 size="small"
                 color="primaryContrast"
@@ -474,7 +451,10 @@ const ControlBar = observer((props) => {
             >
               <ActiveMediaData variant="small" />
             </Stack>
-            <PausePlayIcon sx={{ marginLeft: "auto" }} />
+            <PausePlayButton
+              iconColor="primaryContrast"
+              sx={{ marginLeft: "auto" }}
+            />
             <IconButton
               size="medium"
               color="primaryContrast"

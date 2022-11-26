@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import Typography from "@mui/material/Typography";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -5,22 +7,17 @@ import CardMedia from "@mui/material/CardMedia";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Popper from "@mui/material/Popper";
+import Divider from "@mui/material/Divider";
 
-import MusicVideoIcon from "@mui/icons-material/MusicVideo";
-import StopIcon from "@mui/icons-material/Stop";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
-import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
-import ClosedCaptionIcon from "@mui/icons-material/ClosedCaption";
-import ClosedCaptionDisabledIcon from "@mui/icons-material/ClosedCaptionDisabled";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import FastRewindIcon from "@mui/icons-material/FastRewind";
-import FastForwardIcon from "@mui/icons-material/FastForward";
-import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Replay5Icon from "@mui/icons-material/Replay5";
 import Forward5Icon from "@mui/icons-material/Forward5";
+import SettingsIcon from "@mui/icons-material/Settings";
+
+import { useTheme } from "@emotion/react";
 
 import { observer } from "mobx-react-lite";
 
@@ -33,12 +30,71 @@ import { durationToHMS, countHMSParts } from "services/duration";
 import snackBarHandler from "services/api/error";
 
 import { useAppStore } from "providers/app_context";
+import { useRef } from "react";
 
 const updatePlayer = (store, update, ...args) => {
   update(...args).catch(snackBarHandler(store));
 };
+
+const AdvancedPlayerControl = observer((props) => {
+  const { anchorEl, placement, iconColor, iconSize } = props;
+  const open = Boolean(anchorEl);
+  const id = open ? "advanced-player-control" : undefined;
+
+  const theme = useTheme();
+  const menuWidth = 256;
+
+  if (!open) {
+    return null;
+  }
+
+  console.log(anchorEl.clientHeight);
+  return (
+    <Popper
+      id={id}
+      open={open}
+      anchorEl={anchorEl}
+      placement={placement}
+      modifiers={[
+        {
+          name: "offset",
+          options: {
+            offset: [0, -anchorEl.clientHeight],
+          },
+        },
+      ]}
+    >
+      <Stack
+        direction="row"
+        sx={{
+          width: menuWidth,
+          height: anchorEl.clientHeight,
+          backgroundColor: theme.palette.background.default,
+          boxSizing: "border-box",
+        }}
+      >
+        <Divider orientation="vertical" />
+        <Stack
+          direction="column"
+          sx={{
+            flex: 1,
+            padding: "24px 16px 24px 16px",
+          }}
+        >
+          <Typography variant="h5">Advanced control</Typography>
+          <Stack direction="row">
+            <SubtitleButtons iconColor={iconColor} iconSize={iconSize} />
+          </Stack>
+        </Stack>
+      </Stack>
+    </Popper>
+  );
+});
+
 const MediaControl = observer((props) => {
   const { iconColor, buttonSize = "medium", iconSize = "large" } = props;
+  const [advancedControlAnchor, setAdvancedControlAnchor] = useState(null);
+  const mediaImageRef = useRef();
 
   const store = useAppStore();
   const video = store.videos[store.player.videoId];
@@ -107,11 +163,31 @@ const MediaControl = observer((props) => {
     playerAPI.playMedia(playlist.ids[idx - 1]).catch(snackBarHandler(store));
   };
 
+  const toggleAdvancedControls = () => {
+    if (advancedControlAnchor) {
+      setAdvancedControlAnchor(null);
+    } else {
+      setAdvancedControlAnchor(mediaImageRef.current);
+    }
+  };
+
   return (
     <Card>
-      {video.thumbnail ? (
-        <CardMedia component="img" image={video.thumbnail} alt={video.title} />
-      ) : null}
+      <Box ref={mediaImageRef}>
+        {video.thumbnail ? (
+          <CardMedia
+            component="img"
+            image={video.thumbnail}
+            alt={video.title}
+          />
+        ) : null}
+        <AdvancedPlayerControl
+          anchorEl={advancedControlAnchor}
+          placement="bottom-end"
+          iconSize={iconSize}
+          iconColor={iconColor}
+        />
+      </Box>
 
       <Stack direction="column" alignItems="center" sx={{ width: "100%" }}>
         <PlayerProgress height={7} />
@@ -135,12 +211,18 @@ const MediaControl = observer((props) => {
       <CardContent
         sx={{
           display: "flex",
-          flexDirection: "column",
           flex: 1,
+          flexDirection: "column",
         }}
       >
+        <Stack alignItems="center" sx={{ marginBottom: "16px" }}>
+          <Typography noWrap variant="h4">
+            {artist && `artist.name - `} {video.title}
+          </Typography>
+        </Stack>
+
         <Grid container direction="row">
-          <Grid item xs={4} sx={{ maxWidth: "296px" }}>
+          <Grid container item xs={11}>
             <IconButton size={buttonSize} color={iconColor} onClick={playPrev}>
               <SkipPreviousIcon fontSize={iconSize} />
             </IconButton>
@@ -189,27 +271,20 @@ const MediaControl = observer((props) => {
             </IconButton>
           </Grid>
 
-          <Grid
-            container
-            item
-            alignContent="center"
-            justifyContent="center"
-            xs={4}
-          >
-            <Typography noWrap variant="h4" sx={{ marginRight: "24px" }}>
-              {artist && `artist.name - `} {video.title}
-            </Typography>
-          </Grid>
-          <Grid container item justifyContent="flex-end" xs={4}>
-            <SubtitleButtons iconColor={iconColor} iconSize={iconSize} />
+          <Grid container item justifyContent="flex-end" xs={1}>
+            <IconButton
+              size={buttonSize}
+              color={iconColor}
+              onClick={toggleAdvancedControls}
+            >
+              <SettingsIcon fontSize={iconSize} />
+            </IconButton>
           </Grid>
         </Grid>
 
-        <VolumeControl
-          iconColor={iconColor}
-          height={3}
-          sx={{ marginTop: "24px" }}
-        />
+        <Stack sx={{ margin: "0px 6px 0px 6px" }}>
+          <VolumeControl iconSize="medium" iconColor={iconColor} height={3} />
+        </Stack>
       </CardContent>
     </Card>
   );

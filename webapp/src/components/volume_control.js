@@ -12,6 +12,8 @@ import { observer } from "mobx-react-lite";
 
 const VolumeControl = observer((props) => {
   const {
+    buttonSize = "medium",
+    iconSize = "medium",
     iconColor = "primary",
     sliderColor = "secondary",
     height = 2,
@@ -45,8 +47,10 @@ const VolumeControl = observer((props) => {
 
   return (
     <Stack direction="row" justifyContent="end" alignItems="center" sx={sx}>
-      <IconButton size="small" color={iconColor} onClick={toggleMute}>
-        {(store.player.volume === 0 && <VolumeOffIcon />) || <VolumeDownIcon />}
+      <IconButton size={buttonSize} color={iconColor} onClick={toggleMute}>
+        {(store.player.volume === 0 && (
+          <VolumeOffIcon fontSize={iconSize} />
+        )) || <VolumeDownIcon fontSize={iconSize} />}
       </IconButton>
       <Box justifyContent="center" sx={{ display: "flex", flex: 1 }}>
         <Slider
@@ -80,13 +84,13 @@ const VolumeControl = observer((props) => {
         />
       </Box>
       <IconButton
-        size="small"
+        size={buttonSize}
         color={iconColor}
         sx={{
           marginLeft: "8px",
         }}
       >
-        <VolumeUpIcon />
+        <VolumeUpIcon fontSize={iconSize} />
       </IconButton>
     </Stack>
   );
