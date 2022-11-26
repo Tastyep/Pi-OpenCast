@@ -215,7 +215,8 @@ const DesktopHeaderTabs = (props) => {
   );
 };
 
-const MobileHeader = () => {
+const MobileHeader = (props) => {
+  const {} = props;
   const theme = useTheme();
 
   return (
@@ -223,7 +224,6 @@ const MobileHeader = () => {
       position="sticky"
       sx={{
         backgroundColor: theme.palette.primary.dark,
-        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Box sx={{ paddingTop: "12px" }}>
@@ -285,11 +285,11 @@ const SmallLayout = () => {
   return (
     <Stack sx={{ height: "100%" }}>
       <Notifier />
-      <MobileHeader />
       {controlPageOpen ? (
         <ControlPage closePage={() => setControlPageOpenState(false)} />
       ) : (
         <>
+          <MobileHeader controlPageOpen={controlPageOpen} />
           <Box
             sx={{
               display: "flex",

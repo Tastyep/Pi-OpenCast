@@ -263,7 +263,7 @@ const ControlPage = observer((props) => {
         sx={{
           backgroundColor: theme.palette.primary.dark,
           width: "100%",
-          padding: "8px 0px 8px 0px",
+          padding: "6px 0px 6px 0px",
         }}
       >
         <IconButton
