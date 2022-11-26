@@ -54,8 +54,8 @@ import { hexToRgba } from "services/color";
 
 import { useAppStore } from "providers/app_context";
 
-const HeaderTabs = (props) => {
-  const { smallLayout, sx } = props;
+const MobileHeaderTabs = (props) => {
+  const { sx } = props;
 
   const location = useLocation();
 
@@ -77,124 +77,145 @@ const HeaderTabs = (props) => {
   };
 
   return (
-    <>
-      {smallLayout ? (
-        <Tabs
-          allowScrollButtonsMobile
-          scrollButtons="auto"
-          variant="scrollable"
-          value={rootURL}
-          textColor="inherit"
-          indicatorColor="secondary"
-          sx={sx}
-        >
-          <Tab value="/" to="/" icon={<OndemandVideoIcon />} component={Link} />
-          <Tab
-            value="/profile"
-            to="/profile"
-            icon={<FavoriteIcon />}
-            component={Link}
-          />
-          <Tab
-            value={"/playlists"}
-            to={"playlists"}
-            icon={<PlaylistPlayIcon />}
-            component={Link}
-          />
-          <Tab
-            value={"/artists"}
-            to={"artists"}
-            icon={<GroupsIcon />}
-            component={Link}
-          />
-          <Tab
-            value={"/albums"}
-            to={"albums"}
-            icon={<AlbumIcon />}
-            component={Link}
-          />
-          <Tab
-            value={"/medias"}
-            to={"medias"}
-            icon={<SearchIcon />}
-            component={Link}
-          />
-        </Tabs>
-      ) : (
-        <Tabs
-          variant="standard"
-          value={rootURL}
-          textColor="inherit"
-          orientation="vertical"
-          sx={sx}
-        >
-          <Tab
-            label="Player"
-            value="/"
-            to="/"
-            disableRipple={true}
-            iconPosition="start"
-            icon={<OndemandVideoIcon />}
-            component={Link}
-            sx={tabSx}
-          />
-          <Tab
-            label="Profile"
-            value="/profile"
-            to="/profile"
-            disableRipple={true}
-            iconPosition="start"
-            icon={<FavoriteIcon />}
-            component={Link}
-            sx={tabSx}
-          />
-          <Tab
-            label="Playlists"
-            value={"/playlists"}
-            to={"playlists"}
-            disableRipple={true}
-            iconPosition="start"
-            icon={<PlaylistPlayIcon />}
-            component={Link}
-            sx={tabSx}
-          />
-          <Tab
-            label="Artists"
-            value={"/artists"}
-            to={"artists"}
-            disableRipple={true}
-            iconPosition="start"
-            icon={<GroupsIcon />}
-            component={Link}
-            sx={tabSx}
-          />
-          <Tab
-            label="Albums"
-            value={"/albums"}
-            to={"albums"}
-            disableRipple={true}
-            iconPosition="start"
-            icon={<AlbumIcon />}
-            component={Link}
-            sx={tabSx}
-          />
-          <Tab
-            label="Medias"
-            value={"/medias"}
-            to={"medias"}
-            disableRipple={true}
-            iconPosition="start"
-            icon={<SearchIcon />}
-            component={Link}
-            sx={tabSx}
-          />
-        </Tabs>
-      )}
-    </>
+    <Tabs
+      allowScrollButtonsMobile
+      scrollButtons="auto"
+      variant="scrollable"
+      value={rootURL}
+      textColor="inherit"
+      indicatorColor="secondary"
+      sx={sx}
+    >
+      <Tab value="/" to="/" icon={<OndemandVideoIcon />} component={Link} />
+      <Tab
+        value="/profile"
+        to="/profile"
+        icon={<FavoriteIcon />}
+        component={Link}
+      />
+      <Tab
+        value={"/playlists"}
+        to={"playlists"}
+        icon={<PlaylistPlayIcon />}
+        component={Link}
+      />
+      <Tab
+        value={"/artists"}
+        to={"artists"}
+        icon={<GroupsIcon />}
+        component={Link}
+      />
+      <Tab
+        value={"/albums"}
+        to={"albums"}
+        icon={<AlbumIcon />}
+        component={Link}
+      />
+      <Tab
+        value={"/medias"}
+        to={"medias"}
+        icon={<SearchIcon />}
+        component={Link}
+      />
+    </Tabs>
   );
 };
 
-const Header = ({ smallLayout }) => {
+const DesktopHeaderTabs = (props) => {
+  const { sx } = props;
+
+  const location = useLocation();
+
+  let rootURL = location.pathname;
+  const secondSlashPos = rootURL.indexOf("/", 1);
+  if (secondSlashPos !== -1) {
+    rootURL = rootURL.substring(0, secondSlashPos);
+  }
+
+  const tabSx = {
+    justifyContent: "flex-start",
+    minHeight: "56px",
+
+    "& .MuiTab-iconWrapper": {
+      width: "24px",
+      height: "24px",
+      marginRight: "12px",
+    },
+  };
+
+  return (
+    <Tabs
+      variant="standard"
+      value={rootURL}
+      textColor="inherit"
+      orientation="vertical"
+      sx={sx}
+    >
+      <Tab
+        label="Player"
+        value="/"
+        to="/"
+        disableRipple={true}
+        iconPosition="start"
+        icon={<OndemandVideoIcon />}
+        component={Link}
+        sx={tabSx}
+      />
+      <Tab
+        label="Profile"
+        value="/profile"
+        to="/profile"
+        disableRipple={true}
+        iconPosition="start"
+        icon={<FavoriteIcon />}
+        component={Link}
+        sx={tabSx}
+      />
+      <Tab
+        label="Playlists"
+        value={"/playlists"}
+        to={"playlists"}
+        disableRipple={true}
+        iconPosition="start"
+        icon={<PlaylistPlayIcon />}
+        component={Link}
+        sx={tabSx}
+      />
+      <Tab
+        label="Artists"
+        value={"/artists"}
+        to={"artists"}
+        disableRipple={true}
+        iconPosition="start"
+        icon={<GroupsIcon />}
+        component={Link}
+        sx={tabSx}
+      />
+      <Tab
+        label="Albums"
+        value={"/albums"}
+        to={"albums"}
+        disableRipple={true}
+        iconPosition="start"
+        icon={<AlbumIcon />}
+        component={Link}
+        sx={tabSx}
+      />
+      <Tab
+        label="Medias"
+        value={"/medias"}
+        to={"medias"}
+        disableRipple={true}
+        iconPosition="start"
+        icon={<SearchIcon />}
+        component={Link}
+        sx={tabSx}
+      />
+    </Tabs>
+  );
+};
+
+const MobileHeader = () => {
   const theme = useTheme();
 
   return (
@@ -205,25 +226,37 @@ const Header = ({ smallLayout }) => {
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
-      {smallLayout ? (
-        <Box sx={{ paddingTop: "12px" }}>
+      <Box sx={{ paddingTop: "12px" }}>
+        <StreamInput />
+        <MobileHeaderTabs />
+      </Box>
+    </AppBar>
+  );
+};
+
+const DesktopHeader = () => {
+  const theme = useTheme();
+
+  return (
+    <AppBar
+      position="sticky"
+      sx={{
+        backgroundColor: theme.palette.primary.dark,
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+    >
+      <Grid
+        container
+        sx={{
+          padding: "8px 16px 6px 16px",
+        }}
+      >
+        <Grid item xs={3} />
+        <Grid item xs>
           <StreamInput />
-          <HeaderTabs smallLayout={smallLayout} />
-        </Box>
-      ) : (
-        <Grid
-          container
-          sx={{
-            padding: "8px 16px 6px 16px",
-          }}
-        >
-          <Grid item xs={3} />
-          <Grid item xs>
-            <StreamInput />
-          </Grid>
-          <Grid item xs={3} />
         </Grid>
-      )}
+        <Grid item xs={3} />
+      </Grid>
     </AppBar>
   );
 };
@@ -247,31 +280,30 @@ const CollapsableControlBar = observer((props) => {
 });
 
 const SmallLayout = () => {
-  const [controlPageOpen, closeControlPage] = useState(false);
+  const [controlPageOpen, setControlPageOpenState] = useState(false);
 
   return (
     <Stack sx={{ height: "100%" }}>
       <Notifier />
-      <Header smallLayout={true} />
-      <Drawer
-        anchor="top"
-        open={controlPageOpen}
-        onClose={() => closeControlPage(false)}
-      >
-        <ControlPage closePage={() => closeControlPage(false)} />
-      </Drawer>
-      <Box
-        sx={{
-          display: "flex",
-          flex: 1,
-          minHeight: "0px",
-          margin: "0px 8px 0px 8px",
-        }}
-      >
-        <Outlet />
-      </Box>
-      {!controlPageOpen && (
-        <CollapsableControlBar openTrackInfo={() => closeControlPage(true)} />
+      <MobileHeader />
+      {controlPageOpen ? (
+        <ControlPage closePage={() => setControlPageOpenState(false)} />
+      ) : (
+        <>
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              minHeight: "0px",
+              margin: "0px 8px 0px 8px",
+            }}
+          >
+            <Outlet />
+          </Box>
+          <CollapsableControlBar
+            openTrackInfo={() => setControlPageOpenState(true)}
+          />
+        </>
       )}
     </Stack>
   );
@@ -286,7 +318,7 @@ const LargeLayout = () => {
   return (
     <Stack sx={{ height: "100%" }}>
       <Notifier />
-      <Header smallLayout={false} />
+      <DesktopHeader />
       <Stack direction="row" sx={{ flex: 1 }}>
         <Drawer
           variant="permanent"
@@ -313,7 +345,7 @@ const LargeLayout = () => {
           >
             OpenCast
           </Typography>
-          <HeaderTabs
+          <DesktopHeaderTabs
             smallLayout={false}
             sx={{
               marginLeft: "12px",

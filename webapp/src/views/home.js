@@ -428,18 +428,17 @@ const HomePage = observer(() => {
     }
   }, [store, playlistId]);
 
-  const isSmallDevice = useMediaQuery({
-    maxWidth: SIZES.small.max,
+  const mediumSize = useMediaQuery({
+    maxWidth: SIZES.medium.max,
   });
 
-  console.log("isSmallDevice: ", isSmallDevice);
   if (!playlistId) {
     return null;
   }
 
   return (
-    <PageContainer smallSize={isSmallDevice}>
-      {isSmallDevice ? (
+    <PageContainer smallSize={mediumSize}>
+      {mediumSize ? (
         <Stack sx={{ height: "100%", width: "100%" }}>
           <DroppablePlaylist playlistId={playlistId} />
         </Stack>
