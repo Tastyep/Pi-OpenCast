@@ -1,18 +1,24 @@
+import { STORAGE_KEYS, API_IP } from "./constant.js";
+
 let storage = browser.storage.local;
-storage.set({ apiIp: "192.168.178.74:2020" });
+storage.set({ [STORAGE_KEYS.API_IP]: API_IP });
 
 function updateApiIp() {
-  storage.set({ apiIp: this.value });
-  console.log("API IP set to: ", storage.get("apiIp"));
+  storage
+    .set({ [STORAGE_KEYS.API_IP]: this.value })
+    .then(() => {
+      console.log("API IP set to: ", this.value);
+    })
+    .catch((error) => {
+      console.error("Error setting item:", error);
+    });
 }
 
-function setupIpInput() {
+document.addEventListener("DOMContentLoaded", function () {
   let ipInput = document.getElementsByName("ip-input")[0];
   ipInput.addEventListener("input", updateApiIp);
 
-  storage.get("apiIp").then((item) => {
-    ipInput.value = item.apiIp;
+  storage.get(STORAGE_KEYS.API_IP).then((result) => {
+    ipInput.value = result[STORAGE_KEYS.API_IP];
   });
-}
-
-setupIpInput();
+});
