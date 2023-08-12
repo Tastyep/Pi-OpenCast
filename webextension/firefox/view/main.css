@@ -1,0 +1,49 @@
+#main-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 400px;
+  padding: 8px;
+}
+
+.option-entry {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 8px;  /* Space out each entry */
+}
+
+.label-column {
+  width: 100px;
+  display: flex;
+  align-items: center;  /* Vertically center the labels */
+}
+
+.value-column {
+  flex: 1;
+  display: flex; /* Ensure the button takes up all available space */
+  align-items: center;  /* Vertically center the button */
+}
+
+button {
+  border: none;
+  width: 100%;
+  margin: 3% auto;
+  padding: 4px;
+  text-align: center;
+  font-size: 1.5em;
+  cursor: pointer;
+  background-color: #E5F2F2;
+}
+
+button:hover {
+  background-color: #CFF2F2;
+}
+
+button[type="reset"] {
+  background-color: #FBFBC9;
+}
+
+button[type="reset"]:hover {
+  background-color: #EAEA9D;
+}
+

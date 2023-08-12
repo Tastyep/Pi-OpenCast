@@ -3,19 +3,21 @@
   "name": "OpenCast",
   "version": "1.0",
   "description": "Send the current page URL to OpenCast",
+  "homepage_url": "https://github.com/Tastyep/Pi-OpenCast",
   "icons": {
     "48": "icon/icon.svg"
   },
   "permissions": [
-    "tabs"
+    "activeTab",
+    "storage"
   ],
   "browser_action": {
     "default_icon": "icon/icon.svg",
-    "default_title": "OpenCast"
+    "default_title": "OpenCast",
+    "default_popup": "view/main.html"
   },
-  "background": {
-    "scripts": [
-      "background.js"
-    ]
+  "options_ui": {
+    "page": "view/option.html",
+    "browser_style": true
   }
 }
