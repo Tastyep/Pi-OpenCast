@@ -7,26 +7,38 @@
 </head>
 
 <body>
+  <div id="title-section">
+    <div class="header-row">
+      <img src="../icon/icon.svg" alt="OpenCast Icon" id="opencast-icon" />
+      <span id="title">OpenCast</span>
+    </div>
+    <div id="title-divider"></div>
+  </div>
+
   <div id="main-content">
     <div class="option-entry">
       <div class="label-column">
         <label for="audio-button">Audio</label>
       </div>
       <div class="value-column">
-        <button id="audio-button" name="audio">Audio</button>
+        <button id="audio-button" name="audio" class="active">Audio</button>
       </div>
     </div>
+    <div class="divider"></div>
+
     <div class="option-entry">
       <div class="label-column">
         <label for="video-button">Video</label>
       </div>
       <div class="value-column">
-        <button id="video-button" name="video">Video</button>
+        <button id="video-button" name="video" class="active">Video</button>
       </div>
     </div>
+    <div class="divider"></div>
+
     <button name="cast-button">Cast </button>
   </div>
-  <script src="../js/main.js"></script>
+  <script type="module" src="../js/main.js"></script>
 </body>
 
 </html>
