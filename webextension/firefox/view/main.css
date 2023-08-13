@@ -2,39 +2,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
-}
-
-#title-section > span {
-  display: flex;
-  align-items: center; /* Vertically center align the text with the icon */
-  font-size: 1.5em;
 }
 
 #opencast-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   margin-right: 16px; /* spacing between icon and title */
 }
 
-#title {
-  font-size: 1.5em;
-  font-weight: bold;
+#extern-icon {
+  cursor: pointer;
 }
 
 #title-divider {
   width: 100%;
   height: 1px; /* Slight reduction in thickness for the white theme */
   background-color: #ddd; /* Light gray for the divider to softly separate the sections */
-  margin-top: 10px;
 }
 
 #main-content {
   display: flex;
   flex: 1;
   flex-direction: column;
-  width: 400px;
-  padding: 8px;
+  min-width: 256px;
+  padding: 0px 24px 0px 24px;
+}
+
+.link-container {
+    display: flex;
+    align-items: center;
 }
 
 .header-row {
@@ -43,11 +39,16 @@
 }
 
 .divider {
-  width: 90%;
+  width: 100%;
   height: 1px; /* Slight reduction in thickness for the white theme */
   background-color: #ddd; /* Light gray for the divider to softly separate the sections */
   margin-top: 4px;  
   margin-bottom: 4px; 
+}
+
+.icon {
+  width:24px;
+  height:24px;
 }
 
 .option-entry {
@@ -70,6 +71,54 @@
   flex: 1;
   display: flex; /* Ensure the button takes up all available space */
   align-items: center;  /* Vertically center the button */
+  justify-content: end;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch-input {
+    display: none;
+}
+
+.switch-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.switch-label:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.switch-input:checked + .switch-label {
+    background-color: #2196F3;
+}
+
+.switch-input:checked + .switch-label:before {
+    transform: translateX(26px);
+}
+
+body {
+  margin: 0px;
 }
 
 button {
@@ -81,20 +130,6 @@ button {
   font-size: 1.5em;
   cursor: pointer;
   background-color: #E5F2F2;
-}
-
-button.active {
-  background-color: #4CAF50;
-  color: white;
-}
-
-button:not(.active) {
-  background-color: #FC6868;
-  color: white;
-}
-
-button.active:hover, button:not(.active):hover {
-  filter: brightness(0.9);  /* Darkens the color a bit on hover */
 }
 
 button[name="cast-button"] {

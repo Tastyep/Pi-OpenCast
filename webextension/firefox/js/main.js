@@ -56,19 +56,17 @@ function getActiveTab(handle) {
   });
 }
 
-function toggleButton(button) {
-  button.classList.toggle("active");
-  console.log("togglw");
+function redirectUserToWebApp() {
+  let storage = browser.storage.local;
+  storage.get(STORAGE_KEYS.WEB_APP_IP).then((result) => {
+    window.location.href = result[STORAGE_KEYS.WEB_APP_IP];
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  let audioButton = document.getElementById("audio-button");
-  let videoButton = document.getElementById("video-button");
-  [audioButton, videoButton].forEach((button) => {
-    button.addEventListener("click", function () {
-      toggleButton(button);
-    });
-  });
+  let externButton = document.getElementById("video-button");
+
+  externButton.addEventListener("click", redirectUserToWebApp);
 
   let castButton = document.getElementsByName("cast-button")[0];
   castButton.addEventListener("click", () => {
