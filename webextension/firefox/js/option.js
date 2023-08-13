@@ -1,13 +1,16 @@
-import { STORAGE_KEYS, API_IP } from "./constant.js";
+import { STORAGE_KEYS, API_IP, WEB_APP_IP } from "./constant.js";
 
 let storage = browser.storage.local;
-storage.set({ [STORAGE_KEYS.API_IP]: API_IP });
+storage.set({
+  [STORAGE_KEYS.API_IP]: API_IP,
+  [STORAGE_KEYS.WEB_APP_IP]: WEB_APP_IP,
+});
 
-function updateApiIp() {
+function updateIp(key, value) {
   storage
-    .set({ [STORAGE_KEYS.API_IP]: this.value })
+    .set({ [key]: value })
     .then(() => {
-      console.log("API IP set to: ", this.value);
+      console.log(`${key} set to: ${value}`);
     })
     .catch((error) => {
       console.error("Error setting item:", error);
@@ -15,10 +18,17 @@ function updateApiIp() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  let ipInput = document.getElementsByName("ip-input")[0];
-  ipInput.addEventListener("input", updateApiIp);
+  let apiIpInput = document.getElementById("api-ip");
+  let webappIpInput = document.getElementById("webapp-ip");
+  apiIpInput.addEventListener("input", (event) => {
+    updateIp(STORAGE_KEYS.API_IP, event.target.value);
+  });
+  webappIpInput.addEventListener("input", (event) => {
+    updateIp(STORAGE_KEYS.WEB_APP_IP, event.target.value);
+  });
 
-  storage.get(STORAGE_KEYS.API_IP).then((result) => {
-    ipInput.value = result[STORAGE_KEYS.API_IP];
+  storage.get([STORAGE_KEYS.API_IP, STORAGE_KEYS.WEB_APP_IP]).then((result) => {
+    apiIpInput.value = result[STORAGE_KEYS.API_IP];
+    webappIpInput.value = result[STORAGE_KEYS.WEB_APP_IP];
   });
 });
