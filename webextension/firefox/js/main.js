@@ -59,13 +59,28 @@ function getActiveTab(handle) {
 function redirectUserToWebApp() {
   let storage = browser.storage.local;
   storage.get(STORAGE_KEYS.WEB_APP_IP).then((result) => {
-    window.location.href = result[STORAGE_KEYS.WEB_APP_IP];
+    const webAppUrl = `http://${result[STORAGE_KEYS.WEB_APP_IP]}`;
+
+    browser.tabs.query({}).then((tabs) => {
+      console.log(tabs);
+      for (const tab of tabs) {
+        console.log(tab);
+        if (tab.url.startsWith(webAppUrl)) {
+          browser.tabs.update(tab.id, {
+            active: true,
+          });
+          return;
+        }
+      }
+      browser.tabs.create({
+        url: webAppUrl,
+      });
+    });
   });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  let externButton = document.getElementById("video-button");
-
+  let externButton = document.getElementById("extern-icon");
   externButton.addEventListener("click", redirectUserToWebApp);
 
   let castButton = document.getElementsByName("cast-button")[0];
