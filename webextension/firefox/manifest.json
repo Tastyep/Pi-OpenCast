@@ -9,7 +9,10 @@
   },
   "permissions": [
     "activeTab",
-    "storage"
+    "tabs",
+    "storage",
+    "webNavigation",
+    "contextMenus"
   ],
   "browser_action": {
     "default_icon": "icon/icon.svg",
@@ -19,5 +22,12 @@
   "options_ui": {
     "page": "view/option.html",
     "browser_style": true
+  },
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": false,
+    "type": "module"
   }
 }
