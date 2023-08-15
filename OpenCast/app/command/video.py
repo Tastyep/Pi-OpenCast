@@ -1,5 +1,6 @@
 """ Video commands """
 
+from dataclasses import field
 from OpenCast.infra.media.downloader import Options as DownloadOptions
 
 from .command import Command, Id, command
@@ -19,7 +20,7 @@ class DeleteVideo(Command):
 @command
 class RetrieveVideo(Command):
     output_directory: str
-    dl_opts: DownloadOptions = DownloadOptions()
+    dl_opts: DownloadOptions = field(default_factory=DownloadOptions)
 
 
 @command
