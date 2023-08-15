@@ -1,6 +1,7 @@
 const STORAGE_KEYS = {
   API_IP: "apiIp",
   WEB_APP_IP: "webAppIp",
+  OPT_CAST_VIDEO: "optCastVideo",
 };
 
 const API_IP = "192.168.178.74:2020";

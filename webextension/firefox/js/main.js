@@ -1,5 +1,7 @@
 import { STORAGE_KEYS } from "./constant.js";
 
+let storage = browser.storage.local;
+
 async function queryApi(url, data) {
   try {
     const response = await fetch(url, {
@@ -19,15 +21,15 @@ async function queryApi(url, data) {
   return null;
 }
 
-function castUrl(url) {
+function castUrl(url, videoSwitch) {
   const data = {
     dl_opts: {
+      download_video: videoSwitch,
       download_subtitles: false,
-      download_video: false,
     },
   };
 
-  browser.storage.local.get(STORAGE_KEYS.API_IP).then((result) => {
+  storage.get(STORAGE_KEYS.API_IP).then((result) => {
     const apiIp = result[STORAGE_KEYS.API_IP];
     const BASE_URL = `http://${apiIp}/api/player/stream`;
     const reqUrl = `${BASE_URL}?url=${url}`;
@@ -57,7 +59,6 @@ function getActiveTab(handle) {
 }
 
 function redirectUserToWebApp() {
-  let storage = browser.storage.local;
   storage.get(STORAGE_KEYS.WEB_APP_IP).then((result) => {
     const webAppUrl = `http://${result[STORAGE_KEYS.WEB_APP_IP]}`;
 
@@ -79,14 +80,30 @@ function redirectUserToWebApp() {
   });
 }
 
+function storeInputUpdates(storageKey, elem, event, handle) {
+  elem.addEventListener(event, () => {
+    const value = handle();
+    storage.set({ [storageKey]: value });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   let externButton = document.getElementById("extern-icon");
   externButton.addEventListener("click", redirectUserToWebApp);
 
+  let videoSwitch = document.getElementById("video-switch");
+  storeInputUpdates(STORAGE_KEYS.OPT_CAST_VIDEO, videoSwitch, "click", () => {
+    return videoSwitch.checked;
+  });
+
+  storage.get(STORAGE_KEYS.OPT_CAST_VIDEO).then((result) => {
+    videoSwitch.checked = result[STORAGE_KEYS.OPT_CAST_VIDEO];
+  });
+
   let castButton = document.getElementsByName("cast-button")[0];
   castButton.addEventListener("click", () => {
     getActiveTab((url) => {
-      castUrl(url);
+      castUrl(url, videoSwitch.checked);
     });
   });
 });

@@ -6,6 +6,7 @@ function loadStorageDefault() {
   storage.set({
     [STORAGE_KEYS.API_IP]: API_IP,
     [STORAGE_KEYS.WEB_APP_IP]: WEB_APP_IP,
+    [STORAGE_KEYS.OPT_CAST_VIDEO]: true,
   });
 }
 
