@@ -38,7 +38,7 @@ import PlaylistModal from "components/playlist_modal";
 const PlaylistItemContainer = styled(ListItem)({
   flexGrow: 0,
   flowShrink: 1,
-  width: "256px",
+  width: "512px",
   flexDirection: "column",
   minWidth: "0px",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items

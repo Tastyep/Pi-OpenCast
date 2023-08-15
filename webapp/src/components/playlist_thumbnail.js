@@ -28,7 +28,7 @@ const listPopularVideos = (videos) => {
     .sort((a, b) => {
       return a.totalPlayingDuration < b.totalPlayingDuration;
     })
-    .slice(0, 4);
+    .slice(0, 16);
 };
 
 const PlaylistThumbnail = ({ videos }) => {
@@ -43,11 +43,11 @@ const PlaylistThumbnail = ({ videos }) => {
   }
   return (
     <ImageList
-      cols={2}
+      cols={Math.ceil(Math.sqrt(popVideos.length))}
       gap={0}
       sx={{ width: "100%", height: "100%", aspectRatio: "1/1", margin: "0px" }}
     >
-      {[0, 1, 2, 3].map((index) => (
+      {[...Array(popVideos.length).keys()].map((index) => (
         <ImageListItem key={index} sx={{ aspectRatio: "1/1" }}>
           <img
             src={popVideos[index % popVideos.length].thumbnail}
