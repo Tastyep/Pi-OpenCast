@@ -662,6 +662,9 @@ files = [
     {file = "coverage-5.5.tar.gz", hash = "sha256:ebe78fe9a0e874362175b02371bdfbee64d8edc42a044253ddf4ee7d3c15212c"},
 ]
 
+[package.dependencies]
+toml = {version = "*", optional = true, markers = "extra == \"toml\""}
+
 [package.extras]
 toml = ["toml"]
 
@@ -1431,19 +1434,18 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "pytest-cov"
-version = "2.12.1"
+version = "4.1.0"
 description = "Pytest plugin for measuring coverage."
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = ">=3.7"
 files = [
-    {file = "pytest-cov-2.12.1.tar.gz", hash = "sha256:261ceeb8c227b726249b376b8526b600f38667ee314f910353fa318caa01f4d7"},
-    {file = "pytest_cov-2.12.1-py2.py3-none-any.whl", hash = "sha256:261bb9e47e65bd099c89c3edf92972865210c36813f80ede5277dceb77a4a62a"},
+    {file = "pytest-cov-4.1.0.tar.gz", hash = "sha256:3904b13dfbfec47f003b8e77fd5b589cd11904a21ddf1ab38a64f204d6a10ef6"},
+    {file = "pytest_cov-4.1.0-py3-none-any.whl", hash = "sha256:6ba70b9e97e69fcc3fb45bfeab2d0a138fb65c4d0d6a41ef33983ad114be8c3a"},
 ]
 
 [package.dependencies]
-coverage = ">=5.2.1"
+coverage = {version = ">=5.2.1", extras = ["toml"]}
 pytest = ">=4.6"
-toml = "*"
 
 [package.extras]
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtualenv"]
@@ -2319,4 +2321,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "11906416e82995bd5754941cc3c2c8c56d5fb0ed1051a4cceaa98a110c8edfaf"
+content-hash = "68e7f644c24a76d490cc567ad584fa42e5bbff71099f8a2f2686678267a75f56"

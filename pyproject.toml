@@ -32,7 +32,7 @@ MarkupSafe = "2.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
-pytest-cov = "^2.11"
+pytest-cov = "^4.1"
 sphinx_rtd_theme = "^0.5.1"
 sphinx = "^4.4.0"
 mypy = "^1.5"
