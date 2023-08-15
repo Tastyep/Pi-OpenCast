@@ -42,18 +42,17 @@ function castUrl(url, videoSwitch) {
 function getActiveTab(handle) {
   // Get the current window
   browser.windows.getCurrent({ populate: true }).then((window) => {
-    // Check if there is an active tab
     const activeTab = window.tabs.find((tab) => tab.active);
     if (!activeTab) {
       console.error("No active tab found.");
       return;
     }
-    // Check if the active tab has a URL
+
     if (!activeTab.url) {
       console.error("Active tab has no URL.");
       return;
     }
-    // Log the URL to the console (for testing purposes)
+
     handle(activeTab.url);
   });
 }
