@@ -24,7 +24,8 @@ import { Link } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 
 import { useMediaQuery } from "react-responsive";
-import { SIZES } from "constants.js";
+import { useActiveSize } from "services/size";
+import { SIZES, MARGINS } from "constants.js";
 
 import { queueNext, queueLast, shuffleIds } from "services/playlist";
 import playlistAPI from "services/api/playlist";
@@ -35,16 +36,15 @@ import { useAppStore } from "providers/app_context";
 import { PlaylistMenuThumbnail } from "components/playlist_thumbnail";
 import PlaylistModal from "components/playlist_modal";
 
-const PlaylistItemContainer = styled(ListItem)({
+const PlaylistItemContainer = styled(ListItem)(({ width }) => ({
   flexGrow: 0,
   flowShrink: 1,
-  width: "512px",
+  width: width,
   flexDirection: "column",
-  minWidth: "0px",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
   aspectRatio: "1/1",
-  padding: "0px 0px",
-});
+  padding: "0px", // prevent items be less than the parent size
+}));
 
 const PlaylistItemBar = styled((props) => <Stack {...props} />)({
   flexDirection: "row",
@@ -60,7 +60,7 @@ const PlaylistItemBar = styled((props) => <Stack {...props} />)({
   borderBottomRightRadius: "8px",
 });
 
-const PlaylistItem = ({ playlist, isSmallDevice }) => {
+const PlaylistItem = ({ playlist, size }) => {
   const store = useAppStore();
 
   const [anchor, setAnchor] = useState(null);
@@ -132,7 +132,9 @@ const PlaylistItem = ({ playlist, isSmallDevice }) => {
   };
 
   return (
-    <PlaylistItemContainer>
+    <PlaylistItemContainer
+      width={size.compareTo(SIZES.large) < 0 ? "256px" : "512px"}
+    >
       <Link
         to={playlist.id}
         style={{
@@ -146,7 +148,7 @@ const PlaylistItem = ({ playlist, isSmallDevice }) => {
       >
         <PlaylistMenuThumbnail
           videos={store.playlistVideos(playlist.id)}
-          isSmallDevice={isSmallDevice}
+          isSmallDevice={size.compareTo(SIZES.small) <= 0}
           isMenuOpen={isMenuOpen}
           menuClick={(e) => {
             setAnchor(e.currentTarget);
@@ -206,25 +208,33 @@ const PlaylistsPage = observer(() => {
   const playlists = Object.values(store.playlists);
 
   const [open, setOpen] = useState(false);
-  const isSmallDevice = useMediaQuery({
-    maxWidth: SIZES.small.max,
-  });
+  const sizeKey = useActiveSize();
+  const size = SIZES[sizeKey];
+  if (!size) {
+    return null;
+  }
+  console.log(size);
+  const margin = MARGINS[sizeKey];
 
   playlists.sort((a, b) => {
     return a.name.localeCompare(b.name);
   });
   return (
-    <Stack sx={{ caretColor: "transparent" }}>
+    <Stack direction="column" sx={{ flex: 1, caretColor: "transparent" }}>
       <PlaylistModal open={open} close={() => setOpen(false)} />
       <List
         sx={{
           display: "flex",
           flexDirection: "row",
           flexWrap: "wrap",
-          gap: "8px 16px",
+          gap: margin.margin,
+          alignContent: "baseline",
+          overflow: "auto",
         }}
       >
-        <PlaylistItemContainer>
+        <PlaylistItemContainer
+          width={size.compareTo(SIZES.large) < 0 ? "256px" : "512px"}
+        >
           <IconButton
             sx={{
               width: "100%",
@@ -241,11 +251,7 @@ const PlaylistsPage = observer(() => {
           </PlaylistItemBar>
         </PlaylistItemContainer>
         {playlists.map((playlist, _) => (
-          <PlaylistItem
-            key={playlist.id}
-            playlist={playlist}
-            isSmallDevice={isSmallDevice}
-          />
+          <PlaylistItem key={playlist.id} playlist={playlist} size={size} />
         ))}
       </List>
     </Stack>

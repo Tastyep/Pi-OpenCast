@@ -36,7 +36,7 @@ const AlbumItemContainer = styled(ListItem)({
   flexDirection: "column",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
   aspectRatio: "1/1",
-  padding: "0px 0px",
+  padding: "0px",
 });
 
 const AlbumItemBar = styled((props) => <Stack {...props} />)({
@@ -293,7 +293,9 @@ const AlbumsPage = observer(() => {
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: "8px 16px",
+        gap: "8px",
+        alignContent: "baseline",
+        overflow: "auto",
       }}
     >
       {albums.map((album, _) => (

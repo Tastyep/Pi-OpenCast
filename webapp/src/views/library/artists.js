@@ -33,10 +33,10 @@ const ArtistItemContainer = styled(ListItem)({
   flowShrink: 1,
   width: "256px",
   flexDirection: "column",
-  minWidth: "0px",
   maxWidth: `calc(50% - 8px)`, // Remove the gap between items
   aspectRatio: "1/1",
-  padding: "0px 0px",
+  maxHeight: "256px",
+  padding: "0px",
 });
 
 const ArtistItemBar = styled((props) => <Stack {...props} />)({
@@ -194,22 +194,26 @@ const ArtistsPage = observer(() => {
   });
 
   return (
-    <List
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: "8px 16px",
-      }}
-    >
-      {artists.map((artist, _) => (
-        <ArtistItem
-          key={artist.name}
-          artist={artist}
-          isSmallDevice={isSmallDevice}
-        />
-      ))}
-    </List>
+    <Stack direction="column" sx={{ flex: 1, overflow: "auto" }}>
+      <List
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "8px",
+          alignContent: "baseline",
+          overflow: "auto",
+        }}
+      >
+        {artists.map((artist, _) => (
+          <ArtistItem
+            key={artist.name}
+            artist={artist}
+            isSmallDevice={isSmallDevice}
+          />
+        ))}
+      </List>
+    </Stack>
   );
 });
 
