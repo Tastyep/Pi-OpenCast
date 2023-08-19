@@ -20,6 +20,8 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import AlbumIcon from "@mui/icons-material/Album";
 import SearchIcon from "@mui/icons-material/Search";
 
+import OpenCastIcon from "assets/icon.svg";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -322,17 +324,24 @@ const LargeLayout = () => {
           }}
         >
           <Toolbar />
-          <Typography
-            variant="subtitle1"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              minHeight: "56px",
-              marginLeft: "24px",
-            }}
+          <Stack
+            direction="row"
+            sx={{ alignItems: "flex-end", padding: "16px 24px 32px 16px" }}
           >
-            OpenCast
-          </Typography>
+            <img
+              src={OpenCastIcon}
+              style={{ width: "48px", height: "48px", margin: "0px 16px" }}
+            />
+            <Typography
+              variant="h5"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              OpenCast
+            </Typography>
+          </Stack>
           <DesktopHeaderTabs
             smallLayout={false}
             sx={{
@@ -350,7 +359,7 @@ const LargeLayout = () => {
           sx={{
             display: "flex",
             flex: 1,
-            padding: "0px 32px 0px 32px",
+            padding: "0px 32px",
           }}
         >
           <Outlet />
