@@ -359,7 +359,8 @@ const LargeLayout = () => {
           sx={{
             display: "flex",
             flex: 1,
-            padding: "0px 32px",
+            margin: "0px 32px",
+            overflow: "auto",
           }}
         >
           <Outlet />

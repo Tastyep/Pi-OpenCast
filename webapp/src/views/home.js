@@ -327,11 +327,7 @@ const DroppablePlaylist = observer(({ playlistId }) => {
 
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
-      <Stack
-        direction="row"
-        alignItems="center"
-        sx={{ margin: "0px 0px 8px 0px" }}
-      >
+      <Stack direction="row" alignItems="center" sx={{ margin: "8px" }}>
         <Button
           variant="outlined"
           color="primary"
@@ -466,7 +462,6 @@ const HomePage = observer(() => {
               sx={{
                 display: "flex",
                 flex: 1,
-                padding: "12px 12px 12px 12px",
               }}
             >
               <DroppablePlaylist playlistId={playlistId} />

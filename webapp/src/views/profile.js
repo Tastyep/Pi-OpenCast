@@ -27,7 +27,7 @@ const ProfilePage = observer(() => {
   const store = useAppStore();
 
   return (
-    <Stack direction="column" sx={{ overflowX: "hidden", overflowY: "auto" }}>
+    <Stack direction="column">
       <Typography variant="h6" sx={{ paddingTop: "32px" }}>
         Recent activity
       </Typography>
