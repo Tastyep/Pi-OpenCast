@@ -133,7 +133,7 @@ const PlaylistItem = ({ playlist, size }) => {
 
   return (
     <PlaylistItemContainer
-      width={size.compareTo(SIZES.large) < 0 ? "256px" : "512px"}
+      width={size.compareTo(SIZES.large) < 0 ? "256px" : "448px"}
     >
       <Link
         to={playlist.id}
@@ -233,7 +233,7 @@ const PlaylistsPage = observer(() => {
         }}
       >
         <PlaylistItemContainer
-          width={size.compareTo(SIZES.large) < 0 ? "256px" : "512px"}
+          width={size.compareTo(SIZES.large) < 0 ? "256px" : "448px"}
         >
           <IconButton
             sx={{
