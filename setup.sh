@@ -43,9 +43,8 @@ check_system_deps() {
     [[ "$status" != "0" ]] && fail=true
   done
 
-  if [[ "$fail" = true ]]; then
+  if [ $fail = true ]; then
     log_error "Missing dependencies, please install them."
-    exit 1
   fi
 }
 
@@ -101,9 +100,8 @@ start_at_boot() {
 }
 
 # Prevent user from installing poetry as root
-if [[ "$EUID" = 0 ]]; then
+if [ "$EUID" = "0" ]; then
   log_error "Don't sudo me: './setup.sh'"
-  exit 1
 fi
 
 parse_args "$@"

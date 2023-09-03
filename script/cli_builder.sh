@@ -123,7 +123,7 @@ parse_options_section() {
       options["$opt"]="" # empty string signals that it's the used option.
     else
       options["$opt"]="$long_opt" # short options point to the long one
-      unset ARGS["$opt"]          # remove entry as long options are used
+      unset 'ARGS["$opt"]'          # remove entry as long options are used
     fi
   done
 }

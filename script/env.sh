@@ -19,5 +19,5 @@ jenv() {
     export PATH="$PATH:$node_modules_path"
     (cd "$ROOT/webapp/" && npm install --only=dev)
   fi
-  eval "$@"
+  "$@"
 }
