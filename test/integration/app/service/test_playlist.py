@@ -1,4 +1,5 @@
 from OpenCast.app.command import playlist as Cmd
+from OpenCast.config import settings
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as Evt
 from OpenCast.domain.model.playlist import Playlist
@@ -75,6 +76,52 @@ class PlaylistServiceTest(ServiceTestCase):
             queue_front=False,
         )
 
+    def test_queue_video_above_max(self):
+        playlist_id = IdentityService.id_playlist()
+        video_ids = [
+            IdentityService.id_video(f"source_{i}")
+            for i in range(settings["player.queue.max_size"])
+        ]
+        self.data_producer.playlist(playlist_id, "name", video_ids).populate(
+            self.data_facade
+        )
+
+        video_id = IdentityService.id_video("above_max")
+        playlist = self.playlist_repo.get(playlist_id)
+        self.evt_expecter.expect(
+            Evt.PlaylistContentUpdated, playlist.id, video_ids[1:] + [video_id]
+        ).from_(
+            Cmd.QueueVideo,
+            playlist.id,
+            video_id,
+            queue_front=False,
+        )
+
+    def test_queue_video_above_max_playing_video_first(self):
+        playlist_id = IdentityService.id_playlist()
+        video_ids = [
+            IdentityService.id_video(f"source_{i}")
+            for i in range(settings["player.queue.max_size"])
+        ]
+        self.data_producer.player().video(f"source_0").play(
+            f"source_0"
+        ).parent_producer().playlist(playlist_id, "name", video_ids).populate(
+            self.data_facade
+        )
+
+        video_id = IdentityService.id_video("above_max")
+        playlist = self.playlist_repo.get(playlist_id)
+        self.evt_expecter.expect(
+            Evt.PlaylistContentUpdated,
+            playlist.id,
+            [video_ids[0]] + video_ids[2:] + [video_id],
+        ).from_(
+            Cmd.QueueVideo,
+            playlist.id,
+            video_id,
+            queue_front=False,
+        )
+
     def test_update_playlist_content(self):
         playlist_id = IdentityService.id_playlist()
         self.data_producer.playlist(playlist_id, "name", []).populate(self.data_facade)
@@ -84,3 +131,35 @@ class PlaylistServiceTest(ServiceTestCase):
         self.evt_expecter.expect(
             Evt.PlaylistContentUpdated, playlist.id, new_content
         ).from_(Cmd.UpdatePlaylistContent, playlist.id, new_content)
+
+    def test_update_player_queue_content_above_max(self):
+        playlist_id = HOME_PLAYLIST.id
+        video_ids = [
+            IdentityService.id_video(f"source_{i}")
+            for i in range(settings["player.queue.max_size"])
+        ]
+        self.data_producer.player().parent_producer().select(
+            Playlist, playlist_id
+        ).set_ids(video_ids).populate(self.data_facade)
+
+        new_content = video_ids + [IdentityService.id_video("above_max")]
+        self.evt_expecter.expect(
+            Evt.PlaylistContentUpdated, playlist_id, new_content[1:]
+        ).from_(Cmd.UpdatePlaylistContent, playlist_id, new_content)
+
+    def test_update_player_queue_content_above_max_first_playing(self):
+        playlist_id = HOME_PLAYLIST.id
+        video_ids = [
+            IdentityService.id_video(f"source_{i}")
+            for i in range(settings["player.queue.max_size"])
+        ]
+        self.data_producer.player().video("source_0").play(
+            "source_0"
+        ).parent_producer().select(Playlist, playlist_id).set_ids(video_ids).populate(
+            self.data_facade
+        )
+
+        new_content = video_ids + [IdentityService.id_video("above_max")]
+        self.evt_expecter.expect(
+            Evt.PlaylistContentUpdated, playlist_id, [new_content[0]] + new_content[2:]
+        ).from_(Cmd.UpdatePlaylistContent, playlist_id, new_content)

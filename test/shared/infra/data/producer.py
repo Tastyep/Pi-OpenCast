@@ -1,3 +1,5 @@
+from typing import List
+
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.model import Id
 from OpenCast.domain.model.album import Album
@@ -157,6 +159,10 @@ class PlaylistProducer(DataProducer):
     def video(self, *args, **attrs):
         VideoProducer(self._population).video(*args, **attrs)
         self._population.last(Playlist).ids.append(self._population.last(Video).id)
+        return self
+
+    def set_ids(self, ids: List[Id]):
+        self._population.last(Playlist).ids = ids
         return self
 
 

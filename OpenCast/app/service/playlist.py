@@ -3,10 +3,12 @@
 import structlog
 
 from OpenCast.app.command import playlist as playlist_cmds
+from OpenCast.config import settings
 from OpenCast.domain.constant import HOME_PLAYLIST
 from OpenCast.domain.event import playlist as PlaylistEvt
 from OpenCast.domain.event import video as VideoEvt
 from OpenCast.domain.model.playlist import Playlist
+from OpenCast.domain.service.playlist import shrink_playlist
 
 from .service import Service
 
@@ -20,6 +22,7 @@ class PlaylistService(Service):
         self._observe_event(PlaylistEvt.PlaylistDeleted)
 
         self._playlist_repo = data_facade.playlist_repo
+        self._player_repo = data_facade.player_repo
         self._queueing_service = service_factory.make_queueing_service(
             data_facade.player_repo, data_facade.playlist_repo, data_facade.video_repo
         )
@@ -52,6 +55,12 @@ class PlaylistService(Service):
         def impl(ctx):
             playlist = self._playlist_repo.get(cmd.model_id)
             ids = self._queueing_service.queue(playlist, cmd.video_id, cmd.queue_front)
+
+            player = self._player_repo.get_player()
+            ids = shrink_playlist(
+                ids, settings["player.queue.max_size"], [player.video_id]
+            )
+
             playlist.ids = ids
             ctx.update(playlist)
 
@@ -60,7 +69,15 @@ class PlaylistService(Service):
     def _update_playlist_content(self, cmd):
         def impl(ctx):
             playlist = self._playlist_repo.get(cmd.model_id)
-            playlist.ids = cmd.ids
+            playlist_ids = cmd.ids
+
+            player = self._player_repo.get_player()
+            if playlist.id == player.queue:
+                playlist_ids = shrink_playlist(
+                    playlist_ids, settings["player.queue.max_size"], [player.video_id]
+                )
+
+            playlist.ids = playlist_ids
             ctx.update(playlist)
 
         self._start_transaction(self._playlist_repo, cmd.id, impl)

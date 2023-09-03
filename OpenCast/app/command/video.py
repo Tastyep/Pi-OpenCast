@@ -1,6 +1,7 @@
 """ Video commands """
 
 from dataclasses import field
+
 from OpenCast.infra.media.downloader import Options as DownloadOptions
 
 from .command import Command, Id, command

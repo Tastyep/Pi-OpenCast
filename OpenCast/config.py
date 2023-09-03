@@ -26,6 +26,7 @@ settings.validators.register(
     Validator(
         "PLAYER.LOOP_LAST", default="album", is_in=[False, "track", "album", "playlist"]
     ),
+    Validator("PLAYER.QUEUE.MAX_SIZE", default=50, gt=10, lt=1000),
     Validator("DOWNLOADER.OUTPUT_DIRECTORY", must_exist=True),
     Validator("DOWNLOADER.MAX_CONCURRENCY", default=3, gt=0, lt=10),
     Validator("SUBTITLE.ENABLED", default=True, is_in=[True, False]),

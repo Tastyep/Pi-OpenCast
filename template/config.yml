@@ -20,6 +20,10 @@ default:
     # Loop the last element, one of [False, "track", "album", "playlist"]
     loop_last: "playlist"
 
+    queue:
+      # Maximum size of the player's queue. Videos are deleted from first to last.
+      max_size: 50
+
   downloader:
     # The directory used to store downloaded videos
     output_directory: { OUTPUT_DIRECTORY }
@@ -32,8 +36,10 @@ default:
     # The default language for subtitles
     language: eng
 
+  playlist:
+
 # Testing configuration overrides
 testing:
   log:
-    level: CRITICAL
+    level: DEBUG
     api_trafic: False
