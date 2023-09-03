@@ -103,8 +103,8 @@ class PlaylistServiceTest(ServiceTestCase):
             IdentityService.id_video(f"source_{i}")
             for i in range(settings["player.queue.max_size"])
         ]
-        self.data_producer.player().video(f"source_0").play(
-            f"source_0"
+        self.data_producer.player().video("source_0").play(
+            "source_0"
         ).parent_producer().playlist(playlist_id, "name", video_ids).populate(
             self.data_facade
         )
