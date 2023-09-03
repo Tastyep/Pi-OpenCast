@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Typography from "@mui/material/Typography";
 import Card from "@mui/material/Card";
@@ -26,6 +26,7 @@ import { VolumeControl } from "components/volume_control";
 import { PausePlayButton, SubtitleButtons } from "components/player_buttons";
 
 import playerAPI from "services/api/player";
+import videoAPI from "services/api/video";
 import { durationToHMS, countHMSParts } from "services/duration";
 import snackBarHandler from "services/api/error";
 
@@ -97,7 +98,21 @@ const MediaControl = observer((props) => {
   const mediaImageRef = useRef();
 
   const store = useAppStore();
-  const video = store.videos[store.player.videoId];
+  const player = store.player;
+  const video = store.video(player.videoId);
+
+  useEffect(() => {
+    if (!video) {
+      videoAPI
+        .get(player.videoId)
+        .then((response) => {
+          store.addVideo(response.data);
+        })
+        .catch((error) => {
+          snackBarHandler(store)(error);
+        });
+    }
+  }, [player.videoId]);
 
   if (!video) {
     return null;

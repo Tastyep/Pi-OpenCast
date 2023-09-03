@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
@@ -23,6 +23,10 @@ const MediasPage = observer(() => {
 
   const videos = Object.values(store.videos);
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    store.loadVideos();
+  }, [store]);
 
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,

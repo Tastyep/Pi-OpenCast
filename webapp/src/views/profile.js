@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Box, Divider, Stack, Tabs, Tab, Typography } from "@mui/material";
 
@@ -25,6 +25,10 @@ const listPopularVideos = (videos) => {
 
 const ProfilePage = observer(() => {
   const store = useAppStore();
+
+  useEffect(() => {
+    store.loadVideos();
+  }, [store]);
 
   return (
     <Stack direction="column">

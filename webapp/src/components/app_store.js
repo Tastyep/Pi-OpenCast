@@ -19,6 +19,7 @@ export class AppStore {
   albums = {};
   artists = {};
   notifications = [];
+  videosLoaded = false;
 
   constructor(webSocket, eventDispatcher, modelFactory) {
     makeObservable(this, {
@@ -59,7 +60,6 @@ export class AppStore {
       this.loadPlaylists();
       this.loadAlbums();
       this.loadArtists();
-      this.loadVideos();
     });
     this.modelFactory = modelFactory;
     this.eventDispatcher = eventDispatcher;
@@ -97,12 +97,15 @@ export class AppStore {
       .catch(snackBarHandler(this));
   }
   loadVideos() {
-    return videoAPI
-      .list()
-      .then((response) => {
-        this.setVideos(response.data.videos);
-      })
-      .catch(snackBarHandler(this));
+    if (!this.videosLoaded) {
+      return videoAPI
+        .list()
+        .then((response) => {
+          this.setVideos(response.data.videos);
+          this.videosLoaded = true;
+        })
+        .catch(snackBarHandler(this));
+    }
   }
   loadPlaylists() {
     return playlistAPI
@@ -174,6 +177,7 @@ export class AppStore {
   }
 
   setPlayer(player) {
+    console.log("player loaded");
     this.player = this.modelFactory.makePlayer(player);
   }
 
@@ -205,6 +209,10 @@ export class AppStore {
     return this.playlists[this.player.queue];
   }
 
+  get video() {
+    return (id) => this.videos[id];
+  }
+
   filterVideos(ids) {
     let videos = [];
     for (const id of ids) {
@@ -230,11 +238,13 @@ export class AppStore {
     for (const video of videos) {
       this.addVideo(video);
     }
-    this.webSocket.send("play_time");
   }
 
   addVideo(video) {
     this.videos[video.id] = this.modelFactory.makeVideo(video);
+    if (video.id === this.player.videoId) {
+      this.webSocket.send("play_time");
+    }
   }
   removeVideo(id) {
     delete this.videos[id];
