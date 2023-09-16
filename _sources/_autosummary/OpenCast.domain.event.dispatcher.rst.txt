@@ -1,0 +1,29 @@
+OpenCast.domain.event.dispatcher
+================================
+
+.. automodule:: OpenCast.domain.event.dispatcher
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      EventDispatcher
+   
+   
+
+   
+   
+   
+
+
+

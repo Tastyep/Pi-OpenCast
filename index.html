@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>OpenCast &mdash; OpenCast 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> OpenCast
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">Module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">OpenCast</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>OpenCast</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <a class="reference internal image-reference" href="https://raw.githubusercontent.com/Tastyep/Pi-OpenCast/master/assets/images/banner.webp"><img alt="Banner" class="align-center" src="https://raw.githubusercontent.com/Tastyep/Pi-OpenCast/master/assets/images/banner.webp" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="opencast">
+<h1>OpenCast<a class="headerlink" href="#opencast" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://github.com/Tastyep/Pi-OpenCast/actions?query=workflow%3ATest"><img alt="Test status for master branch" src="https://github.com/Tastyep/Pi-OpenCast/workflows/Test/badge.svg" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/Tastyep/Pi-OpenCast"><img alt="codecov.io status for master branch" src="https://codecov.io/gh/Tastyep/Pi-OpenCast/branch/develop/graph/badge.svg" /></a>
+<a class="reference external image-reference" href="https://github.com/Tastyep/Pi-OpenCast/actions?query=workflow%3ASanitize"><img alt="Sanitizing status for master branch" src="https://github.com/Tastyep/Pi-OpenCast/workflows/Sanitize/badge.svg" /></a>
+<a class="reference external image-reference" href="https://tastyep.github.io/Pi-OpenCast/"><img alt="OpenCast generated documentation" src="https://github.com/Tastyep/Pi-OpenCast/workflows/Documentation/badge.svg" /></a>
+<p>OpenCast is a home theater application whose goal is to transform a computer as small as a Raspberry Pi into
+an awesome streaming device.</p>
+<div class="section" id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Lightweight fast media server, able to run on raspberry-pi.</p></li>
+<li><p>Tons of <a class="reference external" href="https://ytdl-org.github.io/youtube-dl/supportedsites.html">supported sites</a>.</p></li>
+<li><p>Stream support (Youtube, Twitch …)</p></li>
+<li><p>Playlist support</p></li>
+<li><p>Local library.</p></li>
+<li><p>VLC under the hood.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="how-to">
+<h2>How To<a class="headerlink" href="#how-to" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="install">
+<h3>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Tastyep/Pi-OpenCast.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>Pi-OpenCast<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./setup.sh
+</pre></div>
+</div>
+<p>⚠️ Because the web application has grown in size over time, it is possible that building on a raspberry-pi with &lt;= 1giga of RAM will fail as it will run out of memory. In that case, you will have to build it manually on your computer by running the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./OpenCast.sh<span class="w"> </span>build<span class="w"> </span>webapp
+</pre></div>
+</div>
+<p>Then transfer the generated <code class="docutils literal notranslate"><span class="pre">./webapp/build</span></code> directory into the <code class="docutils literal notranslate"><span class="pre">webapp</span></code> directory on your raspberry-pi (filezilla is your friend).</p>
+</div>
+<div class="section" id="use">
+<h3>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h3>
+<p>After successfully installing OpenCast, you should note the IP address of your raspberry-pi:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>hostname<span class="w"> </span>-I
+</pre></div>
+</div>
+<p>You can then access the webpage from any device on the same local network at <code class="docutils literal notranslate"><span class="pre">&lt;ip-addr&gt;:8081</span></code></p>
+</div>
+<div class="section" id="monitor">
+<h3>Monitor<a class="headerlink" href="#monitor" title="Permalink to this headline">¶</a></h3>
+<p>OpenCast is managed as a systemd service and loaded automatically at startup time.
+To interact with the service, two options are available:</p>
+<ul class="simple">
+<li><p>Using systemctl (<strong>recommended</strong>)</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>systemctl<span class="w"> </span>--user<span class="w"> </span><span class="o">[</span>start<span class="p">|</span>stop<span class="p">|</span>restart<span class="p">|</span>status<span class="o">]</span><span class="w"> </span>opencast
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Using the shell entry-point (<strong>advanced</strong>):</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./OpenCast.sh<span class="w"> </span>service<span class="w"> </span><span class="o">[</span>start<span class="p">|</span>stop<span class="p">|</span>restart<span class="p">|</span>status<span class="o">]</span>
+</pre></div>
+</div>
+<p>Logs can be accessed running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>journalctl<span class="w"> </span>--user<span class="w"> </span>-u<span class="w"> </span>opencast
+$<span class="w"> </span>./OpenCast.sh<span class="w"> </span>service<span class="w"> </span>back<span class="w"> </span>log
+</pre></div>
+</div>
+</div>
+<div class="section" id="configure">
+<h3>Configure<a class="headerlink" href="#configure" title="Permalink to this headline">¶</a></h3>
+<p>The backend and the web application can be configured through their configuration file:</p>
+<ul class="simple">
+<li><p>Backend: <code class="docutils literal notranslate"><span class="pre">config.yml</span></code></p></li>
+<li><p>Webapp: <code class="docutils literal notranslate"><span class="pre">webapp/.env</span></code></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="source-code">
+<h2>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>The project is hosted on <a class="reference external" href="https://github.com/Tastyep/Pi-OpenCast">Github</a>.</p>
+<p>Please feel free to file an issue on the <a class="reference external" href="https://github.com/Tastyep/Pi-OpenCast/issues">bug tracker</a>
+if you have found a bug or have suggestions to improve OpenCast.</p>
+<div class="section" id="license">
+<h3>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h3>
+<p>OpenCast is distributed under the <a class="reference external" href="https://raw.githubusercontent.com/Tastyep/Pi-OpenCast/master/LICENSE">MIT License</a>.</p>
+</div>
+</div>
+<div class="section" id="table-of-contents">
+<h2>Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound" id="mastertoc">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module.html">Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/OpenCast.html">OpenCast</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Luc Sinet.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

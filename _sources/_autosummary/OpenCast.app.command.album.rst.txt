@@ -1,0 +1,29 @@
+OpenCast.app.command.album
+==========================
+
+.. automodule:: OpenCast.app.command.album
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DeleteAlbum
+   
+   
+
+   
+   
+   
+
+
+

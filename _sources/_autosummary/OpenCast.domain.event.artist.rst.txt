@@ -1,0 +1,32 @@
+OpenCast.domain.event.artist
+============================
+
+.. automodule:: OpenCast.domain.event.artist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ArtistCreated
+      ArtistDeleted
+      ArtistThumbnailUpdated
+      ArtistVideosUpdated
+   
+   
+
+   
+   
+   
+
+
+

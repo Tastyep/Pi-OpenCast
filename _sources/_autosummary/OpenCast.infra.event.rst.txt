@@ -1,0 +1,33 @@
+OpenCast.infra.event
+====================
+
+.. automodule:: OpenCast.infra.event
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.infra.event.downloader
+   OpenCast.infra.event.event
+   OpenCast.infra.event.player
+

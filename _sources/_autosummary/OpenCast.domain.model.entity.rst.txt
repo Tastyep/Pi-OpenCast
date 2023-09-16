@@ -1,0 +1,29 @@
+OpenCast.domain.model.entity
+============================
+
+.. automodule:: OpenCast.domain.model.entity
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Entity
+   
+   
+
+   
+   
+   
+
+
+

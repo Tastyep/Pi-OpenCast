@@ -1,0 +1,38 @@
+OpenCast.app.service
+====================
+
+.. automodule:: OpenCast.app.service
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.app.service.album
+   OpenCast.app.service.artist
+   OpenCast.app.service.error
+   OpenCast.app.service.module
+   OpenCast.app.service.player
+   OpenCast.app.service.playlist
+   OpenCast.app.service.service
+   OpenCast.app.service.video
+

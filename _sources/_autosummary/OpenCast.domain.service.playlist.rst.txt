@@ -1,0 +1,29 @@
+OpenCast.domain.service.playlist
+================================
+
+.. automodule:: OpenCast.domain.service.playlist
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      shrink_playlist
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

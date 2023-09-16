@@ -1,0 +1,41 @@
+OpenCast.domain.model.video
+===========================
+
+.. automodule:: OpenCast.domain.model.video
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      artist_processor
+      title_processor
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Metadata
+      State
+      Stream
+      StreamSchema
+      Video
+      VideoSchema
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,29 @@
+OpenCast.infra.media.factory
+============================
+
+.. automodule:: OpenCast.infra.media.factory
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      MediaFactory
+   
+   
+
+   
+   
+   
+
+
+

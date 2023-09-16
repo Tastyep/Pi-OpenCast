@@ -1,0 +1,29 @@
+OpenCast.infra.data.facade
+==========================
+
+.. automodule:: OpenCast.infra.data.facade
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DataFacade
+   
+   
+
+   
+   
+   
+
+
+

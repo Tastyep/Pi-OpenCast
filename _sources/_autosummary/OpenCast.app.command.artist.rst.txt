@@ -1,0 +1,29 @@
+OpenCast.app.command.artist
+===========================
+
+.. automodule:: OpenCast.app.command.artist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DeleteArtist
+   
+   
+
+   
+   
+   
+
+
+

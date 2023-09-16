@@ -1,0 +1,29 @@
+OpenCast.app.service.playlist
+=============================
+
+.. automodule:: OpenCast.app.service.playlist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PlaylistService
+   
+   
+
+   
+   
+   
+
+
+

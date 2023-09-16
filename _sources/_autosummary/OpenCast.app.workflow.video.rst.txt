@@ -1,0 +1,30 @@
+OpenCast.app.workflow.video
+===========================
+
+.. automodule:: OpenCast.app.workflow.video
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Video
+      VideoWorkflow
+   
+   
+
+   
+   
+   
+
+
+

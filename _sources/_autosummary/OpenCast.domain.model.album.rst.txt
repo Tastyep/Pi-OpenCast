@@ -1,0 +1,30 @@
+OpenCast.domain.model.album
+===========================
+
+.. automodule:: OpenCast.domain.model.album
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Album
+      AlbumSchema
+   
+   
+
+   
+   
+   
+
+
+

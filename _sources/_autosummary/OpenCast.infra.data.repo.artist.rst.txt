@@ -1,0 +1,29 @@
+OpenCast.infra.data.repo.artist
+===============================
+
+.. automodule:: OpenCast.infra.data.repo.artist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ArtistRepo
+   
+   
+
+   
+   
+   
+
+
+

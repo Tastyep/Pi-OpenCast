@@ -1,0 +1,30 @@
+OpenCast.infra.data.manager
+===========================
+
+.. automodule:: OpenCast.infra.data.manager
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DataManager
+      StorageType
+   
+   
+
+   
+   
+   
+
+
+

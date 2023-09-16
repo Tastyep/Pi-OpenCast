@@ -1,0 +1,41 @@
+OpenCast.app.controller
+=======================
+
+.. automodule:: OpenCast.app.controller
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.app.controller.album_monitor
+   OpenCast.app.controller.artist_monitor
+   OpenCast.app.controller.controller
+   OpenCast.app.controller.module
+   OpenCast.app.controller.monitor
+   OpenCast.app.controller.monitoring_schema
+   OpenCast.app.controller.player
+   OpenCast.app.controller.player_monitor
+   OpenCast.app.controller.playlist_monitor
+   OpenCast.app.controller.root_monitor
+   OpenCast.app.controller.video_monitor
+

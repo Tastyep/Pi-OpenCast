@@ -1,0 +1,29 @@
+OpenCast.infra.data.repo.album
+==============================
+
+.. automodule:: OpenCast.infra.data.repo.album
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AlbumRepo
+   
+   
+
+   
+   
+   
+
+
+

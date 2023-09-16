@@ -1,0 +1,31 @@
+OpenCast.infra.event.downloader
+===============================
+
+.. automodule:: OpenCast.infra.event.downloader
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DownloadError
+      DownloadInfo
+      DownloadSuccess
+   
+   
+
+   
+   
+   
+
+
+

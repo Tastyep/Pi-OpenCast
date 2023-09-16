@@ -1,0 +1,29 @@
+OpenCast.app.workflow.manager
+=============================
+
+.. automodule:: OpenCast.app.workflow.manager
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      WorkflowManager
+   
+   
+
+   
+   
+   
+
+
+

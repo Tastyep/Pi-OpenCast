@@ -1,0 +1,34 @@
+OpenCast.app.command.video
+==========================
+
+.. automodule:: OpenCast.app.command.video
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CreateVideo
+      DeleteVideo
+      FetchVideoSubtitle
+      ParseVideo
+      RetrieveVideo
+      SetVideoReady
+   
+   
+
+   
+   
+   
+
+
+

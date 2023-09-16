@@ -1,0 +1,36 @@
+OpenCast.domain.service
+=======================
+
+.. automodule:: OpenCast.domain.service
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.domain.service.factory
+   OpenCast.domain.service.identity
+   OpenCast.domain.service.player
+   OpenCast.domain.service.playlist
+   OpenCast.domain.service.source
+   OpenCast.domain.service.subtitle
+

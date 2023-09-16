@@ -1,0 +1,30 @@
+OpenCast.domain.model.artist
+============================
+
+.. automodule:: OpenCast.domain.model.artist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Artist
+      ArtistSchema
+   
+   
+
+   
+   
+   
+
+
+

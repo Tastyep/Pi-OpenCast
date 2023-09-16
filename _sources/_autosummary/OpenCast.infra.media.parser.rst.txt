@@ -1,0 +1,29 @@
+OpenCast.infra.media.parser
+===========================
+
+.. automodule:: OpenCast.infra.media.parser
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      VideoParser
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,35 @@
+OpenCast.domain.event.player
+============================
+
+.. automodule:: OpenCast.domain.event.player
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PlayerCreated
+      PlayerStateUpdated
+      PlayerVideoUpdated
+      SubtitleDelayUpdated
+      SubtitleStateUpdated
+      VideoSeeked
+      VolumeUpdated
+   
+   
+
+   
+   
+   
+
+
+
