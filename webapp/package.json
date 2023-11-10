@@ -8,7 +8,7 @@
     "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.2.8",
     "@mui/styles": "^5.2.3",
-    "axios": "^0.24.0",
+    "axios": "^1.6.0",
     "clsx": "^1.1.1",
     "mobx-react": "^7.2.1",
     "notistack": "^2.0.3",
