@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Box, Divider, Stack, Tabs, Tab, Typography } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 
 import { observer } from "mobx-react-lite";
 
@@ -31,7 +31,7 @@ const ProfilePage = observer(() => {
   }, [store]);
 
   return (
-    <Stack direction="column">
+    <Stack direction="column" sx={{ width: "100%" }}>
       <Typography variant="h6" sx={{ paddingTop: "32px" }}>
         Recent activity
       </Typography>
