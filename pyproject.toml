@@ -13,7 +13,7 @@ repository = "https://github.com/Tastyep/Pi-OpenCast"
 keywords = ['raspberry', 'opencast', 'chromecast']
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 "hurry.filesize" = "^0.9"
 transitions = "^0.8.6"
 structlog = "^20.2.0"
