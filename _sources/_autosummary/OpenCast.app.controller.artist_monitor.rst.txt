@@ -1,0 +1,29 @@
+OpenCast.app.controller.artist\_monitor
+=======================================
+
+.. automodule:: OpenCast.app.controller.artist_monitor
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ArtistMonitController
+   
+   
+
+   
+   
+   
+
+
+

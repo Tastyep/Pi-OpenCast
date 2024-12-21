@@ -1,0 +1,32 @@
+OpenCast.app.notification
+=========================
+
+.. automodule:: OpenCast.app.notification
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Level
+      Notification
+      NotificationBase
+      WSResponse
+   
+   
+
+   
+   
+   
+
+
+

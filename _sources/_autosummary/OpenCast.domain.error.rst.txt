@@ -1,0 +1,29 @@
+OpenCast.domain.error
+=====================
+
+.. automodule:: OpenCast.domain.error
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      DomainError
+   
+   
+
+
+

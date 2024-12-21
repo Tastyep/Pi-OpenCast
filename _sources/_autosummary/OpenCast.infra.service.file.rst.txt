@@ -1,0 +1,29 @@
+OpenCast.infra.service.file
+===========================
+
+.. automodule:: OpenCast.infra.service.file
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      FileService
+   
+   
+
+   
+   
+   
+
+
+

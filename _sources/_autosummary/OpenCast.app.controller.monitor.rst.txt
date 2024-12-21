@@ -1,0 +1,29 @@
+OpenCast.app.controller.monitor
+===============================
+
+.. automodule:: OpenCast.app.controller.monitor
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      MonitorController
+   
+   
+
+   
+   
+   
+
+
+

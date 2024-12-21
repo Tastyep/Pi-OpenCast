@@ -1,0 +1,29 @@
+OpenCast.infra.data.repo.player
+===============================
+
+.. automodule:: OpenCast.infra.data.repo.player
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PlayerRepo
+   
+   
+
+   
+   
+   
+
+
+

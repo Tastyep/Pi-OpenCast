@@ -1,0 +1,30 @@
+OpenCast.domain.model.playlist
+==============================
+
+.. automodule:: OpenCast.domain.model.playlist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Playlist
+      PlaylistSchema
+   
+   
+
+   
+   
+   
+
+
+

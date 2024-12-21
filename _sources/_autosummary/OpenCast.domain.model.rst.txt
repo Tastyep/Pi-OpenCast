@@ -1,0 +1,36 @@
+OpenCast.domain.model
+=====================
+
+.. automodule:: OpenCast.domain.model
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.domain.model.album
+   OpenCast.domain.model.artist
+   OpenCast.domain.model.entity
+   OpenCast.domain.model.player
+   OpenCast.domain.model.playlist
+   OpenCast.domain.model.video
+

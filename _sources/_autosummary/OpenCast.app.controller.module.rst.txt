@@ -1,0 +1,29 @@
+OpenCast.app.controller.module
+==============================
+
+.. automodule:: OpenCast.app.controller.module
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ControllerModule
+   
+   
+
+   
+   
+   
+
+
+

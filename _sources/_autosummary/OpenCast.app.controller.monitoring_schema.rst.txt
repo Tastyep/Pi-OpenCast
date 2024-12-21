@@ -1,0 +1,38 @@
+OpenCast.app.controller.monitoring\_schema
+==========================================
+
+.. automodule:: OpenCast.app.controller.monitoring_schema
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      schema
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ErrorSchema
+      VideoDownloadOptions
+      VideoOptions
+      Videos
+   
+   
+
+   
+   
+   
+
+
+

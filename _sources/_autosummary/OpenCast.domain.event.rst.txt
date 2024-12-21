@@ -1,0 +1,37 @@
+OpenCast.domain.event
+=====================
+
+.. automodule:: OpenCast.domain.event
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.domain.event.album
+   OpenCast.domain.event.artist
+   OpenCast.domain.event.dispatcher
+   OpenCast.domain.event.event
+   OpenCast.domain.event.player
+   OpenCast.domain.event.playlist
+   OpenCast.domain.event.video
+

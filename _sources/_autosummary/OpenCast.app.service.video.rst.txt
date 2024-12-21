@@ -1,0 +1,29 @@
+OpenCast.app.service.video
+==========================
+
+.. automodule:: OpenCast.app.service.video
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      VideoService
+   
+   
+
+   
+   
+   
+
+
+

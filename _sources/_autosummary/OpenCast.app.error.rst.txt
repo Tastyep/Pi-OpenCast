@@ -1,0 +1,29 @@
+OpenCast.app.error
+==================
+
+.. automodule:: OpenCast.app.error
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      CommandFailure
+   
+   
+
+
+

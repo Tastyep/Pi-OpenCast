@@ -1,0 +1,38 @@
+OpenCast.app
+============
+
+.. automodule:: OpenCast.app
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.app.command
+   OpenCast.app.controller
+   OpenCast.app.error
+   OpenCast.app.facade
+   OpenCast.app.notification
+   OpenCast.app.service
+   OpenCast.app.tool
+   OpenCast.app.workflow
+

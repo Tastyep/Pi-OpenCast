@@ -1,0 +1,36 @@
+OpenCast.app.command.player
+===========================
+
+.. automodule:: OpenCast.app.command.player
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CreatePlayer
+      PlayVideo
+      SeekVideo
+      StopPlayer
+      TogglePlayerState
+      ToggleSubtitle
+      UpdateSubtitleDelay
+      UpdateVolume
+   
+   
+
+   
+   
+   
+
+
+

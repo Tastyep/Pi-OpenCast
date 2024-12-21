@@ -1,0 +1,33 @@
+OpenCast.app.command.playlist
+=============================
+
+.. automodule:: OpenCast.app.command.playlist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CreatePlaylist
+      DeletePlaylist
+      QueueVideo
+      RenamePlaylist
+      UpdatePlaylistContent
+   
+   
+
+   
+   
+   
+
+
+

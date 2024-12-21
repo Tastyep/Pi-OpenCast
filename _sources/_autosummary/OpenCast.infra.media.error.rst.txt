@@ -1,0 +1,30 @@
+OpenCast.infra.media.error
+==========================
+
+.. automodule:: OpenCast.infra.media.error
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      PlayerError
+      VideoParsingError
+   
+   
+
+
+

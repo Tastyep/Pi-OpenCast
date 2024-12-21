@@ -1,0 +1,29 @@
+OpenCast.app.controller.album\_monitor
+======================================
+
+.. automodule:: OpenCast.app.controller.album_monitor
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AlbumMonitController
+   
+   
+
+   
+   
+   
+
+
+

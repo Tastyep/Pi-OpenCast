@@ -1,0 +1,32 @@
+OpenCast.app.workflow.player
+============================
+
+.. automodule:: OpenCast.app.workflow.player
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      QueuePlaylistWorkflow
+      QueueVideoWorkflow
+      StreamPlaylistWorkflow
+      StreamVideoWorkflow
+   
+   
+
+   
+   
+   
+
+
+

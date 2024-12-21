@@ -1,0 +1,29 @@
+OpenCast.domain.service.subtitle
+================================
+
+.. automodule:: OpenCast.domain.service.subtitle
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SubtitleService
+   
+   
+
+   
+   
+   
+
+
+

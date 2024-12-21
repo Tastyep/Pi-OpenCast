@@ -1,0 +1,29 @@
+OpenCast.infra.data.repo.error
+==============================
+
+.. automodule:: OpenCast.infra.data.repo.error
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      RepoError
+   
+   
+
+
+

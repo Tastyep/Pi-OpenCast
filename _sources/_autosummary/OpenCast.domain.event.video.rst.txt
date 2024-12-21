@@ -1,0 +1,34 @@
+OpenCast.domain.event.video
+===========================
+
+.. automodule:: OpenCast.domain.event.video
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      VideoCreated
+      VideoDeleted
+      VideoParsed
+      VideoRetrieved
+      VideoStateUpdated
+      VideoSubtitleFetched
+   
+   
+
+   
+   
+   
+
+
+

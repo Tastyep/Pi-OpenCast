@@ -1,0 +1,29 @@
+OpenCast.app.service.album
+==========================
+
+.. automodule:: OpenCast.app.service.album
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AlbumService
+   
+   
+
+   
+   
+   
+
+
+

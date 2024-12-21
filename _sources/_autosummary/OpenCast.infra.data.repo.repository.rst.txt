@@ -1,0 +1,29 @@
+OpenCast.infra.data.repo.repository
+===================================
+
+.. automodule:: OpenCast.infra.data.repo.repository
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Repository
+   
+   
+
+   
+   
+   
+
+
+

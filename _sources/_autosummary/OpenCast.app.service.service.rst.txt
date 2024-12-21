@@ -1,0 +1,29 @@
+OpenCast.app.service.service
+============================
+
+.. automodule:: OpenCast.app.service.service
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Service
+   
+   
+
+   
+   
+   
+
+
+

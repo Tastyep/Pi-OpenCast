@@ -1,0 +1,29 @@
+OpenCast.app.service.artist
+===========================
+
+.. automodule:: OpenCast.app.service.artist
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ArtistService
+   
+   
+
+   
+   
+   
+
+
+

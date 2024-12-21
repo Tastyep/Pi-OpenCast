@@ -1,0 +1,43 @@
+OpenCast.app.command
+====================
+
+.. automodule:: OpenCast.app.command
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      make_cmd
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   OpenCast.app.command.album
+   OpenCast.app.command.artist
+   OpenCast.app.command.command
+   OpenCast.app.command.dispatcher
+   OpenCast.app.command.player
+   OpenCast.app.command.playlist
+   OpenCast.app.command.video
+
