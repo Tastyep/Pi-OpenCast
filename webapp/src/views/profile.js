@@ -35,7 +35,7 @@ const ProfilePage = observer(() => {
       <Typography variant="h6" sx={{ paddingTop: "32px" }}>
         Recent activity
       </Typography>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", overflow: "auto" }}>
         <VideoList videos={listLastPlayedVideos(store.videos)} count={10} />
       </Box>
       <Divider
@@ -44,7 +44,7 @@ const ProfilePage = observer(() => {
         }}
       />
       <Typography variant="h6">Most played</Typography>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", overflow: "auto" }}>
         <VideoList videos={listPopularVideos(store.videos)} count={10} />
       </Box>
     </Stack>

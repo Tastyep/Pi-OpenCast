@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { IconButton, List, Stack, Typography } from "@mui/material";
+import { Button, IconButton, List, Stack, Typography } from "@mui/material";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -12,6 +12,8 @@ import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import AlbumIcon from "@mui/icons-material/Album";
+
+import FilterButtonGroup from "components/filter_button_group";
 
 import { styled } from "@mui/material/styles";
 
@@ -276,6 +278,9 @@ const AlbumItem = ({ album, isSmallDevice }) => {
 const AlbumsPage = observer(() => {
   const store = useAppStore();
   const albums = Object.values(store.albums);
+
+  const [filterPattern, setFilterPattern] = useState("All");
+
   const isSmallDevice = useMediaQuery({
     maxWidth: SIZES.small.max,
   });
@@ -284,28 +289,55 @@ const AlbumsPage = observer(() => {
     return null;
   }
 
-  albums.sort((a, b) => {
+  console.log(filterPattern);
+  const filteredAlbums = albums.filter((album) => {
+    return filterPattern === "All"
+      ? true
+      : album.name.startsWith(filterPattern);
+  });
+  filteredAlbums.sort((a, b) => {
     return a.name.localeCompare(b.name);
   });
   return (
-    <List
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: "8px",
-        alignContent: "baseline",
-        overflow: "auto",
-      }}
+    <Stack
+      direction="column"
+      alignItems="flex-start"
+      sx={{ flex: 1, maxWidth: "100%" }}
     >
-      {albums.map((album, _) => (
-        <AlbumItem
-          key={album.name}
-          album={album}
-          isSmallDevice={isSmallDevice}
-        />
-      ))}
-    </List>
+      <FilterButtonGroup
+        collection={albums}
+        clickHandle={setFilterPattern}
+        selectedButtonValue={filterPattern}
+        categoryFactory={(item) => item.name[0]}
+        sx={{
+          marginTop: "8px",
+          maxWidth: "100%",
+          overflowX: "auto",
+          minHeight: "32px",
+        }}
+      >
+        <Button value="All">All</Button>
+      </FilterButtonGroup>
+      <List
+        sx={{
+          display: "flex",
+          width: "100%",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "8px",
+          alignContent: "baseline",
+          overflow: "auto",
+        }}
+      >
+        {filteredAlbums.map((album, _) => (
+          <AlbumItem
+            key={album.name}
+            album={album}
+            isSmallDevice={isSmallDevice}
+          />
+        ))}
+      </List>
+    </Stack>
   );
 });
 

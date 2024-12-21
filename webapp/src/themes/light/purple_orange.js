@@ -64,6 +64,12 @@ const purpleOrangeTheme = {
       main: mixColor("#FFFFFF", primary.main, 0.1),
     },
 
+    // secondary: {
+    //   main: "#F9AA33",
+    //   light: "#F9B043",
+    //   dark: "#D08006",
+    // },
+
     secondary: {
       main: "#F9AA33",
       light: "#F9B043",
