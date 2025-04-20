@@ -16,6 +16,7 @@ source "$ROOT/script/env.sh"
 
 install() {
   (cd "$ROOT" && poetry install)
+  (cd "$ROOT" && poetry update yt-dlp)
   (cd "$ROOT/webapp" && npm install)
 }
 
