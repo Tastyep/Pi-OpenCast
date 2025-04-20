@@ -30,7 +30,7 @@ dynaconf = "^3.1.2"
 yt-dlp = "*" # Always get the latest available 
 MarkupSafe = "2.0.1"
 
-[tool.poetry.dev-dependencies]
+[poetry.group.dev.dependencies]
 pytest = "^6.2"
 pytest-cov = "^2.11"
 sphinx_rtd_theme = "^0.5.1"
