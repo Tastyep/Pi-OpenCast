@@ -1,16 +1,27 @@
-[tool.poetry]
+[project]
 name = "Opencast"
-version = "1.4.4"
+dynamic = [ "version", "dependencies" ]
 description = "A client-server media player that transforms your Raspberry Pi into an awesome streaming device"
-authors = [
-"Luc Sinet <luc.sinet@gmail.com>"
-]
 license = "MIT"
+readme = 'README.md'
 
-readme = 'README.md'  # Markdown files are supported
+requires-python = ">=3.9"
 
+authors = [
+  { name = "Luc Sinet", email="<luc.sinet@gmail.com>" },
+]
+maintainers = [
+  { name = "Luc Sinet", email="<luc.sinet@gmail.com>" },
+]
 repository = "https://github.com/Tastyep/Pi-OpenCast"
 keywords = ['raspberry', 'opencast', 'chromecast']
+
+[project.scripts]
+my-script = 'OpenCast:main'
+
+[tool.poetry]
+version = "1.4.4"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -44,9 +55,6 @@ isort = "^5.10.1"
 coverage = "^5.4"
 sphinxemoji = "^0.1.8"
 black = "^22.3.0"
-
-[tool.poetry.scripts]
-my-script = 'OpenCast:main'
 
 [tool.isort]
 profile = "black"
