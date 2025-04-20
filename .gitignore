@@ -8,6 +8,9 @@
 # node modules
 webapp/node_modules
 
+# python dependencies
+.venv/
+
 # logging directory
 /log/
 
