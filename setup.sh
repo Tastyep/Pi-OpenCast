@@ -92,7 +92,8 @@ start_at_boot() {
   service_name="${INTERNAL_NAME,,}"
   config="$TEMPLATE_DIR/$service_name.service"
   mkdir -p "$HOME/$SYSTEMD_CONFIG_DIR"
-  sed "s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g
+  sed "s#{ MANAGEMENT_SCRIPT }#$ROOT/$INTERNAL_NAME.sh#g
+       s#{ START_COMMAND }#$ROOT/$INTERNAL_NAME.sh service start#g
        s#{ STOP_COMMAND }#$ROOT/$INTERNAL_NAME.sh service stop#g" -- "$config" |
     tee "$HOME/$SYSTEMD_CONFIG_DIR/$service_name.service" >/dev/null
   systemctl --user daemon-reload

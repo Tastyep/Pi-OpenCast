@@ -8,6 +8,11 @@ KillMode=control-group
 RemainAfterExit=true
 TimeoutStartSec=infinity
 TimeoutStopSec=infinity
+# Wait until the service becomes available.
+# This is necessary when you have OpenCast running on a drive that mounts on startup.
+# Example: OverlayFs is running on the read-only main drive. OpenCast is located on a USB stick.
+# NOTE: Adding After=<storage-name>.mounts did not fix the issue.
+ExecStartPre=/bin/bash -c 'while [ ! -f { MANAGEMENT_SCRIPT } ]; do echo "Waiting for OpenCast to become available"; sleep 2; done;'
 ExecStart={ START_COMMAND }
 ExecStop={ STOP_COMMAND }
 
