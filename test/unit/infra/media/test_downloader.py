@@ -106,7 +106,8 @@ class DownloaderTest(TestCase):
         self.cache = Mock()
         self.cache.get.return_value = None
         self.dispatcher = Mock()
-        self.downloader = Downloader(self.executor, self.cache, self.dispatcher)
+        self.downloader = Downloader(
+            self.executor, self.cache, self.dispatcher)
 
     @patch("OpenCast.infra.media.downloader.Path")
     def test_download_video(self, path_cls):
@@ -116,9 +117,11 @@ class DownloaderTest(TestCase):
         op_id = IdentityService.random()
         video_id = IdentityService.id_video("url")
         video_path = "/tmp/media.mp4"
-        self.downloader.download_video(op_id, video_id, "url", video_path, Options())
+        self.downloader.download_video(
+            op_id, video_id, "url", video_path, Options())
 
-        self.dispatcher.dispatch.assert_called_with(DownloadSuccess(op_id, video_path))
+        self.dispatcher.dispatch.assert_called_with(
+            DownloadSuccess(op_id, video_path))
 
     def test_download_video_error(self):
         self.ydl.download.side_effect = RuntimeError("error")
@@ -129,7 +132,8 @@ class DownloaderTest(TestCase):
             op_id, video_id, "url", "/tmp/media.mp4", Options()
         )
 
-        self.dispatcher.dispatch.assert_called_with(DownloadError(op_id, "error"))
+        self.dispatcher.dispatch.assert_called_with(
+            DownloadError(op_id, "error"))
 
     @patch("OpenCast.infra.media.downloader.Path")
     def test_download_video_missing(self, path_cls):
@@ -187,11 +191,11 @@ class DownloaderTest(TestCase):
         metadata = {"url": "url", "title": "title"}
         self.ydl.extract_info.return_value = metadata
         self.assertEqual(
-            metadata, self.downloader.download_metadata("url", process_ie_data=True)
+            metadata, self.downloader.download_metadata("url")
         )
 
     def test_download_metadata_error(self):
         self.ydl.extract_info.side_effect = RuntimeError()
         self.assertEqual(
-            None, self.downloader.download_metadata("url", process_ie_data=True)
+            None, self.downloader.download_metadata("url")
         )

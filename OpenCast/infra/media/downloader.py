@@ -180,9 +180,9 @@ class Downloader:
                     )
         return None
 
-    def download_metadata(self, url: str, process_ie_data: bool):
+    def download_metadata(self, url: str):
         self._cache.clean()
-        cache_key = f"{url}{process_ie_data}"
+        cache_key = f"{url}"
         cached_data = self._cache.get(cache_key)
 
         self._logger.debug(
@@ -191,10 +191,12 @@ class Downloader:
         if cached_data:
             return cached_data
 
+        # https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py
         options = {
             # Allow getting the _type value set to URL when passing a playlist entry
             "noplaylist": True,
-            "extract_flat": False,
+            # Do not download recursively for sub-entries
+            "extract_flat": True,
             # Causes ydl to return None on error
             "ignoreerrors": True,
             "quiet": True,
@@ -204,10 +206,11 @@ class Downloader:
         with ydl:
             try:
                 metadata = ydl.extract_info(
-                    url, download=False, process=process_ie_data
+                    url, download=False, process=True
                 )
                 self._cache.register(cache_key, metadata)
                 return metadata
             except Exception as e:
-                self._logger.error("Downloading metadata error", url=url, error=e)
+                self._logger.error(
+                    "Downloading metadata error", url=url, error=e)
         return None

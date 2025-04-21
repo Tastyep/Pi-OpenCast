@@ -86,7 +86,7 @@ def main(argv=None):
 
     io_factory = IoFactory()
     downloader_executor = ThreadPoolExecutor(settings["downloader.max_concurrency"])
-    media_cache = TimeBasedCache(max_duration=timedelta(minutes=2))
+    media_cache = TimeBasedCache(max_duration=timedelta(minutes=5))
     media_factory = MediaFactory(VlcInstance(), downloader_executor, media_cache)
     player = media_factory.make_player(app_facade.evt_dispatcher)
     infra_facade = InfraFacade(io_factory, media_factory, infra_service_factory, player)

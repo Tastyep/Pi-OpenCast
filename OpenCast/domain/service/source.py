@@ -18,7 +18,7 @@ class SourceService:
         }
 
     def is_playlist(self, source: str) -> bool:
-        data = self._downloader.download_metadata(source, process_ie_data=False)
+        data = self._downloader.download_metadata(source)
         if data is None:
             return False
 
@@ -26,19 +26,19 @@ class SourceService:
 
     def unfold(self, source: str) -> List[str]:
         self._logger.info("Unfolding playlist", url=source)
-        data = self._downloader.download_metadata(source, process_ie_data=True)
+        data = self._downloader.download_metadata(source)
         if data is None:
             return []
 
         entries = data.get("entries", [])
         return [
-            entry["webpage_url"]
+            entry["url"]
             for entry in entries
-            if entry and "webpage_url" in entry
+            if entry and "url" in entry and entry["_type"] == "url"
         ]
 
     def pick_stream_metadata(self, source: str) -> Optional[dict]:
-        data = self._downloader.download_metadata(source, process_ie_data=True)
+        data = self._downloader.download_metadata(source)
         if data is None:
             return None
 
@@ -66,7 +66,7 @@ class SourceService:
         return metadata
 
     def fetch_stream_link(self, source: str) -> Optional[str]:
-        data = self._downloader.download_metadata(source, process_ie_data=True)
+        data = self._downloader.download_metadata(source)
         if data is None:
             return None
 
