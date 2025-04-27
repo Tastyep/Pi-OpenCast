@@ -1,161 +1,164 @@
-import React, { useState } from "react";
-
-import { useTheme } from "@mui/material/styles";
-
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import InputBase from "@mui/material/InputBase";
-import IconButton from "@mui/material/IconButton";
-import Stack from "@mui/material/Stack";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import RadioGroup from "@mui/material/RadioGroup";
-
+import React, { useState } from 'react';
 import {
+  Box,
+  Stack,
+  IconButton,
+  InputBase,
   Popover,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  Switch,
+  FormControlLabel,
+  Divider,
+  RadioGroup,
   Radio,
+  Button,
 } from '@mui/material';
 
-import SendIcon from "@mui/icons-material/Send";
-import MenuIcon from "@mui/icons-material/Menu";
+import SendIcon from '@mui/icons-material/Send';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import AudiotrackIcon from '@mui/icons-material/Audiotrack';
 
-import playerAPI from "services/api/player";
-import snackBarHandler from "services/api/error";
-import { mixColor } from "services/color";
+import { useTheme } from '@mui/material/styles';
 
 import { useAppStore } from "providers/app_context";
+import { mixColor } from "services/color";
+import playerAPI from "services/api/player";
+import snackBarHandler from "services/api/error";
 
-const StreamInput = (props) => {
-  const { sx } = props;
 
+const StreamInput = ({ sx }) => {
   const store = useAppStore();
+  const theme = useTheme();
+  const inputBackground = mixColor(theme.palette.primary.dark, '#FFFFFF', 0.18);
 
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState('');
   const [optionsAnchor, setOptionsAnchor] = useState(null);
-  const [audioOnlyOpt, setAudioOnlyOpt] = useState(false);
-  const [action, setAction] = useState('play');
-  const [subtitleDlOpt, setSubtitleDlOpt] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
+  const [downloadMode, setDownloadMode] = useState('video'); // 'video' | 'audio'
+  const [subtitleDlOpt, setSubtitleDlOpt] = useState(false);
+  const [action, setAction] = useState('play'); // 'play' | 'queue'
 
   const openOptions = (e) => {
     setOptionsAnchor(e.currentTarget);
     setExpanded(true);
   };
 
-  const closeOptions = (e) => {
+  const closeOptions = () => {
     setOptionsAnchor(null);
     setExpanded(false);
   };
 
-  const applyOptions = () => {
-    // use mode & action when downloading/submitting
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!url) return;
+
+    const dl_opts = {
+      download_video: downloadMode === 'video',
+      download_subtitles: subtitleDlOpt,
+    };
+
+    const apiCall =
+      action === 'play'
+        ? playerAPI.streamMedia(url, { dl_opts })
+        : playerAPI.queueMedia(url, { dl_opts });
+
+    apiCall.catch(snackBarHandler(store));
     closeOptions();
+    setUrl('');
   };
-
-  const handleSubmit = (event) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    if (url === "") {
-      return;
-    }
-
-    if (action === "play") {
-      playerAPI
-        .streamMedia(url, {
-          dl_opts: {
-            download_video: !audioOnlyOpt,
-            download_subtitles: subtitleDlOpt,
-          },
-        })
-        .catch(snackBarHandler(store));
-    } else {
-      playerAPI
-        .queueMedia(url, {
-          dl_opts: {
-            download_video: !audioOnlyOpt,
-            download_subtitles: subtitleDlOpt,
-          },
-        })
-        .catch(snackBarHandler(store));
-    }
-
-    closeOptions();
-    setUrl("");
-  };
-
-  const setDownloadedChannels = (value) => {
-    if (!value) {
-      return;
-    }
-
-    setAudioOnlyOpt(value === "audio");
-    console.log("audioOnly:", audioOnlyOpt)
-    // TODO: add real support for downloading subtitles.
-    // Add a button for enabling subtitle downloading.
-    // Add another one for downloading subtitles after downloading a video
-    // setSubtitleDlOpt(value !== "audio");
-  };
-
-  const updateBlur = (evt) => {
-    if (evt.key === "Enter") {
-      evt.target.blur();
-    }
-  };
-
-  const theme = useTheme();
-  const inputBackground = mixColor(theme.palette.primary.dark, "#FFFFFF", 0.18);
 
   return (
     <Box sx={sx}>
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
-        <Stack direction="row">
-          <IconButton color="inherit" onClick={openOptions}>
-            <MenuIcon />
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {/* Options button shows current mode */}
+          <IconButton
+            color="inherit"
+            aria-label="Options"
+            onClick={openOptions}
+          >
+            {downloadMode === 'audio' ? (
+              <AudiotrackIcon />
+            ) : (
+              <VideocamIcon />
+            )}
           </IconButton>
 
+          {/* URL input */}
           <InputBase
             fullWidth
             placeholder="Media's URL"
             value={url}
+            onChange={(e) => setUrl(e.target.value)}
             sx={{
               color: theme.palette.primary.contrastText,
               backgroundColor: inputBackground,
-              borderRadius: "16px",
-              margin: "0px 8px",
-              padding: "0px 16px",
+              borderRadius: '16px',
+              mx: 1,
+              px: 2,
+              py: 0.5,
             }}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyPress={updateBlur}
           />
 
-          <IconButton color="inherit" onClick={handleSubmit}>
-            <SendIcon sx={{ fontSize: "20px" }} />
+          {/* Submit */}
+          <IconButton color="inherit" type="submit">
+            <SendIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Stack>
       </form>
+
+      {/* Popover for all options */}
       <Popover
         open={expanded}
         anchorEl={optionsAnchor}
         onClose={closeOptions}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
-        <Stack spacing={2} p={2} sx={{ width: 240 }}>
-          {/* Download Mode */}
+        <Box sx={{ width: 260, p: 2 }}>
+          {/* Download Settings */}
+          <Typography variant="subtitle2" gutterBottom>
+            Download Settings
+          </Typography>
           <ToggleButtonGroup
-            value={audioOnlyOpt ? "audio" : "video"}
+            value={downloadMode}
             exclusive
-            onChange={(_, val) => val && setDownloadedChannels(val)}
-            aria-label="download mode"
+            fullWidth
+            size="small"
+            onChange={(_, val) => val && setDownloadMode(val)}
+            sx={{ mb: 2 }}
+            aria-label="Download Mode"
           >
-            <ToggleButton value="video">Video</ToggleButton>
-            <ToggleButton value="audio">Audio</ToggleButton>
+            <ToggleButton value="video" aria-label="Download video">
+              <VideocamIcon fontSize="small" sx={{ mr: 0.5 }} /> Video
+            </ToggleButton>
+            <ToggleButton value="audio" aria-label="Download audio only">
+              <AudiotrackIcon fontSize="small" sx={{ mr: 0.5 }} /> Audio
+            </ToggleButton>
           </ToggleButtonGroup>
 
-          {/* Playback Action */}
+          {/* Subtitle Option */}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={subtitleDlOpt}
+                onChange={(e) => setSubtitleDlOpt(e.target.checked)}
+                size="small"
+              />
+            }
+            label="Download Subtitles"
+            sx={{ mb: 2 }}
+          />
+
+          {/* Divider */}
+          <Divider sx={{ my: 1 }} />
+
+          {/* Playback Settings */}
+          <Typography variant="subtitle2" gutterBottom>
+            Playback Settings
+          </Typography>
           <RadioGroup
             value={action}
             onChange={(e) => setAction(e.target.value)}
@@ -172,10 +175,13 @@ const StreamInput = (props) => {
             />
           </RadioGroup>
 
-          <Button variant="contained" onClick={applyOptions}>
-            Apply
-          </Button>
-        </Stack>
+          {/* Done button */}
+          <Box textAlign="right" mt={2}>
+            <Button size="small" onClick={closeOptions}>
+              Done
+            </Button>
+          </Box>
+        </Box>
       </Popover>
     </Box>
   );
