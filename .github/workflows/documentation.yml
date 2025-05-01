@@ -11,16 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      #
+
       - uses: actions/setup-python@v2
         with:
           python-version: "3.8"
+      
+      - name: Install pipx
+        run: sudo apt install -y pipx
+      
       - name: Install dependencies
         run: ./setup.sh --ci
-      #
+
       - name: Generate documentation
         run: ./OpenCast.sh build doc
-      #
+
       - name: Deploy to GitHub Pages
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
