@@ -64,7 +64,10 @@ install_project_deps() {
   log_info "Installing project dependencies..."
 
   pipx install poetry
-  "$ROOT/$INTERNAL_NAME.sh" deps install
+
+  args=""
+  [[ -z "${ARGS["--ci"]}" ]] && args="--dev"
+  "$ROOT/$INTERNAL_NAME.sh" deps install $args
 }
 
 build_service() {

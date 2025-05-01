@@ -15,7 +15,10 @@ source "$ROOT/script/cli_builder.sh"
 source "$ROOT/script/env.sh"
 
 install() {
-  (cd "$ROOT" && poetry install)
+  args=""
+  [[ -z "${ARGS["--dev"]}" ]] && args="--with dev"
+
+  (cd "$ROOT" && poetry install $args -vvv)
   (cd "$ROOT" && poetry update yt-dlp)
   (cd "$ROOT/webapp" && npm install)
 }
