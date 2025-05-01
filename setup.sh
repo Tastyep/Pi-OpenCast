@@ -21,7 +21,7 @@ source "$ROOT/script/logging.sh"
 # Install system dependencies.
 check_system_deps() {
   log_info "Checking system dependencies..."
-  local -a deps=("curl" "lsof" "python" "python3" "pip3" "npm" "node")
+  local -a deps=("curl" "lsof" "python" "python3" "pip3" "npm" "node" "pipx")
   local status fail
   # Set flags to false  by default
   [[ -z "${ARGS["--ci"]}" ]] && deps+=("ffmpeg" "vlc")
@@ -63,7 +63,7 @@ install_nvm() {
 install_project_deps() {
   log_info "Installing project dependencies..."
 
-  curl -sSL https://install.python-poetry.org | python3 -
+  pipx install poetry
   "$ROOT/$INTERNAL_NAME.sh" deps install
 }
 
