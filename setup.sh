@@ -65,9 +65,9 @@ install_project_deps() {
 
   pipx install poetry
 
-  args=""
-  [[ -z "${ARGS["--ci"]}" ]] && args="--dev"
-  "$ROOT/$INTERNAL_NAME.sh" deps install $args
+  installArgs=""
+  [[ -z "${ARGS["--ci"]}" ]] && installArgs="--dev"
+  "$ROOT/$INTERNAL_NAME.sh" deps install "$installArgs"
 }
 
 build_service() {
